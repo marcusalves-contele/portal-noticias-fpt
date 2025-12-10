@@ -1,7 +1,8 @@
 import { ReferralFormData, WebhookResponse } from '../types';
 
-// Placeholder URL - In production this should be an env variable
-const N8N_WEBHOOK_URL = 'https://primary-production-2349.up.railway.app/webhook/referral-submission'; 
+// Webhook URL from env var (VITE_ prefix required for Vite to expose to client)
+const N8N_WEBHOOK_URL = import.meta.env.VITE_N8N_WEBHOOK_URL ||
+  'https://primary-production-2349.up.railway.app/webhook/referral-submission'; 
 
 export const submitReferral = async (data: ReferralFormData): Promise<WebhookResponse> => {
   try {
