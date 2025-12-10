@@ -2,17 +2,18 @@
   "name": "contele-referral-page",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server.js"
+    "start": "serve dist -s -l $PORT"
   },
   "dependencies": {
     "react": "^19.2.1",
     "lucide-react": "^0.557.0",
     "react-dom": "^19.2.1",
-    "express": "^4.18.2"
+    "serve": "^14.2.4"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
