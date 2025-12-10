@@ -81,6 +81,12 @@ VITE_N8N_WEBHOOK_URL=https://primary-production-2349.up.railway.app/webhook/refe
 
 ## Deployment (Railway)
 
+### URLs
+| Ambiente | URL |
+|----------|-----|
+| **Produção** | https://growth-production-8ca9.up.railway.app |
+| **Domínio futuro** | https://indique.contele.io (pendente config Cloudflare) |
+
 ### Configuração no Dashboard
 1. New Project → Deploy from GitHub repo
 2. **Root Directory**: `contele-referral-page`
