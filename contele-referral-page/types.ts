@@ -13,6 +13,13 @@ export interface ReferralFormData {
   referrerName: string;
   referrerPhone: string;
   referrerPixKey: string;
+
+  // UTM Parameters
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  utmTerm?: string;
+  utmContent?: string;
 }
 
 export interface WebhookResponse {

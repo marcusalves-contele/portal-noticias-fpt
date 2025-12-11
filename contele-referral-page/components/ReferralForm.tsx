@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ProductType, ReferralFormData } from '../types';
 import { submitReferral } from '../services/webhookService';
 import { CheckCircle2, AlertCircle, Send, Loader2, DollarSign, Smartphone, User, KeyRound } from 'lucide-react';
@@ -15,6 +15,28 @@ const ReferralForm: React.FC = () => {
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Capture UTM parameters from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const utmUpdates: Partial<ReferralFormData> = {};
+    
+    const source = params.get('utm_source');
+    const medium = params.get('utm_medium');
+    const campaign = params.get('utm_campaign');
+    const term = params.get('utm_term');
+    const content = params.get('utm_content');
+
+    if (source) utmUpdates.utmSource = source;
+    if (medium) utmUpdates.utmMedium = medium;
+    if (campaign) utmUpdates.utmCampaign = campaign;
+    if (term) utmUpdates.utmTerm = term;
+    if (content) utmUpdates.utmContent = content;
+
+    if (Object.keys(utmUpdates).length > 0) {
+      setFormData(prev => ({ ...prev, ...utmUpdates }));
+    }
+  }, []);
 
   // Simple mask for Brazilian phone numbers (XX) XXXXX-XXXX
   const formatPhone = (value: string) => {
@@ -68,6 +90,13 @@ const ReferralForm: React.FC = () => {
         </p>
         <button 
           onClick={() => {
+            
+            // Keep referrer info and UTMs for convenience when referring someone else
+            setFormData(prev => ({ 
+              ...prev, 
+              leadName: '', 
+              leadPhone: '' 
+            })); 
             setFormData({ ...formData, leadName: '', leadPhone: '' }); // Keep referrer info for convenience
             setStatus('idle');
           }}
