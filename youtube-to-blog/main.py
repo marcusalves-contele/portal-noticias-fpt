@@ -128,10 +128,8 @@ def format_duration(duration_iso: str) -> str:
 
 def get_transcript(video_id: str) -> str:
     """Busca transcricao do video"""
-    api = YouTubeTranscriptApi()
-    result = api.fetch(video_id, languages=['pt', 'pt-BR'])
-    segments = list(result)
-    return " ".join([s.text for s in segments])
+    transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['pt', 'pt-BR'])
+    return " ".join([segment['text'] for segment in transcript])
 
 
 def get_video_metadata(video_id: str) -> dict:
