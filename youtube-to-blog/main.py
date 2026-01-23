@@ -16,7 +16,7 @@ from typing import Optional
 from datetime import datetime
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from pydantic import BaseModel, Field
 from PIL import Image
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -80,16 +80,127 @@ class GenerateResponse(BaseModel):
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    return {
-        "service": "YouTube to Blog API",
-        "version": "1.0.0",
-        "endpoints": {
-            "POST /generate": "Gera post a partir de video YouTube",
-            "GET /health": "Health check"
-        }
-    }
+    return """<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube to Blog</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+               max-width: 600px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+        h1 { color: #333; margin-bottom: 5px; }
+        .subtitle { color: #666; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; color: #333; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd;
+                                   border-radius: 6px; font-size: 16px; }
+        textarea { min-height: 100px; resize: vertical; }
+        button { width: 100%; padding: 14px; background: #2563eb; color: white;
+                 border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+        button:hover { background: #1d4ed8; }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        .result { margin-top: 20px; padding: 20px; background: white; border-radius: 6px;
+                  border: 1px solid #ddd; display: none; }
+        .result.success { border-color: #22c55e; }
+        .result.error { border-color: #ef4444; }
+        .result h3 { margin-top: 0; }
+        .result a { color: #2563eb; }
+        .spinner { display: none; }
+        .loading .spinner { display: inline-block; margin-left: 10px; }
+        .loading button span { display: none; }
+        .note { font-size: 13px; color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <h1>YouTube to Blog</h1>
+    <p class="subtitle">Transforma videos em posts de blog</p>
+
+    <form id="form">
+        <div class="form-group">
+            <label for="video_id">URL ou ID do Video</label>
+            <input type="text" id="video_id" placeholder="https://youtube.com/watch?v=... ou ID" required>
+        </div>
+
+        <div class="form-group">
+            <label for="blog">Blog Destino</label>
+            <select id="blog" required>
+                <option value="fleet">Fleet (blog.contelerastreador.com.br)</option>
+                <option value="teams">Teams (blog.conteleteams.com.br)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="transcript">Transcricao (opcional)</label>
+            <textarea id="transcript" placeholder="Cole a transcricao aqui se o auto-fetch falhar..."></textarea>
+            <p class="note">Deixe vazio para buscar automaticamente. Use se der erro de IP bloqueado.</p>
+        </div>
+
+        <button type="submit" id="btn">
+            <span>Gerar Post</span>
+            <span class="spinner">Gerando...</span>
+        </button>
+    </form>
+
+    <div id="result" class="result"></div>
+
+    <script>
+        const form = document.getElementById('form');
+        const btn = document.getElementById('btn');
+        const result = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            btn.disabled = true;
+            btn.classList.add('loading');
+            result.style.display = 'none';
+
+            const data = {
+                video_id: document.getElementById('video_id').value,
+                blog: document.getElementById('blog').value
+            };
+            const transcript = document.getElementById('transcript').value.trim();
+            if (transcript) data.transcript = transcript;
+
+            try {
+                const res = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const json = await res.json();
+
+                result.style.display = 'block';
+                if (json.status === 'success') {
+                    result.className = 'result success';
+                    result.innerHTML = `
+                        <h3>Post Criado!</h3>
+                        <p><strong>Titulo:</strong> ${json.title}</p>
+                        <p><strong>URL:</strong> <a href="${json.post_url}" target="_blank">${json.post_url}</a></p>
+                        <p><strong>Editar:</strong> <a href="${json.edit_url}" target="_blank">WordPress Admin</a></p>
+                        <hr style="margin: 15px 0; border: none; border-top: 1px solid #eee;">
+                        <p><strong>Texto WhatsApp:</strong></p>
+                        <pre style="background:#f5f5f5;padding:10px;border-radius:4px;white-space:pre-wrap;font-size:14px;">${json.whatsapp_text || ''}</pre>
+                    `;
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = `<h3>Erro</h3><p>${json.error}</p>`;
+                }
+            } catch (err) {
+                result.style.display = 'block';
+                result.className = 'result error';
+                result.innerHTML = `<h3>Erro</h3><p>${err.message}</p>`;
+            }
+
+            btn.disabled = false;
+            btn.classList.remove('loading');
+        });
+    </script>
+</body>
+</html>"""
 
 # =============================================================================
 # HELPER FUNCTIONS
