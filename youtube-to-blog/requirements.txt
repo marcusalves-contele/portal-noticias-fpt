@@ -3,5 +3,5 @@ uvicorn==0.27.0
 python-dotenv==1.0.0
 requests==2.31.0
 Pillow==10.2.0
-youtube-transcript-api==0.6.2
+youtube-transcript-api==1.2.3
 pydantic==2.5.3
