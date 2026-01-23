@@ -61,6 +61,7 @@ LOGO_TEAMS_URL = "https://images.contelege.com.br/logo-contele-teams-branco-250x
 class GenerateRequest(BaseModel):
     video_id: str = Field(..., description="ID do video YouTube (11 caracteres)")
     blog: str = Field(..., description="Blog destino: 'fleet' ou 'teams'")
+    transcript: Optional[str] = Field(None, description="Transcricao opcional (usar se auto-fetch falhar)")
 
 class GenerateResponse(BaseModel):
     status: str
@@ -128,10 +129,20 @@ def format_duration(duration_iso: str) -> str:
 
 def get_transcript(video_id: str) -> str:
     """Busca transcricao do video (PT preferido, EN fallback)"""
-    api = YouTubeTranscriptApi()
-    result = api.fetch(video_id, languages=['pt', 'pt-BR', 'en'])
-    segments = list(result)
-    return " ".join([s.text for s in segments])
+    try:
+        api = YouTubeTranscriptApi()
+        result = api.fetch(video_id, languages=['pt', 'pt-BR', 'en'])
+        segments = list(result)
+        return " ".join([s.text for s in segments])
+    except Exception as e:
+        error_msg = str(e)
+        if "blocking" in error_msg.lower() or "ip" in error_msg.lower():
+            raise Exception(
+                "YouTube bloqueou o IP do servidor. "
+                "Use o parametro 'transcript' com a transcricao do video. "
+                "Obtenha a transcricao em: https://www.youtube.com/watch?v=" + video_id
+            )
+        raise
 
 
 def get_video_metadata(video_id: str) -> dict:
@@ -414,8 +425,11 @@ async def generate_post(request: GenerateRequest):
             logo_url = LOGO_FLEET_URL
             categories = [839]  # Gestao de frotas
 
-        # 1. Transcricao
-        transcript = get_transcript(video_id)
+        # 1. Transcricao (usa fornecida ou busca automaticamente)
+        if request.transcript:
+            transcript = request.transcript
+        else:
+            transcript = get_transcript(video_id)
 
         # 2. Metadados
         metadata = get_video_metadata(video_id)
