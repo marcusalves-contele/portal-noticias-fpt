@@ -127,8 +127,12 @@ def format_duration(duration_iso: str) -> str:
 
 
 def get_transcript(video_id: str) -> str:
-    """Busca transcricao do video"""
-    transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['pt', 'pt-BR'])
+    """Busca transcricao do video (PT preferido, EN como fallback)"""
+    try:
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['pt', 'pt-BR'])
+    except Exception:
+        # Fallback para ingles se PT nao disponivel
+        transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=['en', 'en-US'])
     return " ".join([segment['text'] for segment in transcript])
 
 
