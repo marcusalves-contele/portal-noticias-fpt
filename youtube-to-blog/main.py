@@ -457,6 +457,7 @@ Transforme esta transcricao em artigo de blog otimizado para SEO.
 6. CTA final com link: {cta_url}
 7. Tom conversacional, primeira pessoa
 8. Contexto: {contexto}
+9. IMPORTANTE: Estamos em 2026. Use "2026" para referencias ao ano atual (NAO use 2024 ou 2025)
 
 ## FORMATO JSON
 {{
