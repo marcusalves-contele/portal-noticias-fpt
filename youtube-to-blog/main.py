@@ -568,11 +568,21 @@ async def generate_post(request: GenerateRequest):
         blog_prompt = get_blog_prompt(blog, metadata["title"], metadata["duration"], transcript)
         content_raw = call_gemini(blog_prompt)
 
-        # Parse JSON
+        # Parse JSON (com limpeza de caracteres problematicos)
         json_match = re.search(r'\{[\s\S]*\}', content_raw)
         if not json_match:
             raise Exception("Falha ao gerar conteudo JSON")
-        content = json.loads(json_match.group())
+
+        json_str = json_match.group()
+        # Remove newlines dentro de strings JSON (causa erro de parse)
+        json_str = re.sub(r'(?<!\\)\n(?=(?:[^"]*"[^"]*")*[^"]*$)', ' ', json_str)
+        # Tenta parse, se falhar tenta limpar mais
+        try:
+            content = json.loads(json_str)
+        except json.JSONDecodeError:
+            # Tenta extrair apenas o primeiro objeto JSON valido
+            json_str = re.sub(r'[\x00-\x1f\x7f-\x9f]', ' ', json_str)  # Remove control chars
+            content = json.loads(json_str)
 
         # 4. Gerar imagem
         image_prompt = get_image_prompt(blog, metadata["title"])
