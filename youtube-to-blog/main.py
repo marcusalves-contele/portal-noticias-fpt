@@ -46,7 +46,7 @@ WP_TEAMS_USER = "lgazolli"
 WP_TEAMS_PASSWORD = os.environ.get("WP_TEAMS_APP_PASSWORD")
 
 # Gemini
-GEMINI_TEXT_MODEL = "gemini-2.0-flash"
+GEMINI_TEXT_MODEL = "gemini-2.5-pro-preview-05-06"
 GEMINI_IMAGE_MODEL = "gemini-2.5-flash-image"
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
@@ -448,12 +448,23 @@ Transforme esta transcricao em artigo de blog otimizado para SEO.
 ## TRANSCRICAO
 {transcricao[:25000]}
 
+## TOM E ESTILO (MUITO IMPORTANTE)
+- Escreva como ESPECIALISTA compartilhando experiencia pratica, NAO como vendedor
+- EVITE palavras: "garantir", "revolucionar", "transformar", "infalivel", "segredo", "definitivo"
+- EVITE promessas de resultados ou beneficios exagerados
+- Reconheca desafios, limitacoes e nuances quando relevante
+- Baseie-se nos exemplos CONCRETOS e dados mencionados na transcricao
+- Tom: profissional e educativo, como conversa entre colegas de profissao
+- Prefira "pode ajudar" em vez de "vai garantir"
+- Prefira "na minha experiencia" em vez de "sempre funciona"
+- NAO pareca texto gerado por IA - seja natural e realista
+
 ## REQUISITOS
-1. Titulo com numero + beneficio + keyword
-2. Hook forte nos primeiros paragrafos (SEM H2 "Introducao")
+1. Titulo descritivo com keyword principal (EVITE clickbait e promessas)
+2. Introducao que contextualize o assunto de forma natural (SEM promessas exageradas)
 3. 1.500-2.000 palavras
 4. H2/H3 para estrutura
-5. FAQ section
+5. FAQ section com duvidas reais do publico
 6. CTA final com link: {cta_url}
 7. Tom conversacional, primeira pessoa
 8. Contexto: {contexto}
