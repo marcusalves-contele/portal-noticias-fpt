@@ -46,7 +46,7 @@ WP_TEAMS_USER = "lgazolli"
 WP_TEAMS_PASSWORD = os.environ.get("WP_TEAMS_APP_PASSWORD")
 
 # Gemini
-GEMINI_TEXT_MODEL = "gemini-2.5-pro"
+GEMINI_TEXT_MODEL = "gemini-3-pro-preview"
 GEMINI_IMAGE_MODEL = "gemini-2.5-flash-image"
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
