@@ -370,11 +370,26 @@ def upload_image_wordpress(image_bytes: bytes, filename: str, wp_url: str, wp_us
     return response.json()["id"]
 
 
-def create_wordpress_post(content: dict, media_id: int, wp_url: str, wp_user: str, wp_password: str, categories: list) -> dict:
+def create_wordpress_post(content: dict, media_id: int, wp_url: str, wp_user: str, wp_password: str, categories: list, video_id: str, blog: str) -> dict:
     """Cria post no WordPress"""
+    html_content = content["content_html"]
+    embed_url = f"https://www.youtube.com/embed/{video_id}"
+
+    # Define canal baseado no blog
+    canal = "Eng. Leonardo Gazolli - Equipes Externas" if blog == "teams" else "Julio Cesar | Frota Para Todos"
+
+    # Adiciona embed do YouTube ao final (depois de todos os CTAs)
+    html_content += f"""
+<h2>Assista a Live Completa</h2>
+<p>Este artigo foi baseado na <strong>Live</strong> do canal {canal}. Assista ao video completo:</p>
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%;">
+<iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="{embed_url}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+</div>
+"""
+
     post_data = {
         "title": content["title"],
-        "content": content["content_html"],
+        "content": html_content,
         "excerpt": content.get("excerpt", ""),
         "slug": content["slug"],
         "status": "publish",
@@ -568,7 +583,7 @@ async def generate_post(request: GenerateRequest):
         )
 
         # 6. Criar post
-        post_result = create_wordpress_post(content, media_id, wp_url, wp_user, wp_password, categories)
+        post_result = create_wordpress_post(content, media_id, wp_url, wp_user, wp_password, categories, video_id, blog)
 
         # 7. Gerar texto WhatsApp
         whatsapp_prompt = get_whatsapp_prompt(content["title"], post_result["post_url"])
