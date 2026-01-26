@@ -113,24 +113,11 @@ async def root():
         .loading .spinner { display: inline-block; margin-left: 10px; }
         .loading button span { display: none; }
         .note { font-size: 13px; color: #666; margin-top: 5px; }
-        .bookmarklet-section { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; }
-        .bookmarklet-btn { display: inline-block; padding: 10px 20px; background: #10b981;
-                           color: white; text-decoration: none; border-radius: 6px; font-weight: 500; }
-        .bookmarklet-btn:hover { background: #059669; }
-        .instructions { background: white; padding: 15px; border-radius: 6px; margin-top: 15px;
-                        font-size: 14px; line-height: 1.6; }
-        .instructions ol { margin: 10px 0; padding-left: 20px; }
-        .filled-notice { background: #dbeafe; padding: 10px; border-radius: 6px; margin-bottom: 20px;
-                         color: #1e40af; display: none; }
     </style>
 </head>
 <body>
     <h1>YouTube to Blog</h1>
     <p class="subtitle">Transforma videos em posts de blog</p>
-
-    <div id="filled-notice" class="filled-notice">
-        Dados preenchidos automaticamente pelo bookmarklet!
-    </div>
 
     <form id="form">
         <div class="form-group">
@@ -147,9 +134,9 @@ async def root():
         </div>
 
         <div class="form-group">
-            <label for="transcript">Transcricao <span id="transcript-status"></span></label>
-            <textarea id="transcript" placeholder="Cole a transcricao aqui ou use o bookmarklet no YouTube..."></textarea>
-            <p class="note">Use o bookmarklet abaixo para preencher automaticamente.</p>
+            <label for="transcript">Transcricao (opcional)</label>
+            <textarea id="transcript" placeholder="Deixe vazio para buscar automaticamente..."></textarea>
+            <p class="note">A transcricao sera buscada automaticamente do YouTube.</p>
         </div>
 
         <button type="submit" id="btn">
@@ -160,44 +147,10 @@ async def root():
 
     <div id="result" class="result"></div>
 
-    <div class="bookmarklet-section">
-        <h3>Bookmarklet - Captura do YouTube</h3>
-        <p>Arraste o botao abaixo para sua barra de favoritos:</p>
-        <p>
-            <a class="bookmarklet-btn" href="javascript:(function(){if(!location.hostname.includes('youtube.com')){alert('Abra um video no YouTube primeiro!');return;}const v=new URLSearchParams(location.search).get('v');if(!v){alert('Nao encontrei o ID do video na URL');return;}const p=window.ytInitialPlayerResponse||{};const c=p.captions?.playerCaptionsTracklistRenderer?.captionTracks;if(!c||!c.length){alert('Video sem legendas disponiveis');return;}const t=c.find(x=>x.languageCode==='pt')||c.find(x=>x.languageCode.startsWith('pt'))||c[0];fetch(t.baseUrl).then(r=>r.text()).then(xml=>{const d=new DOMParser().parseFromString(xml,'text/xml');const txt=[...d.querySelectorAll('text')].map(e=>e.textContent.replace(/&#39;/g,\"'\").replace(/&quot;/g,'\"').replace(/&amp;/g,'&')).join(' ');const data=btoa(unescape(encodeURIComponent(JSON.stringify({v:v,t:txt}))));window.open('https://youtube-to-blog-production-6f85.up.railway.app/?data='+data,'_blank');}).catch(e=>alert('Erro ao buscar legendas: '+e.message));})();">YT to Blog</a>
-        </p>
-        <div class="instructions">
-            <strong>Como usar:</strong>
-            <ol>
-                <li>Arraste "YT to Blog" para sua barra de favoritos</li>
-                <li>Abra um video no YouTube</li>
-                <li>Clique no bookmarklet</li>
-                <li>A pagina abrira com video e transcricao preenchidos!</li>
-            </ol>
-        </div>
-    </div>
-
     <script>
         const form = document.getElementById('form');
         const btn = document.getElementById('btn');
         const result = document.getElementById('result');
-
-        // Check for bookmarklet data in URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const encodedData = urlParams.get('data');
-        if (encodedData) {
-            try {
-                const json = JSON.parse(decodeURIComponent(escape(atob(encodedData))));
-                if (json.v) document.getElementById('video_id').value = json.v;
-                if (json.t) {
-                    document.getElementById('transcript').value = json.t;
-                    document.getElementById('transcript-status').textContent = '(' + json.t.length + ' chars)';
-                }
-                document.getElementById('filled-notice').style.display = 'block';
-                // Clean URL
-                history.replaceState({}, '', '/');
-            } catch(e) { console.error('Failed to parse bookmarklet data:', e); }
-        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
