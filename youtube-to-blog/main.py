@@ -60,6 +60,9 @@ WHATSAPP_GROUPS = {
     ],
     "teams": [
         "5513997818442-1516882988@g.us",  # Marketing | Teams
+        "120363304219016321@g.us",        # Teams Vendas CEO
+        "120363298722268756@g.us",        # Teams | CS | Produto
+        "5513997188532-1598035323@g.us",  # Teams | Produto
     ]
 }
 
@@ -542,11 +545,81 @@ Transforme esta transcricao em artigo de blog otimizado para SEO.
 """
 
 
-def get_image_prompt(blog: str, theme: str) -> str:
-    """Retorna prompt para geracao de imagem contextualizada com o tema"""
+def generate_image_prompt_with_ai(blog: str, theme: str) -> str:
+    """Usa IA para analisar o tema e criar prompt de imagem contextualizado"""
 
-    # Extrai palavras-chave do tema para contextualizar a cena
-    theme_lower = theme.lower()
+    if blog == "teams":
+        context = "gestao de equipes externas (vendedores, tecnicos, promotores)"
+        style_guide = """
+ESTILO TEAMS:
+- Foto estilo smartphone (iPhone 15 Pro) - natural, autentica
+- Profissional brasileiro (30-45 anos) verificando dados da equipe em tablet/celular
+- Ambiente: escritorio real, luz natural
+- Tela mostra: dashboard teal/azul com graficos ou mapa
+- NOT looking at camera, sem poses de stock photo"""
+    else:
+        context = "gestao de frotas (rastreamento, combustivel, manutencao, motoristas)"
+        style_guide = """
+ESTILO FLEET:
+- Foto documental/editorial profissional (Canon 5D Mark IV, 35mm f/1.8)
+- Gestor de frotas brasileiro (35-50 anos) em ambiente de trabalho REAL relacionado ao tema
+- Luz natural, profundidade de campo rasa
+- NOT looking at camera, momento capturado naturalmente
+- O CENARIO deve mostrar elementos ESPECIFICOS do tema (ex: se fala de caldeira movel, mostrar caldeira movel; se fala de manutencao, mostrar oficina)"""
+
+    meta_prompt = f"""Voce e um especialista em criar prompts para geracao de imagens.
+
+TAREFA: Analisar o titulo do artigo e criar um prompt de imagem que represente VISUALMENTE o tema especifico.
+
+TITULO DO ARTIGO: {theme}
+CONTEXTO: {context}
+
+{style_guide}
+
+INSTRUCOES:
+1. Identifique o ELEMENTO PRINCIPAL do titulo (ex: "caldeira movel", "abastecimento", "manutencao preventiva")
+2. Crie uma cena que MOSTRE esse elemento de forma realista
+3. Inclua um profissional brasileiro interagindo com o cenario
+4. A cena deve ser especifica, NAO generica
+
+FORMATO DE RESPOSTA (retorne APENAS o prompt, sem explicacoes):
+Professional documentary-style photograph for fleet management blog.
+
+ARTICLE TOPIC: [tema]
+
+SCENE: [descricao detalhada da cena com elementos especificos do tema]
+SETTING: [ambiente especifico relacionado ao tema]
+
+SUBJECT: Brazilian fleet professional (35-50yo), business casual.
+POSE: Actively engaged, NOT looking at camera.
+
+TECHNICAL:
+- Natural lighting, shallow depth of field
+- Warm professional color grading
+
+STRICT REQUIREMENTS:
+- NO text, watermarks, logos
+- NO stock photo poses
+- Background must show specific elements related to: [tema]
+
+OUTPUT: 16:9 landscape, photorealistic."""
+
+    try:
+        # Usa modelo de texto rapido para gerar o prompt
+        generated_prompt = call_gemini(meta_prompt, model="gemini-2.0-flash")
+        # Limpa o prompt (remove markdown se houver)
+        generated_prompt = generated_prompt.strip()
+        if generated_prompt.startswith("```"):
+            generated_prompt = "\n".join(generated_prompt.split("\n")[1:-1])
+        print(f"[ImagePrompt] Prompt gerado por IA para: {theme[:50]}...")
+        return generated_prompt
+    except Exception as e:
+        print(f"[ImagePrompt] Fallback para prompt estatico: {e}")
+        return get_image_prompt_fallback(blog, theme)
+
+
+def get_image_prompt_fallback(blog: str, theme: str) -> str:
+    """Fallback: prompt estatico caso a geracao por IA falhe"""
 
     if blog == "teams":
         return f"""Candid smartphone photograph of a real person at work managing their field team.
@@ -566,59 +639,31 @@ Requirements:
 
 Output: 16:9 landscape, photorealistic."""
     else:
-        # Fleet: criar cena contextualizada baseada no tema
-        # Detecta contexto do tema para criar cena apropriada
-        if any(word in theme_lower for word in ['combustivel', 'combustível', 'abastecimento', 'diesel', 'gasolina', 'alcool', 'álcool']):
-            scene = "Fleet manager at a fuel station reviewing consumption data on tablet while truck is being refueled in background"
-            setting = "Gas station during daytime, fuel pumps visible"
-        elif any(word in theme_lower for word in ['manutencao', 'manutenção', 'oficina', 'mecanico', 'mecânico', 'reparo', 'pneu']):
-            scene = "Fleet coordinator in automotive workshop checking maintenance schedule on laptop, vehicles being serviced in background"
-            setting = "Professional auto repair shop, organized tools, lifted vehicles"
-        elif any(word in theme_lower for word in ['motorista', 'condutor', 'cnh', 'dirigir', 'comportamento']):
-            scene = "Fleet supervisor reviewing driver performance metrics on tablet, commercial vehicles parked in background"
-            setting = "Company fleet yard, trucks and vans visible, early morning light"
-        elif any(word in theme_lower for word in ['rota', 'trajeto', 'km', 'quilometr', 'quilômetr', 'viagem', 'entrega']):
-            scene = "Logistics coordinator analyzing route optimization on large monitor showing map with multiple vehicle positions"
-            setting = "Modern logistics control room, multiple screens, route maps"
-        elif any(word in theme_lower for word in ['rastreamento', 'gps', 'localizacao', 'localização', 'monitoramento', 'tempo real']):
-            scene = "Operations manager watching real-time vehicle tracking dashboard on large screen showing fleet positions on map"
-            setting = "Fleet operations center, wall-mounted displays, control stations"
-        elif any(word in theme_lower for word in ['custo', 'economia', 'reducao', 'redução', 'orcamento', 'orçamento', 'despesa']):
-            scene = "Fleet financial analyst reviewing cost reports and charts on laptop, spreadsheets with vehicle expenses"
-            setting = "Corporate office, financial documents visible, calculator on desk"
-        elif any(word in theme_lower for word in ['multa', 'infracao', 'infração', 'velocidade', 'seguranca', 'segurança']):
-            scene = "Fleet safety manager reviewing violation reports on tablet, safety posters visible on wall"
-            setting = "Fleet management office, safety equipment visible, vehicle photos on wall"
-        else:
-            # Cena generica mas com elementos do tema visualmente presentes
-            scene = f"Brazilian fleet manager (35-50yo) actively working on fleet data related to: {theme}. Engaged with technology showing relevant metrics"
-            setting = "Modern fleet operations office, vehicles visible through window, professional environment"
-
         return f"""Professional documentary-style photograph for fleet management blog article.
 
 ARTICLE TOPIC: {theme}
 
-SCENE: {scene}
-SETTING: {setting}
+SCENE: Brazilian fleet manager (35-50yo) actively working in environment related to: {theme}
+SETTING: Professional fleet operations environment with relevant equipment visible
 
-SUBJECT: Brazilian male fleet professional (35-50 years old), wearing business casual (polo shirt or button-down).
+SUBJECT: Brazilian male fleet professional (35-50 years old), wearing business casual.
 POSE: Actively engaged with work, natural posture, NOT looking at camera.
-EXPRESSION: Focused, professional, thoughtful.
 
 TECHNICAL:
-- Shot on Canon 5D Mark IV, 35mm f/1.8
-- Natural window lighting with soft shadows
-- Shallow depth of field (subject sharp, background slightly blurred)
-- Color grading: warm but professional, slight teal in shadows
+- Natural lighting, shallow depth of field
+- Warm professional color grading
 
 STRICT REQUIREMENTS:
 - NO text, watermarks, logos or overlays
-- NO stock photo staging or fake smiles
-- NO looking at camera
-- Must feel like a real moment captured, not posed
+- NO stock photo staging
 - Background must relate to the topic: {theme}
 
 OUTPUT: 16:9 landscape, photorealistic, editorial quality."""
+
+
+def get_image_prompt(blog: str, theme: str) -> str:
+    """Retorna prompt para geracao de imagem - usa IA para contextualizar"""
+    return generate_image_prompt_with_ai(blog, theme)
 
 
 def get_whatsapp_prompt(title: str, url: str) -> str:
