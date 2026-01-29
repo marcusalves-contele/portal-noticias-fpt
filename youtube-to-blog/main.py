@@ -488,12 +488,12 @@ def get_blog_prompt(blog: str, titulo: str, duracao: str, transcricao: str) -> s
         autor = "Leonardo Gazolli, Engenheiro de Producao especialista em gestao de equipes externas"
         contexto = "gestao de equipes externas (vendedores, tecnicos, promotores)"
         canal = "Eng. Leonardo Gazolli - Equipes Externas"
-        cta_url = "https://conteleteams.com.br/?utm_source=blog&utm_medium=post&utm_campaign=youtube-live"
+        cta_base = "https://conteleteams.com.br/?utm_source=blog&utm_medium=post&utm_campaign=youtube-live&utm_term="
     else:
         autor = "Julio Cesar, especialista em gestao de frotas"
         contexto = "gestao de frotas (rastreamento, combustivel, manutencao, motoristas)"
         canal = "Julio Cesar | Frota Para Todos"
-        cta_url = "https://contelerastreador.com.br/?utm_source=blog&utm_medium=post&utm_campaign=youtube-live"
+        cta_base = "https://contelerastreador.com.br/?utm_source=blog&utm_medium=post&utm_campaign=youtube-live&utm_term="
 
     return f"""Voce e o {autor}, escrevendo para o blog em primeira pessoa.
 
@@ -524,10 +524,11 @@ Transforme esta transcricao em artigo de blog otimizado para SEO.
 3. 1.500-2.000 palavras
 4. H2/H3 para estrutura
 5. FAQ section com duvidas reais do publico
-6. CTA final com link: {cta_url}
+6. CTA final com link: {cta_base}[SLUG] (substitua [SLUG] pelo slug que voce gerar)
 7. Tom conversacional, primeira pessoa
 8. Contexto: {contexto}
 9. IMPORTANTE: Estamos em 2026. Use "2026" para referencias ao ano atual (NAO use 2024 ou 2025)
+10. TODOS os links devem ter target="_blank" rel="noopener" para abrir em nova aba
 
 ## FORMATO JSON
 {{
@@ -567,25 +568,25 @@ Output: 16:9 landscape, photorealistic."""
     else:
         # Fleet: criar cena contextualizada baseada no tema
         # Detecta contexto do tema para criar cena apropriada
-        if any(word in theme_lower for word in ['combustivel', 'abastecimento', 'diesel', 'gasolina', 'alcool']):
+        if any(word in theme_lower for word in ['combustivel', 'combustível', 'abastecimento', 'diesel', 'gasolina', 'alcool', 'álcool']):
             scene = "Fleet manager at a fuel station reviewing consumption data on tablet while truck is being refueled in background"
             setting = "Gas station during daytime, fuel pumps visible"
-        elif any(word in theme_lower for word in ['manutencao', 'oficina', 'mecanico', 'reparo', 'pneu']):
+        elif any(word in theme_lower for word in ['manutencao', 'manutenção', 'oficina', 'mecanico', 'mecânico', 'reparo', 'pneu']):
             scene = "Fleet coordinator in automotive workshop checking maintenance schedule on laptop, vehicles being serviced in background"
             setting = "Professional auto repair shop, organized tools, lifted vehicles"
         elif any(word in theme_lower for word in ['motorista', 'condutor', 'cnh', 'dirigir', 'comportamento']):
             scene = "Fleet supervisor reviewing driver performance metrics on tablet, commercial vehicles parked in background"
             setting = "Company fleet yard, trucks and vans visible, early morning light"
-        elif any(word in theme_lower for word in ['rota', 'trajeto', 'km', 'quilometr', 'viagem', 'entrega']):
+        elif any(word in theme_lower for word in ['rota', 'trajeto', 'km', 'quilometr', 'quilômetr', 'viagem', 'entrega']):
             scene = "Logistics coordinator analyzing route optimization on large monitor showing map with multiple vehicle positions"
             setting = "Modern logistics control room, multiple screens, route maps"
-        elif any(word in theme_lower for word in ['rastreamento', 'gps', 'localizacao', 'monitoramento', 'tempo real']):
+        elif any(word in theme_lower for word in ['rastreamento', 'gps', 'localizacao', 'localização', 'monitoramento', 'tempo real']):
             scene = "Operations manager watching real-time vehicle tracking dashboard on large screen showing fleet positions on map"
             setting = "Fleet operations center, wall-mounted displays, control stations"
-        elif any(word in theme_lower for word in ['custo', 'economia', 'reducao', 'orcamento', 'despesa']):
+        elif any(word in theme_lower for word in ['custo', 'economia', 'reducao', 'redução', 'orcamento', 'orçamento', 'despesa']):
             scene = "Fleet financial analyst reviewing cost reports and charts on laptop, spreadsheets with vehicle expenses"
             setting = "Corporate office, financial documents visible, calculator on desk"
-        elif any(word in theme_lower for word in ['multa', 'infracao', 'velocidade', 'seguranca']):
+        elif any(word in theme_lower for word in ['multa', 'infracao', 'infração', 'velocidade', 'seguranca', 'segurança']):
             scene = "Fleet safety manager reviewing violation reports on tablet, safety posters visible on wall"
             setting = "Fleet management office, safety equipment visible, vehicle photos on wall"
         else:
