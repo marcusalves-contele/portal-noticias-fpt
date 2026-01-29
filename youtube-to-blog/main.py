@@ -50,19 +50,16 @@ EVOLUTION_API_ENDPOINT = os.environ.get("EVOLUTION_API_ENDPOINT")
 EVOLUTION_API_KEY = os.environ.get("EVOLUTION_API_KEY")
 EVOLUTION_INSTANCE = os.environ.get("EVOLUTION_INSTANCE", "Vendas%20n2")
 
-# Grupos WhatsApp por produto
+# Grupos WhatsApp por produto (IDs da instancia Vendas n2)
 WHATSAPP_GROUPS = {
     "fleet": [
-        "120363040705704064@g.us",   # VIP | Frota Para Todos (comunidade Julio)
-        "5513997818442-1555960865@g.us",  # Fleet | Produto
+        "120363040705704064@g.us",   # VIP | Frota Para Todos
         "120363298313504328@g.us",   # Fleet | CS | Produto
         "120363305098835612@g.us",   # Fleet Vendas CEO
     ],
     "teams": [
-        "5513997818442-1516882988@g.us",  # Marketing | Teams
-        "120363304219016321@g.us",        # Teams Vendas CEO
-        "120363298722268756@g.us",        # Teams | CS | Produto
-        "5513997188532-1598035323@g.us",  # Teams | Produto
+        "120363304219016321@g.us",   # Teams Vendas CEO
+        "120363298722268756@g.us",   # Teams | CS | Produto
     ]
 }
 
@@ -669,19 +666,33 @@ def get_image_prompt(blog: str, theme: str) -> str:
 
 
 def get_whatsapp_prompt(title: str, url: str) -> str:
-    """Retorna prompt para texto WhatsApp"""
-    return f"""Crie mensagem CURTA (3-4 linhas) para WhatsApp divulgando este post:
+    """Retorna prompt para texto WhatsApp atrativo"""
+    return f"""Crie uma mensagem WhatsApp IRRESISTIVEL para divulgar este post de blog.
 
 POST: "{title}"
 URL: {url}
 
-REGRAS:
-- Hook forte na primeira linha
-- Max 1 emoji
-- SEM "confira", "nao perca"
-- Tom de colega indicando conteudo util
+OBJETIVO: Fazer a pessoa QUERER clicar e ler o artigo.
 
-RETORNE APENAS O TEXTO."""
+ESTRUTURA (3-4 linhas max):
+1. GANCHO: Pergunta provocativa OU dado surpreendente OU dor comum do gestor
+2. PROMESSA: O que a pessoa vai descobrir/aprender (beneficio claro)
+3. LINK: URL direto
+
+EXEMPLOS DE GANCHOS BONS:
+- "Voce sabe quanto sua frota perde por mes com [problema]?"
+- "Descobri um erro que 80% dos gestores cometem com [tema]"
+- "Essa dica simples economizou R$X mil pra um cliente"
+- "O que ninguem te conta sobre [tema]..."
+
+REGRAS:
+- Max 1 emoji (no inicio ou fim)
+- Tom de colega compartilhando descoberta util
+- PROIBIDO: "confira", "nao perca", "acesse", "clique aqui", "saiba mais"
+- PROIBIDO: Parecer propaganda ou robo
+- Seja especifico sobre o BENEFICIO de ler
+
+RETORNE APENAS O TEXTO DA MENSAGEM."""
 
 
 # =============================================================================
