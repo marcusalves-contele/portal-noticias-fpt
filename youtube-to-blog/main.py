@@ -45,6 +45,24 @@ WP_TEAMS_URL = "https://blog.conteleteams.com.br"
 WP_TEAMS_USER = "lgazolli"
 WP_TEAMS_PASSWORD = os.environ.get("WP_TEAMS_APP_PASSWORD")
 
+# Evolution API (WhatsApp)
+EVOLUTION_API_ENDPOINT = os.environ.get("EVOLUTION_API_ENDPOINT")
+EVOLUTION_API_KEY = os.environ.get("EVOLUTION_API_KEY")
+EVOLUTION_INSTANCE = os.environ.get("EVOLUTION_INSTANCE", "Vendas%20n2")
+
+# Grupos WhatsApp por produto
+WHATSAPP_GROUPS = {
+    "fleet": [
+        "120363040705704064@g.us",   # VIP | Frota Para Todos (comunidade Julio)
+        "5513997818442-1555960865@g.us",  # Fleet | Produto
+        "120363298313504328@g.us",   # Fleet | CS | Produto
+        "120363305098835612@g.us",   # Fleet Vendas CEO
+    ],
+    "teams": [
+        "5513997818442-1516882988@g.us",  # Marketing | Teams
+    ]
+}
+
 # Gemini
 GEMINI_TEXT_MODEL = "gemini-3-pro-preview"
 GEMINI_IMAGE_MODEL = "gemini-2.5-flash-image"
@@ -356,6 +374,47 @@ def apply_watermark(image_bytes: bytes, logo_url: str) -> bytes:
     return output.getvalue()
 
 
+def send_whatsapp_message(group_id: str, message: str) -> bool:
+    """Envia mensagem para grupo WhatsApp via Evolution API"""
+    if not EVOLUTION_API_ENDPOINT or not EVOLUTION_API_KEY:
+        print(f"[WhatsApp] Credenciais nao configuradas, pulando envio para {group_id}")
+        return False
+
+    try:
+        url = f"{EVOLUTION_API_ENDPOINT}/message/sendText/{EVOLUTION_INSTANCE}"
+        headers = {
+            "apikey": EVOLUTION_API_KEY,
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "number": group_id,
+            "text": message
+        }
+
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        if response.status_code == 201:
+            print(f"[WhatsApp] Mensagem enviada para {group_id}")
+            return True
+        else:
+            print(f"[WhatsApp] Erro ao enviar para {group_id}: {response.status_code}")
+            return False
+    except Exception as e:
+        print(f"[WhatsApp] Excecao ao enviar para {group_id}: {e}")
+        return False
+
+
+def send_whatsapp_to_groups(blog: str, message: str) -> int:
+    """Envia mensagem para todos os grupos do produto"""
+    groups = WHATSAPP_GROUPS.get(blog, [])
+    sent_count = 0
+
+    for group_id in groups:
+        if send_whatsapp_message(group_id, message):
+            sent_count += 1
+
+    return sent_count
+
+
 def upload_image_wordpress(image_bytes: bytes, filename: str, wp_url: str, wp_user: str, wp_password: str) -> int:
     """Upload imagem para WordPress e retorna media_id"""
     response = requests.post(
@@ -483,7 +542,10 @@ Transforme esta transcricao em artigo de blog otimizado para SEO.
 
 
 def get_image_prompt(blog: str, theme: str) -> str:
-    """Retorna prompt para geracao de imagem"""
+    """Retorna prompt para geracao de imagem contextualizada com o tema"""
+
+    # Extrai palavras-chave do tema para contextualizar a cena
+    theme_lower = theme.lower()
 
     if blog == "teams":
         return f"""Candid smartphone photograph of a real person at work managing their field team.
@@ -503,22 +565,59 @@ Requirements:
 
 Output: 16:9 landscape, photorealistic."""
     else:
-        return f"""Professional photograph for fleet management blog.
+        # Fleet: criar cena contextualizada baseada no tema
+        # Detecta contexto do tema para criar cena apropriada
+        if any(word in theme_lower for word in ['combustivel', 'abastecimento', 'diesel', 'gasolina', 'alcool']):
+            scene = "Fleet manager at a fuel station reviewing consumption data on tablet while truck is being refueled in background"
+            setting = "Gas station during daytime, fuel pumps visible"
+        elif any(word in theme_lower for word in ['manutencao', 'oficina', 'mecanico', 'reparo', 'pneu']):
+            scene = "Fleet coordinator in automotive workshop checking maintenance schedule on laptop, vehicles being serviced in background"
+            setting = "Professional auto repair shop, organized tools, lifted vehicles"
+        elif any(word in theme_lower for word in ['motorista', 'condutor', 'cnh', 'dirigir', 'comportamento']):
+            scene = "Fleet supervisor reviewing driver performance metrics on tablet, commercial vehicles parked in background"
+            setting = "Company fleet yard, trucks and vans visible, early morning light"
+        elif any(word in theme_lower for word in ['rota', 'trajeto', 'km', 'quilometr', 'viagem', 'entrega']):
+            scene = "Logistics coordinator analyzing route optimization on large monitor showing map with multiple vehicle positions"
+            setting = "Modern logistics control room, multiple screens, route maps"
+        elif any(word in theme_lower for word in ['rastreamento', 'gps', 'localizacao', 'monitoramento', 'tempo real']):
+            scene = "Operations manager watching real-time vehicle tracking dashboard on large screen showing fleet positions on map"
+            setting = "Fleet operations center, wall-mounted displays, control stations"
+        elif any(word in theme_lower for word in ['custo', 'economia', 'reducao', 'orcamento', 'despesa']):
+            scene = "Fleet financial analyst reviewing cost reports and charts on laptop, spreadsheets with vehicle expenses"
+            setting = "Corporate office, financial documents visible, calculator on desk"
+        elif any(word in theme_lower for word in ['multa', 'infracao', 'velocidade', 'seguranca']):
+            scene = "Fleet safety manager reviewing violation reports on tablet, safety posters visible on wall"
+            setting = "Fleet management office, safety equipment visible, vehicle photos on wall"
+        else:
+            # Cena generica mas com elementos do tema visualmente presentes
+            scene = f"Brazilian fleet manager (35-50yo) actively working on fleet data related to: {theme}. Engaged with technology showing relevant metrics"
+            setting = "Modern fleet operations office, vehicles visible through window, professional environment"
 
-Topic: {theme}
+        return f"""Professional documentary-style photograph for fleet management blog article.
 
-Scene: Brazilian fleet manager reviewing vehicle data on tablet/laptop.
-Setting: Modern office or operations center.
-Screen shows: Dashboard with routes, vehicles, metrics.
+ARTICLE TOPIC: {theme}
 
-Style: Corporate photography, natural lighting, shallow depth of field.
+SCENE: {scene}
+SETTING: {setting}
 
-Requirements:
-- NO text or watermarks
-- Authentic, not staged
-- Professional but approachable
+SUBJECT: Brazilian male fleet professional (35-50 years old), wearing business casual (polo shirt or button-down).
+POSE: Actively engaged with work, natural posture, NOT looking at camera.
+EXPRESSION: Focused, professional, thoughtful.
 
-Output: 16:9 landscape, photorealistic."""
+TECHNICAL:
+- Shot on Canon 5D Mark IV, 35mm f/1.8
+- Natural window lighting with soft shadows
+- Shallow depth of field (subject sharp, background slightly blurred)
+- Color grading: warm but professional, slight teal in shadows
+
+STRICT REQUIREMENTS:
+- NO text, watermarks, logos or overlays
+- NO stock photo staging or fake smiles
+- NO looking at camera
+- Must feel like a real moment captured, not posed
+- Background must relate to the topic: {theme}
+
+OUTPUT: 16:9 landscape, photorealistic, editorial quality."""
 
 
 def get_whatsapp_prompt(title: str, url: str) -> str:
@@ -614,6 +713,10 @@ async def generate_post(request: GenerateRequest):
         # 7. Gerar texto WhatsApp
         whatsapp_prompt = get_whatsapp_prompt(content["title"], post_result["post_url"])
         whatsapp_text = call_gemini(whatsapp_prompt).strip()
+
+        # 8. Enviar WhatsApp para grupos do produto
+        sent_count = send_whatsapp_to_groups(blog, whatsapp_text)
+        print(f"[WhatsApp] Enviado para {sent_count} grupos de {blog}")
 
         return GenerateResponse(
             status="success",
