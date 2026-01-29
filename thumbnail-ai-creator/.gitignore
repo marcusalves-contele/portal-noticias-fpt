@@ -1,0 +1,5 @@
+.env
+output/*.png
+referencias/convidados/*
+*.pyc
+__pycache__/
