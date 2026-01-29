@@ -666,33 +666,40 @@ def get_image_prompt(blog: str, theme: str) -> str:
 
 
 def get_whatsapp_prompt(title: str, url: str) -> str:
-    """Retorna prompt para texto WhatsApp atrativo"""
-    return f"""Crie uma mensagem WhatsApp IRRESISTIVEL para divulgar este post de blog.
+    """Retorna prompt para texto WhatsApp com copywriting persuasivo"""
+    return f"""Voce e um copywriter expert. Crie uma mensagem WhatsApp IMPOSSIVEL de ignorar.
 
 POST: "{title}"
 URL: {url}
 
-OBJETIVO: Fazer a pessoa QUERER clicar e ler o artigo.
+MODELO MENTAL (Simon Sinek):
+Comece pelo PORQUE. Por que o gestor deveria se importar com isso AGORA?
 
-ESTRUTURA (3-4 linhas max):
-1. GANCHO: Pergunta provocativa OU dado surpreendente OU dor comum do gestor
-2. PROMESSA: O que a pessoa vai descobrir/aprender (beneficio claro)
-3. LINK: URL direto
+FORMULA:
+[Afirmacao provocativa sobre o problema] + [Gancho de curiosidade incompleto] + [Link]
 
-EXEMPLOS DE GANCHOS BONS:
-- "Voce sabe quanto sua frota perde por mes com [problema]?"
-- "Descobri um erro que 80% dos gestores cometem com [tema]"
-- "Essa dica simples economizou R$X mil pra um cliente"
-- "O que ninguem te conta sobre [tema]..."
+BONS EXEMPLOS:
+"Caldeira movel e um buraco negro de combustivel. A menos que voce faca isso aqui.
+{url}"
 
-REGRAS:
-- Max 1 emoji (no inicio ou fim)
-- Tom de colega compartilhando descoberta util
-- PROIBIDO: "confira", "nao perca", "acesse", "clique aqui", "saiba mais"
-- PROIBIDO: Parecer propaganda ou robo
-- Seja especifico sobre o BENEFICIO de ler
+"Gestores experientes erram nisso o tempo todo. E so percebem quando olham o fechamento do mes.
+{url}"
 
-RETORNE APENAS O TEXTO DA MENSAGEM."""
+"Se voce acha que controla o combustivel da sua frota, esse artigo vai te surpreender.
+{url}"
+
+PALAVRAS PROIBIDAS:
+- descubra, confira, acesse, clique, saiba mais, nao perca
+- voce sabia, e importante, precisamos falar
+- qualquer saudacao (oi, pessoal, galera)
+- emojis no inicio
+
+FORMATO:
+- 2 frases curtas + link
+- Maximo 200 caracteres antes do link
+- Tom: insider revelando segredo, nao vendedor
+
+RETORNE APENAS A MENSAGEM, NADA MAIS."""
 
 
 # =============================================================================
