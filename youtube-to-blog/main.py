@@ -348,15 +348,15 @@ def generate_image(prompt: str) -> bytes:
 
 
 def apply_watermark(image_bytes: bytes, logo_url: str) -> bytes:
-    """Aplica watermark na imagem"""
+    """Aplica watermark na imagem com margem segura para thumbnails"""
     img = Image.open(BytesIO(image_bytes)).convert("RGBA")
 
     # Baixa logo
     logo_response = requests.get(logo_url)
     logo = Image.open(BytesIO(logo_response.content)).convert("RGBA")
 
-    # Redimensiona logo (12% da largura)
-    scale = 0.12
+    # Redimensiona logo (10% da largura - um pouco menor para caber melhor)
+    scale = 0.10
     new_width = int(img.size[0] * scale)
     ratio = logo.size[1] / logo.size[0]
     new_height = int(new_width * ratio)
@@ -366,9 +366,11 @@ def apply_watermark(image_bytes: bytes, logo_url: str) -> bytes:
     alpha = logo.split()[3].point(lambda p: int(p * 0.85))
     logo.putalpha(alpha)
 
-    # Posiciona
-    margin = 30
-    pos = (img.size[0] - new_width - margin, img.size[1] - new_height - margin)
+    # Posiciona com margem segura (10% da dimensao para evitar corte em thumbnails)
+    # WordPress faz crop para thumbnails, entao o logo precisa estar na "safe zone"
+    margin_x = int(img.size[0] * 0.08)  # 8% da largura
+    margin_y = int(img.size[1] * 0.10)  # 10% da altura
+    pos = (img.size[0] - new_width - margin_x, img.size[1] - new_height - margin_y)
     img.paste(logo, pos, logo)
 
     # Converte para bytes
