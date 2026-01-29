@@ -431,7 +431,47 @@ def upload_image_wordpress(image_bytes: bytes, filename: str, wp_url: str, wp_us
     return response.json()["id"]
 
 
-def create_wordpress_post(content: dict, media_id: int, wp_url: str, wp_user: str, wp_password: str, categories: list, video_id: str, blog: str) -> dict:
+def detect_content_type(title: str, description: str = "") -> dict:
+    """Usa IA para detectar o tipo de conteudo do video"""
+    prompt = f"""Analise o titulo e descricao deste video do YouTube e identifique o tipo de conteudo.
+
+TITULO: {title}
+DESCRICAO: {description[:500] if description else "N/A"}
+
+TIPOS POSSIVEIS:
+- live: Transmissao ao vivo, live stream
+- podcast: Episodio de podcast, bate-papo, conversa
+- entrevista: Entrevista com convidado, case de cliente
+- webinar: Webinar, aula, workshop
+- tutorial: Tutorial, como fazer, passo a passo
+- video: Video comum (quando nao se encaixa nos outros)
+
+RESPONDA APENAS em JSON:
+{{"tipo": "live|podcast|entrevista|webinar|tutorial|video", "titulo_secao": "Assista ao Video Completo", "descricao": "Este artigo foi baseado no video..."}}
+
+EXEMPLOS:
+- "LIVE #45: Gestao de Frotas" -> {{"tipo": "live", "titulo_secao": "Assista a Live Completa", "descricao": "Este artigo foi baseado na live"}}
+- "Podcast EP12: Entrevista com Joao" -> {{"tipo": "podcast", "titulo_secao": "Ouca o Episodio Completo", "descricao": "Este artigo foi baseado no episodio do podcast"}}
+- "Case: Como a Empresa X reduziu custos" -> {{"tipo": "entrevista", "titulo_secao": "Assista a Entrevista Completa", "descricao": "Este artigo foi baseado na entrevista"}}
+"""
+    try:
+        result = call_gemini(prompt, model="gemini-2.0-flash")
+        # Extrai JSON da resposta
+        json_match = re.search(r'\{[^}]+\}', result)
+        if json_match:
+            return json.loads(json_match.group())
+    except Exception as e:
+        print(f"[ContentType] Erro na deteccao, usando padrao: {e}")
+
+    # Fallback padrao
+    return {
+        "tipo": "video",
+        "titulo_secao": "Assista ao Video Completo",
+        "descricao": "Este artigo foi baseado no video"
+    }
+
+
+def create_wordpress_post(content: dict, media_id: int, wp_url: str, wp_user: str, wp_password: str, categories: list, video_id: str, blog: str, content_type: dict = None) -> dict:
     """Cria post no WordPress"""
     html_content = content["content_html"]
     video_url = f"https://www.youtube.com/watch?v={video_id}"
@@ -440,10 +480,17 @@ def create_wordpress_post(content: dict, media_id: int, wp_url: str, wp_user: st
     # Define canal baseado no blog
     canal = "Eng. Leonardo Gazolli - Equipes Externas" if blog == "teams" else "Julio Cesar | Frota Para Todos"
 
-    # Adiciona thumbnail clicavel do YouTube ao final (funciona sempre, mesmo com restricoes de embed)
+    # Usa tipo de conteudo detectado ou padrao
+    if content_type is None:
+        content_type = {"titulo_secao": "Assista ao Video Completo", "descricao": "Este artigo foi baseado no video"}
+
+    titulo_secao = content_type.get("titulo_secao", "Assista ao Video Completo")
+    descricao_video = content_type.get("descricao", "Este artigo foi baseado no video")
+
+    # Adiciona thumbnail clicavel do YouTube ao final
     html_content += f"""
-<h2>Assista a Live Completa</h2>
-<p>Este artigo foi baseado na <strong>Live</strong> do canal {canal}. Clique para assistir ao video completo:</p>
+<h2>{titulo_secao}</h2>
+<p>{descricao_video} do canal <strong>{canal}</strong>. Clique para assistir:</p>
 <a href="{video_url}" target="_blank" rel="noopener" style="display: block; position: relative; max-width: 100%;">
 <img src="{thumbnail_url}" alt="Assistir no YouTube" style="width: 100%; border-radius: 8px;">
 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 68px; height: 48px; background: #f00; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
@@ -773,14 +820,20 @@ async def generate_post(request: GenerateRequest):
             wp_url, wp_user, wp_password
         )
 
-        # 6. Criar post
-        post_result = create_wordpress_post(content, media_id, wp_url, wp_user, wp_password, categories, video_id, blog)
+        # 6. Detectar tipo de conteudo (apenas Teams - tem podcasts, entrevistas, etc)
+        content_type = None
+        if blog == "teams":
+            content_type = detect_content_type(metadata["title"], metadata.get("description", ""))
+            print(f"[ContentType] Detectado: {content_type.get('tipo', 'video')}")
 
-        # 7. Gerar texto WhatsApp
+        # 7. Criar post
+        post_result = create_wordpress_post(content, media_id, wp_url, wp_user, wp_password, categories, video_id, blog, content_type)
+
+        # 8. Gerar texto WhatsApp
         whatsapp_prompt = get_whatsapp_prompt(content["title"], post_result["post_url"])
         whatsapp_text = call_gemini(whatsapp_prompt).strip()
 
-        # 8. Enviar WhatsApp para grupos do produto
+        # 9. Enviar WhatsApp para grupos do produto
         sent_count = send_whatsapp_to_groups(blog, whatsapp_text)
         print(f"[WhatsApp] Enviado para {sent_count} grupos de {blog}")
 
