@@ -134,3 +134,57 @@ thumbnail-ai-creator/
 3. Descrever características faciais específicas
 4. Especificar poses e expressões claramente
 5. Texto legível: pedir "large bold white text with shadow"
+
+---
+
+## Exemplo de Prompt Completo (Fleet)
+
+```
+Create a YouTube thumbnail in 16:9 aspect ratio for a fleet management channel.
+
+REFERENCE IMAGES PROVIDED:
+- Image 1 and 2: JULIO (main host) face references - may be rotated 90 degrees
+- Image 3: GUEST face reference (if applicable)
+- Image 4: COMPOSITION/STYLE REFERENCE (if applicable)
+
+JULIO (MAIN HOST) - FACE CONSISTENCY:
+- Gray/white stubble beard (salt and pepper, short)
+- Short brown hair, slightly wavy
+- Brown/hazel eyes, NO glasses
+- Age: 40-42 years old, YOUTHFUL appearance
+- Wearing dark blue Contele polo shirt
+
+SKIN TEXTURE - CRITICAL:
+- Keep skin SMOOTH like a fit 40 year old
+- Do NOT add wrinkles or age marks
+- Forehead SMOOTH, cheeks FIRM
+
+COMPOSITION:
+- Julio in CENTER, medium shot (waist up)
+- POSE: [DEFINIR POSE BASEADO NO TEMA]
+- Background: [DEFINIR BACKGROUND]
+
+TEXT ELEMENTS:
+- TOP: Red badge "LIVE [NUMBER]"
+- TITLE: "[TÍTULO]" large white bold text with shadow
+
+EXPRESSION: [DEFINIR EXPRESSÃO]
+
+LOGOS:
+- Purple Contele logo (stylized "9")
+- [OUTROS LOGOS SE APLICÁVEL]
+
+STYLE: Professional YouTube thumbnail, photorealistic, purple/magenta cinematic lighting, high contrast.
+```
+
+---
+
+## Checklist Antes de Gerar
+
+- [ ] Canal definido (Fleet/Teams)
+- [ ] Título impactante (máx 7 palavras)
+- [ ] Pose escolhida para o tema
+- [ ] Expressão definida
+- [ ] Refs do apresentador disponíveis
+- [ ] Ref do convidado (se houver)
+- [ ] Background/elementos definidos
