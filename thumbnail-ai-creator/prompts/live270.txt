@@ -1,0 +1,53 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a fleet management channel.
+
+REFERENCE IMAGES PROVIDED:
+- Images 1-2: JULIO (main host) face references - may be rotated 90 degrees
+
+JULIO (MAIN HOST) - FACE CONSISTENCY CRITICAL:
+- Gray/white stubble beard (salt and pepper, short, well-groomed)
+- Short brown hair, slightly wavy, natural looking
+- Brown/hazel eyes, NO glasses
+- Age: 40-42 years old, YOUTHFUL appearance, natural skin
+- Wearing PLAIN dark navy blue polo shirt (NO logos, NO text on shirt)
+- Natural relaxed posture, authentic expression
+
+SKIN TEXTURE - CRITICAL:
+- Keep skin SMOOTH like a fit 40 year old
+- Do NOT add wrinkles, age spots, or blemishes
+- Forehead SMOOTH, cheeks FIRM
+- Healthy, natural skin tone
+- Natural lighting on face, not overprocessed
+
+COMPOSITION - SPLIT CONTRAST CONCEPT:
+- Julio positioned CENTER of frame, medium shot (chest up)
+- POSE: Both hands open at chest level, palms up, as if weighing two options
+- LEFT side of image: DARKER, ominous tones (surveillance/oppression side)
+- RIGHT side of image: BRIGHTER, warmer tones (management/efficiency side)
+
+EXPRESSION: Questioning look, one eyebrow slightly raised, slight head tilt, serious but curious expression - as if asking "which one are you doing?"
+
+VISUAL ELEMENTS:
+- LEFT SIDE: Large stylized surveillance camera with eye, darker purple/red tones
+- RIGHT SIDE: Dashboard/analytics screen with graphs, brighter blue tones
+- Fleet trucks silhouettes blurred in background
+
+TEXT ELEMENTS - LOGICAL ALIGNMENT CRITICAL:
+- TOP LEFT: Red badge "LIVE 270"
+- LEFT TEXT: "PERSEGUIÇÃO?" (matches the surveillance/dark side)
+- CENTER: "OU" in smaller text
+- RIGHT TEXT: "MONITORAMENTO" (matches the dashboard/bright side)
+- Large white bold text with strong black shadow
+- Text positioned in lower third of image, below Julio's chest
+
+NO LOGOS:
+- Do NOT add any logos anywhere in the image
+- Do NOT add watermarks or brand marks
+- Keep the image clean and focused on the message
+
+COLOR GRADE:
+- Overall purple/magenta cinematic tint
+- High contrast for mobile visibility
+- Split lighting effect matching the duality theme
+- Left side darker/redder, right side brighter/bluer
+
+STYLE: Professional YouTube thumbnail, photorealistic natural-looking face (like V1 reference), slightly stylized background elements, dramatic split lighting, high contrast for mobile viewing. The thumbnail should provoke curiosity and make viewers want to click.

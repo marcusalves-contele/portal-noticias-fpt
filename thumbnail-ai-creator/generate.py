@@ -49,7 +49,8 @@ def generate_single(api_key, parts, variation_num, output_prefix):
         "contents": [{"parts": parts}],
         "generationConfig": {
             "responseModalities": ["IMAGE"],
-            "imageConfig": {"aspectRatio": "16:9"}
+            "imageConfig": {"aspectRatio": "16:9"},
+            "temperature": 0  # Reduz variação para maior consistência
         }
     }
 

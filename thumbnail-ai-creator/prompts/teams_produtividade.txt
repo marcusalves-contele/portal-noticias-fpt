@@ -1,0 +1,61 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a team management channel.
+
+REFERENCE IMAGES PROVIDED:
+- Images 1-2: LEONARDO (main host) face references
+
+LEONARDO (MAIN HOST) - FACE CONSISTENCY CRITICAL:
+- Dark brown hair with some gray streaks, wavy/curly
+- Black rectangular frame GLASSES (MUST include glasses)
+- Oval/round face shape, fuller cheeks
+- Clean shaven (NO beard, NO stubble)
+- Brown eyes behind glasses
+- Age: 43-47 years old, professional appearance
+- Wearing PLAIN dark navy blue t-shirt (NO logos, NO text on shirt)
+- Natural relaxed posture, authentic expression
+
+SKIN TEXTURE - CRITICAL:
+- Keep skin SMOOTH and NATURAL
+- Do NOT add wrinkles or age marks excessively
+- Healthy, natural skin tone
+
+COMPOSITION:
+- Leonardo positioned LEFT side of frame, medium shot (chest up)
+- POSE: Confident gesture - one hand showing "5" with fingers OR thumbs up
+- Looking at camera with confident, professional expression
+
+EXPRESSION: Confident and approachable - slight smile, eyebrows slightly raised, like someone about to share valuable tips
+
+VISUAL ELEMENTS:
+- RIGHT SIDE: Floating 3D elements representing productivity:
+  - Checklist with checkmarks
+  - Graph/chart going up
+  - Clock/time icon
+  - People/team icons
+- Elements should float in a modern, clean arrangement
+- Subtle blue glow around elements
+
+BACKGROUND:
+- Modern corporate office environment, blurred
+- Blue/cyan color tones (Contele Teams brand colors)
+- Bokeh blur, soft professional lighting
+- Glass windows suggestion in background
+
+TEXT ELEMENTS:
+- TOP: Small badge or no badge (Teams style)
+- MAIN TITLE: "5 PASSOS PARA ALTA PERFORMANCE" in large bold text
+- "5" should be extra large and highlighted (yellow or cyan)
+- White text with strong shadow for readability
+- Position text in lower third or right side, not overlapping face
+
+NO LOGOS:
+- Do NOT add any logos anywhere in the image
+- Do NOT add watermarks or brand marks
+- Keep the image clean and focused
+
+COLOR GRADE:
+- Blue/cyan corporate tones (Contele Teams brand)
+- Professional, modern lighting
+- High contrast for mobile visibility
+- Warm highlights on face, cool blue in background
+
+STYLE: Professional YouTube thumbnail, photorealistic natural-looking face, modern corporate feel, blue/cyan color scheme, high contrast for mobile viewing. The thumbnail should convey "I'm going to teach you 5 practical tips for high performance."
