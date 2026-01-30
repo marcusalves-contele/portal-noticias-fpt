@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Reembolso KM - Contele Teams</title>
+    <meta name="description" content="Calcule o reembolso de quilometragem para sua equipe externa. Inclui combustível, depreciação, seguro e despesas extras.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="bg-overlay"></div>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-area">
+                    <div class="logo-box">KM</div>
+                    <div class="logo-text">
+                        <h1>CALCULADORA DE REEMBOLSO</h1>
+                        <p>Para Equipes Externas</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="social-proof" id="socialProof">
+                        <span class="social-proof-number" id="counterDisplay">300+</span>
+                        <span class="social-proof-text">cálculos</span>
+                    </div>
+                    <button class="btn btn-secondary btn-small" id="btnHistorico">
+                        <span class="btn-icon">&#128269;</span> Meu histórico
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Formulário de Cálculo -->
+            <div class="card card-form">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="card-title-icon">&#128221;</span>
+                        Dados da Viagem
+                    </h2>
+                </div>
+
+                <form id="formCalculo">
+                    <div class="form-grid">
+                        <!-- Coluna 1: Data, KM, Veículo -->
+                        <div class="form-column">
+                            <div class="form-section">
+                                <h3 class="section-title">Registro</h3>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label class="form-label">Data</label>
+                                        <input type="date" class="form-input" id="dataViagem">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Tipo de Registro</label>
+                                        <select class="form-select" id="tipoRegistro">
+                                            <option value="individual">Viagem Individual</option>
+                                            <option value="consolidado">Consolidado do Dia</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3 class="section-title">Quilometragem</h3>
+                                <div class="grid-3">
+                                    <div class="form-group">
+                                        <label class="form-label">KM Inicial</label>
+                                        <input type="number" class="form-input" id="kmInicial" step="0.1" min="0" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">KM Final</label>
+                                        <input type="number" class="form-input" id="kmFinal" step="0.1" min="0" placeholder="0">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">KM Percorrido</label>
+                                        <input type="number" class="form-input input-highlight" id="kmPercorrido" step="0.1" min="0" placeholder="Ou digite direto">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3 class="section-title">Veículo</h3>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label class="form-label">Tipo</label>
+                                        <select class="form-select" id="tipoVeiculo">
+                                            <option value="carro_popular">Carro Popular</option>
+                                            <option value="carro_medio">Carro Médio</option>
+                                            <option value="carro_suv">SUV / Pickup</option>
+                                            <option value="moto">Moto</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label-optional">Placa (opcional)</label>
+                                        <input type="text" class="form-input form-input-optional" id="placaVeiculo" placeholder="ABC-1234" maxlength="8">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label-optional">Modelo / Cor (opcional)</label>
+                                    <input type="text" class="form-input form-input-optional" id="modeloVeiculo" placeholder="Ex: Onix Prata">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Coluna 2: Combustível, Despesas -->
+                        <div class="form-column">
+                            <div class="form-section">
+                                <h3 class="section-title">Combustível</h3>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label class="form-label">Preço (R$/L)</label>
+                                        <input type="number" class="form-input" id="precoCombustivel" step="0.01" min="0" value="6.29">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Consumo (km/L)</label>
+                                        <input type="number" class="form-input" id="consumoMedio" step="0.1" min="1" value="11.0">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section form-section-optional">
+                                <h3 class="section-title section-title-optional">Despesas Adicionais (opcional)</h3>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label class="form-label-optional">Pedágio</label>
+                                        <input type="text" class="form-input form-input-optional input-currency" id="valorPedagio" placeholder="R$ 0,00" inputmode="decimal">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label-optional">Estacionamento</label>
+                                        <input type="text" class="form-input form-input-optional input-currency" id="valorEstacionamento" placeholder="R$ 0,00" inputmode="decimal">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label-optional">Alimentação</label>
+                                        <input type="text" class="form-input form-input-optional input-currency" id="valorAlimentacao" placeholder="R$ 0,00" inputmode="decimal">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label-optional">Outras</label>
+                                        <input type="text" class="form-input form-input-optional input-currency" id="valorOutras" placeholder="R$ 0,00" inputmode="decimal">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section form-section-optional">
+                                <h3 class="section-title section-title-optional">Descrição (opcional)</h3>
+                                <div class="form-group">
+                                    <input type="text" class="form-input form-input-optional" id="descricaoViagem" placeholder="Ex: Visita cliente ABC, Entrega rota Sul...">
+                                </div>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <strong>Dica:</strong> Depreciação (R$ 0,20/km) e seguro (R$ 0,15/km) são automáticos.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-primary btn-large" id="btnCalcular">
+                            <span class="btn-icon">&#128202;</span> Calcular Reembolso
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Resultado do Cálculo -->
+            <div class="card card-result" id="cardResultado">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="card-title-icon">&#129518;</span>
+                        Resultado do Cálculo
+                    </h2>
+                </div>
+
+                <div id="resultadoCalculo" style="display: none;">
+                    <div class="result-display">
+                        <div class="result-label">Valor Total do Reembolso</div>
+                        <div class="result-value" id="valorTotalReembolso">R$ 0,00</div>
+                        <div class="result-subtitle">
+                            <span id="kmTotalDisplay">0 km</span> &bull; Custo por km: <span id="valorPorKmDisplay">R$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <div class="breakdown-row">
+                        <div class="breakdown-section">
+                            <h4 class="breakdown-title">Custos por Quilômetro</h4>
+                            <div class="breakdown-grid breakdown-grid-3">
+                                <div class="breakdown-item">
+                                    <div class="breakdown-label">Combustível</div>
+                                    <div class="breakdown-value" id="detCombustivel">R$ 0,00</div>
+                                </div>
+                                <div class="breakdown-item">
+                                    <div class="breakdown-label">Depreciação</div>
+                                    <div class="breakdown-value" id="detDepreciacao">R$ 0,00</div>
+                                </div>
+                                <div class="breakdown-item">
+                                    <div class="breakdown-label">Seguro</div>
+                                    <div class="breakdown-value" id="detSeguro">R$ 0,00</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="breakdown-section" id="despesasExtrasSection" style="display: none;">
+                            <h4 class="breakdown-title">Despesas Extras</h4>
+                            <div class="breakdown-grid">
+                                <div class="breakdown-item" id="itemPedagio" style="display: none;">
+                                    <div class="breakdown-label">Pedágio</div>
+                                    <div class="breakdown-value" id="detPedagio">R$ 0,00</div>
+                                </div>
+                                <div class="breakdown-item" id="itemEstacionamento" style="display: none;">
+                                    <div class="breakdown-label">Estacionamento</div>
+                                    <div class="breakdown-value" id="detEstacionamento">R$ 0,00</div>
+                                </div>
+                                <div class="breakdown-item" id="itemAlimentacao" style="display: none;">
+                                    <div class="breakdown-label">Alimentação</div>
+                                    <div class="breakdown-value" id="detAlimentacao">R$ 0,00</div>
+                                </div>
+                                <div class="breakdown-item" id="itemOutras" style="display: none;">
+                                    <div class="breakdown-label">Outras</div>
+                                    <div class="breakdown-value" id="detOutras">R$ 0,00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" id="btnNovoCalculo">
+                            <span class="btn-icon">&#128260;</span> Novo Cálculo
+                        </button>
+                        <button class="btn btn-primary" id="btnCompartilhar">
+                            <span class="btn-icon">&#128279;</span> Compartilhar
+                        </button>
+                    </div>
+                </div>
+
+                <div id="emptyResult" class="empty-state">
+                    <div class="empty-state-icon">&#9650;</div>
+                    <div class="empty-state-text">Preencha os dados acima</div>
+                    <p>O resultado aparecerá aqui após calcular</p>
+                </div>
+            </div>
+
+            <!-- Histórico do Dia -->
+            <div class="card" id="cardHistoricoDia" style="display: none;">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <span class="card-title-icon">&#128197;</span>
+                        Viagens do Dia
+                    </h2>
+                    <span class="badge" id="totalDiaDisplay">R$ 0,00</span>
+                </div>
+                <div id="listaHistoricoDia"></div>
+            </div>
+
+            <!-- CTA Contele -->
+            <div class="card cta-card">
+                <div class="cta-content">
+                    <h3>Automatize o controle de reembolso KM</h3>
+                    <p>Com o <strong>Contele Teams</strong>, sua equipe registra km automaticamente pelo celular. Sem planilhas, sem erros.</p>
+                    <a href="#" target="_blank" class="btn btn-cta" id="btnCTATeams">
+                        Conhecer Contele Teams
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <div class="footer-content">
+                <a href="https://conteleteams.com.br" target="_blank" class="footer-logo">
+                    <img src="https://images.contelege.com.br/logo-contele-teams-branco-250x150px.png" alt="Contele Teams" height="140">
+                </a>
+                <p class="footer-text">
+                    Calculadora desenvolvida por <a href="https://conteleteams.com.br" target="_blank">Contele Teams</a>
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Popup de Captura -->
+    <div id="popupCaptura" class="popup-overlay" style="display: none;">
+        <div class="popup-container">
+            <div class="popup-header">
+                <h3>Salvar seu resultado</h3>
+                <button class="popup-close" id="btnFecharPopup">&times;</button>
+            </div>
+            <div class="popup-body">
+                <p class="popup-text">Informe seus dados para salvar e acessar seu histórico depois.</p>
+                <div class="form-group">
+                    <label class="form-label">Seu Nome *</label>
+                    <input type="text" class="form-input" id="inputNome" placeholder="Como podemos te chamar?" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">WhatsApp *</label>
+                    <input type="tel" class="form-input" id="inputWhatsapp" placeholder="(11) 99999-9999" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nome da Empresa (opcional)</label>
+                    <input type="text" class="form-input" id="inputEmpresa" placeholder="Sua empresa">
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="btn btn-secondary" id="btnPular">Pular</button>
+                <button class="btn btn-primary" id="btnSalvarDados">
+                    <span class="btn-icon">&#128190;</span> Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup de Histórico -->
+    <div id="popupHistorico" class="popup-overlay" style="display: none;">
+        <div class="popup-container popup-large">
+            <div class="popup-header">
+                <h3>Meu Histórico</h3>
+                <button class="popup-close" id="btnFecharHistorico">&times;</button>
+            </div>
+            <div class="popup-body">
+                <p class="popup-text">Digite o WhatsApp que usou para recuperar seus cálculos.</p>
+                <div class="form-group">
+                    <label class="form-label">WhatsApp</label>
+                    <input type="tel" class="form-input" id="inputBuscarWhatsapp" placeholder="(11) 99999-9999">
+                </div>
+                <div id="historicoResultado" style="display: none;">
+                    <h4 class="section-title">Seus cálculos anteriores</h4>
+                    <div id="listaHistorico"></div>
+                </div>
+                <div id="historicoVazio" style="display: none;">
+                    <div class="empty-state small">
+                        <div class="empty-state-icon">&#128269;</div>
+                        <p>Nenhum histórico encontrado.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="btn btn-secondary" id="btnCancelarHistorico">Cancelar</button>
+                <button class="btn btn-primary" id="btnBuscarHistorico">
+                    <span class="btn-icon">&#128269;</span> Buscar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p class="loading-text" id="loadingText">Calculando...</p>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
