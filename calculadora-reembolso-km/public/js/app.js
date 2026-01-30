@@ -352,17 +352,41 @@
         }
 
         if (lista) {
-            lista.innerHTML = viagens.map(v => `
-                <div class="historico-dia-item">
-                    <div class="historico-dia-info">
-                        <span class="historico-dia-km">${v.km.toFixed(1)} km</span>
-                        ${v.placa ? ` • ${v.placa}` : ''}
-                        ${v.descricao ? ` • <em>${v.descricao}</em>` : ''}
-                        <span style="opacity: 0.6"> • ${v.hora}</span>
-                    </div>
-                    <div class="historico-dia-valor">${formatMoney(v.total)}</div>
-                </div>
-            `).join('');
+            lista.innerHTML = '';
+            viagens.forEach(v => {
+                const item = document.createElement('div');
+                item.className = 'historico-dia-item';
+
+                const info = document.createElement('div');
+                info.className = 'historico-dia-info';
+
+                const kmSpan = document.createElement('span');
+                kmSpan.className = 'historico-dia-km';
+                kmSpan.textContent = `${v.km.toFixed(1)} km`;
+                info.appendChild(kmSpan);
+
+                if (v.placa) {
+                    info.appendChild(document.createTextNode(` • ${v.placa}`));
+                }
+                if (v.descricao) {
+                    const em = document.createElement('em');
+                    em.textContent = ` • ${v.descricao}`;
+                    info.appendChild(em);
+                }
+
+                const horaSpan = document.createElement('span');
+                horaSpan.style.opacity = '0.6';
+                horaSpan.textContent = ` • ${v.hora}`;
+                info.appendChild(horaSpan);
+
+                const valor = document.createElement('div');
+                valor.className = 'historico-dia-valor';
+                valor.textContent = formatMoney(v.total);
+
+                item.appendChild(info);
+                item.appendChild(valor);
+                lista.appendChild(item);
+            });
         }
     }
 
@@ -567,9 +591,10 @@
             if (vazioDiv) vazioDiv.style.display = 'none';
             if (resultadoDiv) resultadoDiv.style.display = 'block';
 
-            // Renderiza lista
+            // Renderiza lista com DOM seguro
             if (listaDiv) {
-                listaDiv.innerHTML = data.resultados.slice(0, 10).map(r => {
+                listaDiv.innerHTML = '';
+                data.resultados.slice(0, 10).forEach(r => {
                     const date = new Date(r.created_at);
                     const dateStr = date.toLocaleDateString('pt-BR', {
                         day: '2-digit',
@@ -579,18 +604,31 @@
                         minute: '2-digit'
                     });
 
-                    return `
-                        <div class="historico-item">
-                            <div class="historico-item-header">
-                                <span class="historico-item-date">${dateStr}</span>
-                                <span class="historico-item-value">${formatMoney(r.valor_reembolso)}</span>
-                            </div>
-                            <div class="historico-item-details">
-                                ${r.km_percorrido} km | ${r.tipo_veiculo || 'Carro'}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                    const item = document.createElement('div');
+                    item.className = 'historico-item';
+
+                    const header = document.createElement('div');
+                    header.className = 'historico-item-header';
+
+                    const dateSpan = document.createElement('span');
+                    dateSpan.className = 'historico-item-date';
+                    dateSpan.textContent = dateStr;
+
+                    const valueSpan = document.createElement('span');
+                    valueSpan.className = 'historico-item-value';
+                    valueSpan.textContent = formatMoney(r.valor_reembolso);
+
+                    header.appendChild(dateSpan);
+                    header.appendChild(valueSpan);
+
+                    const details = document.createElement('div');
+                    details.className = 'historico-item-details';
+                    details.textContent = `${r.km_percorrido} km | ${r.tipo_veiculo || 'Carro'}`;
+
+                    item.appendChild(header);
+                    item.appendChild(details);
+                    listaDiv.appendChild(item);
+                });
             }
 
             // Atualiza cookie_id e telefone local
@@ -608,7 +646,122 @@
 
     function handleNewCalculation() {
         resetForm();
+        // Switch to resultado tab
+        switchTab('resultado');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================
+    // TABS FUNCTIONALITY
+    // ==========================================
+    function initTabs() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                switchTab(tabName);
+            });
+        });
+    }
+
+    function switchTab(tabName) {
+        // Update buttons
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === tabName);
+        });
+
+        // Update content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.toggle('active', content.dataset.tabContent === tabName);
+        });
+    }
+
+    async function handleSearchHistoryInline() {
+        const input = document.getElementById('inputHistoricoInline');
+        const telefone = cleanPhone(input?.value || '');
+
+        if (telefone.length < 10) {
+            alert('Informe um WhatsApp válido.');
+            input?.focus();
+            return;
+        }
+
+        showLoading('Buscando histórico...');
+
+        const data = await apiGetHistory({ telefone });
+
+        hideLoading();
+
+        const resultadoDiv = document.getElementById('historicoInlineResultado');
+        const vazioDiv = document.getElementById('historicoInlineVazio');
+        const listaDiv = document.getElementById('listaHistoricoInline');
+
+        if (data?.resultados && data.resultados.length > 0) {
+            if (vazioDiv) vazioDiv.style.display = 'none';
+            if (resultadoDiv) resultadoDiv.style.display = 'block';
+
+            // Render list with safe text content
+            if (listaDiv) {
+                listaDiv.innerHTML = '';
+                data.resultados.slice(0, 10).forEach(r => {
+                    const date = new Date(r.created_at);
+                    const dateStr = date.toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    const item = document.createElement('div');
+                    item.className = 'historico-item';
+
+                    const header = document.createElement('div');
+                    header.className = 'historico-item-header';
+
+                    const dateSpan = document.createElement('span');
+                    dateSpan.className = 'historico-item-date';
+                    dateSpan.textContent = dateStr;
+
+                    const valueSpan = document.createElement('span');
+                    valueSpan.className = 'historico-item-value';
+                    valueSpan.textContent = formatMoney(r.valor_reembolso);
+
+                    header.appendChild(dateSpan);
+                    header.appendChild(valueSpan);
+
+                    const details = document.createElement('div');
+                    details.className = 'historico-item-details';
+                    details.textContent = `${r.km_percorrido} km | ${r.tipo_veiculo || 'Carro'}`;
+
+                    item.appendChild(header);
+                    item.appendChild(details);
+                    listaDiv.appendChild(item);
+                });
+            }
+
+            // Update local cookie_id and phone
+            if (data.usuario) {
+                const storageData = getStorageData();
+                storageData.cookie_id = data.usuario.cookie_id;
+                storageData.telefone = telefone;
+                saveStorageData(storageData);
+            }
+
+            // Scroll to the card
+            setTimeout(() => {
+                const cardResultado = document.getElementById('cardResultado');
+                if (cardResultado) {
+                    cardResultado.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+        } else {
+            if (resultadoDiv) resultadoDiv.style.display = 'none';
+            if (vazioDiv) {
+                vazioDiv.style.display = 'block';
+                vazioDiv.querySelector('p').textContent = 'Nenhum histórico encontrado para este número.';
+            }
+        }
     }
 
     function handleShare() {
@@ -684,20 +837,23 @@
         const btnBuscarHistorico = document.getElementById('btnBuscarHistorico');
 
         if (btnHistorico) btnHistorico.addEventListener('click', () => {
-            // Limpa estado anterior
-            const resultadoDiv = document.getElementById('historicoResultado');
-            const vazioDiv = document.getElementById('historicoVazio');
-            if (resultadoDiv) resultadoDiv.style.display = 'none';
-            if (vazioDiv) vazioDiv.style.display = 'none';
+            // Switch to history tab and scroll to result card
+            switchTab('historico');
 
-            // Preenche telefone se ja tiver
+            // Preenche telefone se já tiver
             const savedPhone = getUserPhone();
-            if (savedPhone) {
-                const input = document.getElementById('inputBuscarWhatsapp');
-                if (input) input.value = formatPhone(savedPhone);
+            const inputInline = document.getElementById('inputHistoricoInline');
+            if (savedPhone && inputInline) {
+                inputInline.value = formatPhone(savedPhone);
             }
 
-            showPopup('popupHistorico');
+            // Scroll to result card
+            setTimeout(() => {
+                const cardResultado = document.getElementById('cardResultado');
+                if (cardResultado) {
+                    cardResultado.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
         });
 
         if (btnFecharHistorico) btnFecharHistorico.addEventListener('click', () => hidePopup('popupHistorico'));
@@ -718,6 +874,34 @@
                     handleSearchHistory();
                 }
             });
+        }
+
+        // Tabs na seção de resultado
+        initTabs();
+
+        // Inline history search
+        const btnBuscarInline = document.getElementById('btnBuscarInline');
+        if (btnBuscarInline) {
+            btnBuscarInline.addEventListener('click', handleSearchHistoryInline);
+        }
+
+        const inputHistoricoInline = document.getElementById('inputHistoricoInline');
+        if (inputHistoricoInline) {
+            inputHistoricoInline.addEventListener('input', (e) => {
+                e.target.value = formatPhone(e.target.value);
+            });
+            inputHistoricoInline.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSearchHistoryInline();
+                }
+            });
+
+            // Preenche com telefone salvo
+            const savedPhone = getUserPhone();
+            if (savedPhone) {
+                inputHistoricoInline.value = formatPhone(savedPhone);
+            }
         }
 
         // Fecha popup ao clicar fora

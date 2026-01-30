@@ -170,12 +170,18 @@
             <!-- Resultado do Cálculo -->
             <div class="card card-result" id="cardResultado">
                 <div class="card-header">
-                    <h2 class="card-title">
-                        <span class="card-title-icon">&#129518;</span>
-                        Resultado do Cálculo
-                    </h2>
+                    <div class="tab-container">
+                        <button class="tab-button active" id="tabResultado" data-tab="resultado">
+                            <span class="tab-icon">&#129518;</span> Resultado
+                        </button>
+                        <button class="tab-button" id="tabHistorico" data-tab="historico">
+                            <span class="tab-icon">&#128197;</span> Histórico
+                        </button>
+                    </div>
                 </div>
 
+                <!-- Tab: Resultado -->
+                <div class="tab-content active" id="tabContentResultado" data-tab-content="resultado">
                 <div id="resultadoCalculo" style="display: none;">
                     <div class="result-display">
                         <div class="result-label">Valor Total do Reembolso</div>
@@ -242,6 +248,30 @@
                     <div class="empty-state-text">Preencha os dados acima</div>
                     <p>O resultado aparecerá aqui após calcular</p>
                 </div>
+                </div>
+
+                <!-- Tab: Histórico -->
+                <div class="tab-content" id="tabContentHistorico" data-tab-content="historico">
+                    <div class="historico-search-inline">
+                        <div class="form-group">
+                            <label class="form-label">WhatsApp para buscar histórico</label>
+                            <div class="input-with-button">
+                                <input type="tel" class="form-input" id="inputHistoricoInline" placeholder="(11) 99999-9999">
+                                <button class="btn btn-primary" id="btnBuscarInline">
+                                    <span class="btn-icon">&#128269;</span> Buscar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="historicoInlineResultado" style="display: none;">
+                        <h4 class="section-title">Seus cálculos anteriores</h4>
+                        <div id="listaHistoricoInline"></div>
+                    </div>
+                    <div id="historicoInlineVazio" class="empty-state small">
+                        <div class="empty-state-icon">&#128269;</div>
+                        <p>Digite seu WhatsApp acima para buscar seu histórico de cálculos.</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Histórico do Dia -->
@@ -261,7 +291,7 @@
                 <div class="cta-content">
                     <h3>Automatize o controle de reembolso KM</h3>
                     <p>Com o <strong>Contele Teams</strong>, sua equipe registra km automaticamente pelo celular. Sem planilhas, sem erros.</p>
-                    <a href="#" target="_blank" class="btn btn-cta" id="btnCTATeams">
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-cta" id="btnCTATeams">
                         Conhecer Contele Teams
                     </a>
                 </div>
@@ -270,11 +300,11 @@
 
         <footer class="app-footer">
             <div class="footer-content">
-                <a href="https://conteleteams.com.br" target="_blank" class="footer-logo">
+                <a href="https://conteleteams.com.br" target="_blank" rel="noopener noreferrer" class="footer-logo">
                     <img src="https://images.contelege.com.br/logo-contele-teams-branco-250x150px.png" alt="Contele Teams" height="140">
                 </a>
                 <p class="footer-text">
-                    Calculadora desenvolvida por <a href="https://conteleteams.com.br" target="_blank">Contele Teams</a>
+                    Calculadora desenvolvida por <a href="https://conteleteams.com.br" target="_blank" rel="noopener noreferrer">Contele Teams</a>
                 </p>
             </div>
         </footer>

@@ -13,11 +13,32 @@ const apiRoutes = require('./routes/api');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// CORS configuration
+// CORS configuration - restrict to specific origins
+const allowedOrigins = [
+  'https://calculadora-reembolso-km-production.up.railway.app',
+  'https://calculadora.conteleteams.com.br',
+  'https://conteleteams.com.br',
+  'http://localhost:3000'
+];
+
 app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, same-origin)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      // In production, reject unknown origins. In dev, allow all for testing.
+      if (process.env.NODE_ENV === 'production') {
+        callback(new Error('CORS not allowed'), false);
+      } else {
+        callback(null, true);
+      }
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
 }));
 
 // Body parser

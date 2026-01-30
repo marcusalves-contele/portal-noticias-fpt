@@ -857,6 +857,73 @@ body::before {
     color: var(--cor-texto-muted);
 }
 
+/* Tabs */
+.tab-container {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tab-button {
+    background: transparent;
+    border: 1px solid var(--cor-borda);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    color: var(--cor-texto-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.tab-button:hover {
+    background: var(--cor-bg-light);
+    border-color: var(--cor-destaque);
+    color: var(--cor-texto);
+}
+
+.tab-button.active {
+    background: linear-gradient(135deg, var(--cor-destaque), var(--cor-azul));
+    border-color: var(--cor-destaque);
+    color: white;
+    box-shadow: 0 4px 15px rgba(74, 88, 255, 0.3);
+}
+
+.tab-icon {
+    font-size: 1em;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Inline History Search */
+.historico-search-inline {
+    margin-bottom: 1rem;
+}
+
+.input-with-button {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.input-with-button .form-input {
+    flex: 1;
+}
+
+.input-with-button .btn {
+    white-space: nowrap;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .form-grid {

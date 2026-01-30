@@ -357,6 +357,7 @@ describe('API Calculadora Reembolso KM', () => {
     it('should include CORS headers', async () => {
       const response = await request(app)
         .get('/health')
+        .set('Origin', 'http://localhost:3000')
         .expect(200);
 
       expect(response.headers).toHaveProperty('access-control-allow-origin');
@@ -365,6 +366,7 @@ describe('API Calculadora Reembolso KM', () => {
     it('should handle OPTIONS preflight', async () => {
       const response = await request(app)
         .options('/api/resultado')
+        .set('Origin', 'http://localhost:3000')
         .expect(204);
 
       expect(response.headers).toHaveProperty('access-control-allow-methods');
