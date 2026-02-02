@@ -329,10 +329,26 @@ body::before {
     box-shadow: 0 0 0 3px rgba(74, 88, 255, 0.15);
 }
 
-.form-input[type="number"],
+.form-input[type="number"] {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+}
+
+/* Date input - fix iOS overflow/spacing */
 .form-input[type="date"] {
     font-family: 'JetBrains Mono', monospace;
     font-weight: 500;
+    text-align: left;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    min-height: 44px;
+}
+
+/* iOS date input fix */
+.form-input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
+    padding-left: 0;
 }
 
 .form-input.input-highlight {
