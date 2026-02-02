@@ -119,7 +119,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Consumo (km/L)</label>
-                                        <input type="number" class="form-input" id="consumoMedio" step="0.1" min="1" value="11.0">
+                                        <input type="number" class="form-input" id="consumoMedio" step="0.1" min="1" value="12.0">
                                     </div>
                                 </div>
                             </div>
@@ -154,7 +154,8 @@
                             </div>
 
                             <div class="alert alert-info">
-                                <strong>Dica:</strong> Depreciação (R$ 0,20/km) e seguro (R$ 0,15/km) são automáticos.
+                                <strong>Dica:</strong> Depreciação, seguro, manutenção, pneus e IPVA são calculados automaticamente com base no tipo de veículo.
+                                <a href="#" id="linkMetodologia" style="color: inherit; text-decoration: underline;">Ver metodologia</a>
                             </div>
                         </div>
                     </div>
@@ -194,7 +195,7 @@
                     <div class="breakdown-row">
                         <div class="breakdown-section">
                             <h4 class="breakdown-title">Custos por Quilômetro</h4>
-                            <div class="breakdown-grid breakdown-grid-3">
+                            <div class="breakdown-grid breakdown-grid-4">
                                 <div class="breakdown-item">
                                     <div class="breakdown-label">Combustível</div>
                                     <div class="breakdown-value" id="detCombustivel">R$ 0,00</div>
@@ -206,6 +207,10 @@
                                 <div class="breakdown-item">
                                     <div class="breakdown-label">Seguro</div>
                                     <div class="breakdown-value" id="detSeguro">R$ 0,00</div>
+                                </div>
+                                <div class="breakdown-item">
+                                    <div class="breakdown-label" title="Manutenção + Pneus + IPVA">Outros custos</div>
+                                    <div class="breakdown-value" id="detCustosFixos">R$ 0,00</div>
                                 </div>
                             </div>
                         </div>
@@ -370,6 +375,114 @@
                 <button class="btn btn-primary" id="btnBuscarHistorico">
                     <span class="btn-icon">&#128269;</span> Buscar
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Metodologia -->
+    <div id="popupMetodologia" class="popup-overlay" style="display: none;">
+        <div class="popup-container popup-metodologia">
+            <div class="popup-header">
+                <h3>Como Calculamos o Reembolso</h3>
+                <button class="popup-close" id="btnFecharMetodologia">&times;</button>
+            </div>
+            <div class="popup-body popup-body-scroll">
+                <div class="metodologia-intro">
+                    <p>Nossa calculadora considera <strong>todos os custos reais</strong> de usar um veículo próprio para trabalho, não apenas combustível.</p>
+                </div>
+
+                <div class="metodologia-section">
+                    <h4>Componentes do Cálculo</h4>
+                    <div class="metodologia-grid">
+                        <div class="metodologia-item">
+                            <div class="metodologia-icon">⛽</div>
+                            <div class="metodologia-content">
+                                <strong>Combustível</strong>
+                                <p>Preço do litro ÷ consumo do veículo. Você informa os valores atuais.</p>
+                            </div>
+                        </div>
+                        <div class="metodologia-item">
+                            <div class="metodologia-icon">📉</div>
+                            <div class="metodologia-content">
+                                <strong>Depreciação</strong>
+                                <p>Perda de valor do veículo pelo uso. Baseado na taxa de 20%/ano da Receita Federal.</p>
+                            </div>
+                        </div>
+                        <div class="metodologia-item">
+                            <div class="metodologia-icon">🛡️</div>
+                            <div class="metodologia-content">
+                                <strong>Seguro</strong>
+                                <p>Custo anual do seguro rateado por km. Média de 3-5% do valor do veículo.</p>
+                            </div>
+                        </div>
+                        <div class="metodologia-item">
+                            <div class="metodologia-icon">🔧</div>
+                            <div class="metodologia-content">
+                                <strong>Outros Custos</strong>
+                                <p>Manutenção preventiva, pneus e IPVA. Rateados proporcionalmente ao uso.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metodologia-section">
+                    <h4>Valores por Categoria de Veículo</h4>
+                    <p class="metodologia-note">Custos fixos por km (além do combustível):</p>
+                    <table class="metodologia-table">
+                        <thead>
+                            <tr>
+                                <th>Categoria</th>
+                                <th>Valor Médio</th>
+                                <th>Custo Fixo/km</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>🏍️ Moto</td>
+                                <td>R$ 20.000</td>
+                                <td>R$ 0,20</td>
+                            </tr>
+                            <tr>
+                                <td>🚗 Carro Popular</td>
+                                <td>R$ 70.000</td>
+                                <td>R$ 0,72</td>
+                            </tr>
+                            <tr>
+                                <td>🚙 Carro Médio</td>
+                                <td>R$ 120.000</td>
+                                <td>R$ 1,15</td>
+                            </tr>
+                            <tr>
+                                <td>🚐 SUV / Pickup</td>
+                                <td>R$ 180.000</td>
+                                <td>R$ 1,70</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="metodologia-section">
+                    <h4>Proporcionalidade 50%</h4>
+                    <p>Como o veículo também é usado para fins pessoais, aplicamos <strong>50% nos custos fixos</strong> (depreciação, seguro, IPVA). Essa é a prática recomendada pelo mercado e aceita pela jurisprudência trabalhista brasileira (CLT Art. 2º).</p>
+                </div>
+
+                <div class="metodologia-section">
+                    <h4>Fontes e Referências</h4>
+                    <ul class="metodologia-fontes">
+                        <li><strong>Receita Federal:</strong> Taxa de depreciação 20%/ano</li>
+                        <li><strong>Tabela FIPE:</strong> Valores médios de mercado</li>
+                        <li><strong>IRS (EUA):</strong> Metodologia de mileage rate como referência</li>
+                        <li><strong>Pesquisas de mercado:</strong> VExpenses, Flash, PontoTel (2025)</li>
+                        <li><strong>Base Contele:</strong> Dados de +10.000 veículos rastreados</li>
+                    </ul>
+                </div>
+
+                <div class="metodologia-disclaimer">
+                    <p><strong>Nota:</strong> Os valores são estimativas para referência. Cada empresa pode definir sua política de reembolso considerando suas particularidades.</p>
+                </div>
+            </div>
+            <div class="popup-footer">
+                <button class="btn btn-primary" id="btnEntendidoMetodologia">Entendi</button>
             </div>
         </div>
     </div>

@@ -11,9 +11,50 @@
     // ==========================================
     const CONFIG = {
         API_BASE: '', // Relativo - mesmo servidor
-        DEPRECIATION_PER_KM: 0.20,
-        INSURANCE_PER_KM: 0.15,
         STORAGE_KEY: 'calc_reembolso_km'
+    };
+
+    // ==========================================
+    // CUSTOS POR CATEGORIA DE VEÍCULO (R$/km)
+    // Baseado em pesquisa 2025 - Proporcionalidade 50% para custos fixos
+    // ==========================================
+    const VEHICLE_COSTS = {
+        moto: {
+            // Moto 150cc, valor médio R$ 20k, 20k km/ano
+            depreciacao: 0.10,      // R$ 4k deprec × 50% ÷ 20k km
+            seguro: 0.03,           // R$ 1.2k × 50% ÷ 20k km
+            custos_fixos: 0.07,     // Combo: Manutenção R$0.04 + Pneus R$0.01 + IPVA R$0.02
+            total_fixo: 0.20,
+            consumo_default: 35.0,
+            valor_medio: 20000
+        },
+        carro_popular: {
+            // Carro popular, valor médio R$ 70k, 15k km/ano
+            depreciacao: 0.47,      // R$ 14k deprec × 50% ÷ 15k km
+            seguro: 0.08,           // R$ 2.5k × 50% ÷ 15k km
+            custos_fixos: 0.17,     // Combo: Manutenção R$0.10 + Pneus R$0.03 + IPVA R$0.04
+            total_fixo: 0.72,
+            consumo_default: 12.0,
+            valor_medio: 70000
+        },
+        carro_medio: {
+            // Carro médio, valor médio R$ 120k, 15k km/ano
+            depreciacao: 0.80,      // R$ 24k deprec × 50% ÷ 15k km
+            seguro: 0.13,           // R$ 4k × 50% ÷ 15k km
+            custos_fixos: 0.22,     // Combo: Manutenção R$0.12 + Pneus R$0.04 + IPVA R$0.06
+            total_fixo: 1.15,
+            consumo_default: 10.0,
+            valor_medio: 120000
+        },
+        carro_suv: {
+            // SUV/Pickup, valor médio R$ 180k, 15k km/ano
+            depreciacao: 1.20,      // R$ 36k deprec × 50% ÷ 15k km
+            seguro: 0.20,           // R$ 6k × 50% ÷ 15k km
+            custos_fixos: 0.30,     // Combo: Manutenção R$0.14 + Pneus R$0.06 + IPVA R$0.10
+            total_fixo: 1.70,
+            consumo_default: 8.0,
+            valor_medio: 180000
+        }
     };
 
     // ==========================================
@@ -250,7 +291,11 @@
     function calculateReembolso() {
         const km = getInputValue('kmPercorrido', 0);
         const precoComb = getInputValue('precoCombustivel', 6.29);
-        const consumo = getInputValue('consumoMedio', 11);
+        const consumo = getInputValue('consumoMedio', 12);
+        const tipoVeiculo = document.getElementById('tipoVeiculo')?.value || 'carro_popular';
+
+        // Busca custos da categoria do veículo
+        const vehicleCosts = VEHICLE_COSTS[tipoVeiculo] || VEHICLE_COSTS.carro_popular;
 
         // Despesas extras usam formato de moeda
         const pedagio = parseCurrencyInput(document.getElementById('valorPedagio')?.value || '');
@@ -258,13 +303,14 @@
         const alimentacao = parseCurrencyInput(document.getElementById('valorAlimentacao')?.value || '');
         const outras = parseCurrencyInput(document.getElementById('valorOutras')?.value || '');
 
-        // Calculos de custos por km
+        // Calculos de custos por km usando taxas da categoria
         const combustivel = consumo > 0 ? (km / consumo) * precoComb : 0;
-        const depreciacao = km * CONFIG.DEPRECIATION_PER_KM;
-        const seguro = km * CONFIG.INSURANCE_PER_KM;
+        const depreciacao = km * vehicleCosts.depreciacao;
+        const seguro = km * vehicleCosts.seguro;
+        const custosFixos = km * vehicleCosts.custos_fixos;  // Combo: Manutenção + Pneus + IPVA
 
-        // Custo por km (apenas custos variaveis)
-        const custoPorKm = combustivel + depreciacao + seguro;
+        // Custo total por km (combustível + custos fixos da categoria)
+        const custoPorKm = combustivel + depreciacao + seguro + custosFixos;
         const valorPorKm = km > 0 ? custoPorKm / km : 0;
 
         // Despesas extras (fixas)
@@ -284,11 +330,13 @@
             outras,
             depreciacao,
             seguro,
+            custosFixos,          // Combo: Manutenção + Pneus + IPVA
             custoPorKm,
             despesasExtras,
             total,
             valorPorKm,
-            tipoVeiculo: document.getElementById('tipoVeiculo')?.value || 'carro_popular',
+            tipoVeiculo,
+            vehicleCosts,         // Taxas usadas no cálculo
             placaVeiculo: document.getElementById('placaVeiculo')?.value || null,
             modeloVeiculo: document.getElementById('modeloVeiculo')?.value || null,
             dataViagem: document.getElementById('dataViagem')?.value || new Date().toISOString().split('T')[0],
@@ -403,10 +451,11 @@
         setText('kmTotalDisplay', `${result.km.toFixed(1)} km`);
         setText('valorPorKmDisplay', `${formatMoney(result.valorPorKm)}/km`);
 
-        // Custos por km
+        // Custos por km - valores já calculados
         setText('detCombustivel', formatMoney(result.combustivel));
         setText('detDepreciacao', formatMoney(result.depreciacao));
         setText('detSeguro', formatMoney(result.seguro));
+        setText('detCustosFixos', formatMoney(result.custosFixos));
 
         // Despesas extras - mostra apenas se tiver valor
         const despesasSection = document.getElementById('despesasExtrasSection');
@@ -440,9 +489,9 @@
         const form = document.getElementById('formCalculo');
         if (form) form.reset();
 
-        // Reset valores padrao
+        // Reset valores padrao (usando default do carro_popular)
         setValue('precoCombustivel', '6.29');
-        setValue('consumoMedio', '11.0');
+        setValue('consumoMedio', VEHICLE_COSTS.carro_popular.consumo_default.toFixed(1));
         setValue('valorPedagio', '0');
         setValue('valorEstacionamento', '0');
         setValue('valorAlimentacao', '0');
@@ -913,18 +962,12 @@
             });
         });
 
-        // Ajusta consumo baseado no tipo de veiculo
-        const tipoVeiculo = document.getElementById('tipoVeiculo');
-        if (tipoVeiculo) {
-            tipoVeiculo.addEventListener('change', (e) => {
-                const consumoMap = {
-                    'carro_popular': 11.0,
-                    'carro_medio': 10.0,
-                    'carro_suv': 8.0,
-                    'moto': 30.0
-                };
-                const consumo = consumoMap[e.target.value] || 11.0;
-                setValue('consumoMedio', consumo.toFixed(1));
+        // Ajusta consumo baseado no tipo de veiculo (usando VEHICLE_COSTS)
+        const tipoVeiculoSelect = document.getElementById('tipoVeiculo');
+        if (tipoVeiculoSelect) {
+            tipoVeiculoSelect.addEventListener('change', (e) => {
+                const vehicleCosts = VEHICLE_COSTS[e.target.value] || VEHICLE_COSTS.carro_popular;
+                setValue('consumoMedio', vehicleCosts.consumo_default.toFixed(1));
             });
         }
 
@@ -951,6 +994,26 @@
             placaInput.addEventListener('input', (e) => {
                 e.target.value = formatPlaca(e.target.value);
             });
+        }
+
+        // Modal de Metodologia
+        const linkMetodologia = document.getElementById('linkMetodologia');
+        const btnFecharMetodologia = document.getElementById('btnFecharMetodologia');
+        const btnEntendidoMetodologia = document.getElementById('btnEntendidoMetodologia');
+
+        if (linkMetodologia) {
+            linkMetodologia.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPopup('popupMetodologia');
+            });
+        }
+
+        if (btnFecharMetodologia) {
+            btnFecharMetodologia.addEventListener('click', () => hidePopup('popupMetodologia'));
+        }
+
+        if (btnEntendidoMetodologia) {
+            btnEntendidoMetodologia.addEventListener('click', () => hidePopup('popupMetodologia'));
         }
 
         console.log('Calculadora Reembolso KM - Inicializada');

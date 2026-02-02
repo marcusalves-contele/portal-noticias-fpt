@@ -528,6 +528,10 @@ body::before {
     grid-template-columns: repeat(3, 1fr);
 }
 
+.breakdown-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
 .breakdown-item {
     background: var(--cor-bg-light);
     padding: 0.6rem;
@@ -924,6 +928,157 @@ body::before {
     white-space: nowrap;
 }
 
+/* Modal Metodologia */
+.popup-metodologia {
+    max-width: 700px;
+    max-height: 90vh;
+}
+
+.popup-body-scroll {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.popup-body-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.popup-body-scroll::-webkit-scrollbar-track {
+    background: var(--cor-bg-light);
+    border-radius: 3px;
+}
+
+.popup-body-scroll::-webkit-scrollbar-thumb {
+    background: var(--cor-destaque);
+    border-radius: 3px;
+}
+
+.metodologia-intro {
+    background: rgba(74, 88, 255, 0.1);
+    border-left: 3px solid var(--cor-destaque);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0 8px 8px 0;
+}
+
+.metodologia-intro p {
+    margin: 0;
+    color: var(--cor-texto);
+}
+
+.metodologia-section {
+    margin-bottom: 1.5rem;
+}
+
+.metodologia-section h4 {
+    color: var(--cor-amarelo);
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.metodologia-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.metodologia-item {
+    display: flex;
+    gap: 0.75rem;
+    background: var(--cor-bg-light);
+    padding: 0.75rem;
+    border-radius: 8px;
+}
+
+.metodologia-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.metodologia-content strong {
+    display: block;
+    color: var(--cor-texto);
+    margin-bottom: 0.25rem;
+}
+
+.metodologia-content p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--cor-texto-muted);
+    line-height: 1.4;
+}
+
+.metodologia-note {
+    font-size: 0.9rem;
+    color: var(--cor-texto-muted);
+    margin-bottom: 0.75rem;
+}
+
+.metodologia-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.metodologia-table th,
+.metodologia-table td {
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.metodologia-table th {
+    background: var(--cor-bg-light);
+    color: var(--cor-texto-muted);
+    font-weight: 500;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.metodologia-table td:last-child {
+    font-weight: 600;
+    color: var(--cor-verde);
+}
+
+.metodologia-fontes {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.metodologia-fontes li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--cor-borda);
+    font-size: 0.9rem;
+    color: var(--cor-texto-muted);
+}
+
+.metodologia-fontes li:last-child {
+    border-bottom: none;
+}
+
+.metodologia-fontes li strong {
+    color: var(--cor-texto);
+}
+
+.metodologia-disclaimer {
+    background: rgba(255, 214, 10, 0.1);
+    border: 1px solid rgba(255, 214, 10, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.metodologia-disclaimer p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--cor-texto-muted);
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .form-grid {
@@ -950,6 +1105,10 @@ body::before {
     .breakdown-grid-3 {
         grid-template-columns: repeat(3, 1fr);
     }
+
+    .breakdown-grid-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 @media (max-width: 600px) {
@@ -966,7 +1125,8 @@ body::before {
     }
 
     .breakdown-grid,
-    .breakdown-grid-3 {
+    .breakdown-grid-3,
+    .breakdown-grid-4 {
         grid-template-columns: 1fr;
     }
 
@@ -1002,5 +1162,17 @@ body::before {
         width: 36px;
         height: 36px;
         font-size: 0.9rem;
+    }
+
+    .metodologia-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .popup-metodologia {
+        max-height: 95vh;
+    }
+
+    .popup-body-scroll {
+        max-height: 55vh;
     }
 }
