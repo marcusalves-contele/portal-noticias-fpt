@@ -36,7 +36,7 @@ Calculadora de reembolso por km rodado para equipes externas. Ativo de marketing
 
 | Item | Valor |
 |------|-------|
-| **URL Producao** | https://calculadora-reembolso-km-production.up.railway.app |
+| **URL Producao** | https://calculadora-reembolso-km.contele.io |
 | **Stack** | Node.js, Express, HTML/CSS/JS vanilla |
 | **Database** | Supabase (PostgreSQL) |
 | **Tabelas** | `growth_calculadora_usuarios`, `growth_calculadora_resultados` |
