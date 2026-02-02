@@ -16,42 +16,43 @@
 
     // ==========================================
     // CUSTOS POR CATEGORIA DE VEÍCULO (R$/km)
-    // Baseado em pesquisa 2025 - Proporcionalidade 50% para custos fixos
+    // Baseado em pesquisa 2025 - Valores conservadores e equilibrados
+    // Premissas: Depreciação 10%/ano (carro usado), 18.000 km/ano, 50% proporcionalidade
     // ==========================================
     const VEHICLE_COSTS = {
         moto: {
-            // Moto 150cc, valor médio R$ 20k, 20k km/ano
-            depreciacao: 0.10,      // R$ 4k deprec × 50% ÷ 20k km
-            seguro: 0.03,           // R$ 1.2k × 50% ÷ 20k km
-            custos_fixos: 0.07,     // Combo: Manutenção R$0.04 + Pneus R$0.01 + IPVA R$0.02
-            total_fixo: 0.20,
+            // Moto 150cc, valor médio R$ 20k
+            depreciacao: 0.06,      // R$ 20k × 10% × 50% ÷ 18k km
+            seguro: 0.03,           // R$ 1.2k × 50% ÷ 18k km
+            custos_fixos: 0.06,     // Combo: Manutenção + Pneus + IPVA
+            total_fixo: 0.15,
             consumo_default: 35.0,
             valor_medio: 20000
         },
         carro_popular: {
-            // Carro popular, valor médio R$ 70k, 15k km/ano
-            depreciacao: 0.47,      // R$ 14k deprec × 50% ÷ 15k km
-            seguro: 0.08,           // R$ 2.5k × 50% ÷ 15k km
-            custos_fixos: 0.17,     // Combo: Manutenção R$0.10 + Pneus R$0.03 + IPVA R$0.04
-            total_fixo: 0.72,
+            // Carro popular, valor médio R$ 70k
+            depreciacao: 0.19,      // R$ 70k × 10% × 50% ÷ 18k km
+            seguro: 0.07,           // R$ 2.5k × 50% ÷ 18k km
+            custos_fixos: 0.19,     // Combo: Manutenção + Pneus + IPVA
+            total_fixo: 0.45,
             consumo_default: 12.0,
             valor_medio: 70000
         },
         carro_medio: {
-            // Carro médio, valor médio R$ 120k, 15k km/ano
-            depreciacao: 0.80,      // R$ 24k deprec × 50% ÷ 15k km
-            seguro: 0.13,           // R$ 4k × 50% ÷ 15k km
-            custos_fixos: 0.22,     // Combo: Manutenção R$0.12 + Pneus R$0.04 + IPVA R$0.06
-            total_fixo: 1.15,
+            // Carro médio, valor médio R$ 120k
+            depreciacao: 0.33,      // R$ 120k × 10% × 50% ÷ 18k km
+            seguro: 0.11,           // R$ 4k × 50% ÷ 18k km
+            custos_fixos: 0.26,     // Combo: Manutenção + Pneus + IPVA
+            total_fixo: 0.70,
             consumo_default: 10.0,
             valor_medio: 120000
         },
         carro_suv: {
-            // SUV/Pickup, valor médio R$ 180k, 15k km/ano
-            depreciacao: 1.20,      // R$ 36k deprec × 50% ÷ 15k km
-            seguro: 0.20,           // R$ 6k × 50% ÷ 15k km
-            custos_fixos: 0.30,     // Combo: Manutenção R$0.14 + Pneus R$0.06 + IPVA R$0.10
-            total_fixo: 1.70,
+            // SUV/Pickup, valor médio R$ 180k
+            depreciacao: 0.50,      // R$ 180k × 10% × 50% ÷ 18k km
+            seguro: 0.15,           // R$ 6k × 50% ÷ 18k km
+            custos_fixos: 0.35,     // Combo: Manutenção + Pneus + IPVA
+            total_fixo: 1.00,
             consumo_default: 8.0,
             valor_medio: 180000
         }
@@ -640,42 +641,11 @@
             if (vazioDiv) vazioDiv.style.display = 'none';
             if (resultadoDiv) resultadoDiv.style.display = 'block';
 
-            // Renderiza lista com DOM seguro
+            // Renderiza lista com DOM seguro (usando createHistoricoItem)
             if (listaDiv) {
                 listaDiv.innerHTML = '';
                 data.resultados.slice(0, 10).forEach(r => {
-                    const date = new Date(r.created_at);
-                    const dateStr = date.toLocaleDateString('pt-BR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-
-                    const item = document.createElement('div');
-                    item.className = 'historico-item';
-
-                    const header = document.createElement('div');
-                    header.className = 'historico-item-header';
-
-                    const dateSpan = document.createElement('span');
-                    dateSpan.className = 'historico-item-date';
-                    dateSpan.textContent = dateStr;
-
-                    const valueSpan = document.createElement('span');
-                    valueSpan.className = 'historico-item-value';
-                    valueSpan.textContent = formatMoney(r.valor_reembolso);
-
-                    header.appendChild(dateSpan);
-                    header.appendChild(valueSpan);
-
-                    const details = document.createElement('div');
-                    details.className = 'historico-item-details';
-                    details.textContent = `${r.km_percorrido} km | ${r.tipo_veiculo || 'Carro'}`;
-
-                    item.appendChild(header);
-                    item.appendChild(details);
+                    const item = createHistoricoItem(r);
                     listaDiv.appendChild(item);
                 });
             }
@@ -698,6 +668,230 @@
         // Switch to resultado tab
         switchTab('resultado');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================
+    // HISTÓRICO - ITEM RENDERING
+    // ==========================================
+    function createHistoricoItem(r) {
+        const date = new Date(r.created_at);
+        const dateStr = date.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // Dados extras do JSON
+        const dados = r.dados_completos || {};
+        const placa = dados.placaVeiculo || null;
+        const descricao = dados.descricao || null;
+        const tipoVeiculo = formatTipoVeiculo(r.tipo_veiculo);
+
+        const item = document.createElement('div');
+        item.className = 'historico-item historico-item-clickable';
+        item.setAttribute('role', 'button');
+        item.setAttribute('tabindex', '0');
+
+        // Header: data e valor
+        const header = document.createElement('div');
+        header.className = 'historico-item-header';
+
+        const dateSpan = document.createElement('span');
+        dateSpan.className = 'historico-item-date';
+        dateSpan.textContent = dateStr;
+
+        const valueSpan = document.createElement('span');
+        valueSpan.className = 'historico-item-value';
+        valueSpan.textContent = formatMoney(r.valor_reembolso);
+
+        header.appendChild(dateSpan);
+        header.appendChild(valueSpan);
+
+        // Detalhes: km, tipo, placa
+        const details = document.createElement('div');
+        details.className = 'historico-item-details';
+
+        let detailsText = `${r.km_percorrido} km • ${tipoVeiculo}`;
+        if (placa) {
+            detailsText += ` • ${placa}`;
+        }
+        details.textContent = detailsText;
+
+        // Descrição (se houver)
+        if (descricao) {
+            const descSpan = document.createElement('div');
+            descSpan.className = 'historico-item-descricao';
+            descSpan.textContent = descricao;
+            item.appendChild(header);
+            item.appendChild(details);
+            item.appendChild(descSpan);
+        } else {
+            item.appendChild(header);
+            item.appendChild(details);
+        }
+
+        // Indicador de clique
+        const clickHint = document.createElement('span');
+        clickHint.className = 'historico-item-hint';
+        clickHint.textContent = 'Ver detalhes →';
+        item.appendChild(clickHint);
+
+        // Click handler para abrir detalhes
+        item.addEventListener('click', () => showHistoricoDetalhes(r));
+        item.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') showHistoricoDetalhes(r);
+        });
+
+        return item;
+    }
+
+    function formatTipoVeiculo(tipo) {
+        const map = {
+            'moto': 'Moto',
+            'carro_popular': 'Popular',
+            'carro_medio': 'Médio',
+            'carro_suv': 'SUV/Pickup'
+        };
+        return map[tipo] || tipo || 'Carro';
+    }
+
+    function showHistoricoDetalhes(registro) {
+        const dados = registro.dados_completos || {};
+
+        // Criar modal de detalhes
+        let modal = document.getElementById('popupDetalhesHistorico');
+        if (!modal) {
+            modal = createDetalhesModal();
+            document.body.appendChild(modal);
+        }
+
+        // Preencher dados
+        const date = new Date(registro.created_at);
+        const dateStr = date.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // Valores
+        const combustivel = dados.combustivel || 0;
+        const depreciacao = dados.depreciacao || 0;
+        const seguro = dados.seguro || 0;
+        const custosFixos = dados.custosFixos || 0;
+        const despesasExtras = dados.despesasExtras || 0;
+
+        document.getElementById('detalheData').textContent = dateStr;
+        document.getElementById('detalheKm').textContent = `${registro.km_percorrido} km`;
+        document.getElementById('detalheTipo').textContent = formatTipoVeiculo(registro.tipo_veiculo);
+        document.getElementById('detalhePlaca').textContent = dados.placaVeiculo || '-';
+        document.getElementById('detalheDescricao').textContent = dados.descricao || '-';
+        document.getElementById('detalheTotal').textContent = formatMoney(registro.valor_reembolso);
+        document.getElementById('detalhePorKm').textContent = `${formatMoney(registro.valor_reembolso / registro.km_percorrido)}/km`;
+
+        // Breakdown
+        document.getElementById('detalheCombustivel').textContent = formatMoney(combustivel);
+        document.getElementById('detalheDepreciacao').textContent = formatMoney(depreciacao);
+        document.getElementById('detalheSeguro').textContent = formatMoney(seguro);
+        document.getElementById('detalheCustosFixos').textContent = formatMoney(custosFixos);
+
+        // Despesas extras
+        const extrasSection = document.getElementById('detalheExtrasSection');
+        if (despesasExtras > 0) {
+            extrasSection.style.display = 'block';
+            document.getElementById('detalheExtras').textContent = formatMoney(despesasExtras);
+        } else {
+            extrasSection.style.display = 'none';
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function createDetalhesModal() {
+        const modal = document.createElement('div');
+        modal.id = 'popupDetalhesHistorico';
+        modal.className = 'popup-overlay';
+        modal.innerHTML = `
+            <div class="popup-container popup-detalhes">
+                <div class="popup-header">
+                    <h3>Detalhes do Cálculo</h3>
+                    <button class="popup-close" id="btnFecharDetalhes">&times;</button>
+                </div>
+                <div class="popup-body">
+                    <div class="detalhes-info-grid">
+                        <div class="detalhes-info-item">
+                            <span class="detalhes-label">Data</span>
+                            <span class="detalhes-value" id="detalheData">-</span>
+                        </div>
+                        <div class="detalhes-info-item">
+                            <span class="detalhes-label">Distância</span>
+                            <span class="detalhes-value" id="detalheKm">-</span>
+                        </div>
+                        <div class="detalhes-info-item">
+                            <span class="detalhes-label">Veículo</span>
+                            <span class="detalhes-value" id="detalheTipo">-</span>
+                        </div>
+                        <div class="detalhes-info-item">
+                            <span class="detalhes-label">Placa</span>
+                            <span class="detalhes-value" id="detalhePlaca">-</span>
+                        </div>
+                    </div>
+                    <div class="detalhes-descricao-box">
+                        <span class="detalhes-label">Descrição</span>
+                        <span class="detalhes-value" id="detalheDescricao">-</span>
+                    </div>
+                    <div class="detalhes-resultado">
+                        <div class="detalhes-total">
+                            <span>Valor Total</span>
+                            <span id="detalheTotal">R$ 0,00</span>
+                        </div>
+                        <div class="detalhes-porkm">
+                            <span id="detalhePorKm">R$ 0,00/km</span>
+                        </div>
+                    </div>
+                    <div class="detalhes-breakdown">
+                        <h4>Composição do Valor</h4>
+                        <div class="detalhes-breakdown-grid">
+                            <div class="detalhes-breakdown-item">
+                                <span>Combustível</span>
+                                <span id="detalheCombustivel">R$ 0,00</span>
+                            </div>
+                            <div class="detalhes-breakdown-item">
+                                <span>Depreciação</span>
+                                <span id="detalheDepreciacao">R$ 0,00</span>
+                            </div>
+                            <div class="detalhes-breakdown-item">
+                                <span>Seguro</span>
+                                <span id="detalheSeguro">R$ 0,00</span>
+                            </div>
+                            <div class="detalhes-breakdown-item">
+                                <span>Outros custos</span>
+                                <span id="detalheCustosFixos">R$ 0,00</span>
+                            </div>
+                        </div>
+                        <div class="detalhes-breakdown-item" id="detalheExtrasSection" style="display:none; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--cor-borda);">
+                            <span>Despesas extras</span>
+                            <span id="detalheExtras">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="popup-footer">
+                    <button class="btn btn-primary" id="btnOkDetalhes">Fechar</button>
+                </div>
+            </div>
+        `;
+
+        // Event listeners
+        modal.querySelector('#btnFecharDetalhes').addEventListener('click', () => modal.style.display = 'none');
+        modal.querySelector('#btnOkDetalhes').addEventListener('click', () => modal.style.display = 'none');
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+
+        return modal;
     }
 
     // ==========================================
@@ -753,38 +947,7 @@
             if (listaDiv) {
                 listaDiv.innerHTML = '';
                 data.resultados.slice(0, 10).forEach(r => {
-                    const date = new Date(r.created_at);
-                    const dateStr = date.toLocaleDateString('pt-BR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-
-                    const item = document.createElement('div');
-                    item.className = 'historico-item';
-
-                    const header = document.createElement('div');
-                    header.className = 'historico-item-header';
-
-                    const dateSpan = document.createElement('span');
-                    dateSpan.className = 'historico-item-date';
-                    dateSpan.textContent = dateStr;
-
-                    const valueSpan = document.createElement('span');
-                    valueSpan.className = 'historico-item-value';
-                    valueSpan.textContent = formatMoney(r.valor_reembolso);
-
-                    header.appendChild(dateSpan);
-                    header.appendChild(valueSpan);
-
-                    const details = document.createElement('div');
-                    details.className = 'historico-item-details';
-                    details.textContent = `${r.km_percorrido} km | ${r.tipo_veiculo || 'Carro'}`;
-
-                    item.appendChild(header);
-                    item.appendChild(details);
+                    const item = createHistoricoItem(r);
                     listaDiv.appendChild(item);
                 });
             }
@@ -816,11 +979,30 @@
     function handleShare() {
         if (!lastResult) return;
 
-        const text = `Calculei meu reembolso KM:\n\n` +
-            `KM: ${lastResult.km.toFixed(1)} km\n` +
-            `Total: ${formatMoney(lastResult.total)}\n` +
-            `Por km: ${formatMoney(lastResult.valorPorKm)}\n\n` +
-            `Calcule o seu: ${window.location.href}`;
+        // Formata data
+        const dataViagem = lastResult.dataViagem
+            ? new Date(lastResult.dataViagem + 'T12:00:00').toLocaleDateString('pt-BR')
+            : new Date().toLocaleDateString('pt-BR');
+
+        // Formata tipo veículo
+        const tipoDisplay = formatTipoVeiculo(lastResult.tipoVeiculo);
+
+        // Monta texto com detalhes
+        let text = `📊 Calculei meu reembolso KM:\n\n`;
+        text += `📅 Data: ${dataViagem}\n`;
+        text += `🚗 Veículo: ${tipoDisplay}`;
+        if (lastResult.placaVeiculo) {
+            text += ` (${lastResult.placaVeiculo})`;
+        }
+        text += `\n`;
+        text += `📏 Distância: ${lastResult.km.toFixed(1)} km\n`;
+        text += `\n`;
+        text += `💰 Total: ${formatMoney(lastResult.total)}\n`;
+        text += `📈 Por km: ${formatMoney(lastResult.valorPorKm)}\n`;
+        if (lastResult.descricao) {
+            text += `\n📝 ${lastResult.descricao}\n`;
+        }
+        text += `\n🔗 Calcule o seu: ${window.location.href}`;
 
         if (navigator.share) {
             navigator.share({
@@ -831,11 +1013,26 @@
         } else {
             // Fallback: copia pro clipboard
             navigator.clipboard.writeText(text).then(() => {
-                alert('Resultado copiado!');
+                showToast('Resultado copiado para a área de transferência!');
             }).catch(() => {
-                alert('Compartilhe:\n\n' + text);
+                // Fallback do fallback: mostra em alert
+                prompt('Copie o texto abaixo:', text);
             });
         }
+    }
+
+    // Toast notification
+    function showToast(message, duration = 3000) {
+        let toast = document.getElementById('toastNotification');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'toastNotification';
+            toast.className = 'toast-notification';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), duration);
     }
 
     // ==========================================
