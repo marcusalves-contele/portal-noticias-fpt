@@ -2,8 +2,9 @@ Create a YouTube thumbnail in 16:9 aspect ratio for a fleet management channel.
 
 REFERENCE IMAGES PROVIDED:
 - Images 1-2: JULIO (main host) face references - may be rotated 90 degrees
+- USE THESE REFERENCE IMAGES AS THE PRIMARY SOURCE for Julio's face - match his facial features EXACTLY
 
-JULIO (MAIN HOST) - FACE CONSISTENCY CRITICAL:
+JULIO (MAIN HOST) - FACE CONSISTENCY CRITICAL (MATCH REFERENCE PHOTOS EXACTLY):
 - Gray/white stubble beard (salt and pepper, short, well-groomed)
 - Short brown hair, slightly wavy, natural looking
 - Brown/hazel eyes, NO glasses
@@ -32,10 +33,10 @@ VISUAL ELEMENTS:
 - Fleet trucks silhouettes blurred in background
 
 TEXT ELEMENTS - LOGICAL ALIGNMENT CRITICAL:
-- TOP LEFT: Red badge "LIVE 270"
-- LEFT TEXT: "PERSEGUIÇÃO?" (matches the surveillance/dark side)
+- TOP LEFT: Red rectangular badge with white dot and text "LIVE" followed by episode number "270" (NOT viewer count - this is episode #270)
+- LEFT TEXT: "PERSEGUIÇÃO" (matches the surveillance/dark side)
 - CENTER: "OU" in smaller text
-- RIGHT TEXT: "MONITORAMENTO" (matches the dashboard/bright side)
+- RIGHT TEXT: "MONITORAMENTO?" (matches the dashboard/bright side, question mark at the END)
 - Large white bold text with strong black shadow
 - Text positioned in lower third of image, below Julio's chest
 
