@@ -6,10 +6,12 @@ Gera 3 variações de thumbnail baseado em prompt otimizado.
 Uso:
     python3 generate.py --prompt "seu prompt aqui" --refs ref1.jpg ref2.jpg
     python3 generate.py --prompt-file prompts/live316.txt --refs referencias/julio/*.JPEG
+    python3 generate.py --live 317  # Auto-detecta convidado e refs
 """
 
 import os
 import sys
+import re
 import base64
 import json
 import argparse
@@ -22,7 +24,60 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 PROJECT_DIR = Path(__file__).parent
 ENV_PATH = PROJECT_DIR / ".env"
 OUTPUT_DIR = PROJECT_DIR / "output"
+REFS_DIR = PROJECT_DIR / "referencias"
+GUESTS_DIR = REFS_DIR / "convidados"
 MODEL = "gemini-3-pro-image-preview"  # Nano Banana Pro
+
+
+def find_guest_for_live(live_number):
+    """
+    Busca arquivo de convidado para uma live específica.
+
+    Padrão do arquivo: {titulo}_live-{numero}-{Nome-Completo}.{ext}
+    Exemplos:
+        - convidado_live-317-Nelson-Margarido.jpg
+        - especialista_live-320-Maria-Silva.png
+        - gestor_live-325-Joao-Santos.jpeg
+
+    Returns:
+        dict com 'path', 'title', 'name' ou None se não encontrar
+    """
+    if not GUESTS_DIR.exists():
+        return None
+
+    # Busca arquivos que contenham o número da live
+    pattern = re.compile(rf'^(\w+)_live-{live_number}-(.+)\.(jpg|jpeg|png|webp)$', re.IGNORECASE)
+
+    for file in GUESTS_DIR.iterdir():
+        match = pattern.match(file.name)
+        if match:
+            title = match.group(1).capitalize()  # "convidado" -> "Convidado"
+            name_parts = match.group(2).split('-')
+            name = ' '.join(name_parts)  # "Nelson-Margarido" -> "Nelson Margarido"
+
+            return {
+                'path': str(file),
+                'title': title,
+                'name': name,
+                'display': f"{title} {name}"  # "Convidado Nelson Margarido"
+            }
+
+    return None
+
+
+def get_host_refs(channel='fleet'):
+    """Retorna lista de referências do apresentador principal."""
+    if channel.lower() == 'fleet':
+        julio_dir = REFS_DIR / "julio"
+        if julio_dir.exists():
+            return sorted([str(f) for f in julio_dir.glob("*.JPEG")] +
+                         [str(f) for f in julio_dir.glob("*.jpg")])
+    elif channel.lower() == 'teams':
+        leo_dir = REFS_DIR / "leonardo"
+        if leo_dir.exists():
+            return sorted([str(f) for f in leo_dir.glob("*.jpg")] +
+                         [str(f) for f in leo_dir.glob("*.jpeg")])
+    return []
 
 def load_api_key():
     """Carrega API key do .env"""
@@ -143,11 +198,23 @@ def main():
     parser.add_argument('--prompt', help='Prompt direto')
     parser.add_argument('--prompt-file', help='Arquivo com o prompt')
     parser.add_argument('--refs', nargs='+', help='Imagens de referência')
+    parser.add_argument('--live', type=int, help='Número da live (auto-detecta convidado e refs)')
+    parser.add_argument('--channel', default='fleet', choices=['fleet', 'teams'], help='Canal (fleet ou teams)')
     parser.add_argument('--variations', type=int, default=3, help='Número de variações (padrão: 3)')
     parser.add_argument('--prefix', help='Prefixo para arquivos de saída')
     parser.add_argument('--open', action='store_true', help='Abrir imagens após gerar')
+    parser.add_argument('--check-guest', type=int, help='Apenas verifica se existe convidado para a live')
 
     args = parser.parse_args()
+
+    # Modo de verificação de convidado
+    if args.check_guest:
+        guest = find_guest_for_live(args.check_guest)
+        if guest:
+            print(json.dumps(guest, ensure_ascii=False))
+        else:
+            print(json.dumps({"found": False}))
+        sys.exit(0)
 
     # Carrega prompt
     if args.prompt_file:
@@ -163,8 +230,26 @@ def main():
     print("THUMBNAIL AI CREATOR - NANO BANANA PRO")
     print(f"{'='*60}")
 
-    # Expande globs nas referências
+    # Monta referências
     refs = []
+
+    # Se --live foi passado, auto-detecta refs e convidado
+    if args.live:
+        # Refs do apresentador principal
+        host_refs = get_host_refs(args.channel)
+        refs.extend(host_refs)
+
+        # Verifica se tem convidado
+        guest = find_guest_for_live(args.live)
+        if guest:
+            refs.append(guest['path'])
+            print(f"  Convidado detectado: {guest['display']}")
+
+        # Prefix automático se não especificado
+        if not args.prefix:
+            args.prefix = f"live{args.live}"
+
+    # Refs manuais (adiciona às automáticas se houver)
     if args.refs:
         for ref in args.refs:
             if '*' in ref:
