@@ -455,7 +455,7 @@ EXEMPLOS:
 - "Case: Como a Empresa X reduziu custos" -> {{"tipo": "entrevista", "titulo_secao": "Assista a Entrevista Completa", "descricao": "Este artigo foi baseado na entrevista"}}
 """
     try:
-        result = call_gemini(prompt, model="gemini-2.0-flash")
+        result = call_gemini(prompt, model="gemini-3-flash-preview")
         # Extrai JSON da resposta
         json_match = re.search(r'\{[^}]+\}', result)
         if json_match:
@@ -653,7 +653,7 @@ OUTPUT: 16:9 landscape, photorealistic."""
 
     try:
         # Usa modelo de texto rapido para gerar o prompt
-        generated_prompt = call_gemini(meta_prompt, model="gemini-2.0-flash")
+        generated_prompt = call_gemini(meta_prompt, model="gemini-3-flash-preview")
         # Limpa o prompt (remove markdown se houver)
         generated_prompt = generated_prompt.strip()
         if generated_prompt.startswith("```"):
