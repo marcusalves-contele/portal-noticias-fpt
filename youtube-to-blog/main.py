@@ -36,7 +36,7 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 YOUTUBE_API_KEY = os.environ.get("YOUTUBE_API_KEY")
 
 # WordPress Fleet
-WP_FLEET_URL = "https://blog.contelefleet.com.br"
+WP_FLEET_URL = "https://blog.contelerastreador.com.br"
 WP_FLEET_USER = "Admin"
 WP_FLEET_PASSWORD = os.environ.get("WP_FLEET_APP_PASSWORD")
 
@@ -146,7 +146,7 @@ async def root():
         <div class="form-group">
             <label for="blog">Blog Destino</label>
             <select id="blog" required>
-                <option value="fleet">Fleet (blog.contelefleet.com.br)</option>
+                <option value="fleet">Fleet (blog.contelerastreador.com.br)</option>
                 <option value="teams">Teams (blog.conteleteams.com.br)</option>
             </select>
         </div>
@@ -542,7 +542,7 @@ def get_blog_prompt(blog: str, titulo: str, duracao: str, transcricao: str) -> s
         autor = "Julio Cesar, especialista em gestao de frotas"
         contexto = "gestao de frotas (rastreamento, combustivel, manutencao, motoristas)"
         canal = "Julio Cesar | Frota Para Todos"
-        cta_base = "https://contelefleet.com.br/?utm_source=blog&utm_medium=post&utm_campaign=youtube-live&utm_term="
+        cta_base = "https://contelerastreador.com.br/?utm_source=blog&utm_medium=post&utm_campaign=youtube-live&utm_term="
 
     return f"""Voce e o {autor}, escrevendo para o blog em primeira pessoa.
 
