@@ -1,0 +1,62 @@
+CRITICAL - FACE REFERENCE IMAGES:
+- Images 1-3 are JULIO's actual face photos - YOU MUST COPY THIS EXACT FACE
+- Image 4 is LEONARDO TEIXEIRA (guest) - copy his exact face. NOTE: this photo has cyberpunk visual effects (neon lights, headset) - IGNORE all effects and copy ONLY the facial features
+- Image 5 is LUCCA SILVA (guest) - copy his exact face. NOTE: this photo has cyberpunk visual effects (holographic glasses, neon) - IGNORE all effects and copy ONLY the facial features
+- Do NOT create different people - the generated faces MUST be recognizable as the same people from reference photos
+
+Create a YouTube thumbnail (16:9) with ALL THREE people from the reference photos.
+
+JULIO (HOST) - CENTER - COPY FROM IMAGES 1-3:
+- WIDER face shape, slightly square jaw - MATCH THE REFERENCE
+- DENSE gray/white stubble beard covering jaw and chin (salt and pepper, NOT sparse)
+- Receding hairline with short brown/gray hair - MATCH THE REFERENCE
+- Deep-set brown/hazel eyes, NO glasses
+- Age: 37-40 years old, YOUTHFUL and FIT appearance
+- Skin SMOOTH and FIRM — do NOT add wrinkles, crow's feet, forehead lines, or age spots
+- He looks YOUNGER than his beard suggests — keep face tight and fresh
+- Dark navy blue polo shirt (plain, no logos)
+- The face MUST be recognizable as the same person from the reference photos
+- Position: CENTER of frame, slightly forward/larger than guests, excited smile, hands open gesturing
+
+LEONARDO TEIXEIRA (GUEST 1) - LEFT SIDE - COPY FACE FROM IMAGE 4:
+- IGNORE the cyberpunk effects in the reference - focus ONLY on his real facial features
+- Young man, early-mid 20s, Brazilian
+- His MOST DISTINCTIVE feature: VERY LONG wavy/curly dark brown hair going past his shoulders
+- Thin goatee/mustache, light facial hair
+- Oval/elongated face shape with defined cheekbones
+- Dark brown eyes, NO glasses (the glasses in the ref are cyberpunk props - he does NOT wear glasses)
+- Warm skin tone, youthful smooth skin
+- Friendly natural smile showing teeth
+- Dark casual t-shirt (plain black)
+- Position: LEFT side of frame, slightly behind Julio, confident relaxed smile
+
+LUCCA SILVA (GUEST 2) - RIGHT SIDE - COPY FACE FROM IMAGE 5:
+- IGNORE the cyberpunk effects in the reference - focus ONLY on his real facial features
+- Young man, early 20s, Brazilian, mixed-race/pardo
+- Short tight curly/afro dark hair — very short on sides
+- BLACK-FRAMED RECTANGULAR GLASSES — he actually wears glasses in real life, keep them
+- Wider nose, full lips, wide bright smile showing teeth
+- Medium-dark skin tone
+- Clean shaven, no facial hair at all
+- Youthful round face
+- Dark casual t-shirt (plain black)
+- Position: RIGHT side of frame, slightly behind Julio, big enthusiastic smile
+
+COMPOSITION:
+- THREE PEOPLE clearly visible: Julio CENTER (larger), Leo Teixeira LEFT, Lucca RIGHT
+- All medium shot (chest up)
+- Background: Modern recording studio with purple/magenta ambient lighting
+- A large screen behind them showing a video player interface
+- 3D floating YouTube play button (red/white) between Julio and Leonardo
+- Small smartphone showing a training video floating near Lucca's side
+
+TEXT:
+- "LIVE 319" red badge top-left corner
+- "POLÍTICA DE FROTAS" large bold white text with strong black shadow
+- "EM VIDEOAULAS" bold text in bright YELLOW below the main title
+- "Convidados Lucca Silva e Leonardo Teixeira" medium white text with dark semi-transparent pill background, bottom center
+- Text on lower third, not overlapping faces
+
+COLOR: Rich purple/magenta base with warm yellow/gold accents. High contrast.
+
+STYLE: Professional YouTube thumbnail, photorealistic faces matching reference photos exactly, cinematic purple lighting, high contrast for mobile. The THREE faces must be clearly recognizable as the same people in the reference photos. FACE ACCURACY is the #1 priority.

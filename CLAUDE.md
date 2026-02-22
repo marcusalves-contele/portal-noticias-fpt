@@ -168,3 +168,49 @@ npm run preview  # Serve SPA com fallback
 ### Formulário não valida telefone
 - Formato esperado: (XX) XXXXX-XXXX
 - Regex: `/^\(\d{2}\) \d{5}-\d{4}$/`
+
+---
+
+## Thumbnail AI Creator
+
+Sistema de geração de thumbnails YouTube com Gemini (`gemini-3-pro-image-preview`).
+Doc completo: `thumbnail-ai-creator/CLAUDE.md`
+
+### Planilhas de Conteúdo (fonte de dados)
+| Canal | Spreadsheet ID | Sheet |
+|-------|---------------|-------|
+| **Fleet** (Julio) | `1lluvZ8SKQNThV4o4OzWqmsttP-BgRC1FU3AqwvfJbqI` | `Fleet` (gid=25167001) |
+| **Teams** (Leonardo) | `1RjMazaU0fV5npXIJFcZTrrGVbJVeWxv8VV8y1uMEJVU` | `Teams` (gid=1789816867) |
+
+**Colunas**: Tarefa no Asana | tema | Tipo | title | Texto da thumb | Convidado | url | summary | type
+
+Linhas com "Tarefa no Asana" preenchido = thumbs pendentes de criação.
+
+### Grupo WhatsApp de Entrega
+- **Grupo**: IA - Growth Contele
+- **JID**: `120363424539843742@g.us`
+- Enviar thumbs aprovadas via zap agent (suporta imagens via `/send-image`)
+
+### Referências Disponíveis
+- **Julio** (Fleet): `referencias/julio/` — 3 fotos (2 sérias + 1 sorrindo)
+- **Leonardo** (Teams): `referencias/leonardo/` — 2 fotos (cyberpunk-styled)
+- **Convidados**: `referencias/convidados/` — padrão: `convidado_live-{NUM}-{Nome}.{ext}`
+
+### Pendências para Liberar o Sistema pro Time
+
+1. **Fotos profissionais 4K do Julio e Leonardo**
+   - Expressões variadas: sério, empolgado, surpreso, preocupado
+   - Hoje as refs são limitadas e impactam fidelidade facial
+   - Julio: 3 fotos atuais (aceitáveis mas não ideais)
+   - Leonardo: 2 fotos cyberpunk (ruim pra referência, neon/efeitos atrapalham)
+
+2. **Fotos dos convidados**
+   - Hoje depende de buscar manualmente (site, Asana, etc)
+   - Ideal: time sobe foto na planilha/Asana ANTES de pedir thumb
+   - Fotos reais simples (selfie, foto corporativa) > fotos estilizadas
+
+3. **Planilha unificada**
+   - Hoje: 2 planilhas separadas (Fleet + Teams) como base de conteúdo
+   - Objetivo: base de dados ÚNICA com todos os vídeos + ações
+   - Precisa alinhar formato com Marco (conversa pendente)
+   - Proposta: vídeos + status thumb + link thumb + responsável + prioridade

@@ -1,0 +1,31 @@
+REFERENCE IMAGES:
+- Image 1: THE ORIGINAL HERO IMAGE — this is the base. Keep the ENTIRE scene exactly as-is.
+- Images 2-4: JULIO's real face photos. Image 4 (smiling, black shirt) is the MOST IMPORTANT — this is how he ACTUALLY looks.
+
+TASK: Take Image 1 and ONLY replace Julio's face to make him look MUCH YOUNGER. Like 35 years old. Everything else stays PIXEL-PERFECT identical.
+
+FACE CHANGES — BE AGGRESSIVE:
+- He must look 35 YEARS OLD MAXIMUM — currently he looks 50+, that's WRONG
+- COMPLETELY SMOOTH skin — zero wrinkles anywhere (forehead, eyes, mouth, neck)
+- NO crow's feet, NO laugh lines, NO nasolabral folds
+- Cheeks FULL and FIRM — no sagging, no hollow cheeks
+- Jawline TIGHT and DEFINED — no jowls, no loose skin
+- Under-eye area SMOOTH — no bags, no dark circles
+- Neck skin TIGHT — no loose neck skin
+- Forehead completely SMOOTH and unwrinkled
+- Face shape WIDER and more FULL like in reference photo 4 (smiling)
+- Eyes BRIGHT and ALERT — youthful energy
+- Hair slightly THICKER and more BROWN (less gray)
+- Beard can stay salt-and-pepper but on a YOUNG face
+- Skin has a healthy GLOW — like someone who works out and takes care of himself
+- Think: a 35-year-old tech CEO who surfs on weekends
+
+WHAT MUST NOT CHANGE:
+- The entire background, stage, venue, audience (every person)
+- The podium, microphone, screen with "Frota Para Todos"
+- Purple/blue stage lighting
+- Julio's body, posture, clothing, hands
+- The wide panoramic composition
+- The color grading and atmosphere
+
+The ONLY thing that changes is his FACE — make it dramatically younger.

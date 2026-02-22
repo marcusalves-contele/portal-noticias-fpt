@@ -1,0 +1,39 @@
+CRITICAL - FACE REFERENCE IMAGES:
+- Images 1-2 are LEONARDO's actual face photos - YOU MUST COPY THIS EXACT FACE
+- Do NOT create a different person - use the reference photos as the PRIMARY SOURCE
+
+Create a YouTube thumbnail (16:9) for a team management channel.
+
+LEONARDO (HOST) - COPY FROM IMAGES 1-2:
+- Oval face, clear smooth skin
+- Medium brown hair, well-groomed, slightly wavy on top
+- Expressive brown eyes, friendly face
+- Age: 30-35 years old, youthful professional appearance
+- Skin SMOOTH and NATURAL — no wrinkles, healthy glow
+- The face MUST be recognizable as the same person from the reference photos
+- Wearing a professional blue/dark shirt (Contele Teams style)
+- Position: RIGHT side of frame, leaning slightly forward with an excited expression
+- POSE: Holding a printed spreadsheet/document in one hand, pointing at it with the other hand
+- Expression: Excited, energetic, "you NEED this!" look — wide eyes, slight smile, eyebrows raised
+
+COMPOSITION:
+- Leonardo on RIGHT side (40% of frame), dynamic forward-leaning pose
+- LEFT side: Large bold text area
+- Background: Modern office desk setup, slightly blurred
+- A laptop open on the desk showing a spreadsheet/CRM dashboard
+- Floating 3D elements: A glowing spreadsheet icon, a magnifying glass, client contact cards flying out
+
+3D FLOATING ELEMENTS (subtle, 2-3 items):
+- A green download arrow icon (representing free download)
+- Small spreadsheet/grid icon with a checkmark
+- A few client profile cards scattered in the background
+
+TEXT:
+- "PARE DE PERDER VENDAS!" large bold WHITE text with strong black shadow on LEFT side
+- "PLANILHA GRÁTIS" slightly smaller bold text in bright GREEN below, with a download icon
+- Text positioned on LEFT half, not overlapping Leonardo's face
+- Clean readable text, maximum impact
+
+COLOR: Blue/cyan corporate base (Contele Teams brand #0066CC) with green accent highlights for the "free/download" element. Professional but urgent feel.
+
+STYLE: Professional YouTube thumbnail, photorealistic face matching reference photos exactly, blue/cyan corporate lighting, high contrast for mobile. Modern SaaS/productivity feel. Prioritize FACE ACCURACY over visual elements.

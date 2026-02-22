@@ -1,0 +1,27 @@
+CRITICAL - REFERENCE IMAGES:
+- Image 1: THE ORIGINAL HERO IMAGE — keep this EXACTLY as-is for composition, lighting, audience, stage, background, podium, screen, everything. DO NOT change the scene.
+- Images 2-4: JULIO's actual face photos showing his REAL youthful appearance — use these to FIX his face in the hero image.
+
+TASK: EDIT ONLY JULIO'S FACE in Image 1. Keep EVERYTHING else identical.
+
+The man at the podium in Image 1 looks too old. His face needs to match the reference photos (Images 2-4) which show his REAL younger appearance.
+
+WHAT TO CHANGE (ONLY the man's face):
+- Make his face look like the reference photos — YOUNGER, age 37-40
+- Skin SMOOTH and FIRM — remove any wrinkles, crow's feet, forehead lines
+- Face should be WIDER and more full, matching reference photos
+- Keep the same stubble beard (salt and pepper) but on a younger face
+- Eyes more alert and energetic
+- Overall: he should look fit, healthy, and 37-40 years old maximum
+- Reference photo 4 (smiling, black FrotaParaTodos shirt) shows his TRUE youthful energy — match that
+
+WHAT TO KEEP EXACTLY THE SAME (DO NOT CHANGE):
+- The entire background, stage, audience, lighting, colors
+- The podium, microphone, "Frota Para Todos" screen/branding
+- The purple/blue lighting atmosphere
+- Julio's body position, posture, clothing (dark polo shirt)
+- The composition and framing (wide panoramic)
+- The audience size, seating, and positioning
+- Every single pixel that is NOT Julio's face
+
+OUTPUT: Same wide panoramic format as the original image. The result should look like the same photo but with Julio looking younger and more energetic.
