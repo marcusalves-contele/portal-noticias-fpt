@@ -1,0 +1,64 @@
+CRITICAL - FACE REFERENCE IMAGES:
+- Image 1 is LEONARDO TEIXEIRA's actual face photo - YOU MUST COPY THIS EXACT FACE
+  NOTE: this photo has cyberpunk visual effects (neon lights, headset, rain) - IGNORE ALL effects and copy ONLY the real facial features underneath
+- Image 2 is LUCCA SILVA's actual face photo - YOU MUST COPY THIS EXACT FACE
+  NOTE: this photo has cyberpunk visual effects (holographic glasses, green neon, cables) - IGNORE ALL effects and copy ONLY the real facial features underneath
+- Do NOT create different people - the generated faces MUST be recognizable as the same people from reference photos
+
+Create a YouTube thumbnail (16:9) for a fleet management training video featuring BOTH people from the reference photos.
+
+LEONARDO TEIXEIRA (PRESENTER 1) - LEFT SIDE - COPY FACE FROM IMAGE 1:
+- IGNORE the cyberpunk effects in the reference - focus ONLY on his real facial features
+- Young Brazilian man, early-mid 20s
+- His MOST DISTINCTIVE feature: VERY LONG wavy/curly dark brown hair going well past his shoulders
+- Thin goatee/mustache, light facial hair on chin
+- Oval/elongated face shape with defined cheekbones
+- Dark brown eyes, NO glasses (any glasses in ref are cyberpunk props)
+- Warm olive skin tone, youthful smooth skin
+- POSE: Holding a messy stack of crumpled papers in one hand, tossing them away with a dismissive gesture
+- EXPRESSION: Relieved smile, like "finally done with this nonsense"
+- Wearing plain black t-shirt (no logos)
+- Position: LEFT side of frame, medium shot (chest up)
+
+LUCCA SILVA (PRESENTER 2) - RIGHT SIDE - COPY FACE FROM IMAGE 2:
+- IGNORE the cyberpunk effects in the reference - focus ONLY on his real facial features
+- Young Brazilian man, early 20s, mixed-race/pardo
+- Short tight curly/afro dark hair — very short on sides
+- BLACK-FRAMED RECTANGULAR GLASSES — he actually wears these in real life, KEEP them
+- Wider nose, full lips, wide bright enthusiastic smile showing teeth
+- Medium-dark skin tone
+- Clean shaven, no facial hair at all
+- Youthful round face
+- POSE: Pointing confidently toward a glowing holographic shield/screen between them that shows "IA" text
+- EXPRESSION: Excited, energized, like showing off something amazing
+- Wearing plain black t-shirt (no logos)
+- Position: RIGHT side of frame, medium shot (chest up)
+
+COMPOSITION:
+- TWO PEOPLE clearly visible: Leonardo LEFT, Lucca RIGHT
+- Between them: a glowing digital SHIELD element with circuit-board patterns, radiating blue/cyan light
+- Leonardo's side has scattered crumpled paper falling/floating away (the OLD way - analog, dying)
+- Lucca's side has floating 3D tech icons: Google Gemini sparkle logo, a notebook/document icon transforming into audio waves, a play button
+- The visual CONTRAST: LEFT = paper chaos being discarded, RIGHT = clean digital AI future
+- Both presenters are well-lit, facing slightly toward center
+
+BACKGROUND:
+- Deep dark blue gradient base (Contele navy #002F6C)
+- Subtle purple/magenta cinematic lighting from the sides
+- The glowing shield between them illuminates their faces with cool blue light
+- Clean, professional, modern tech feel
+
+TEXT:
+- TOP CENTER: Yellow/gold badge "TREINAMENTO" (no live number)
+- CONTEXT LINE: "POLITICA DE FROTAS" medium bold white text just below the badge, upper area
+- MAIN TITLE: "NINGUEM LE AS REGRAS?" large bold white text with strong black shadow, positioned in lower third
+- SUBTITLE: "RESOLVA COM IA" in bright electric cyan/green below the main title
+- Text must NOT overlap faces
+- Text must be large and legible on mobile
+
+NO LOGOS:
+- Do NOT add any logos anywhere in the image
+- Do NOT add watermarks or brand marks
+- Keep the image clean and focused
+
+STYLE: Professional YouTube thumbnail, photorealistic natural-looking faces matching reference photos exactly, dramatic lighting with blue/purple tones, high contrast for mobile viewing. The TWO faces must be clearly recognizable as the same people in the reference photos. FACE ACCURACY is the #1 priority.

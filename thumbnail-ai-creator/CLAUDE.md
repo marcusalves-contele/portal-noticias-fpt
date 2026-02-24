@@ -267,3 +267,53 @@ JULIO - COPY THE FACE FROM REFERENCE PHOTOS EXACTLY:
 ```
 
 Se esse bloco não estiver no início do prompt, o modelo gera pessoas aleatórias.
+
+---
+
+## Aprendizados — Fev/2026
+
+### Refs Cyberpunk = Fidelidade Facial Baixa (~60-70%)
+
+Fotos com efeitos pesados (neon, hologramas, headsets cyberpunk) prejudicam a capacidade do Gemini de copiar rostos. O modelo confunde efeitos visuais com características faciais reais.
+
+**Solução validada: Face-lock com thumb aprovada**
+
+Quando a primeira geração acertar os rostos mas o conceito mudar:
+1. Gerar primeiro com conceito simples (menos elementos visuais = mais atenção nos rostos)
+2. Usar a thumb aprovada como **3a referência** nas próximas gerações
+3. No prompt, instruir: "Image 3 is a PREVIOUSLY APPROVED THUMBNAIL — use as PRIMARY face reference"
+
+Exemplo real:
+```bash
+python3 generate.py \
+  --prompt-file prompts/treinamento_choque_v3_facelock.txt \
+  --refs \
+    referencias/convidados/convidado_live-319-Leonardo-Teixeira.jpg \
+    referencias/convidados/convidado_live-319-Lucca-Silva.jpg \
+    output/treinamento_politica_ia_v1.png \
+  --variations 3 \
+  --prefix treinamento_choque_facelock
+```
+
+Resultado: rostos melhoraram significativamente na segunda composição (choque) usando a thumb da primeira (dor) como âncora facial.
+
+**Recomendação**: Sempre pedir fotos naturais (selfie, corporativa) dos apresentadores. Fotos estilizadas/cyberpunk servem como fallback mas nunca vão dar 90%+ de fidelidade.
+
+### Vídeos de Treinamento (não-live)
+
+Para vídeos que não são lives numeradas:
+- Sem badge "LIVE XXX" — usar badge "TREINAMENTO" no topo
+- Usar `--refs` manual em vez de `--live` (que puxa Julio automaticamente)
+- Prefix descritivo: `--prefix treinamento_politica_ia`
+- Apresentadores podem ser diferentes do host do canal (ex: Leonardo + Lucca no canal Fleet)
+
+### Texto Overlay via Pillow = Ruim
+
+Adicionar texto por cima de thumb gerada com Pillow fica amador — fonte não combina com o estilo da imagem. Melhor pedir o texto direto no prompt do Gemini na primeira geração. Se precisar adicionar contexto depois, é melhor regerar do zero.
+
+### A/B Testing de Thumbs
+
+Estratégia validada: gerar 2 conceitos diferentes pro mesmo vídeo e deixar o time escolher.
+- **Ângulo "dor"**: curiosity gap focado no problema ("Ninguém lê as regras?")
+- **Ângulo "choque de valor"**: contraste financeiro ("R$10.000 → R$0 GRÁTIS")
+- Cada ângulo atrai perfil diferente de espectador — ambos são válidos para CTR

@@ -1,0 +1,65 @@
+CRITICAL - FACE REFERENCE IMAGES:
+- Image 1 is LEONARDO TEIXEIRA's actual face photo - YOU MUST COPY THIS EXACT FACE
+  NOTE: this photo has cyberpunk visual effects (neon lights, headset, rain) - IGNORE ALL effects and copy ONLY the real facial features underneath
+- Image 2 is LUCCA SILVA's actual face photo - YOU MUST COPY THIS EXACT FACE
+  NOTE: this photo has cyberpunk visual effects (holographic glasses, green neon, cables) - IGNORE ALL effects and copy ONLY the real facial features underneath
+- Do NOT create different people - the generated faces MUST be recognizable as the same people from reference photos
+
+Create a YouTube thumbnail (16:9) for a fleet management training video featuring BOTH people from the reference photos. The theme is SHOCK at how something that used to cost thousands of reais is now FREE with AI.
+
+LEONARDO TEIXEIRA (PRESENTER 1) - LEFT SIDE - COPY FACE FROM IMAGE 1:
+- IGNORE the cyberpunk effects in the reference - focus ONLY on his real facial features
+- Young Brazilian man, early-mid 20s
+- His MOST DISTINCTIVE feature: VERY LONG wavy/curly dark brown hair going well past his shoulders
+- Thin goatee/mustache, light facial hair on chin
+- Oval/elongated face shape with defined cheekbones
+- Dark brown eyes, NO glasses (any glasses in ref are cyberpunk props)
+- Warm olive skin tone, youthful smooth skin
+- POSE: Both hands on head in a "MIND BLOWN" gesture, mouth open in shock/disbelief
+- EXPRESSION: Genuinely SHOCKED, jaw dropped, eyes wide, like "I can't believe this is real"
+- Wearing plain black t-shirt (no logos)
+- Position: LEFT side of frame, medium shot (chest up)
+
+LUCCA SILVA (PRESENTER 2) - RIGHT SIDE - COPY FACE FROM IMAGE 2:
+- IGNORE the cyberpunk effects in the reference - focus ONLY on his real facial features
+- Young Brazilian man, early 20s, mixed-race/pardo
+- Short tight curly/afro dark hair — very short on sides
+- BLACK-FRAMED RECTANGULAR GLASSES — he actually wears these in real life, KEEP them
+- Wider nose, full lips
+- Medium-dark skin tone
+- Clean shaven, no facial hair at all
+- Youthful round face
+- POSE: One hand pointing at a giant "R$0" text between them, the other hand open in a "can you believe this?" gesture
+- EXPRESSION: SHOCKED and excited at the same time, mouth open, eyebrows raised high, wide eyes behind glasses
+- Wearing plain black t-shirt (no logos)
+- Position: RIGHT side of frame, medium shot (chest up)
+
+COMPOSITION:
+- TWO PEOPLE clearly visible: Leonardo LEFT, Lucca RIGHT
+- CENTER: A large crossed-out price "R$10.000" in RED with a big diagonal red X through it
+- Below the crossed-out price: giant "R$0" or "GRATIS" text in bright neon GREEN, glowing
+- LEFT side subtle elements: stack of expensive consultant invoices/documents fading away
+- RIGHT side subtle elements: Google Gemini sparkle icon and a notebook icon glowing in blue/cyan
+- The visual story: EXPENSIVE (red, crossed out) → FREE WITH AI (green, glowing)
+
+BACKGROUND:
+- Deep dark blue gradient base
+- LEFT side has a subtle warm RED tint (the "expensive" side)
+- RIGHT side has a subtle cool GREEN/CYAN tint (the "free AI" side)
+- Dramatic split lighting enhancing the contrast
+- Clean, professional feel despite the shock factor
+
+TEXT:
+- TOP CENTER: Yellow/gold badge "TREINAMENTO"
+- The crossed-out "R$10.000" and "R$0" / "GRATIS" are VISUAL ELEMENTS, part of the composition (not just flat text)
+- BOTTOM: "POLÍTICA DE FROTAS + TREINAMENTO" medium bold white text with black shadow, lower third
+- "COM 2 IAs GRÁTIS" in bright electric green below, slightly smaller
+- Text must NOT overlap faces
+- Text must be large and legible on mobile
+
+NO LOGOS:
+- Do NOT add any logos anywhere in the image
+- Do NOT add watermarks or brand marks
+- Keep the image clean and focused
+
+STYLE: Professional YouTube thumbnail, photorealistic natural-looking faces matching reference photos exactly, dramatic split lighting red-to-green, high contrast for mobile viewing. The TWO faces must be clearly recognizable as the same people in the reference photos. FACE ACCURACY is the #1 priority. The overall mood is SHOCK and DISBELIEF at the value being offered for free.

@@ -1,0 +1,65 @@
+CRITICAL - FACE REFERENCE IMAGES:
+- Image 1 is LEONARDO TEIXEIRA's face photo (has cyberpunk effects - IGNORE effects, copy ONLY facial features)
+- Image 2 is LUCCA SILVA's face photo (has cyberpunk effects - IGNORE effects, copy ONLY facial features)
+- Image 3 is a PREVIOUSLY APPROVED THUMBNAIL showing BOTH Leonardo and Lucca with ACCURATE faces
+  - The man on the LEFT in Image 3 is LEONARDO TEIXEIRA — THIS is how he must look in the new thumbnail
+  - The man on the RIGHT in Image 3 is LUCCA SILVA — THIS is how he must look in the new thumbnail
+  - Use Image 3 as the PRIMARY face reference for BOTH people — it shows their real appearance better than the cyberpunk photos
+
+FACE ACCURACY IS THE #1 PRIORITY. The faces in the new thumbnail MUST match Image 3 exactly.
+
+Create a YouTube thumbnail (16:9) for a fleet management training video. The theme is SHOCK at how something that used to cost thousands of reais is now FREE with AI.
+
+LEONARDO TEIXEIRA (PRESENTER 1) - LEFT SIDE:
+- MUST match the LEFT person in Image 3 exactly
+- Young Brazilian man, early-mid 20s
+- VERY LONG wavy/curly dark brown hair going well past his shoulders
+- Thin goatee/mustache, light facial hair on chin
+- Oval/elongated face shape with defined cheekbones
+- Dark brown eyes, NO glasses
+- Warm olive skin tone, youthful smooth skin
+- POSE: Both hands on head in a "MIND BLOWN" gesture, mouth open in shock/disbelief
+- EXPRESSION: Genuinely SHOCKED, jaw dropped, eyes wide, like "I can't believe this is real"
+- Wearing plain black t-shirt (no logos)
+- Position: LEFT side of frame, medium shot (chest up)
+
+LUCCA SILVA (PRESENTER 2) - RIGHT SIDE:
+- MUST match the RIGHT person in Image 3 exactly
+- Young Brazilian man, early 20s, mixed-race/pardo
+- Short tight curly/afro dark hair — very short on sides
+- BLACK-FRAMED RECTANGULAR GLASSES — he wears these in real life
+- Wider nose, full lips
+- Medium-dark skin tone
+- Clean shaven, no facial hair at all
+- Youthful round face
+- POSE: One hand pointing at the giant "R$0" text, the other hand open in disbelief
+- EXPRESSION: SHOCKED and excited, mouth open, eyebrows raised, wide eyes behind glasses
+- Wearing plain black t-shirt (no logos)
+- Position: RIGHT side of frame, medium shot (chest up)
+
+COMPOSITION:
+- TWO PEOPLE clearly visible: Leonardo LEFT, Lucca RIGHT
+- CENTER: A large crossed-out price "R$10.000" in RED with a big diagonal red X through it
+- Below the crossed-out price: giant "R$0" or "GRATIS" text in bright neon GREEN, glowing
+- LEFT side subtle elements: expensive consultant invoices/documents fading away
+- RIGHT side subtle elements: Google Gemini sparkle icon and notebook icon glowing in cyan
+- The visual story: EXPENSIVE (red, crossed out) to FREE WITH AI (green, glowing)
+
+BACKGROUND:
+- Deep dark blue gradient base
+- LEFT side has a subtle warm RED tint (the "expensive" side)
+- RIGHT side has a subtle cool GREEN/CYAN tint (the "free AI" side)
+- Dramatic split lighting enhancing the contrast
+
+TEXT:
+- TOP CENTER: Yellow/gold badge "TREINAMENTO"
+- The crossed-out "R$10.000" and "R$0" / "GRATIS" are VISUAL ELEMENTS, part of the composition
+- BOTTOM: "POLITICA DE FROTAS + TREINAMENTO" medium bold white text with black shadow, lower third
+- "COM 2 IAs GRATIS" in bright electric green below
+- Text must NOT overlap faces, must be large and legible on mobile
+
+NO LOGOS:
+- Do NOT add any logos anywhere
+- Do NOT add watermarks or brand marks
+
+STYLE: Professional YouTube thumbnail, photorealistic natural-looking faces matching the approved thumbnail (Image 3) exactly, dramatic split lighting red-to-green, high contrast for mobile viewing. FACE ACCURACY matching Image 3 is the absolute #1 priority.
