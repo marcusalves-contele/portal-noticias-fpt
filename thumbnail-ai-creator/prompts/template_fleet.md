@@ -59,6 +59,11 @@ BACKGROUND:
 - Purple/magenta color grade overlay
 - Bokeh blur, dramatic lighting
 
+BRIEFING CONTEXT (informa o tom e posicionamento visual):
+- Público: {AUDIENCE} — o criativo deve falar diretamente com essa pessoa
+- Objetivo: {OBJECTIVE} — a imagem deve comunicar essa mensagem em 1 segundo
+- Conteúdo: {CONTENT_DESCRIPTION} — use isso para definir elementos visuais relevantes
+
 TEXT ELEMENTS:
 - TOP LEFT: Red badge "LIVE {LIVE_NUMBER}"
 - TITLE: "{TITLE}" large white bold text with strong black shadow
