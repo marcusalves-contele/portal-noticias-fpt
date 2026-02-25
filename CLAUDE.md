@@ -171,6 +171,56 @@ npm run preview  # Serve SPA com fallback
 
 ---
 
+## SEO de Títulos YouTube
+
+Sistema de geração de títulos SEO para os canais Fleet e Teams.
+Doc completo: `seo-title-creator/CLAUDE.md` (a criar)
+
+### Briefing Obrigatório (BLOCKER — mesmo método das thumbnails)
+
+**ANTES de gerar qualquer título**, as 3 respostas devem estar completas:
+
+1. **Quem assiste esse vídeo?** (público específico — maturidade, cargo, problema)
+2. **O que queremos que essa pessoa entenda ou decida?** (objetivo claro)
+3. **O que vai acontecer no conteúdo?** (o que tem no vídeo — ferramentas, demo, passo a passo)
+
+Resposta genérica entra → título genérico sai. O diferencial do vídeo só aparece quando as 3 perguntas estão respondidas.
+
+### Método de Geração
+
+Com o briefing em mãos:
+
+1. **Identificar o diferencial real** — o que esse vídeo tem que outros 50 sobre o mesmo tema não têm
+2. **Mapear keyword primária** — o que o público digita quando está com esse problema
+3. **Gerar par A/B**:
+   - **A (SEO-first)**: keyword primária no início (primeiros 60 chars), captura busca ativa
+   - **B (CTR-first)**: dor ou curiosidade como hook, filtro de público na primeira palavra
+
+### Boas Práticas
+
+| O que funciona | O que não funciona |
+|---|---|
+| Keyword primária nos primeiros 60 chars | Keyword enterrada no meio do título |
+| Diferencial específico do vídeo | "Passo a Passo do Zero" (genérico) |
+| Número + grátis como especificidade | "em Minutos" (clichê sem credibilidade) |
+| Dor real do público na abertura | Título que serve pra qualquer vídeo do tema |
+| Par A/B com ângulos distintos | 4 variações do mesmo ângulo |
+
+### Caso de Referência — Live Política de Frota + IA
+
+**Briefing**:
+- Público: gestores sem política definida ou com problema de compliance de motoristas
+- Objetivo: mostrar que dá pra criar E aplicar com IA gratuita
+- Conteúdo: criar política com IA + transformar em treinamento de vídeo para motoristas
+
+**Diferencial descoberto**: o passo "transformar em treinamento de vídeo" — não aparecia em nenhum título original.
+
+**Resultado**:
+- A: `Política de Frota com IA: Crie o Documento e Transforme em Treinamento para Motoristas`
+- B: `Sem Política de Frota? IA Cria e Transforma em Treinamento de Vídeo para Motoristas`
+
+---
+
 ## Thumbnail AI Creator
 
 Sistema de geração de thumbnails YouTube com Gemini (`gemini-3-pro-image-preview`).
