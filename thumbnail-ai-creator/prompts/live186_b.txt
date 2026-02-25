@@ -1,0 +1,57 @@
+BRIEFING (v2 — ângulo B):
+- Público: Gestores de equipes externas
+- Objetivo: Pré-lançamento do novo app Contele Gestor — FOMO, exclusividade, "seja o primeiro"
+- Ângulo: Não é o app em si — é o gestor no controle. O app some no fundo. O gestor é o herói.
+
+---
+
+CRITICAL - FACE REFERENCE IMAGES:
+- Images 1-2 are LEONARDO's actual face photos — YOU MUST COPY THIS EXACT FACE
+- Do NOT create a different person — use the reference photos as the PRIMARY SOURCE
+- Focus on FACIAL STRUCTURE from the references, not the stylized lighting effects
+
+Create a YouTube thumbnail (16:9) — no guest, only Leonardo.
+
+LEONARDO (HOST) — COPY FACE FROM REFERENCES:
+- Oval face, clear smooth skin, natural appearance
+- Medium brown hair, well-groomed, slightly wavy
+- Expressive brown eyes, intense and direct
+- Age: 32-36 years old
+- Wearing a clean dark shirt (no effects on clothing)
+- SKIN: smooth, photorealistic, no cyberpunk effects on face
+
+COMPOSITION:
+- Leonardo positioned RIGHT-CENTER of frame, medium-close shot (shoulders up, face dominant)
+- POSE: Arms crossed or one hand raised palm-forward toward viewer, body slightly turned, head facing camera
+- Body language: "You're getting access before everyone else — are you ready?"
+- Leonardo is LARGE in frame — face takes 40-50% of the image
+
+EXPRESSION: Intense confidence mixed with a slight smile. Not excited — composed, exclusive. The look of someone who knows something most people don't yet. One eyebrow slightly raised. This is NOT "look at this cool thing" — it's "I'm calling on YOU specifically."
+
+BACKGROUND:
+- Dark, moody, deep navy to black gradient — dramatic, premium feel
+- Subtle glowing cyan/blue light coming from left side (like a screen glow off-camera)
+- Faint abstract geometric lines or grid pattern in deep background (tech depth)
+- NO office furniture visible — abstract, timeless
+
+FLOATING ELEMENTS (subtle, NOT dominant):
+- A dim, ghosted smartphone silhouette in the far background — barely visible, not a hero element
+- Faint glow dots suggesting map pins or data points, very subtle
+- Small "BETA" or lock icon with a subtle glow near the title area
+
+TEXT ELEMENTS (LEFT side of frame, stacked):
+- TOP LEFT: Dark navy badge with cyan border "LIVE 186"
+- MAIN TITLE LINE 1: "ANTES DE" — large bold white text, strong black shadow
+- MAIN TITLE LINE 2: "TODO MUNDO" — very large bold white text with deep CYAN highlight background (#00B4D8)
+- SUBTITLE: "Pré-Lançamento App do Gestor" — smaller white text in semi-transparent dark pill
+- All text left-aligned, giving space for Leonardo's face on the right
+
+COLOR PALETTE:
+- Background: deep navy (#060D1F) to dark cyan (#003355)
+- Accent: bright cyan (#00B4D8) for title highlight
+- Text: white with strong shadows
+- Atmosphere: premium, exclusive, dark — NOT the bright corporate blue of ângulo A
+
+STYLE: Professional YouTube thumbnail, photorealistic face. Dark, premium, exclusive vibe — the opposite of the bright product launch (ângulo A). Target emotion: "I'm being called before everyone else — I need to watch this." High contrast, mobile-first legibility.
+
+NO LOGOS: Do NOT add any company logos.

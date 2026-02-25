@@ -23,72 +23,94 @@ Retorna JSON com informações do convidado se encontrado:
 - Exemplos: `convidado_live-317-Nelson-Margarido.jpg`, `especialista_live-320-Maria-Silva.png`
 - Títulos suportados: convidado, especialista, gestor, parceiro, etc.
 
-### 2. Coletar Informações
+### 2. Briefing Obrigatório (BLOCKER — não pular)
 
-Se o usuário já forneceu as informações (título, tema, número), use-as diretamente.
+**ANTES de criar qualquer prompt**, as 3 respostas abaixo devem estar completas e específicas:
 
-Caso contrário, pergunte apenas o necessário:
+1. **Quem assiste esse vídeo?** (público — ex: "gestor de equipe externa", NÃO "usuários em geral")
+2. **O que queremos que essa pessoa entenda ou decida?** (objetivo — ex: "que existe um pré-lançamento e ele deve experimentar")
+3. **O que vai acontecer no conteúdo?** (o que tem no vídeo — ex: "demo das funcionalidades do novo app do gestor")
+
+**Regras:**
+- Se qualquer uma estiver vaga ou ausente → perguntar, não prosseguir
+- O título/tema é **derivado** dessas respostas, não substituto delas
+- Resposta genérica entra → criativo genérico sai (caso Live 186 v1)
+
+**Contexto coletado** antes de prosseguir para o próximo passo:
 - Canal: Fleet (Julio) ou Teams (Leonardo)?
 - Número da live
-- Título/tema
+- Respostas das 3 perguntas acima
 - Se NÃO detectou convidado automaticamente: Tem convidado?
 
-### 3. Criar Prompt Criativo (IA decide)
+### 3. Definir 2 Ângulos Criativos (A/B)
 
-Baseado nas respostas, VOCÊ define criativamente:
+A partir do briefing, **VOCÊ define 2 conceitos distintos** — não variações do mesmo, mas abordagens diferentes.
 
-- **Pose do apresentador**: Escolha a mais impactante para o tema
-- **Expressão facial**: Combine com o tom do conteúdo
-- **Elementos visuais**: Objetos nas mãos, ícones 3D, logos
-- **Composição**: Posição, background, elementos de fundo
-- **Texto impactante**: Reescreva o título se necessário para ser mais persuasivo
+Cada ângulo deve ter:
+- **Título diferente** (não apenas reformulado — apelo emocional diferente)
+- **Composição diferente** (pose, posição no frame, elementos visuais)
+- **Hook diferente** (o que vai fazer o gestor clicar no ângulo A vs ângulo B)
 
-**Pesquise tendências** de thumbnails 2026:
-- Cores vibrantes, alto contraste
-- Rostos expressivos em close
-- Texto grande e legível
-- Elementos 3D/floating
-- Sense of urgency ou curiosity gap
+**Pares de ângulos comuns:**
 
-### 3. Montar Prompt Final
+| Par | Ângulo A | Ângulo B |
+|-----|----------|----------|
+| Desejo vs FOMO | "Olha o que chegou" — empolgação, novidade | "Seja o primeiro" — urgência, pré-lançamento exclusivo |
+| Dor vs Solução | Problema que o gestor enfrenta hoje | O que muda com o novo recurso |
+| Produto vs Resultado | Mostra o app/feature em detalhe | Mostra o gestor no controle, equipe funcionando |
+| Surpresa vs Autoridade | Reação de "uau", algo inesperado | Tom seguro, "isso já chegou" |
 
-Use os templates em `prompts/template_fleet.md` ou `prompts/template_teams.md` como base.
+Documente os 2 ângulos antes de criar qualquer prompt:
+```
+Ângulo A: [título] — [hook em 1 frase]
+Ângulo B: [título] — [hook em 1 frase]
+```
 
-Salve o prompt final em `prompts/live{NUMBER}.txt`
+### 4. Criar 2 Prompts e Gerar
 
-### 4. Gerar 3 Variações
+Crie 2 arquivos de prompt separados e gere 2 variações de cada.
 
-**Modo automático (recomendado)** - detecta refs e convidado pelo número da live:
+Salve os prompts como `prompts/live{NUMBER}_a.txt` e `prompts/live{NUMBER}_b.txt`.
+
+**Geração (rodar os 2 em sequência):**
 ```bash
 cd /Users/marcofassa/Documents/growth-contele/thumbnail-ai-creator
 
-# Fleet (Julio) - padrão
+# Ângulo A
 python3 generate.py \
-  --prompt-file prompts/live{NUMBER}.txt \
-  --live {NUMBER} \
-  --variations 3
-
-# Teams (Leonardo)
-python3 generate.py \
-  --prompt-file prompts/live{NUMBER}.txt \
+  --prompt-file prompts/live{NUMBER}_a.txt \
   --live {NUMBER} \
   --channel teams \
-  --variations 3
+  --variations 2 \
+  --prefix live{NUMBER}_a
+
+# Ângulo B
+python3 generate.py \
+  --prompt-file prompts/live{NUMBER}_b.txt \
+  --live {NUMBER} \
+  --channel teams \
+  --variations 2 \
+  --prefix live{NUMBER}_b
 ```
 
-**Modo manual** - especifica refs manualmente:
+**Fleet (Julio)** — remover `--channel teams` (fleet é o padrão).
+
+**Modo manual** (refs específicas):
 ```bash
 python3 generate.py \
-  --prompt-file prompts/live{NUMBER}.txt \
+  --prompt-file prompts/live{NUMBER}_a.txt \
   --refs referencias/julio/*.JPEG referencias/convidados/nome.jpg \
-  --variations 3 \
-  --prefix live{NUMBER}
+  --variations 2 \
+  --prefix live{NUMBER}_a
 ```
 
-### 5. Apresentar ao Usuário
+### 5. Apresentar ao Usuário — 2 Finalistas
 
-Mostre as 3 variações usando `Read` para exibir as imagens.
-Pergunte qual preferem ou se querem ajustes.
+1. Mostrar as 4 imagens geradas (2 do ângulo A + 2 do ângulo B) com `Read`
+2. Perguntar qual variação de A preferem e qual de B preferem
+3. **Resultado final**: 1 imagem do ângulo A + 1 imagem do ângulo B = par A/B para teste
+
+Se quiser ajustes em algum ângulo, ajustar o prompt do ângulo específico e regerar só ele.
 
 ---
 
@@ -101,12 +123,17 @@ thumbnail-ai-creator/
 ├── prompts/
 │   ├── template_fleet.md   # Template Julio/Fleet
 │   ├── template_teams.md   # Template Leonardo/Teams
-│   └── live{N}.txt         # Prompts específicos por live
+│   ├── live{N}_a.txt       # Ângulo A (conceito 1)
+│   └── live{N}_b.txt       # Ângulo B (conceito 2)
 ├── referencias/
 │   ├── julio/              # Fotos ref Julio (2 JPEGs)
 │   ├── leonardo/           # Fotos ref Leonardo
 │   └── convidados/         # Fotos de convidados (ver padrão abaixo)
 └── output/                 # Thumbnails geradas
+    ├── live{N}_a_v1.png    # Variação 1 do ângulo A
+    ├── live{N}_a_v2.png    # Variação 2 do ângulo A
+    ├── live{N}_b_v1.png    # Variação 1 do ângulo B
+    └── live{N}_b_v2.png    # Variação 2 do ângulo B
 ```
 
 ### Padrão de Nomenclatura de Convidados
@@ -238,13 +265,14 @@ STYLE: Professional YouTube thumbnail, photorealistic, purple/magenta cinematic 
 
 ## Workflow Resumido
 
-1. Usuário fornece info da live (título, número, tema)
-2. Verificar se existe convidado: `--check-guest {NUM}`
-3. **EU (Claude Code) crio o prompt diretamente** - NÃO delegar para subagentes
-4. Usar o template base `_base_fleet.txt` como estrutura
-5. Se tem convidado: incluir descrição física + texto "{Título} {Nome}"
-6. Gerar: `python3 generate.py --prompt-file prompts/live{NUM}.txt --live {NUM}`
-7. Mostrar variações e pedir aprovação
+1. Usuário fornece info da live (número, tema)
+2. Verificar convidado: `--check-guest {NUM}`
+3. **Briefing obrigatório**: 3 perguntas respondidas (público, objetivo, conteúdo)
+4. **Definir 2 ângulos criativos** (A e B) com títulos e hooks diferentes
+5. **EU (Claude Code) crio os 2 prompts** — NÃO delegar para subagentes
+6. Salvar como `prompts/live{NUM}_a.txt` e `prompts/live{NUM}_b.txt`
+7. Gerar 2 variações de cada ângulo (`--variations 2 --prefix live{NUM}_a/b`)
+8. Mostrar as 4 imagens → usuário escolhe 1 de cada ângulo → par A/B final
 
 ## IMPORTANTE: Geração de Prompts
 

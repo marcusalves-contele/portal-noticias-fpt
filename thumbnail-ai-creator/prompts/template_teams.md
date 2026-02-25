@@ -48,6 +48,11 @@ BACKGROUND:
 - Bokeh blur, soft lighting
 - Glass windows, modern furniture
 
+BRIEFING CONTEXT (informa o tom e posicionamento visual):
+- Público: {AUDIENCE} — o criativo deve falar diretamente com essa pessoa
+- Objetivo: {OBJECTIVE} — a imagem deve comunicar essa mensagem em 1 segundo
+- Conteúdo: {CONTENT_DESCRIPTION} — use isso para definir elementos visuais relevantes
+
 TEXT ELEMENTS:
 - "{TITLE}" large white bold text
 - Last line with blue/purple highlight background
