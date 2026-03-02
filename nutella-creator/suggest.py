@@ -33,7 +33,7 @@ _LOCAL_ENV = Path(__file__).parent / ".env"
 _THUMB_ENV = Path(__file__).parent.parent / "thumbnail-ai-creator" / ".env"
 ENV_PATH = _LOCAL_ENV if _LOCAL_ENV.exists() else _THUMB_ENV
 OUTPUT_DIR = Path(__file__).parent / "output"
-GEMINI_MODEL = "gemini-3-pro-preview"
+GEMINI_MODEL = "gemini-3.1-pro-preview"
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
 

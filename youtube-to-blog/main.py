@@ -64,8 +64,8 @@ WHATSAPP_GROUPS = {
 }
 
 # Gemini
-GEMINI_TEXT_MODEL = "gemini-3-pro-preview"
-GEMINI_IMAGE_MODEL = "gemini-2.5-flash-image"
+GEMINI_TEXT_MODEL = "gemini-3.1-pro-preview"
+GEMINI_IMAGE_MODEL = "gemini-3.1-flash-image-preview"
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
 # Logos
