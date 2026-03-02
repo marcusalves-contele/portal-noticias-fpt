@@ -158,16 +158,17 @@ O script extrai automaticamente:
 
 ### Julio César (Fleet) — Referências Oficiais (Mar/2026)
 - `referencias/julio/julio-ref-primary-1.jpg` — Foto real ensaio (polo preta, frontal neutro, fundo branco)
-- `referencias/julio/julio-ref-primary-2.jpg` — Estúdio Gemini (braços cruzados, iluminação Rembrandt)
 
-**SEMPRE usar as 2 fotos primary.** `generate.py` carrega automaticamente `*-primary-*.jpg` com `--channel fleet`.
-Refs antigas IA (gray_blazzer, polo_navy, polo_white) arquivadas em `referencias/julio/_old/`.
+**Usar `--channel fleet`** — `generate.py` carrega automaticamente `*-primary-*.jpg`.
+Refs antigas IA (`julio_gray_blazzer.png`, `julio_polo_navy.png`, `julio_polo_white.png`) disponíveis na pasta principal para uso manual com `--refs`.
+10 fotos de poses disponíveis em `referencias/julio/julio-polo-preta-*.jpg` para uso manual.
 
 ### Leonardo Gazolli (Teams) — Referências Oficiais (Mar/2026)
-- `referencias/leonardo/leo-ref-primary.jpg` — Estúdio Gemini refinado (sorrindo, camiseta preta Contele, fundo branco)
+- `referencias/leonardo/leo-ref-primary.png` — Estúdio Gemini refinado (sorrindo, camiseta preta Contele, fundo branco)
+  - Gerado por Gemini Nano Banana 2, refinamento de curva (pele + dentes). Cópia de `leonardo_studio_v1.png`.
 
-Foto real ensaio 02/Mar/2026 → geração Gemini Nano Banana 2 → refinamento de curva (pele + dentes).
-Refs antigas IA arquivadas em `referencias/leonardo/_old/`.
+**Usar `--channel teams`** — `generate.py` carrega automaticamente `leo-ref-primary.png`.
+10 fotos de poses disponíveis em `referencias/leonardo/leo-camiseta-preta-contele-*.jpg` para uso manual.
 
 ---
 
@@ -399,8 +400,8 @@ Estratégia validada: gerar 2 conceitos diferentes pro mesmo vídeo e deixar o t
 - Código já atualiza `get_host_refs('teams')` para usar só ela — qualquer `--channel teams` já puxa automaticamente
 - As fotos originais (`leo-ia.jpg`, `leo-ia-2.jpg`) ficam como fallback mas **não usar como referência primária**
 
-#### APRENDIZADO CRÍTICO: Referência oficial = `teams_leo_face_v1.png`
-- `leo-ref-primary.png` = cópia de `output/teams_leo_face_v1.png` — definido pelo Marco como referência canônica do Leonardo
+#### APRENDIZADO CRÍTICO: Referência oficial = `leo-ref-primary.png`
+- `leo-ref-primary.png` = cópia de `leonardo_studio_v1.png` (ensaio Mar/2026, Gemini Nano Banana 2 + curva)
 - Não substituir sem aprovação explícita do Marco
 - Para gerar A (fundo escuro/urgência): usar `b_fl3_v2` como ref única (sem fotos originais) — resolve conflito de iluminação
 - Para gerar B (fundo azul/corporativo): usar `--channel teams` normalmente (puxa `leo-ref-primary.png`)
