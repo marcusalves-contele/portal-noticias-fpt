@@ -156,17 +156,18 @@ O script extrai automaticamente:
 
 ## Referências Disponíveis
 
-### Julio César (Fleet)
-- `referencias/julio/julio-ref-01.JPEG` - Perfil com camisa Contele (expressão séria)
-- `referencias/julio/julio-ref-02.JPEG` - Frontal sério
-- `referencias/julio/julio_ref-sorrindo.jpg` - **SORRINDO** (usar para temas empolgantes)
+### Julio César (Fleet) — Referências Oficiais (Mar/2026)
+- `referencias/julio/julio-ref-primary-1.jpg` — Foto real ensaio (polo preta, frontal neutro, fundo branco)
+- `referencias/julio/julio-ref-primary-2.jpg` — Estúdio Gemini (braços cruzados, iluminação Rembrandt)
 
-**IMPORTANTE:** Escolher referência baseado no tema:
-- Tema SÉRIO/ALERTA (multas, golpes, prejuízo): usar refs 01 e 02
-- Tema EMPOLGANTE/NOVIDADE (IA grátis, lançamento, dica): usar ref-sorrindo PRIMEIRO
+**SEMPRE usar as 2 fotos primary.** `generate.py` carrega automaticamente `*-primary-*.jpg` com `--channel fleet`.
+Refs antigas IA (gray_blazzer, polo_navy, polo_white) arquivadas em `referencias/julio/_old/`.
 
-### Leonardo (Teams)
-- Aguardando 4 fotos profissionais
+### Leonardo Gazolli (Teams) — Referências Oficiais (Mar/2026)
+- `referencias/leonardo/leo-ref-primary.jpg` — Estúdio Gemini refinado (sorrindo, camiseta preta Contele, fundo branco)
+
+Foto real ensaio 02/Mar/2026 → geração Gemini Nano Banana 2 → refinamento de curva (pele + dentes).
+Refs antigas IA arquivadas em `referencias/leonardo/_old/`.
 
 ---
 
@@ -339,9 +340,110 @@ Para vídeos que não são lives numeradas:
 
 Adicionar texto por cima de thumb gerada com Pillow fica amador — fonte não combina com o estilo da imagem. Melhor pedir o texto direto no prompt do Gemini na primeira geração. Se precisar adicionar contexto depois, é melhor regerar do zero.
 
+### Pipeline Face-Lock — Método Avançado para Múltiplos Rostos
+
+**Quando acionar**: thumbnails com 3+ pessoas (host + 2 convidados) onde a geração direta falha — rostos saem genéricos, sem semelhança com as referências.
+
+**Por que acontece**: o modelo tem limite de atenção. Com 4+ imagens de referência simultâneas (2 do host + 2 convidados), ele distribui a atenção e nenhum rosto sai fiel.
+
+**O método — 2 etapas:**
+
+1. **Etapa 1 — Acertar o rosto do host**
+   - Gerar com apenas 2 refs (as fotos do host)
+   - Sem convidados no prompt ainda
+   - Gerar 2-3 variações e aprovar a melhor
+
+2. **Etapa 2 — Face-lock + convidados**
+   - Usar a thumb aprovada na Etapa 1 como `Image 3` nas refs
+   - Adicionar refs dos convidados como `Image 4`, `Image 5`
+   - No prompt: "Image 3 is a PREVIOUSLY APPROVED THUMBNAIL — use as PRIMARY face reference"
+   - O host fica consistente; convidados entram no espaço livre da composição
+
+**Exemplo real — Live 320 (26/02/2026):**
+```bash
+# Etapa 1 — host sozinho
+python3 generate.py \
+  --prompt-file prompts/live320_b_julio.txt \
+  --refs referencias/julio/julio-ref-01.JPEG referencias/julio/julio-ref-02.JPEG \
+  --variations 2 --prefix live320_b_julio
+
+# Etapa 2 — face-lock + 2 convidados
+python3 generate.py \
+  --prompt-file prompts/live320_b_facelock.txt \
+  --refs referencias/julio/julio-ref-01.JPEG referencias/julio/julio-ref-02.JPEG \
+    output/live320_b_julio_v1.png \
+    referencias/convidados/convidado_live-320-Carla-da-Luz.png \
+    referencias/convidados/convidado_live-320-Hiago-Daros.png \
+  --variations 3 --prefix live320_b_facelock
+```
+
+**Resultado**: host consistente em 100% das gerações. Fidelidade dos convidados depende da qualidade das fotos de referência.
+
+**Regra**: só acionar o Pipeline Face-Lock quando a geração direta falhar. Para 1 convidado (3 refs total), a geração direta ainda funciona bem.
+
+---
+
 ### A/B Testing de Thumbs
 
 Estratégia validada: gerar 2 conceitos diferentes pro mesmo vídeo e deixar o time escolher.
 - **Ângulo "dor"**: curiosity gap focado no problema ("Ninguém lê as regras?")
 - **Ângulo "choque de valor"**: contraste financeiro ("R$10.000 → R$0 GRÁTIS")
 - Cada ângulo atrai perfil diferente de espectador — ambos são válidos para CTR
+
+---
+
+### Leonardo Gazolli (Teams) — Aprendizados (Fev/2026)
+
+#### Referência Oficial
+- **`referencias/leonardo/leo-ref-primary.png`** — única ref válida para o Leo
+- Código já atualiza `get_host_refs('teams')` para usar só ela — qualquer `--channel teams` já puxa automaticamente
+- As fotos originais (`leo-ia.jpg`, `leo-ia-2.jpg`) ficam como fallback mas **não usar como referência primária**
+
+#### APRENDIZADO CRÍTICO: Referência oficial = `teams_leo_face_v1.png`
+- `leo-ref-primary.png` = cópia de `output/teams_leo_face_v1.png` — definido pelo Marco como referência canônica do Leonardo
+- Não substituir sem aprovação explícita do Marco
+- Para gerar A (fundo escuro/urgência): usar `b_fl3_v2` como ref única (sem fotos originais) — resolve conflito de iluminação
+- Para gerar B (fundo azul/corporativo): usar `--channel teams` normalmente (puxa `leo-ref-primary.png`)
+
+#### Ordem das Referências Importa
+- Colocar a âncora aprovada como **Image 1** (primeiro `--refs`) dá resultados mais fiéis do que como Image 3
+- O modelo dá mais peso para as primeiras imagens da lista
+
+#### Fundo Escuro (Ângulo A/Urgência) > Fundo Claro (Ângulo B/Corporativo)
+- Quando o fundo é escuro/dramático (vermelho, carvão), o modelo mantém melhor a fidelidade facial
+- Quando muda para fundo azul/corporativo (ângulo B), o rosto deriva — fica mais jovem e diferente
+- **Solução**: gerar ângulo A primeiro (fundo escuro), aprovar o melhor, usar como âncora para ângulo B
+
+#### Pipeline Obrigatório para Teams A/B
+```
+1. Gerar ângulo A com --channel teams (usa leo-ref-primary.png automaticamente)
+2. Aprovar melhor variação do A
+3. Gerar ângulo B com âncora = melhor A como Image 1:
+   python3 generate.py \
+     --prompt-file prompts/..._b.txt \
+     --refs output/melhor_A.png \
+     --variations 3 --prefix ..._b
+4. Após gerar A e B — comparar qual ficou mais fiel ao Leo real
+5. Atualizar leo-ref-primary.png com a versão mais fiel (pode ser do B!)
+```
+
+#### Prompt: menos elementos = mais fidelidade facial
+- Prompts com muitos elementos (smartphone flutuando + ícones + texto + fundo complexo) dispersam atenção do modelo
+- Para Teams B (corporativo), manter composição simples: 1 smartphone, fundo limpo, sem muitos elementos flutuantes
+
+---
+
+### Processo Padrão A/B — Válido para Fleet (Julio) e Teams (Leo)
+
+**Regra universal para ambos os canais**: gerar sempre par A/B, 1 variação de cada após refinar a referência.
+
+| Etapa | Fleet (Julio) | Teams (Leo) |
+|-------|--------------|-------------|
+| Ref primária | `referencias/julio/` (3 fotos, escolher por tema) | `referencias/leonardo/leo-ref-primary.png` |
+| Gerar A | `--channel fleet` | `--channel teams` |
+| Gerar B | `--refs output/melhor_A.png` | `--refs output/melhor_A.png` |
+| Atualizar ref | Comparar A e B → salvar a mais fiel em `julio-ref-approved.png` se necessário | Substituir `leo-ref-primary.png` pela versão mais fiel |
+
+**Quantidade por rodada**: 1 variação de cada ângulo após a ref estar travada (não 2-3 — economiza API e evita confusão de escolha).
+
+**Face-lock para Julio**: aplicar o mesmo pipeline de Teams — se o B derivar do rosto, usar o melhor A como âncora.

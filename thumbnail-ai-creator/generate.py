@@ -66,14 +66,30 @@ def find_guest_for_live(live_number):
 
 
 def get_host_refs(channel='fleet'):
-    """Retorna lista de referências do apresentador principal."""
+    """Retorna lista de referências do apresentador principal.
+
+    Julio (Fleet): carrega arquivos *-primary-*.jpg em orden — foto real + estúdio Gemini.
+    Leonardo (Teams): carrega leo-ref-primary.jpg (estúdio Gemini refinado, Mar/2026).
+    Refs antigas (IA geradas) movidas para _old/ — não usar.
+    """
     if channel.lower() == 'fleet':
         julio_dir = REFS_DIR / "julio"
         if julio_dir.exists():
+            # Prioriza arquivos *-primary-* (foto real + estúdio), depois qualquer .jpg
+            primaries = sorted(julio_dir.glob("*-primary-*.jpg"))
+            if primaries:
+                return [str(f) for f in primaries]
             return sorted([str(f) for f in julio_dir.glob("*.JPEG")] +
                          [str(f) for f in julio_dir.glob("*.jpg")])
     elif channel.lower() == 'teams':
         leo_dir = REFS_DIR / "leonardo"
+        # Preferência: .jpg (foto real/estúdio), fallback: .png legado
+        primary_jpg = leo_dir / "leo-ref-primary.jpg"
+        if primary_jpg.exists():
+            return [str(primary_jpg)]
+        primary_png = leo_dir / "leo-ref-primary.png"
+        if primary_png.exists():
+            return [str(primary_png)]
         if leo_dir.exists():
             return sorted([str(f) for f in leo_dir.glob("*.jpg")] +
                          [str(f) for f in leo_dir.glob("*.jpeg")])
