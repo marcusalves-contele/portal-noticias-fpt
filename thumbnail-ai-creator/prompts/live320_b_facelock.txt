@@ -1,0 +1,42 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a Brazilian fleet management channel.
+
+CRITICAL - FACE REFERENCE IMAGES:
+- Images 1-2 are JULIO's actual face photos
+- Image 3 is a PREVIOUSLY APPROVED THUMBNAIL of JULIO — use as PRIMARY face reference for him
+- The man in the center MUST look EXACTLY like the person in Image 3 (approved thumbnail)
+- Image 4: CARLA DA LUZ face reference (guest lawyer) - COPY HER FACE EXACTLY from this photo
+- Image 5: HIAGO DAROS face reference (guest lawyer) - COPY HIS FACE EXACTLY from this photo
+
+JULIO - MATCH IMAGE 3 EXACTLY:
+- Use Image 3 as the PRIMARY source for Julio's face, pose and style
+- Keep the SAME facial features, beard, hair, skin tone as Image 3
+- PLAIN dark navy blue polo shirt (same as Image 3)
+- Age: 45+, mature appearance
+
+COMPOSITION:
+- Julio positioned CENTER of frame, medium shot (chest up), same pose as Image 3
+- CARLA DA LUZ on the LEFT side of Julio, slightly behind, shoulder-level
+- HIAGO DAROS on the RIGHT side of Julio, slightly behind, shoulder-level
+- All three looking toward camera, confident and professional
+
+GUESTS - COPY FACES FROM REFERENCES:
+- Carla (Image 4): woman, professional suit, serious and authoritative expression
+- Hiago (Image 5): man, professional suit or formal attire, confident expression
+- Label below Carla: "Adv. Carla da Luz" in small white text
+- Label below Hiago: "Adv. Hiago Daros" in small white text
+
+BACKGROUND:
+- Keep the SAME deep purple/dark blue background with courthouse elements as Image 3
+- Same cinematic purple/magenta lighting
+- Bokeh blur, same premium authoritative feel
+
+TEXT ELEMENTS:
+- TOP LEFT: Red badge with white text "LIVE 320"
+- MAIN TITLE: "MULTAS ANTT: COMO PAGAR MENOS OU ZERAR" in large white bold text with strong black shadow
+- Subtitle: "com advogados especialistas" in smaller gold/yellow italic text
+- Position all text in lower portion, not overlapping faces
+
+NO LOGOS:
+- Do NOT add any logos, watermarks or brand marks anywhere
+
+STYLE: Professional YouTube thumbnail, photorealistic faces, authoritative purple/dark blue cinematic lighting, high contrast for mobile viewing.

@@ -1,0 +1,61 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a team management channel.
+
+REFERENCE IMAGES PROVIDED:
+- Images 1-2: LEONARDO (main host) face references
+
+LEONARDO (MAIN HOST) - FACE CONSISTENCY CRITICAL:
+- Dark brown hair with some gray streaks, wavy/curly
+- Black rectangular frame GLASSES (MUST include glasses)
+- Oval/round face shape, fuller cheeks
+- Clean shaven (NO beard, NO stubble)
+- Brown eyes behind glasses
+- Age: 43-47 years old, professional appearance
+- Wearing PLAIN dark navy blue t-shirt (NO logos, NO text on shirt)
+
+SKIN TEXTURE - CRITICAL:
+- Keep skin SMOOTH and NATURAL
+- Do NOT add excessive wrinkles or age marks
+- Healthy, natural skin tone
+
+COMPOSITION:
+- Leonardo positioned LEFT side of frame, medium shot (chest up)
+- POSE: Confident expert stance — one arm pointing toward floating smartphone/dashboard on the right side of the frame, chin slightly raised, body language of "I'm going to show you exactly how this works"
+- Engaging, direct gaze at camera with slight knowing smile
+
+EXPRESSION: Confident and authoritative — slight assertive smile, calm focused eyes behind glasses, the expression of someone who has found the solution and is about to reveal it
+
+VISUAL ELEMENTS:
+- RIGHT SIDE: Floating 3D smartphone showing a performance dashboard
+  - Metrics/charts on the phone screen (upward arrows, percentage indicators)
+  - Small team icons (field workers) arranged in a consistent pattern
+  - Checkmark icons floating around phone suggesting standardized process
+  - Green/cyan glow around the smartphone
+- Subtle "formula" visual metaphor — elements arranged in a logical connected flow
+
+BACKGROUND:
+- Modern corporate office, softly blurred (bokeh)
+- Blue/cyan color tones — Contele Teams brand colors (#0066CC to #00B4D8)
+- Clean, professional, optimistic atmosphere
+- Soft light from windows in background
+- Professional lighting on Leonardo's face (warm key light, blue fill)
+
+TEXT ELEMENTS:
+- TOP: No badge (clean look)
+- MAIN TITLE: "FÓRMULA DOS MELHORES" in large bold white text
+- "MELHORES" on its own line with cyan/blue highlight background
+- Strong text shadow for readability on blue background
+- Text positioned right-to-center, stacked vertically
+
+NO LOGOS:
+- Do NOT add any logos anywhere
+- No watermarks or brand marks
+- Keep image clean and professional
+
+COLOR GRADE:
+- Blue/cyan corporate tones — Contele Teams brand
+- Warm highlights on Leonardo's face
+- Cool blue environment
+- High contrast for mobile visibility
+- Optimistic, solution-focused atmosphere
+
+STYLE: Professional YouTube thumbnail, photorealistic natural-looking face, modern corporate feel, blue/cyan color scheme. The thumbnail should convey "I have the formula that top-performing field teams use — and I'm going to show you how to apply it to your team via smartphone." Confident, revealing, authoritative.

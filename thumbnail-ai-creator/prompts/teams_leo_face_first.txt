@@ -1,0 +1,38 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a team management channel.
+
+CRITICAL - FACE REFERENCE IMAGES:
+- Images 1-2 are LEONARDO's actual face photos - YOU MUST COPY THIS EXACT FACE
+- Do NOT create a different person - use the reference photos as the PRIMARY SOURCE
+- The man in the thumbnail MUST look like the man in reference images 1-2
+
+LEONARDO - COPY THE FACE FROM REFERENCE PHOTOS EXACTLY:
+- ROUND/OVAL face shape with fuller cheeks - MATCH THE REFERENCE
+- Dark wavy/curly hair with natural texture, some gray streaks - MATCH THE REFERENCE
+- BLACK RECTANGULAR FRAME GLASSES (MUST include glasses - visible in reference photo 1)
+- Dark brown eyes BEHIND the glasses
+- Clean shaven face - NO beard, NO stubble
+- Age: 43-48 years old, natural mature appearance - MATCH THE REFERENCE
+- Wearing PLAIN dark navy blue t-shirt
+
+SKIN TEXTURE:
+- Natural skin, healthy appearance
+- Do NOT over-smooth or make him look younger than the reference
+- Keep realistic skin texture matching the reference photos
+
+COMPOSITION:
+- Leonardo centered in frame, medium shot (chest up)
+- POSE: Slight forward lean, direct eye contact with camera
+- Confident, serious expression — focused gaze straight at camera
+- Natural body posture
+
+EXPRESSION: Serious and professional, slight tension in face — eyebrows slightly raised, direct eye contact. The expression of someone delivering important information.
+
+BACKGROUND:
+- Simple dark gradient background (dark charcoal/gray)
+- Minimal elements, clean — this is a face reference generation
+- Subtle warm side lighting from the right
+
+TEXT ELEMENTS:
+- None — no text overlay needed for this reference generation
+
+STYLE: Photorealistic, professional YouTube thumbnail style. Focus entirely on face accuracy and photorealism. The goal is to capture Leonardo's exact facial features from the reference photos.

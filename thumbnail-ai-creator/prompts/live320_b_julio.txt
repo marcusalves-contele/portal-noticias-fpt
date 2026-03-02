@@ -1,0 +1,42 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a Brazilian fleet management channel.
+
+CRITICAL - FACE REFERENCE IMAGES:
+- Images 1-2 are JULIO's actual face photos - YOU MUST COPY THIS EXACT FACE
+- Do NOT create a different person - use the reference photos as the PRIMARY SOURCE
+- The man in the thumbnail MUST look like the man in reference images 1-2
+
+JULIO - COPY THE FACE FROM REFERENCE PHOTOS EXACTLY:
+- WIDER face shape, slightly square jaw - MATCH THE REFERENCE
+- DENSE gray/white stubble beard covering jaw and chin (salt and pepper, NOT sparse)
+- Receding hairline with short brown/gray hair - MATCH THE REFERENCE
+- Deep-set brown/hazel eyes, NO glasses
+- Age: 45+, mature appearance
+- PLAIN dark navy blue polo shirt (NO logos, NO text on shirt)
+- The face MUST be recognizable as the same person from the reference photos
+
+SKIN TEXTURE - CRITICAL:
+- Keep skin SMOOTH like a fit 45 year old
+- Do NOT add wrinkles, age spots, or blemishes
+- Forehead SMOOTH, cheeks FIRM
+- Healthy, natural skin tone
+
+COMPOSITION:
+- Julio positioned CENTER of frame, medium shot (chest up)
+- POSE: Arms slightly open, confident and solution-oriented posture
+- EXPRESSION: Confident, slightly satisfied — "we solved this" energy, direct eye contact
+
+BACKGROUND:
+- Deep purple/dark blue professional gradient background
+- Subtle courthouse or legal office elements blurred in background
+- Premium, authoritative feel, bokeh blur, cinematic purple/magenta lighting
+
+TEXT ELEMENTS:
+- TOP LEFT: Red badge with white text "LIVE 320"
+- MAIN TITLE: "MULTA ANTT DE R$10.000 → COMO PAGAR MENOS OU ZERAR" in large white bold text with strong black shadow
+- Subtitle: "com advogados especialistas" in smaller gold/yellow italic text
+- Position all text in lower portion, not overlapping Julio's face
+
+NO LOGOS:
+- Do NOT add any logos, watermarks or brand marks anywhere
+
+STYLE: Professional YouTube thumbnail, photorealistic face, authoritative purple/dark blue cinematic lighting, high contrast for mobile viewing.

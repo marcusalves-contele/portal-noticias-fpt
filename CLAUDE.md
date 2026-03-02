@@ -246,6 +246,34 @@ Linhas com "Tarefa no Asana" preenchido = thumbs pendentes de criação.
 - **Leonardo** (Teams): `referencias/leonardo/` — 2 fotos (cyberpunk-styled)
 - **Convidados**: `referencias/convidados/` — padrão: `convidado_live-{NUM}-{Nome}.{ext}`
 
+---
+
+## Nutella Creator
+
+Sistema de identificação de clips virais a partir de lives. Extrai trechos de alto potencial de compartilhamento com timestamps precisos.
+Doc completo: `nutella-creator/CLAUDE.md`
+
+### Fluxo
+1. URL do vídeo → transcrição oficial com timestamps (`YouTubeTranscriptApi`)
+2. Gemini analisa e sugere 3-5 nutellas com: entrada/saída, título, texto de thumb, por que viraliza
+3. Guia enviado no grupo **IA - Growth Contele** (`120363424539843742@g.us`) — 1 msg por nutella
+
+### Comando
+```bash
+cd nutella-creator
+python3 suggest.py https://youtube.com/watch?v=VIDEO_ID
+```
+
+### Tipos de nutella
+- **Antes/Depois** — contraste de custo/esforço
+- **Verdade Incômoda** — o que todo mundo sabe mas não fala
+- **WOW Factor** — demo ao vivo que parece impossível
+- **Desafio** — ação imediata pro gestor
+- **Jurídico/Prático** — resolve dor com dado acionável
+- **Autoridade** — posiciona Julio/Leonardo como referência
+
+---
+
 ### Pendências para Liberar o Sistema pro Time
 
 1. **Fotos profissionais 4K do Julio e Leonardo**

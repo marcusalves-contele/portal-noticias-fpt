@@ -1,0 +1,43 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a team management channel.
+
+CRITICAL — SINGLE FACE REFERENCE:
+- Image 1 shows THIS EXACT PERSON in a blue-lit corporate setting
+- Your task: recreate THE SAME FACE in a dark dramatic setting with a different expression
+- Do NOT change the face — only change the lighting, expression, and background
+- COPY the face from Image 1: face shape, glasses, hair, skin, jawline, everything
+
+WHAT TO KEEP IDENTICAL FROM IMAGE 1:
+- Face shape: wider, squarish — DO NOT make it oval or narrow
+- Hair: dark, short-ish, natural — match exactly
+- Glasses: black rectangular frame, same size and position
+- Skin tone and texture — match exactly, do NOT smooth
+- Age: same person, same age — do NOT make younger
+
+WHAT CHANGES vs Image 1:
+- Expression: alarmed, concerned — eyebrows raised, mouth slightly open, intense gaze
+- Lighting: dramatic warm amber/orange side light from right, dark background
+- Background: dark charcoal, NOT blue corporate
+- Pose: leaning slightly forward, one hand raised open — urgent warning
+
+COMPOSITION:
+- Person positioned RIGHT side of frame, medium shot (chest up)
+- Dark navy blue t-shirt
+
+BACKGROUND:
+- Dark charcoal/near-black
+- Warm orange/amber key light from right on face
+- Red vignette on left edge
+- High contrast, cinematic
+
+TEXT ELEMENTS:
+- TOP LEFT: Red badge "ALERTA" with warning icon
+- "O CLIENTE" first line — large bold white text
+- "PERCEBE!" second line — white text on solid red background
+- Text in left 55% of frame, strong shadow
+
+VISUAL ELEMENTS:
+- Bottom left: small silhouette of person walking away
+
+NO LOGOS, NO WATERMARKS
+
+STYLE: Professional YouTube thumbnail, photorealistic. The SAME PERSON from Image 1, but alarmed, in dark urgent setting. Face must be recognizable as identical to Image 1.

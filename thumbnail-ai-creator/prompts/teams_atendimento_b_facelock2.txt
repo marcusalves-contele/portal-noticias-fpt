@@ -1,0 +1,59 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a team management channel.
+
+CRITICAL - FACE REFERENCE IMAGES:
+- Images 1-2 are original face photos of LEONARDO
+- Image 3 is a PREVIOUSLY APPROVED THUMBNAIL — THIS IS YOUR PRIMARY FACE REFERENCE
+- The man in the thumbnail MUST look EXACTLY like the man in Image 3
+- Copy every facial detail from Image 3: face shape, glasses, hair, skin tone, age
+- Do NOT create a younger or different-looking person
+
+LEONARDO - COPY FROM IMAGE 3 EXACTLY:
+- ROUND/OVAL face shape with fuller cheeks — MATCH IMAGE 3
+- Dark wavy/curly hair — MATCH IMAGE 3
+- BLACK RECTANGULAR FRAME GLASSES — MUST be identical to Image 3
+- Dark brown eyes behind glasses — MATCH IMAGE 3
+- Clean shaven — NO beard, NO stubble
+- Age appearance: MATCH IMAGE 3 exactly
+- Wearing PLAIN dark navy blue t-shirt
+
+SKIN TEXTURE:
+- Match Image 3 exactly — do NOT make skin smoother or younger
+- Realistic natural texture as in Image 3
+
+COMPOSITION:
+- Leonardo positioned LEFT side of frame, medium shot (chest up)
+- POSE: Confident expert stance — one arm pointing toward floating smartphone/dashboard on the right side of the frame, chin slightly raised
+- Engaging direct gaze at camera with slight knowing smile
+
+EXPRESSION: Confident and authoritative — slight assertive smile, calm focused eyes behind glasses — the expression of someone who found the solution and is about to reveal it
+
+VISUAL ELEMENTS:
+- RIGHT SIDE: Floating 3D smartphone showing a performance dashboard
+  - Metrics/charts on phone screen (upward arrows, percentage indicators)
+  - Small team icons (field workers) arranged in consistent pattern
+  - Checkmark icons floating around phone
+  - Green/cyan glow around the smartphone
+
+BACKGROUND:
+- Modern corporate office, softly blurred (bokeh)
+- Blue/cyan color tones — Contele Teams brand colors
+- Clean, professional, optimistic atmosphere
+- Soft light from windows in background
+
+TEXT ELEMENTS:
+- No badge
+- MAIN TITLE: "FÓRMULA DOS" on first line, "MELHORES" on second line with cyan/blue highlight background
+- Large bold white text with strong shadow
+- Text positioned lower-right area
+
+NO LOGOS:
+- Do NOT add any logos anywhere
+- No watermarks or brand marks
+
+COLOR GRADE:
+- Blue/cyan corporate tones
+- Warm highlights on Leonardo's face
+- Cool blue environment
+- High contrast for mobile visibility
+
+STYLE: Professional YouTube thumbnail, photorealistic face IDENTICAL to Image 3, modern corporate feel, blue/cyan color scheme. Confident, revealing, authoritative tone.

@@ -1,0 +1,60 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a Brazilian fleet management channel.
+
+CRITICAL - FACE REFERENCE IMAGES:
+- Images 1-2 are JULIO's actual face photos - YOU MUST COPY THIS EXACT FACE
+- Do NOT create a different person - use the reference photos as the PRIMARY SOURCE
+- The man in the thumbnail MUST look like the man in reference images 1-2
+- Image 3: CARLA DA LUZ face reference (guest lawyer) - COPY HER FACE EXACTLY
+- Image 4: HIAGO DAROS face reference (guest lawyer) - COPY HIS FACE EXACTLY
+
+JULIO - COPY THE FACE FROM REFERENCE PHOTOS EXACTLY:
+- WIDER face shape, slightly square jaw - MATCH THE REFERENCE
+- DENSE gray/white stubble beard covering jaw and chin (salt and pepper, NOT sparse)
+- Receding hairline with short brown/gray hair - MATCH THE REFERENCE
+- Deep-set brown/hazel eyes, NO glasses
+- Age: 45+, mature appearance
+- PLAIN dark navy blue polo shirt (NO logos, NO text on shirt)
+- The face MUST be recognizable as the same person from the reference photos
+
+SKIN TEXTURE - CRITICAL:
+- Keep skin SMOOTH like a fit 45 year old
+- Do NOT add wrinkles, age spots, or blemishes
+- Forehead SMOOTH, cheeks FIRM
+- Healthy, natural skin tone
+
+COMPOSITION:
+- Julio positioned CENTER of frame, medium shot (chest up)
+- POSE: Arms slightly open, confident and solution-oriented posture
+- EXPRESSION: Confident, slightly satisfied — "we solved this" energy
+
+GUESTS — CARLA DA LUZ AND HIAGO DAROS:
+- Carla on the LEFT of Julio, Hiago on the RIGHT of Julio
+- Slightly behind Julio, shoulder-level framing
+- COPY THEIR FACES EXACTLY from reference images 3 and 4
+- Both looking confident and professional
+- Professional suit attire (lawyers)
+- Label below Carla: "Adv. Carla da Luz" in small white text
+- Label below Hiago: "Adv. Hiago Daros" in small white text
+
+BACKGROUND:
+- Deep purple/dark blue professional gradient background
+- Subtle courthouse or legal office elements blurred in background
+- Premium, authoritative feel
+- Bokeh blur, cinematic purple/magenta lighting
+
+BRIEFING CONTEXT:
+- Público: Gestores de frota experientes de transportadoras e embarcadoras
+- Objetivo: Mostrar que é possível pagar multas ANTT com desconto ou recorrer e zerar
+- Conteúdo: Advogados especialistas apresentam como contestar e reduzir multas ANTT do CNPJ
+
+TEXT ELEMENTS:
+- TOP LEFT: Red badge with white text "LIVE 320"
+- MAIN TITLE: "MULTA ANTT DE R$10.000 → COMO PAGAR MENOS OU ZERAR" in large white bold text with strong black shadow
+- Subtitle: "com advogados especialistas" in smaller yellow/gold italic text
+- Position all text in lower portion, not overlapping faces
+
+NO LOGOS:
+- Do NOT add any logos anywhere in the image
+- Do NOT add watermarks or brand marks
+
+STYLE: Professional YouTube thumbnail, photorealistic faces, authoritative purple/dark blue cinematic lighting, high contrast for mobile viewing, Brazilian professional context.

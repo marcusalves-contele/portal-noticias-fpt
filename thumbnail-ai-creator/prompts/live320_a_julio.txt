@@ -1,0 +1,42 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a Brazilian fleet management channel.
+
+CRITICAL - FACE REFERENCE IMAGES:
+- Images 1-2 are JULIO's actual face photos - YOU MUST COPY THIS EXACT FACE
+- Do NOT create a different person - use the reference photos as the PRIMARY SOURCE
+- The man in the thumbnail MUST look like the man in reference images 1-2
+
+JULIO - COPY THE FACE FROM REFERENCE PHOTOS EXACTLY:
+- WIDER face shape, slightly square jaw - MATCH THE REFERENCE
+- DENSE gray/white stubble beard covering jaw and chin (salt and pepper, NOT sparse)
+- Receding hairline with short brown/gray hair - MATCH THE REFERENCE
+- Deep-set brown/hazel eyes, NO glasses
+- Age: 45+, mature appearance
+- PLAIN dark navy blue polo shirt (NO logos, NO text on shirt)
+- The face MUST be recognizable as the same person from the reference photos
+
+SKIN TEXTURE - CRITICAL:
+- Keep skin SMOOTH like a fit 45 year old
+- Do NOT add wrinkles, age spots, or blemishes
+- Forehead SMOOTH, cheeks FIRM
+- Healthy, natural skin tone
+
+COMPOSITION:
+- Julio positioned center-right, medium shot (chest up)
+- POSE: One hand raised in "stop/warning" gesture toward camera
+- EXPRESSION: Serious, concerned, warning — eyebrows slightly furrowed, direct eye contact
+
+BACKGROUND:
+- Dark red/crimson gradient background, dramatic and alert
+- Blurred trucks and highway road faintly visible in background
+- Red and orange warning tones, bokeh blur, dramatic cinematic lighting
+
+TEXT ELEMENTS:
+- TOP LEFT: Red badge with white text "LIVE 320"
+- MAIN TITLE: "MULTA ANTT: VOCÊ ESTÁ SENDO AUTUADO?" in large white bold text with strong black shadow
+- Below title: "R$ 500 a R$ 10.000" in bright red/orange bold text
+- Position all text on the LEFT side, not overlapping Julio's face
+
+NO LOGOS:
+- Do NOT add any logos, watermarks or brand marks anywhere
+
+STYLE: Professional YouTube thumbnail, photorealistic face, dramatic red/crimson alert lighting, high contrast for mobile viewing.

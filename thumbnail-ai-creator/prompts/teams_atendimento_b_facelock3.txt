@@ -1,0 +1,50 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a team management channel.
+
+CRITICAL - FACE REFERENCE IMAGES:
+- Image 1 is a PREVIOUSLY APPROVED THUMBNAIL — THIS IS YOUR PRIMARY FACE REFERENCE
+- Images 2-3 are supplementary face photos of the same person
+- The man in the thumbnail MUST look IDENTICAL to the man in Image 1
+- Copy every facial detail from Image 1: face shape, glasses, hair, skin tone, wrinkles, age
+- Do NOT make him younger, thinner, or different in any way from Image 1
+
+LEONARDO - COPY FROM IMAGE 1 EXACTLY:
+- ROUND/OVAL face shape, fuller cheeks, slightly wider jaw — MATCH IMAGE 1
+- Dark wavy/curly hair, natural texture — MATCH IMAGE 1
+- BLACK RECTANGULAR FRAME GLASSES — identical frame as in Image 1
+- Dark brown eyes behind glasses — MATCH IMAGE 1
+- Clean shaven — NO beard, NO stubble
+- Realistic skin with natural texture — MATCH IMAGE 1, do NOT smooth
+- Age appearance: mature, 43-48 years — MATCH IMAGE 1 exactly
+- Wearing PLAIN dark navy blue t-shirt
+
+COMPOSITION:
+- Leonardo positioned LEFT side of frame, medium shot (chest up)
+- POSE: Pointing with one finger toward a floating smartphone on the right side
+- Confident direct gaze at camera, slight smile — approachable expert
+
+EXPRESSION: Confident, assertive — slight knowing smile, calm eyes behind glasses
+
+VISUAL ELEMENTS (keep simple):
+- RIGHT SIDE: ONE floating smartphone showing a performance dashboard
+  - Simple upward bar chart visible on screen
+  - Green/cyan glow around phone
+  - Positioned upper-right quadrant
+
+BACKGROUND:
+- Modern office, softly blurred bokeh
+- Blue/cyan tones — clean and professional
+- Soft natural window light
+
+TEXT ELEMENTS:
+- MAIN TITLE: "FÓRMULA DOS" on first line in large bold white text
+- "MELHORES" on second line with solid cyan (#00B4D8) highlight background
+- Text in lower-right area, strong shadow for readability
+
+NO LOGOS, NO BADGES, NO WATERMARKS
+
+COLOR GRADE:
+- Blue/cyan corporate
+- Warm light on Leonardo's face
+- High contrast for mobile
+
+STYLE: Professional YouTube thumbnail. Photorealistic. The ONLY priority is that the face matches Image 1 exactly. Everything else is secondary.

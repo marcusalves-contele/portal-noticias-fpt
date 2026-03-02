@@ -1,0 +1,56 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a team management channel.
+
+CRITICAL - FACE REFERENCE IMAGES:
+- Images 1-2 are LEONARDO's actual face photos
+- Image 3 is a PREVIOUSLY APPROVED THUMBNAIL — use as PRIMARY face reference
+- The man in the thumbnail MUST look like the man in Image 3 (approved face)
+- Do NOT create a different person — copy the face from Image 3 exactly
+
+LEONARDO - COPY THE FACE FROM IMAGE 3 EXACTLY:
+- ROUND/OVAL face shape with fuller cheeks - MATCH IMAGE 3
+- Dark wavy/curly hair with natural texture - MATCH IMAGE 3
+- BLACK RECTANGULAR FRAME GLASSES - MUST include glasses exactly as in Image 3
+- Dark brown eyes BEHIND the glasses - MATCH IMAGE 3
+- Clean shaven - NO beard, NO stubble
+- Age: 43-48 years old - MATCH IMAGE 3
+- Wearing PLAIN dark navy blue t-shirt
+
+SKIN TEXTURE:
+- Natural skin matching Image 3
+- Do NOT over-smooth or make younger than Image 3
+- Realistic skin texture
+
+COMPOSITION:
+- Leonardo positioned RIGHT side of frame, medium shot (chest up)
+- POSE: Leaning slightly forward toward camera, one hand raised with open palm — urgent warning body language
+- Direct eye contact with camera, intense focused gaze
+
+EXPRESSION: Concerned and alarmed — raised eyebrows, serious wide eyes behind glasses, mouth slightly open — the look of someone delivering an important warning to the viewer
+
+VISUAL ELEMENTS:
+- LEFT SIDE: Large bold text
+- Below text: subtle silhouette of a person walking away (client leaving)
+- Red warning vignette around edges suggesting urgency
+
+BACKGROUND:
+- Dark charcoal background, moody
+- Dramatic side lighting with red/orange accent on Leonardo's side
+- High contrast, cinematic feel
+
+TEXT ELEMENTS:
+- TOP LEFT: Red badge reading "ALERTA" in small caps
+- MAIN TITLE: "O CLIENTE" on first line, "PERCEBE!" on second line with red highlight background
+- Large bold white text with strong shadow
+- Text occupies left 55% of the frame
+
+NO LOGOS:
+- Do NOT add any logos anywhere
+- No watermarks or brand marks
+
+COLOR GRADE:
+- Dark urgent atmosphere — charcoal background with red/orange accents
+- Leonardo's face lit warmly (yellow-orange key light)
+- Red vignette edges suggesting alarm
+- High contrast for mobile visibility
+
+STYLE: Professional YouTube thumbnail, photorealistic face matching Image 3, urgent warning tone. Dark background with red accents. Text dominant and readable at small sizes.

@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+output/
+downloads/
+*.png
+*.mp4
+*.webp
+badge_preview.html
+.DS_Store

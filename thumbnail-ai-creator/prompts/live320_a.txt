@@ -1,0 +1,60 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a Brazilian fleet management channel.
+
+CRITICAL - FACE REFERENCE IMAGES:
+- Images 1-2 are JULIO's actual face photos - YOU MUST COPY THIS EXACT FACE
+- Do NOT create a different person - use the reference photos as the PRIMARY SOURCE
+- The man in the thumbnail MUST look like the man in reference images 1-2
+- Image 3: CARLA DA LUZ face reference (guest lawyer) - COPY HER FACE EXACTLY
+- Image 4: HIAGO DAROS face reference (guest lawyer) - COPY HIS FACE EXACTLY
+
+JULIO - COPY THE FACE FROM REFERENCE PHOTOS EXACTLY:
+- WIDER face shape, slightly square jaw - MATCH THE REFERENCE
+- DENSE gray/white stubble beard covering jaw and chin (salt and pepper, NOT sparse)
+- Receding hairline with short brown/gray hair - MATCH THE REFERENCE
+- Deep-set brown/hazel eyes, NO glasses
+- Age: 45+, mature appearance
+- PLAIN dark navy blue polo shirt (NO logos, NO text on shirt)
+- The face MUST be recognizable as the same person from the reference photos
+
+SKIN TEXTURE - CRITICAL:
+- Keep skin SMOOTH like a fit 45 year old
+- Do NOT add wrinkles, age spots, or blemishes
+- Forehead SMOOTH, cheeks FIRM
+- Healthy, natural skin tone
+
+COMPOSITION:
+- Julio positioned center-right, medium shot (chest up)
+- POSE: One hand raised in "stop/warning" gesture, looking directly at camera
+- EXPRESSION: Serious, concerned, warning — eyebrows slightly furrowed
+
+GUESTS — CARLA DA LUZ AND HIAGO DAROS:
+- Both positioned on the LEFT side of the frame, slightly smaller than Julio
+- Carla on far left, Hiago next to her
+- COPY THEIR FACES EXACTLY from reference images 3 and 4
+- Both looking serious and authoritative
+- Professional attire (suits or formal clothing)
+- Label below Carla: "Adv. Carla da Luz" in small white text
+- Label below Hiago: "Adv. Hiago Daros" in small white text
+
+BACKGROUND:
+- Dark red/crimson gradient background, dramatic and alert
+- Blurred trucks and highway road faintly visible in background
+- Red and orange warning tones
+- Bokeh blur, dramatic cinematic lighting
+
+BRIEFING CONTEXT:
+- Público: Gestores de frota experientes de transportadoras e embarcadoras
+- Objetivo: Fazer o gestor entender que está em risco de multas ANTT graves sem saber
+- Conteúdo: Dois advogados explicam todos os tipos de multa ANTT para CNPJ de empresa
+
+TEXT ELEMENTS:
+- TOP LEFT: Red badge with white text "LIVE 320"
+- MAIN TITLE: "MULTA ANTT: VOCÊ ESTÁ SENDO AUTUADO?" in large white bold text with strong black shadow
+- Below title: "R$ 500 a R$ 10.000" in bright red/orange text, large and bold
+- Position all text in lower portion, not overlapping faces
+
+NO LOGOS:
+- Do NOT add any logos anywhere in the image
+- Do NOT add watermarks or brand marks
+
+STYLE: Professional YouTube thumbnail, photorealistic faces, dramatic red/crimson alert lighting, high contrast for mobile viewing, Brazilian professional context.

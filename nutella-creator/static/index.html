@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nutella Creator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --purple: #8B23E5;
+      --purple-dim: #6B1CB5;
+      --purple-glow: rgba(139, 35, 229, 0.25);
+      --purple-subtle: rgba(139, 35, 229, 0.08);
+      --surface-0: #09090b;
+      --surface-1: #0f0f12;
+      --surface-2: #16161a;
+      --surface-3: #1e1e24;
+      --surface-4: #26262e;
+      --border: #2a2a32;
+      --border-hover: #3a3a44;
+      --text-primary: #e8e8ec;
+      --text-secondary: #8e8e96;
+      --text-muted: #56565e;
+      --green: #2dd4a0;
+      --green-dim: rgba(45, 212, 160, 0.12);
+      --red: #f43f5e;
+      --red-dim: rgba(244, 63, 94, 0.12);
+      --amber: #f59e0b;
+      --amber-dim: rgba(245, 158, 11, 0.12);
+      --blue: #3b82f6;
+      --blue-dim: rgba(59, 130, 246, 0.12);
+      --font-display: 'Instrument Sans', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-display);
+      background: var(--surface-0);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Scanline texture overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+    }
+
+    /* ===== SCREEN MANAGEMENT ===== */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: block; animation: screenIn 0.5s var(--ease-out); }
+    @keyframes screenIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== TOP BAR ===== */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(20px) saturate(1.4);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .topbar-icon {
+      width: 28px; height: 28px;
+      background: var(--purple);
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .topbar-icon::before {
+      content: '';
+      width: 12px; height: 12px;
+      border: 2px solid #fff;
+      border-radius: 2px;
+      transform: rotate(45deg);
+    }
+    .topbar-icon::after {
+      content: '';
+      position: absolute;
+      width: 4px; height: 4px;
+      background: #fff;
+      border-radius: 50%;
+      top: 6px; right: 6px;
+    }
+
+    .topbar-title {
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .topbar-sep {
+      width: 1px;
+      height: 24px;
+      background: var(--border);
+    }
+
+    .topbar-nav {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      flex: 1;
+    }
+
+    .topbar-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .topbar-pill:hover { border-color: var(--border-hover); color: var(--text-secondary); }
+    .topbar-pill.approved { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+    .topbar-pill.rejected { border-color: var(--red); color: var(--red); background: var(--red-dim); opacity: 0.5; }
+    .topbar-pill.active { border-color: var(--purple); color: var(--purple); }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .topbar-counter {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .topbar-counter strong { color: var(--green); font-weight: 600; }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1px solid;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--purple);
+      border-color: var(--purple);
+      color: #fff;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--purple-dim); box-shadow: 0 0 20px var(--purple-glow); }
+
+    .btn-approve { border-color: var(--green); color: var(--green); }
+    .btn-approve:hover:not(:disabled) { background: var(--green); color: #000; }
+    .btn-approve.active { background: var(--green); color: #000; }
+
+    .btn-reject { border-color: var(--red); color: var(--red); }
+    .btn-reject:hover:not(:disabled) { background: var(--red); color: #fff; }
+    .btn-reject.active { background: var(--red); color: #fff; }
+
+    .btn-ghost { border-color: var(--border); color: var(--text-secondary); }
+    .btn-ghost:hover:not(:disabled) { border-color: var(--border-hover); color: var(--text-primary); }
+
+    .btn-amber { border-color: var(--amber); color: var(--amber); }
+    .btn-amber:hover:not(:disabled) { background: var(--amber); color: #000; }
+
+    .btn-upload {
+      background: linear-gradient(135deg, var(--red), #c026d3);
+      border-color: transparent;
+      color: #fff;
+    }
+    .btn-upload:hover:not(:disabled) { box-shadow: 0 0 24px rgba(244, 63, 94, 0.3); }
+
+    .btn-sm { font-size: 11px; padding: 5px 12px; }
+
+    /* ===== SCREEN 1: HOME ===== */
+    .home {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 60px 32px;
+      position: relative;
+    }
+
+    .home-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 600px 400px at 50% 30%, rgba(139, 35, 229, 0.08), transparent),
+        radial-gradient(ellipse 400px 300px at 70% 60%, rgba(139, 35, 229, 0.04), transparent);
+      pointer-events: none;
+    }
+
+    .home-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 640px;
+      text-align: center;
+    }
+
+    .home-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--purple);
+      background: var(--purple-subtle);
+      border: 1px solid rgba(139, 35, 229, 0.2);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.6s var(--ease-out) 0.1s both;
+    }
+    .home-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--purple);
+      border-radius: 50%;
+      animation: pulse-dot 2s ease infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .home h1 {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      animation: fadeUp 0.6s var(--ease-out) 0.2s both;
+    }
+    .home h1 span { color: var(--purple); }
+
+    .home-sub {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+      animation: fadeUp 0.6s var(--ease-out) 0.3s both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .home-input-group {
+      display: flex;
+      gap: 0;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.3s;
+      animation: fadeUp 0.6s var(--ease-out) 0.4s both;
+    }
+    .home-input-group:focus-within {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px var(--purple-glow);
+    }
+
+    .home-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 16px 20px;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+    }
+    .home-input::placeholder { color: var(--text-muted); }
+
+    .home-input-btn {
+      padding: 16px 28px;
+      background: var(--purple);
+      border: none;
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: -0.01em;
+    }
+    .home-input-btn:hover { background: var(--purple-dim); }
+    .home-input-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .home-history {
+      margin-top: 48px;
+      text-align: left;
+      width: 100%;
+      animation: fadeUp 0.6s var(--ease-out) 0.5s both;
+    }
+
+    .home-history-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 8px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .history-item:hover {
+      border-color: var(--purple);
+      background: var(--surface-2);
+      transform: translateX(4px);
+    }
+
+    .history-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .history-dot.ready { background: var(--green); }
+    .history-dot.analyzed { background: var(--amber); }
+
+    .history-info { flex: 1; min-width: 0; }
+
+    .history-id {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .history-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .history-count {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--surface-3);
+      padding: 3px 10px;
+      border-radius: 6px;
+    }
+
+    .history-arrow {
+      color: var(--text-muted);
+      font-size: 14px;
+      transition: transform 0.2s;
+    }
+    .history-item:hover .history-arrow { transform: translateX(3px); color: var(--purple); }
+
+    /* ===== SCREEN 2/3: PROGRESS ===== */
+    .progress-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 60px 32px;
+    }
+
+    .progress-container {
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .progress-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .progress-header h2 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .progress-header p {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .progress-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .progress-step {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: all 0.3s;
+    }
+    .progress-step.active {
+      border-color: var(--purple);
+      background: var(--surface-2);
+    }
+    .progress-step.done {
+      border-color: rgba(45, 212, 160, 0.3);
+    }
+
+    .step-indicator {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+    .progress-step.active .step-indicator {
+      background: var(--purple-subtle);
+      border-color: var(--purple);
+      color: var(--purple);
+    }
+    .progress-step.done .step-indicator {
+      background: var(--green-dim);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .step-info { flex: 1; }
+
+    .step-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+    .progress-step:not(.active):not(.done) .step-label { color: var(--text-muted); }
+
+    .step-detail {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .spinner-ring {
+      width: 18px; height: 18px;
+      border: 2px solid var(--purple);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .progress-bar-container {
+      margin-top: 24px;
+      background: var(--surface-2);
+      border-radius: 6px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple), #c026d3);
+      border-radius: 6px;
+      transition: width 0.5s var(--ease-out);
+      position: relative;
+    }
+    .progress-bar-fill::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 40px;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+      animation: shimmer 1.5s ease infinite;
+    }
+    @keyframes shimmer {
+      0% { opacity: 0; }
+      50% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    /* Nutellas selection (after analysis) */
+    .nutellas-select {
+      margin-top: 32px;
+    }
+
+    .nutellas-select-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .nutella-select-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nutella-select-card:hover { border-color: var(--border-hover); }
+    .nutella-select-card.selected { border-color: var(--purple); background: var(--purple-subtle); }
+
+    .select-check {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border);
+      border-radius: 5px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .nutella-select-card.selected .select-check {
+      background: var(--purple);
+      border-color: var(--purple);
+    }
+    .select-check::after {
+      content: '✓';
+      font-size: 12px;
+      color: #fff;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .nutella-select-card.selected .select-check::after { opacity: 1; }
+
+    .select-rank {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--purple);
+      width: 36px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .select-info { flex: 1; min-width: 0; }
+
+    .select-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .select-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 12px;
+      margin-top: 3px;
+    }
+
+    .tipo-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .tipo-badge.viralização { background: var(--red-dim); color: var(--red); }
+    .tipo-badge.autoridade { background: var(--purple-subtle); color: var(--purple); }
+    .tipo-badge.inscricao { background: var(--green-dim); color: var(--green); }
+    .tipo-badge.educacional { background: var(--blue-dim); color: var(--blue); }
+    .tipo-badge.wow_factor { background: var(--amber-dim); color: var(--amber); }
+
+    /* ===== SCREEN 4: REVIEW ===== */
+    .review-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 32px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .nutella-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.3s;
+    }
+    .nutella-card.approved { border-color: rgba(45, 212, 160, 0.4); }
+    .nutella-card.rejected { border-color: rgba(244, 63, 94, 0.3); opacity: 0.5; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 24px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .card-rank {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--purple);
+      font-family: var(--font-mono);
+      letter-spacing: -0.03em;
+      flex-shrink: 0;
+    }
+
+    .card-title-area { flex: 1; min-width: 0; }
+
+    .card-ctr-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-seo-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .status-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 5px;
+      background: var(--surface-3);
+      color: var(--text-muted);
+    }
+    .status-tag.approved { background: var(--green-dim); color: var(--green); }
+    .status-tag.rejected { background: var(--red-dim); color: var(--red); }
+
+    .card-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+
+    .card-players {
+      padding: 20px 24px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .player-wrapper { flex: 1; }
+    .player-wrapper.short { flex: 0 0 160px; }
+
+    .player-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .video-player {
+      width: 100%;
+      border-radius: 8px;
+      background: #000;
+      display: block;
+    }
+    .player-wrapper.short .video-player { max-height: 340px; }
+
+    .card-meta-panel {
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .meta-section-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .titles-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .title-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .title-tag {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .title-tag.seo { background: var(--blue-dim); color: var(--blue); }
+    .title-tag.ctr { background: var(--purple-subtle); color: var(--purple); }
+    .title-tag.short { background: var(--green-dim); color: var(--green); }
+
+    .hook-block {
+      font-size: 13px;
+      color: var(--amber);
+      font-style: italic;
+      background: var(--amber-dim);
+      padding: 12px 14px;
+      border-radius: 8px;
+      border-left: 3px solid var(--amber);
+      line-height: 1.5;
+    }
+
+    .viral-block {
+      font-size: 13px;
+      color: var(--green);
+      background: var(--green-dim);
+      padding: 12px 14px;
+      border-radius: 8px;
+      border-left: 3px solid var(--green);
+      line-height: 1.5;
+    }
+
+    .meta-detail {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: var(--surface-4);
+      color: var(--text-muted);
+      padding: 1px 6px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    /* Thumb area */
+    .card-thumb-row {
+      border-top: 1px solid var(--border);
+      padding: 20px 24px;
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .thumb-preview-area {
+      flex: 0 0 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .thumb-text-display {
+      font-size: 20px;
+      font-weight: 900;
+      text-align: center;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 2px solid var(--purple);
+      background: var(--surface-2);
+      color: #fff;
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+    }
+
+    .thumb-image-area {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--surface-3);
+      min-height: 80px;
+    }
+
+    .thumb-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 80px;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .thumb-loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 80px;
+      border: 1px solid var(--purple);
+      border-radius: 8px;
+      background: var(--purple-subtle);
+      color: var(--purple);
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .thumb-img {
+      width: 100%;
+      display: none;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid var(--border);
+      transition: border-color 0.2s;
+    }
+    .thumb-img:hover { border-color: var(--purple); }
+
+    .thumb-feedback-area {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feedback-textarea {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      padding: 10px 14px;
+      font-family: var(--font-display);
+      font-size: 13px;
+      resize: vertical;
+      min-height: 60px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .feedback-textarea:focus { border-color: var(--purple); }
+    .feedback-textarea::placeholder { color: var(--text-muted); }
+
+    .thumb-meta-detail {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ===== SCREEN 5: UPLOAD ===== */
+    .upload-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 60px 32px;
+    }
+
+    .upload-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .upload-header h2 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .upload-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .upload-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      align-items: center;
+    }
+
+    .upload-thumb {
+      width: 160px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 6px;
+      background: var(--surface-3);
+      flex-shrink: 0;
+    }
+
+    .upload-info { flex: 1; }
+
+    .upload-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .upload-desc {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      max-height: 44px;
+      overflow: hidden;
+    }
+
+    .upload-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .upload-results {
+      margin-top: 32px;
+      display: none;
+    }
+
+    .upload-result-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+    }
+
+    .upload-result-icon {
+      width: 24px; height: 24px;
+      border-radius: 6px;
+      background: var(--green-dim);
+      display: grid;
+      place-items: center;
+      color: var(--green);
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .upload-result-link {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--purple);
+      text-decoration: none;
+    }
+    .upload-result-link:hover { text-decoration: underline; }
+
+    .upload-result-sched {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+
+    /* ===== OVERLAY ===== */
+    .thumb-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+    .thumb-overlay.active { display: flex; }
+    .thumb-overlay img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 10px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 400;
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.3s var(--ease-out);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-color: rgba(45, 212, 160, 0.4); }
+    .toast.success::before { content: ''; width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+    .toast.error { border-color: rgba(244, 63, 94, 0.4); }
+    .toast.error::before { content: ''; width: 6px; height: 6px; background: var(--red); border-radius: 50%; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1100px) {
+      .card-body { grid-template-columns: 1fr; }
+      .card-players { border-right: none; border-bottom: 1px solid var(--border); }
+      .card-thumb-row { flex-direction: column; }
+      .thumb-preview-area { flex: unset; }
+    }
+
+    @media (max-width: 700px) {
+      .home h1 { font-size: 32px; }
+      .topbar { padding: 0 16px; }
+      .review-container { padding: 16px; }
+      .card-players { flex-direction: column; }
+      .player-wrapper.short { flex: unset; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== SCREEN 1: HOME ===== -->
+  <div class="screen active" id="screen-home">
+    <div class="home">
+      <div class="home-bg"></div>
+      <div class="home-content">
+        <div class="home-badge">PIPELINE ATIVO</div>
+        <h1>Nutella <span>Creator</span></h1>
+        <p class="home-sub">Clips virais de lives — análise, corte, thumbnail e upload</p>
+
+        <div class="home-input-group">
+          <input class="home-input" id="url-input" type="text"
+                 placeholder="Cole a URL do YouTube aqui..."
+                 autocomplete="off" spellcheck="false">
+          <button class="home-input-btn" id="btn-analyze" onclick="startAnalysis()">
+            Analisar
+          </button>
+        </div>
+
+        <div class="home-history" id="history-section">
+          <div class="home-history-title">Recentes</div>
+          <div id="history-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 2: ANALYSIS PROGRESS ===== -->
+  <div class="screen" id="screen-analyze">
+    <div class="progress-screen">
+      <div class="progress-container">
+        <div class="progress-header">
+          <h2>Analisando</h2>
+          <p id="analyze-video-label">Processando vídeo...</p>
+        </div>
+
+        <div class="progress-steps" id="analyze-steps">
+          <div class="progress-step active" id="step-transcript">
+            <div class="step-indicator"><div class="spinner-ring"></div></div>
+            <div class="step-info">
+              <div class="step-label">Transcrição</div>
+              <div class="step-detail">Buscando legendas do YouTube...</div>
+            </div>
+          </div>
+          <div class="progress-step" id="step-analysis">
+            <div class="step-indicator">2</div>
+            <div class="step-info">
+              <div class="step-label">Análise IA</div>
+              <div class="step-detail">Aguardando...</div>
+            </div>
+          </div>
+          <div class="progress-step" id="step-complete">
+            <div class="step-indicator">3</div>
+            <div class="step-info">
+              <div class="step-label">Nutellas</div>
+              <div class="step-detail">Aguardando...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nutellas-select" id="nutellas-select" style="display:none">
+          <div class="nutellas-select-title">Nutellas identificadas</div>
+          <div id="nutellas-select-list"></div>
+          <div style="display:flex;gap:12px;margin-top:16px;justify-content:center">
+            <button class="btn btn-ghost" onclick="selectAllNutellas()">Selecionar todas</button>
+            <button class="btn btn-primary" id="btn-build" onclick="startBuild()">Construir selecionadas</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 3: BUILD PROGRESS ===== -->
+  <div class="screen" id="screen-build">
+    <div class="progress-screen">
+      <div class="progress-container">
+        <div class="progress-header">
+          <h2>Construindo</h2>
+          <p id="build-status-label">Preparando clips...</p>
+        </div>
+
+        <div class="progress-steps" id="build-steps">
+          <div class="progress-step active" id="bstep-download">
+            <div class="step-indicator"><div class="spinner-ring"></div></div>
+            <div class="step-info">
+              <div class="step-label">Download</div>
+              <div class="step-detail">Baixando vídeo...</div>
+            </div>
+          </div>
+          <div class="progress-step" id="bstep-build">
+            <div class="step-indicator">2</div>
+            <div class="step-info">
+              <div class="step-label">Composição</div>
+              <div class="step-detail" id="build-detail">Aguardando...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-bar-container" style="margin-top:24px">
+          <div class="progress-bar-fill" id="build-bar" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 4: REVIEW ===== -->
+  <div class="screen" id="screen-review">
+    <div class="topbar" id="review-topbar">
+      <div class="topbar-brand" onclick="goHome()">
+        <div class="topbar-icon"></div>
+        <span class="topbar-title">Nutella Creator</span>
+      </div>
+      <div class="topbar-sep"></div>
+      <div class="topbar-nav" id="review-nav"></div>
+      <div class="topbar-actions">
+        <div class="topbar-counter" id="review-counter">
+          <strong>0</strong> aprovadas
+        </div>
+        <button class="btn btn-upload btn-sm" id="btn-go-upload" style="display:none" onclick="goUpload()">
+          Upload YouTube
+        </button>
+      </div>
+    </div>
+    <div class="review-container" id="review-cards"></div>
+  </div>
+
+  <!-- ===== SCREEN 5: UPLOAD ===== -->
+  <div class="screen" id="screen-upload">
+    <div class="topbar">
+      <div class="topbar-brand" onclick="goHome()">
+        <div class="topbar-icon"></div>
+        <span class="topbar-title">Nutella Creator</span>
+      </div>
+      <div class="topbar-sep"></div>
+      <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">UPLOAD</span>
+    </div>
+    <div class="upload-container">
+      <div class="upload-header">
+        <h2>Upload para YouTube</h2>
+        <p style="color:var(--text-secondary);font-size:14px" id="upload-summary"></p>
+      </div>
+      <div class="upload-preview" id="upload-preview"></div>
+      <div class="upload-actions" id="upload-actions">
+        <button class="btn btn-ghost" onclick="showScreen('review')">Voltar</button>
+        <button class="btn btn-primary" onclick="doUpload(false)">Upload Unlisted</button>
+        <button class="btn btn-upload" onclick="doUpload(true)">Agendar Publicação</button>
+      </div>
+      <div class="upload-results" id="upload-results"></div>
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div class="thumb-overlay" id="thumb-overlay" onclick="closeOverlay()">
+    <img id="thumb-overlay-img" src="">
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ===== STATE =====
+    let currentVideoId = '';
+    let currentNutellas = [];
+    let currentMetas = [];
+    let currentState = {};
+    let currentThumbs = {};
+    let selectedRanks = new Set();
+
+    // ===== NAVIGATION =====
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + id).classList.add('active');
+    }
+
+    function goHome() {
+      showScreen('home');
+      loadHistory();
+    }
+
+    // ===== TOAST =====
+    function toast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show ' + type;
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ===== OVERLAY =====
+    function openOverlay(src) {
+      document.getElementById('thumb-overlay-img').src = src;
+      document.getElementById('thumb-overlay').classList.add('active');
+    }
+    function closeOverlay() {
+      document.getElementById('thumb-overlay').classList.remove('active');
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+
+    // ===== SCREEN 1: HOME =====
+    async function loadHistory() {
+      try {
+        const resp = await fetch('/api/videos');
+        const data = await resp.json();
+        const list = document.getElementById('history-list');
+
+        if (!data.videos || data.videos.length === 0) {
+          list.innerHTML = '<p style="color:var(--text-muted);font-size:13px;font-style:italic">Nenhum vídeo processado ainda</p>';
+          return;
+        }
+
+        list.innerHTML = data.videos.map(v => {
+          const date = v.generated_at ? new Date(v.generated_at).toLocaleDateString('pt-BR') : '';
+          const status = v.has_cuts ? 'ready' : 'analyzed';
+          const statusLabel = v.has_cuts ? 'Clips prontos' : 'Analisado';
+          return `
+            <div class="history-item" onclick="loadVideo('${v.video_id}', ${v.has_cuts})">
+              <div class="history-dot ${status}"></div>
+              <div class="history-info">
+                <div class="history-id">${v.video_id}</div>
+                <div class="history-meta">${date} · ${statusLabel}</div>
+              </div>
+              <div class="history-count">${v.nutellas_count} nutellas</div>
+              <div class="history-arrow">→</div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.error('loadHistory error:', e);
+      }
+    }
+
+    async function loadVideo(videoId, hasCuts) {
+      currentVideoId = videoId;
+      if (hasCuts) {
+        await loadReview(videoId);
+        showScreen('review');
+      } else {
+        // Load nutellas for selection
+        try {
+          const resp = await fetch('/api/metas/' + videoId);
+          const data = await resp.json();
+          currentNutellas = data.nutellas || [];
+          showNutellasSelect(currentNutellas);
+          showScreen('analyze');
+        } catch (e) {
+          toast('Erro ao carregar: ' + e.message, 'error');
+        }
+      }
+    }
+
+    // ===== SCREEN 2: ANALYSIS =====
+    async function startAnalysis() {
+      const url = document.getElementById('url-input').value.trim();
+      if (!url) { toast('Cole uma URL do YouTube', 'error'); return; }
+
+      document.getElementById('btn-analyze').disabled = true;
+      showScreen('analyze');
+
+      // Reset steps
+      resetSteps(['step-transcript', 'step-analysis', 'step-complete']);
+      activateStep('step-transcript');
+      document.getElementById('nutellas-select').style.display = 'none';
+
+      try {
+        const resp = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({url})
+        });
+        const data = await resp.json();
+
+        if (data.error) {
+          toast(data.error, 'error');
+          document.getElementById('btn-analyze').disabled = false;
+          return;
+        }
+
+        // Connect SSE
+        const es = new EventSource('/api/progress/' + data.job_id);
+
+        es.addEventListener('progress', e => {
+          const d = JSON.parse(e.data);
+          if (d.step === 'transcript') {
+            activateStep('step-transcript');
+            document.querySelector('#step-transcript .step-detail').textContent = d.message;
+          } else if (d.step === 'analysis') {
+            completeStep('step-transcript');
+            activateStep('step-analysis');
+            document.querySelector('#step-analysis .step-detail').textContent = d.message;
+          }
+        });
+
+        es.addEventListener('complete', e => {
+          es.close();
+          const d = JSON.parse(e.data);
+          completeStep('step-analysis');
+          completeStep('step-complete');
+          document.querySelector('#step-complete .step-detail').textContent = d.count + ' nutellas identificadas';
+          document.getElementById('btn-analyze').disabled = false;
+          currentVideoId = d.video_id;
+
+          // Load and show nutellas for selection
+          fetch('/api/metas/' + d.video_id)
+            .then(r => r.json())
+            .then(data => {
+              currentNutellas = data.nutellas || [];
+              showNutellasSelect(currentNutellas);
+            });
+        });
+
+        es.addEventListener('error', e => {
+          if (e.data) {
+            const d = JSON.parse(e.data);
+            toast('Erro: ' + d.message, 'error');
+          }
+          es.close();
+          document.getElementById('btn-analyze').disabled = false;
+        });
+
+        es.onerror = () => {
+          es.close();
+          document.getElementById('btn-analyze').disabled = false;
+        };
+
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+        document.getElementById('btn-analyze').disabled = false;
+      }
+    }
+
+    function showNutellasSelect(nutellas) {
+      selectedRanks = new Set(nutellas.map(n => n.rank));
+      const list = document.getElementById('nutellas-select-list');
+      list.innerHTML = nutellas.map(n => {
+        const dur = calcDuration(n.clip_entrada, n.clip_saida);
+        return `
+          <div class="nutella-select-card selected" data-rank="${n.rank}" onclick="toggleSelect(${n.rank}, this)">
+            <div class="select-check"></div>
+            <div class="select-rank">#${n.rank}</div>
+            <div class="select-info">
+              <div class="select-title">${n.titulo_ctr}</div>
+              <div class="select-meta">
+                <span>${dur}</span>
+                <span>${n.clip_entrada} → ${n.clip_saida}</span>
+              </div>
+            </div>
+            <div class="tipo-badge ${n.tipo || ''}">${(n.tipo || '').replace('_', ' ')}</div>
+          </div>
+        `;
+      }).join('');
+      document.getElementById('nutellas-select').style.display = 'block';
+    }
+
+    function toggleSelect(rank, el) {
+      if (selectedRanks.has(rank)) {
+        selectedRanks.delete(rank);
+        el.classList.remove('selected');
+      } else {
+        selectedRanks.add(rank);
+        el.classList.add('selected');
+      }
+    }
+
+    function selectAllNutellas() {
+      document.querySelectorAll('.nutella-select-card').forEach(el => {
+        const rank = parseInt(el.dataset.rank);
+        selectedRanks.add(rank);
+        el.classList.add('selected');
+      });
+    }
+
+    function calcDuration(start, end) {
+      const toSec = t => { const p = t.split(':'); return p.length === 3 ? +p[0]*3600 + +p[1]*60 + +p[2] : +p[0]*60 + +p[1]; };
+      const s = toSec(end) - toSec(start);
+      return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+    }
+
+    // ===== SCREEN 3: BUILD =====
+    async function startBuild() {
+      if (selectedRanks.size === 0) { toast('Selecione ao menos uma nutella', 'error'); return; }
+
+      showScreen('build');
+      document.getElementById('build-bar').style.width = '5%';
+
+      // Reset steps
+      resetSteps(['bstep-download', 'bstep-build']);
+      activateStep('bstep-download');
+
+      try {
+        const resp = await fetch('/api/build', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({video_id: currentVideoId, ranks: [...selectedRanks]})
+        });
+        const data = await resp.json();
+
+        const es = new EventSource('/api/progress/' + data.job_id);
+
+        es.addEventListener('progress', e => {
+          const d = JSON.parse(e.data);
+          if (d.step === 'download') {
+            activateStep('bstep-download');
+            document.querySelector('#bstep-download .step-detail').textContent = d.message;
+            document.getElementById('build-bar').style.width = '15%';
+          } else if (d.step === 'build') {
+            completeStep('bstep-download');
+            activateStep('bstep-build');
+            document.getElementById('build-detail').textContent = d.message;
+            document.getElementById('build-status-label').textContent = d.message;
+            if (d.current && d.total) {
+              const pct = 15 + (d.current / d.total) * 85;
+              document.getElementById('build-bar').style.width = pct + '%';
+            }
+          }
+        });
+
+        es.addEventListener('complete', e => {
+          es.close();
+          document.getElementById('build-bar').style.width = '100%';
+          completeStep('bstep-build');
+          toast('Clips construídos', 'success');
+          // Auto go to review
+          setTimeout(async () => {
+            await loadReview(currentVideoId);
+            showScreen('review');
+          }, 800);
+        });
+
+        es.addEventListener('error', e => {
+          if (e.data) {
+            const d = JSON.parse(e.data);
+            toast('Erro: ' + d.message, 'error');
+          }
+          es.close();
+        });
+
+        es.onerror = () => { es.close(); };
+
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+      }
+    }
+
+    // ===== STEP HELPERS =====
+    function resetSteps(ids) {
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('active', 'done');
+        el.querySelector('.step-indicator').innerHTML = '';
+      });
+    }
+
+    function activateStep(id) {
+      const el = document.getElementById(id);
+      el.classList.add('active');
+      el.classList.remove('done');
+      el.querySelector('.step-indicator').innerHTML = '<div class="spinner-ring"></div>';
+    }
+
+    function completeStep(id) {
+      const el = document.getElementById(id);
+      el.classList.remove('active');
+      el.classList.add('done');
+      el.querySelector('.step-indicator').innerHTML = '✓';
+    }
+
+    // ===== SCREEN 4: REVIEW =====
+    async function loadReview(videoId) {
+      currentVideoId = videoId;
+      try {
+        const resp = await fetch('/api/metas/' + videoId);
+        const data = await resp.json();
+
+        currentMetas = data.metas || [];
+        currentState = data.state || {};
+        currentThumbs = data.thumbs || {};
+
+        renderReviewNav();
+        renderReviewCards();
+        updateReviewCounter();
+      } catch (e) {
+        toast('Erro ao carregar review: ' + e.message, 'error');
+      }
+    }
+
+    function renderReviewNav() {
+      const nav = document.getElementById('review-nav');
+      nav.innerHTML = currentMetas.map(m => {
+        const st = currentState[String(m.rank)] || '';
+        return `<div class="topbar-pill ${st}" id="nav-${m.rank}" onclick="scrollToCard(${m.rank})">#${m.rank} ${(m.titulo_ctr || '').substring(0, 30)}...</div>`;
+      }).join('');
+    }
+
+    function renderReviewCards() {
+      const container = document.getElementById('review-cards');
+      container.innerHTML = currentMetas.map(m => {
+        const rank = m.rank;
+        const st = currentState[String(rank)] || '';
+        const thumbFile = currentThumbs[String(rank)] || '';
+        const clipFile = m.clip?.arquivo || '';
+        const shortFile = m.shorts?.arquivo || '';
+
+        const clipSrc = clipFile ? `/output/${currentVideoId}_cuts/${clipFile}` : '';
+        const shortSrc = shortFile ? `/output/${currentVideoId}_cuts/${shortFile}` : '';
+        const thumbSrc = thumbFile ? `/output/${currentVideoId}_cuts/${thumbFile}?t=${Date.now()}` : '';
+
+        const hasThumb = !!thumbFile;
+
+        return `
+        <section class="nutella-card ${st}" id="card-${rank}" data-rank="${rank}">
+          <div class="card-header">
+            <div class="card-rank">#${rank}</div>
+            <div class="card-title-area">
+              <div class="card-ctr-title">${m.titulo_ctr || ''}</div>
+              <div class="card-seo-title">${m.titulo_seo || ''}</div>
+            </div>
+            ${m.tipo ? `<div class="tipo-badge ${m.tipo}">${m.tipo.replace('_',' ')}</div>` : ''}
+            <div class="card-actions">
+              <button class="btn btn-approve btn-sm ${st === 'approved' ? 'active' : ''}" onclick="setApproval(${rank}, 'approved')">Aprovar</button>
+              <button class="btn btn-reject btn-sm ${st === 'rejected' ? 'active' : ''}" onclick="setApproval(${rank}, 'rejected')">Rejeitar</button>
+              <div class="status-tag ${st}" id="status-${rank}">${st || 'pendente'}</div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="card-players">
+              ${clipSrc ? `
+              <div class="player-wrapper">
+                <div class="player-label">16:9 clip [${m.clip?.entrada || ''} → ${m.clip?.saida || ''}]</div>
+                <video class="video-player" controls preload="metadata"><source src="${clipSrc}" type="video/mp4"></video>
+              </div>` : ''}
+              ${shortSrc ? `
+              <div class="player-wrapper short">
+                <div class="player-label">9:16 short</div>
+                <video class="video-player" controls preload="metadata"><source src="${shortSrc}" type="video/mp4"></video>
+              </div>` : ''}
+            </div>
+
+            <div class="card-meta-panel">
+              <div>
+                <div class="meta-section-title">Títulos</div>
+                <div class="titles-list">
+                  <div class="title-row"><span class="title-tag seo">SEO</span> ${m.titulo_seo || ''}</div>
+                  <div class="title-row"><span class="title-tag ctr">CTR</span> ${m.titulo_ctr || ''}</div>
+                  <div class="title-row"><span class="title-tag short">SHORT</span> ${m.titulo_shorts || '-'}</div>
+                </div>
+              </div>
+
+              ${m.hook_transcricao ? `
+              <div>
+                <div class="meta-section-title">Hook</div>
+                <div class="hook-block">"${m.hook_transcricao}"</div>
+              </div>` : ''}
+
+              ${m.por_que_viraliza ? `
+              <div>
+                <div class="meta-section-title">Por que viraliza</div>
+                <div class="viral-block">${m.por_que_viraliza}</div>
+              </div>` : ''}
+            </div>
+          </div>
+
+          <div class="card-thumb-row">
+            <div class="thumb-preview-area">
+              <div class="thumb-text-display">${m.thumbnail_texto || ''}</div>
+
+              <div class="thumb-image-area" id="thumb-area-${rank}">
+                <div class="thumb-placeholder" id="thumb-ph-${rank}" style="${hasThumb ? 'display:none' : ''}">Aprove para gerar thumbnail</div>
+                <div class="thumb-loading" id="thumb-load-${rank}">
+                  <div class="spinner-ring"></div>
+                  <span>Gerando...</span>
+                </div>
+                <img class="thumb-img" id="thumb-img-${rank}" src="${thumbSrc}" style="${hasThumb ? 'display:block' : ''}" onclick="openOverlay(this.src)">
+              </div>
+            </div>
+
+            <div class="thumb-feedback-area" id="thumb-fb-${rank}" style="${hasThumb ? 'display:flex' : ''}">
+              <div class="meta-section-title">Feedback</div>
+              <textarea class="feedback-textarea" id="feedback-${rank}" placeholder="Ex: texto maior, fundo mais escuro, Julio mais jovem..." rows="3"></textarea>
+              <button class="btn btn-amber btn-sm" id="regen-btn-${rank}" onclick="regenerateThumb(${rank})">Regerar com feedback</button>
+
+              <div class="thumb-meta-detail">
+                <strong>Expressão:</strong> ${m.expressao_julio || '-'}<br>
+                <strong>Pairing:</strong> ${m.thumbnail_pairing || '-'}<br>
+                <strong>Composição:</strong> ${m.thumbnail_composicao || '-'}
+              </div>
+            </div>
+          </div>
+        </section>
+        `;
+      }).join('');
+    }
+
+    function scrollToCard(rank) {
+      document.getElementById('card-' + rank)?.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+
+    async function setApproval(rank, status) {
+      const current = currentState[String(rank)];
+      const newStatus = current === status ? 'pending' : status;
+
+      try {
+        await fetch('/api/approve', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({video_id: currentVideoId, rank, status: newStatus})
+        });
+
+        if (newStatus === 'pending') {
+          delete currentState[String(rank)];
+        } else {
+          currentState[String(rank)] = newStatus;
+        }
+
+        // Update card UI
+        const card = document.getElementById('card-' + rank);
+        card.classList.remove('approved', 'rejected');
+        if (newStatus !== 'pending') card.classList.add(newStatus);
+
+        // Update buttons
+        card.querySelector('.btn-approve').classList.toggle('active', newStatus === 'approved');
+        card.querySelector('.btn-reject').classList.toggle('active', newStatus === 'rejected');
+
+        // Update status tag
+        const tag = document.getElementById('status-' + rank);
+        tag.className = 'status-tag ' + (newStatus === 'pending' ? '' : newStatus);
+        tag.textContent = newStatus === 'pending' ? 'pendente' : (newStatus === 'approved' ? 'aprovada' : 'rejeitada');
+
+        // Update nav pill
+        const nav = document.getElementById('nav-' + rank);
+        if (nav) {
+          nav.classList.remove('approved', 'rejected');
+          if (newStatus !== 'pending') nav.classList.add(newStatus);
+        }
+
+        updateReviewCounter();
+
+        // Auto-generate thumb on approve
+        if (newStatus === 'approved') {
+          const img = document.getElementById('thumb-img-' + rank);
+          if (!img.src || img.style.display === 'none') {
+            generateThumb(rank);
+          }
+        }
+
+        toast('#' + rank + ' ' + (newStatus === 'pending' ? 'pendente' : newStatus), 'success');
+
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+      }
+    }
+
+    function updateReviewCounter() {
+      const approved = Object.values(currentState).filter(s => s === 'approved').length;
+      document.getElementById('review-counter').innerHTML = `<strong>${approved}</strong> aprovadas`;
+      document.getElementById('btn-go-upload').style.display = approved > 0 ? '' : 'none';
+    }
+
+    async function generateThumb(rank) {
+      const ph = document.getElementById('thumb-ph-' + rank);
+      const load = document.getElementById('thumb-load-' + rank);
+      const img = document.getElementById('thumb-img-' + rank);
+      const fb = document.getElementById('thumb-fb-' + rank);
+
+      if (ph) ph.style.display = 'none';
+      load.style.display = 'flex';
+      img.style.display = 'none';
+
+      try {
+        const resp = await fetch('/api/generate-thumb', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({video_id: currentVideoId, rank})
+        });
+        const data = await resp.json();
+        load.style.display = 'none';
+
+        if (data.thumb) {
+          img.src = '/output/' + currentVideoId + '_cuts/' + data.thumb + '?t=' + Date.now();
+          img.style.display = 'block';
+          fb.style.display = 'flex';
+          currentThumbs[String(rank)] = data.thumb;
+          toast('#' + rank + ' thumbnail gerada', 'success');
+        } else {
+          if (ph) ph.style.display = '';
+          toast('Erro: ' + (data.error || 'falha'), 'error');
+        }
+      } catch (e) {
+        load.style.display = 'none';
+        if (ph) ph.style.display = '';
+        toast('Erro de conexão', 'error');
+      }
+    }
+
+    async function regenerateThumb(rank) {
+      const feedback = document.getElementById('feedback-' + rank).value.trim();
+      if (!feedback) { toast('Escreva o feedback antes', 'error'); return; }
+
+      const load = document.getElementById('thumb-load-' + rank);
+      const img = document.getElementById('thumb-img-' + rank);
+      const btn = document.getElementById('regen-btn-' + rank);
+
+      load.style.display = 'flex';
+      img.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Regerando...';
+
+      try {
+        const resp = await fetch('/api/regenerate-thumb', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({video_id: currentVideoId, rank, feedback})
+        });
+        const data = await resp.json();
+        load.style.display = 'none';
+        btn.disabled = false;
+        btn.textContent = 'Regerar com feedback';
+
+        if (data.thumb) {
+          img.src = '/output/' + currentVideoId + '_cuts/' + data.thumb + '?t=' + Date.now();
+          img.style.display = 'block';
+          document.getElementById('feedback-' + rank).value = '';
+          toast('#' + rank + ' thumbnail regerada', 'success');
+        } else {
+          img.style.display = 'block';
+          toast('Erro: ' + (data.error || 'falha'), 'error');
+        }
+      } catch (e) {
+        load.style.display = 'none';
+        btn.disabled = false;
+        btn.textContent = 'Regerar com feedback';
+        toast('Erro de conexão', 'error');
+      }
+    }
+
+    // ===== SCREEN 5: UPLOAD =====
+    function goUpload() {
+      const approvedRanks = Object.entries(currentState)
+        .filter(([_, s]) => s === 'approved')
+        .map(([r]) => parseInt(r))
+        .sort((a, b) => a - b);
+
+      if (approvedRanks.length === 0) { toast('Nenhuma aprovada', 'error'); return; }
+
+      const preview = document.getElementById('upload-preview');
+      preview.innerHTML = approvedRanks.map(rank => {
+        const meta = currentMetas.find(m => m.rank === rank);
+        if (!meta) return '';
+        const thumbFile = currentThumbs[String(rank)] || '';
+        const thumbSrc = thumbFile ? `/output/${currentVideoId}_cuts/${thumbFile}` : '';
+        return `
+          <div class="upload-item">
+            ${thumbSrc ? `<img class="upload-thumb" src="${thumbSrc}">` : '<div class="upload-thumb" style="display:grid;place-items:center;color:var(--text-muted);font-size:11px">Sem thumb</div>'}
+            <div class="upload-info">
+              <div class="upload-title">#${rank} ${meta.titulo_seo || meta.titulo_ctr}</div>
+              <div class="upload-desc">${meta.descricao_curta || meta.hook_transcricao || ''}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('upload-summary').textContent = approvedRanks.length + ' vídeos para upload';
+      document.getElementById('upload-results').style.display = 'none';
+      document.getElementById('upload-actions').style.display = 'flex';
+
+      showScreen('upload');
+    }
+
+    async function doUpload(schedule) {
+      const approvedRanks = Object.entries(currentState)
+        .filter(([_, s]) => s === 'approved')
+        .map(([r]) => parseInt(r))
+        .sort((a, b) => a - b);
+
+      const mode = schedule ? 'agendar' : 'upload unlisted';
+      if (!confirm(approvedRanks.length + ' vídeos para ' + mode + '. Confirma?')) return;
+
+      document.querySelectorAll('#upload-actions button').forEach(b => b.disabled = true);
+      toast((schedule ? 'Agendando' : 'Subindo') + ' ' + approvedRanks.length + ' vídeos...', 'success');
+
+      try {
+        const resp = await fetch('/api/upload-youtube', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            video_id: currentVideoId,
+            ranks: approvedRanks,
+            privacy: schedule ? 'private' : 'unlisted',
+            schedule
+          })
+        });
+        const data = await resp.json();
+
+        document.querySelectorAll('#upload-actions button').forEach(b => b.disabled = false);
+
+        if (data.uploaded && data.uploaded.length) {
+          const results = document.getElementById('upload-results');
+          results.innerHTML = '<div class="meta-section-title" style="margin-bottom:12px">Publicados</div>' +
+            data.uploaded.map(v => `
+              <div class="upload-result-item">
+                <div class="upload-result-icon">✓</div>
+                <span>#${v.rank}</span>
+                <a class="upload-result-link" href="${v.url}" target="_blank">${v.url}</a>
+                ${v.publish_at ? `<span class="upload-result-sched">${v.publish_at}</span>` : ''}
+              </div>
+            `).join('');
+
+          if (data.errors && data.errors.length) {
+            results.innerHTML += '<div style="color:var(--red);font-size:13px;margin-top:12px">Erros: ' + data.errors.join(', ') + '</div>';
+          }
+
+          results.style.display = 'block';
+          document.getElementById('upload-actions').style.display = 'none';
+          toast(data.uploaded.length + ' vídeos publicados', 'success');
+        } else {
+          toast('Erro: ' + (data.error || data.errors?.join(', ') || 'falha'), 'error');
+        }
+      } catch (e) {
+        document.querySelectorAll('#upload-actions button').forEach(b => b.disabled = false);
+        toast('Erro: ' + e.message, 'error');
+      }
+    }
+
+    // ===== INIT =====
+    document.getElementById('url-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') startAnalysis();
+    });
+
+    loadHistory();
+  </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a Brazilian fleet management channel.
+
+CRITICAL - FACE REFERENCE IMAGES:
+- Images 1-2 are JULIO's actual face photos
+- Image 3 is a PREVIOUSLY APPROVED THUMBNAIL of JULIO — use as PRIMARY face reference for him
+- The man in the thumbnail MUST look EXACTLY like the person in Image 3 (approved thumbnail)
+- Image 4: CARLA DA LUZ face reference (guest lawyer) - COPY HER FACE EXACTLY from this photo
+- Image 5: HIAGO DAROS face reference (guest lawyer) - COPY HIS FACE EXACTLY from this photo
+
+JULIO - MATCH IMAGE 3 EXACTLY:
+- Use Image 3 as the PRIMARY source for Julio's face, expression and style
+- Keep the SAME facial features, beard, hair, skin tone as Image 3
+- PLAIN dark navy blue polo shirt (same as Image 3)
+- Age: 45+, mature appearance
+
+COMPOSITION:
+- Julio positioned CENTER-RIGHT, medium shot (chest up)
+- POSE: One hand raised in "stop/warning" gesture toward camera, same as Image 3
+- EXPRESSION: Serious, concerned, warning — eyebrows slightly furrowed, direct eye contact
+- CARLA DA LUZ on the FAR LEFT, slightly smaller, serious expression
+- HIAGO DAROS next to Carla (center-left), slightly smaller, serious expression
+- Both guests looking toward camera, authoritative posture, professional suit attire
+
+GUESTS - COPY FACES FROM REFERENCES:
+- Carla (Image 4): woman, black suit jacket, serious and authoritative expression
+- Hiago (Image 5): man, suit, confident and serious expression
+- Label below Carla: "Adv. Carla da Luz" in small white text
+- Label below Hiago: "Adv. Hiago Daros" in small white text
+
+BACKGROUND:
+- Keep the SAME dark red/crimson background with trucks and highway as Image 3
+- Same dramatic red/orange warning tones, bokeh blur, cinematic lighting
+
+TEXT ELEMENTS:
+- TOP LEFT: Red badge with white text "LIVE 320"
+- MAIN TITLE: "MULTAS ANTT: COMO PAGAR MENOS OU ZERAR" in large white bold text with strong black shadow
+- Position text in lower-left area, not overlapping faces
+
+NO LOGOS:
+- Do NOT add any logos, watermarks or brand marks anywhere
+
+STYLE: Professional YouTube thumbnail, photorealistic faces, dramatic red/crimson alert lighting, high contrast for mobile viewing.

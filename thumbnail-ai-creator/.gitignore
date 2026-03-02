@@ -3,3 +3,4 @@ output/*.png
 referencias/convidados/*
 *.pyc
 __pycache__/
+output/*.html

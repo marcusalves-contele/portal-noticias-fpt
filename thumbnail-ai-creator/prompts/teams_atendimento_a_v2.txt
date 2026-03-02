@@ -1,0 +1,54 @@
+Create a YouTube thumbnail in 16:9 aspect ratio for a team management channel.
+
+CRITICAL - FACE REFERENCE IMAGE:
+- Image 1 is the OFFICIAL face reference for LEONARDO — copy this face exactly
+- The man in the thumbnail MUST look identical to the man in Image 1
+- Do NOT create a younger, thinner, or different-looking person
+
+LEONARDO - COPY FROM IMAGE 1 EXACTLY:
+- ROUND/OVAL face shape with fuller cheeks — MATCH IMAGE 1
+- Dark wavy/curly hair, natural texture — MATCH IMAGE 1
+- BLACK RECTANGULAR FRAME GLASSES — identical to Image 1, MUST include glasses
+- Dark brown eyes behind glasses — MATCH IMAGE 1
+- Clean shaven — NO beard, NO stubble
+- Age appearance: mature, 43-48 years — MATCH IMAGE 1
+- Wearing PLAIN dark navy blue t-shirt
+
+SKIN TEXTURE:
+- Match Image 1 — do NOT smooth or make younger
+- Realistic natural skin texture
+
+COMPOSITION:
+- Leonardo positioned RIGHT side of frame, medium shot (chest up)
+- POSE: Leaning slightly forward toward camera, one hand raised with open palm — urgent warning body language
+- Direct intense eye contact with camera
+
+EXPRESSION: Concerned and alarmed — raised eyebrows, serious wide eyes behind glasses, mouth slightly open — the look of someone delivering an urgent warning
+
+VISUAL ELEMENTS:
+- LEFT SIDE: Large bold text (occupies left 55% of frame)
+- Bottom center: small silhouette of a person walking away (client leaving)
+- Red vignette around edges suggesting urgency
+- Dark dramatic atmosphere
+
+BACKGROUND:
+- Dark charcoal/near-black background
+- Dramatic warm side lighting (orange/amber) on Leonardo from the right
+- Red accent glow on left side
+- High contrast, cinematic feel
+
+TEXT ELEMENTS:
+- TOP LEFT: Red badge "ALERTA" in small caps with warning icon
+- MAIN TITLE: "O CLIENTE" on first line in large bold white text
+- "PERCEBE!" on second line with solid red highlight background
+- Strong text shadow for readability
+
+NO LOGOS, NO WATERMARKS
+
+COLOR GRADE:
+- Dark urgent atmosphere — charcoal + red/orange accents
+- Warm orange key light on Leonardo's face
+- Red vignette edges
+- High contrast for mobile visibility
+
+STYLE: Professional YouTube thumbnail, photorealistic face matching Image 1 exactly. Urgent warning tone. The thumbnail must communicate "your team's inconsistency is costing you clients right now."
