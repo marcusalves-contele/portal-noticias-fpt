@@ -158,6 +158,46 @@ Estado de aprovação: `{cuts_dir}/state.json` (server-side, não localStorage).
 
 ---
 
+## Agendamento Inteligente
+
+Baseado em análise de **2.873 vídeos** do canal (2024–2026). Doc completo: `obsidian-marco/DOCS/nutella-agendamento-inteligente.md`
+
+### Regras
+- **Nutellas (clips 16:9)**: qui 15h e sex 17h — dias mais fortes do canal
+- **Shorts (9:16)**: ter 18h e seg 17h — feed separado, não canibaliza
+- **Quarta: NUNCA** — dia da live semanal (8h BRT), performa abaixo da média
+- **Padrão teaser**: Short 2–3 dias antes do clip correspondente
+- **1 vídeo/dia** máximo
+
+### Re-autenticar com Analytics
+```bash
+python3 reauth_youtube_analytics.py
+```
+Scope: `yt-analytics.readonly` — habilita views por hora, retenção, origem do tráfego.
+
+---
+
+## Thumbnails
+
+- **Modelo**: `gemini-3.1-flash-image-preview` (Nano Banana 2)
+- **Refs Julio**: varredura dinâmica em `thumbnail-ai-creator/referencias/julio/` — exclui `*studio_v1*` (AI-geradas)
+- **Seleção por expressão**: `expressao_julio` do meta → keyword matching no nome do arquivo
+- **Âncora facial**: sempre inclui `frontal-neutro` como ref primária
+- **Temperature**: 0 (máxima consistência facial)
+- **Shirt**: black polo (novas fotos mar/2026)
+
+---
+
+## Dependências
+
+- Python: `youtube-transcript-api`, `requests`, `google-api-python-client`, `google-auth`
+- Sistema: `ffmpeg`, `yt-dlp`
+- Python (build): `opencv-python`, `mediapipe`
+- API Keys: `GEMINI_NANO_BANANA_KEY` (.env local ou `../thumbnail-ai-creator/.env`)
+- YouTube: `token_youtube_write.pickle` em `../../assistant-sexta-feira/`
+
+---
+
 ## Aprendizados
 
 - Gemini precisa timestamps `[MM:SS]` em chunks de 90s para cortes precisos
@@ -167,3 +207,5 @@ Estado de aprovação: `{cuts_dir}/state.json` (server-side, não localStorage).
 - "Verdade Incômoda" viraliza em WhatsApp corporativo
 - "WOW Factor" (demo) gera mais inscritos
 - Shorts de 45-60s > Shorts de 20-30s em retenção
+- Freeze frame 1.5s no início do Short = capa garantida (YouTube usa frame 0)
+- Refs AI-geradas (`*studio_v1*`) degradam fidelidade facial — excluir sempre

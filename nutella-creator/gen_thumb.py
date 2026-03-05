@@ -32,12 +32,32 @@ _LOCAL_ENV    = PROJECT_DIR / ".env"
 _THUMB_ENV    = THUMB_PROJECT / ".env"
 ENV_PATH      = _LOCAL_ENV if _LOCAL_ENV.exists() else _THUMB_ENV
 
-# Julio reference images — oficiais (fev/2026)
-JULIO_REFS = [
-    REFS_DIR / "julio_gray_blazzer.png",   # blazer cinza, fundo preto
-    REFS_DIR / "julio_polo_navy.png",      # polo navy, fundo preto
-    REFS_DIR / "julio_polo_white.png",     # polo navy, fundo branco
-]
+# Mapeamento expressão → keywords no nome do arquivo
+# select_refs() varre a pasta dinamicamente — sem hardcode
+EXPRESSION_MAP = {
+    "serio":      ["frontal-neutro"],
+    "neutro":     ["frontal-neutro"],
+    "firme":      ["frontal-neutro", "bracos-cruzados"],
+    "surpreso":   ["surpreso"],
+    "chocado":    ["surpreso"],
+    "pensativo":  ["pensativo"],
+    "reflexivo":  ["pensativo"],
+    "assertivo":  ["dedo-para-cima"],
+    "apontando":  ["dedo-para-cima"],
+    "autoridade": ["bracos-cruzados", "frontal-neutro"],
+    "ironico":      ["perfil-3-4", "pensativo"],
+    "critico":      ["bracos-cruzados"],
+    "preocupado":   ["pensativo", "frontal-neutro"],
+    "serio":        ["frontal-neutro"],
+    "desafiador":   ["bracos-cruzados", "dedo-para-cima"],
+    "confiante":    ["bracos-cruzados"],
+    "sorrindo":   ["sorrindo"],
+    "animado":    ["sorrindo"],
+    "empolgado":  ["sorrindo", "dedo-para-cima"],
+    "explicando": ["gesto-explicando"],
+    "ensinando":  ["gesto-explicando"],
+    "atencao":    ["mao-aberta"],
+}
 
 # -------------------------------------------------------------------
 # API
@@ -85,7 +105,7 @@ JULIO - COPY THE FACE FROM REFERENCE PHOTOS EXACTLY:
 - Receding hairline with short brown/gray hair - MATCH THE REFERENCE
 - Deep-set brown/hazel eyes, NO glasses
 - Age: 45+, mature appearance
-- Dark navy blue polo shirt (plain, no logos)
+- Black polo shirt (plain, no logos) — match the reference photos exactly
 - The face MUST be recognizable as the same person from the reference photos
 
 SKIN TEXTURE - CRITICAL:
@@ -134,8 +154,50 @@ def build_prompt(meta: dict) -> str:
 
 
 def select_refs(meta: dict) -> list[Path]:
-    """Seleciona referências oficiais do Julio (3 fotos profissionais)."""
-    return [r for r in JULIO_REFS if r.exists()]
+    """
+    Varre REFS_DIR dinamicamente e seleciona até 3 referências do Julio:
+    1. Sempre inclui frontal-neutro como âncora facial principal
+    2. Adiciona a foto de expressão que melhor corresponde ao meta
+    3. Completa com 1 foto de fallback para variedade facial
+    Exclui arquivos _studio_v1 (gerados por IA, degradam fidelidade).
+    """
+    expressao = (meta.get("expressao_julio") or "serio").lower()
+
+    # Scan dinâmico: jpg/png reais, excluindo AI-generated e duplicatas
+    available = {
+        f.stem.lower(): f
+        for f in REFS_DIR.iterdir()
+        if f.suffix.lower() in (".jpg", ".jpeg", ".png")
+        and "studio_v1" not in f.name
+        and "ref-primary" not in f.name
+    }
+
+    refs = []
+
+    # 1. Âncora facial: frontal-neutro é a melhor ref de face lock
+    primary = next((v for k, v in available.items() if "frontal-neutro" in k), None)
+    if primary:
+        refs.append(primary)
+
+    # 2. Foto de expressão correspondente
+    for kw in EXPRESSION_MAP.get(expressao, []):
+        match = next((v for k, v in available.items() if kw in k and v not in refs), None)
+        if match:
+            refs.append(match)
+            break
+
+    # 3. Fallback: completa até 3 refs com outras poses para variedade
+    FALLBACK_ORDER = ["bracos-cruzados", "dedo-para-cima", "gesto-explicando",
+                      "sorrindo", "surpreso", "pensativo", "mao-aberta"]
+    for kw in FALLBACK_ORDER:
+        if len(refs) >= 3:
+            break
+        match = next((v for k, v in available.items() if kw in k and v not in refs), None)
+        if match:
+            refs.append(match)
+
+    print(f"    Refs: {[r.name for r in refs]}")
+    return refs
 
 
 # -------------------------------------------------------------------

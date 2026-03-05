@@ -36,14 +36,86 @@ TOKEN_PATH  = SEXTA_DIR / "token_youtube_write.pickle"
 
 CHANNEL_ID  = "UCz31CtOANqSFuLEdFTi1iCQ"  # Frota Para Todos
 CATEGORY_EDUCATION = "27"
+PLAYLIST_CORTES = "PLuVWEr9u-IQ044ZxtQj8chOEuJ3P80KoF"  # "Cortes de Lives"
 
 # Fuso horario Brasil (UTC-3)
 BRT = timezone(timedelta(hours=-3))
 
-# Melhores horarios para publicar (BRT) — baseado em dados do canal
-# Dias uteis: engajamento melhor
-# Horarios: 9h (views+engagement), 18h (alcance), 12h (lunch break)
-BEST_HOURS_BRT = [9, 18, 12, 15, 20]
+# Ranking de slots — validado em 3 análises independentes (mar/2026):
+#   1. Histórico de publicação (2.873 vídeos, 2024–2026)
+#   2. Score orgânico (mediana × engajamento), últimos 6 meses
+#   3. Confirmação em 12 meses (649 vídeos, mar/25–fev/26)
+#
+# NUTELLAS (clips 16:9 > 90s) — (weekday, hour, minute):
+#   1º qui 15h00 — score 31.819, eng=9.91%, n=64 — CONFIRMADO
+#   2º sex 17h00 — score 13.169, eng=4.40%,  n=9  — CONFIRMADO
+#   3º sáb 06h30 — TESTE (dados de sáb orgânico prometem; manhã cedo evita competição)
+#   4º dom 08h00 — TESTE (mesmo raciocínio)
+#   5º ter 15h00 — overflow (score fraco mas melhor que não publicar)
+#   6º seg 15h00 — overflow extremo
+#   NUNCA quarta — dia da live semanal (8h BRT)
+#
+# SHORTS (9:16 ≤ 90s) — dia tem impacto PEQUENO nos 12m (scores próximos):
+#   1º ter 18h00 — estratégia: teaseia Nutella de quinta (2 dias antes)
+#   2º sex 18h00 — score orgânico ok em 6m
+#   3º sáb 18h00 — mediana ok nos 6m
+#   4º dom 18h00 — mediana ok
+#   5º seg 18h00 — overflow
+#   NUNCA quarta
+#
+# Clips e Shorts compartilham o conjunto de datas ocupadas (max 1 vídeo/dia).
+CLIP_PRIORITY = [
+    (3, 15,  0),  # qui 15h00
+    (4, 17,  0),  # sex 17h00
+    (5,  6, 30),  # sáb 06h30
+    (6,  8,  0),  # dom 08h00
+    (1, 15,  0),  # ter 15h00
+    (0, 15,  0),  # seg 15h00
+]
+SHORT_PRIORITY = [
+    (1, 18,  0),  # ter 18h00
+    (4, 18,  0),  # sex 18h00
+    (5, 18,  0),  # sáb 18h00
+    (6, 18,  0),  # dom 18h00
+    (0, 18,  0),  # seg 18h00
+]
+
+# -------------------------------------------------------------------
+# Modo Experimento — Backlog (ativo desde mar/2026, revisão mai/2026)
+# -------------------------------------------------------------------
+# Objetivo: distribuir os clips do backlog de ~24 lives por TODOS os dias
+# (seg/ter/qui/sex/sáb/dom — nunca quarta) em horários variados para
+# medir qual combinação dia+hora gera melhor CTR, views e inscritos.
+#
+# 12 slots de clip × ~2 clips/live × 24 lives = ~48 clips.
+# Cada slot recebe ~4 amostras → dados suficientes para comparação em mai/2026.
+#
+# Slots confirmados (qui 15h, sex 17h) ficam no topo como BASELINE.
+# Trocar para False ao concluir o experimento.
+EXPERIMENT_MODE = True
+
+EXPERIMENT_CLIPS = [
+    (3, 15,  0),  # qui 15h — baseline #1 (confirmado, n=64)
+    (4, 17,  0),  # sex 17h — baseline #2 (confirmado, n=9)
+    (1, 12,  0),  # ter 12h — teste horário almoço
+    (0, 17,  0),  # seg 17h — teste tarde início de semana
+    (5,  7,  0),  # sáb 07h — teste manhã cedo fim de semana
+    (6, 10,  0),  # dom 10h — teste manhã domingo
+    (3, 19,  0),  # qui 19h — teste noite quinta
+    (4, 10,  0),  # sex 10h — teste manhã sexta
+    (1, 19,  0),  # ter 19h — teste noite terça
+    (0,  9,  0),  # seg 09h — teste manhã segunda
+    (5, 15,  0),  # sáb 15h — teste tarde sábado
+    (6, 17,  0),  # dom 17h — teste tarde domingo
+]
+EXPERIMENT_SHORTS = [
+    (1, 18,  0),  # ter 18h — baseline
+    (4, 18,  0),  # sex 18h — alternativo
+    (5, 18,  0),  # sáb 18h
+    (6, 18,  0),  # dom 18h
+    (0, 18,  0),  # seg 18h
+    (3, 18,  0),  # qui 18h
+]
 
 
 # -------------------------------------------------------------------
@@ -81,52 +153,94 @@ def get_youtube(creds):
 # Scheduling Intelligence
 # -------------------------------------------------------------------
 
-def get_best_publish_times(youtube, num_slots: int) -> list[datetime]:
-    """Calcula melhores horarios para publicar nos proximos dias.
-
-    Analisa videos recentes do canal e distribui nos melhores slots.
-    Evita conflito com videos ja agendados ou recentemente publicados.
+def get_best_publish_times(youtube, num_clips: int, num_shorts: int = 0) -> dict:
     """
-    # Busca videos recentes pra evitar conflito
-    recent = youtube.search().list(
-        part="snippet",
-        channelId=CHANNEL_ID,
-        order="date",
-        type="video",
-        maxResults=10,
-    ).execute()
+    Calcula horários de publicação.
 
-    recent_dates = set()
+    EXPERIMENT_MODE=True  (mar-mai/2026): cicla por 12 slots em 6 dias
+    para medir qual dia+hora converte melhor. Baselines (qui 15h, sex 17h)
+    ficam no topo do ciclo como referência comparativa.
+
+    EXPERIMENT_MODE=False: usa ranking otimizado histórico
+    (qui 15h > sex 17h > sáb 06h30 > dom 08h > ter 15h > seg 15h).
+
+    Nunca quarta — dia da live semanal (8h BRT).
+    Clips e Shorts compartilham datas ocupadas: máximo 1 vídeo por dia.
+    """
+    clip_priority  = EXPERIMENT_CLIPS  if EXPERIMENT_MODE else CLIP_PRIORITY
+    short_priority = EXPERIMENT_SHORTS if EXPERIMENT_MODE else SHORT_PRIORITY
+    # Datas já ocupadas (vídeos agendados ou recentes)
+    recent = youtube.search().list(
+        part="snippet", channelId=CHANNEL_ID,
+        order="date", type="video", maxResults=20,
+    ).execute()
+    used = set()
     for item in recent.get("items", []):
-        pub = item["snippet"]["publishedAt"][:10]  # YYYY-MM-DD
-        recent_dates.add(pub)
+        pub = item["snippet"]["publishedAt"][:10]
+        used.add(pub)
 
     now = datetime.now(BRT)
-    slots = []
-    day_offset = 1  # comeca amanha
-    hour_idx = 0
 
-    while len(slots) < num_slots:
-        candidate = (now + timedelta(days=day_offset)).replace(
-            hour=BEST_HOURS_BRT[hour_idx % len(BEST_HOURS_BRT)],
-            minute=0, second=0, microsecond=0
-        )
+    def next_slots(priority: list[tuple], count: int) -> list[datetime]:
+        """
+        Aloca 'count' slots a partir da lista de prioridade.
 
-        date_str = candidate.strftime("%Y-%m-%d")
+        Modo otimizado (EXPERIMENT_MODE=False):
+          wd_map com 1 slot por weekday — varre dias cronologicamente
+          e pega o melhor horário disponível para cada dia.
 
-        # Pula se ja tem video nesse dia (max 1 por dia pra nao canibalizar)
-        if date_str not in recent_dates:
-            slots.append(candidate)
-            recent_dates.add(date_str)
+        Modo experimento (EXPERIMENT_MODE=True):
+          Cicla pelos slots em ORDEM da lista. Para cada slot (wd, h, m)
+          encontra a próxima data livre com aquele weekday. Garante que
+          TODOS os 12 slots do experimento sejam usados em sequência,
+          incluindo horários alternativos no mesmo dia da semana.
+          Resultado é reordenado cronologicamente para exibição.
+        """
+        if EXPERIMENT_MODE:
+            result = []
+            slot_idx = 0
+            n = len(priority)
+            while len(result) < count and slot_idx < n * 10:
+                wd, h, m = priority[slot_idx % n]
+                slot_idx += 1
+                for day_offset in range(1, 91):
+                    candidate = now + timedelta(days=day_offset)
+                    if candidate.weekday() != wd:
+                        continue
+                    dt = candidate.replace(hour=h, minute=m, second=0, microsecond=0)
+                    date_str = dt.strftime("%Y-%m-%d")
+                    if date_str not in used:
+                        result.append(dt)
+                        used.add(date_str)
+                        break
+            return sorted(result)
+        else:
+            # Modo otimizado: 1 slot por weekday, varre dias forward
+            wd_map = {}
+            for rank, (wd, h, m) in enumerate(priority):
+                if wd not in wd_map:
+                    wd_map[wd] = (h, m, rank)
 
-        # Proximo dia (1 video por dia)
-        day_offset += 1
-        hour_idx += 1
+            result = []
+            day_offset = 1
+            while len(result) < count and day_offset <= 90:
+                candidate = now + timedelta(days=day_offset)
+                wd = candidate.weekday()
+                day_offset += 1
+                if wd not in wd_map:
+                    continue
+                h, m, _ = wd_map[wd]
+                dt = candidate.replace(hour=h, minute=m, second=0, microsecond=0)
+                date_str = dt.strftime("%Y-%m-%d")
+                if date_str not in used:
+                    result.append(dt)
+                    used.add(date_str)
+            return result
 
-        if day_offset > 30:
-            break
+    clip_times  = next_slots(clip_priority,  num_clips)
+    short_times = next_slots(short_priority, num_shorts)
 
-    return slots
+    return {"clips": clip_times, "shorts": short_times}
 
 
 def format_schedule_brt(dt: datetime) -> str:
@@ -326,6 +440,16 @@ def upload_nutella(meta: dict, cuts_dir: Path, youtube,
     else:
         print(f"    AVISO: Sem thumbnail para #{rank}")
 
+    # Adiciona à playlist "Cortes de Lives"
+    try:
+        youtube.playlistItems().insert(
+            part="snippet",
+            body={"snippet": {"playlistId": PLAYLIST_CORTES, "resourceId": {"kind": "youtube#video", "videoId": video_id}}},
+        ).execute()
+        print(f"    Playlist: adicionado a 'Cortes de Lives'")
+    except Exception as e:
+        print(f"    AVISO playlist: {e}")
+
     return {
         "rank": rank,
         "video_id": video_id,
@@ -334,6 +458,66 @@ def upload_nutella(meta: dict, cuts_dir: Path, youtube,
         "privacy": privacy,
         "publish_at": format_schedule_brt(publish_at) if publish_at else None,
         "thumb_set": thumb_path is not None,
+    }
+
+
+# -------------------------------------------------------------------
+# Short upload
+# -------------------------------------------------------------------
+
+def build_short_description(meta: dict, source_video_id: str = None) -> str:
+    lines = []
+    desc = meta.get("descricao_curta", "")
+    if desc:
+        lines.append(desc)
+        lines.append("")
+    if source_video_id:
+        lines.append(f"Live completa: https://youtube.com/watch?v={source_video_id}")
+        lines.append("")
+    lines.append("#Shorts #GestãoDeFrotas #FrotaParaTodos #Frota #GestorDeEquipe")
+    return "\n".join(lines)
+
+
+def upload_short(meta: dict, cuts_dir: Path, youtube,
+                 privacy: str = "unlisted", publish_at: datetime = None,
+                 source_video_id: str = None) -> dict | None:
+    """Upload do Short 9:16 com título curto e #Shorts."""
+    rank = meta["rank"]
+    short_info = meta.get("shorts", {})
+    short_file = short_info.get("arquivo", "")
+
+    if not short_file:
+        print(f"  #{rank}: sem arquivo de Short no meta, pulando")
+        return None
+
+    short_path = cuts_dir / short_file
+    if not short_path.exists():
+        print(f"  ERRO: Short não encontrado: {short_path}")
+        return None
+
+    raw_title = meta.get("titulo_shorts", "") or meta.get("titulo_ctr", "")
+    title = raw_title[:100]
+    description = build_short_description(meta, source_video_id)
+    tags = build_tags(meta) + ["shorts", "short"]
+
+    schedule_info = f" | Agenda: {format_schedule_brt(publish_at)}" if publish_at else ""
+    print(f"\n  #{rank} SHORT: {title}")
+    print(f"    Privacy: {privacy}{schedule_info}")
+
+    response = upload_video(
+        youtube, short_path, title, description, tags,
+        privacy=privacy, publish_at=publish_at,
+    )
+    video_id = response["id"]
+
+    return {
+        "rank": rank,
+        "video_id": video_id,
+        "url": f"https://youtube.com/shorts/{video_id}",
+        "title": title,
+        "type": "short",
+        "privacy": privacy,
+        "publish_at": format_schedule_brt(publish_at) if publish_at else None,
     }
 
 

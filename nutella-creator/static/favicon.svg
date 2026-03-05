@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Prisma triangular -->
+  <polygon points="16,3 29,26 3,26" fill="#1a0a2e" stroke="#8B23E5" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Feixe de luz entrando (branco) -->
+  <line x1="3" y1="14" x2="12.5" y2="18" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>
+  <!-- Refração saindo — espectro -->
+  <line x1="12.5" y1="18" x2="29" y2="10" stroke="#FF6B6B" stroke-width="1" stroke-linecap="round" opacity="0.9"/>
+  <line x1="12.5" y1="18" x2="29" y2="13" stroke="#FFD93D" stroke-width="1" stroke-linecap="round" opacity="0.85"/>
+  <line x1="12.5" y1="18" x2="29" y2="16" stroke="#6BCB77" stroke-width="1" stroke-linecap="round" opacity="0.85"/>
+  <line x1="12.5" y1="18" x2="29" y2="19" stroke="#4DDBFF" stroke-width="1" stroke-linecap="round" opacity="0.85"/>
+  <line x1="12.5" y1="18" x2="29" y2="22" stroke="#8B23E5" stroke-width="1" stroke-linecap="round" opacity="0.9"/>
+  <!-- Ponto de refração -->
+  <circle cx="12.5" cy="18" r="1.2" fill="white" opacity="0.95"/>
+</svg>

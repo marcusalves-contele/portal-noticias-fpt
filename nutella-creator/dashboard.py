@@ -24,6 +24,9 @@ import time
 import io
 import re
 import queue
+import base64
+import email.parser
+import email.policy
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
@@ -51,6 +54,18 @@ def run_analyze(url: str, job_id: str):
         video_id = extract_video_id(url)
         _emit(job_id, "progress", {"step": "transcript", "message": f"Transcrição de {video_id}..."})
 
+        # Busca título do vídeo via yt-dlp
+        video_title = ""
+        try:
+            import subprocess as _sp
+            r = _sp.run(
+                ["yt-dlp", "--get-title", f"https://youtube.com/watch?v={video_id}"],
+                capture_output=True, text=True, timeout=15
+            )
+            video_title = r.stdout.strip()
+        except Exception:
+            pass
+
         segments = get_transcript_with_timestamps(video_id)
         transcript_text = build_transcript_text(segments, chunk_size=90)
         if len(transcript_text) > 22000:
@@ -75,6 +90,7 @@ def run_analyze(url: str, job_id: str):
 
         result = {
             "video_id": video_id,
+            "video_title": video_title,
             "youtube_url": f"https://youtube.com/watch?v={video_id}",
             "generated_at": datetime.now().isoformat(),
             "segments_total": len(segments),
@@ -236,12 +252,26 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         # API routes
         if path == "/api/videos":
             self._handle_list_videos()
+        elif path == "/api/thumb-queue":
+            self._handle_thumb_queue()
+        elif path == "/api/thumb-guest-check":
+            self._handle_thumb_guest_check(parsed.query)
         elif path.startswith("/api/metas/"):
             video_id = path.split("/api/metas/")[1]
             self._handle_get_metas(video_id)
         elif path.startswith("/api/progress/"):
             job_id = path.split("/api/progress/")[1]
             self._handle_sse(job_id)
+        elif path.startswith("/thumb-refs/"):
+            # Serve guest reference photos from thumbnail-ai-creator/referencias/
+            rel_path = path[len("/thumb-refs/"):]
+            refs_dir = PROJECT_DIR.parent / "thumbnail-ai-creator" / "referencias"
+            file_path = (refs_dir / rel_path).resolve()
+            # Safety: ensure path stays inside refs_dir
+            if str(file_path).startswith(str(refs_dir.resolve())) and file_path.exists() and file_path.is_file():
+                self._serve_file(file_path)
+            else:
+                self._json({"error": "not found"}, 404)
         elif path.startswith("/output/"):
             # Serve files from output directory
             rel_path = path[len("/output/"):]
@@ -257,17 +287,29 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             super().do_GET()
 
     def do_POST(self):
+        path = urlparse(self.path).path
+        content_type = self.headers.get("Content-Type", "")
+        length = int(self.headers.get("Content-Length", 0))
+
+        # Multipart (file upload)
+        if content_type.startswith("multipart/form-data"):
+            if path == "/api/thumb-upload-guest":
+                raw = self.rfile.read(length)
+                self._handle_thumb_upload_guest_multipart(raw, content_type)
+                return
+            self._json({"error": "not found"}, 404)
+            return
+
         try:
-            length = int(self.headers.get("Content-Length", 0))
             body = json.loads(self.rfile.read(length)) if length else {}
         except Exception:
             self._json({"error": "invalid JSON"}, 400)
             return
 
-        path = urlparse(self.path).path
-
         if path == "/api/analyze":
             self._handle_analyze(body)
+        elif path == "/api/auto-briefing":
+            self._handle_auto_briefing(body)
         elif path == "/api/build":
             self._handle_build(body)
         elif path == "/api/approve":
@@ -278,6 +320,16 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_regenerate_thumb(body)
         elif path == "/api/upload-youtube":
             self._handle_upload(body)
+        elif path == "/api/thumb-transcribe":
+            self._handle_thumb_transcribe(body)
+        elif path == "/api/thumb-generate":
+            self._handle_thumb_generate(body)
+        elif path == "/api/thumb-feedback":
+            self._handle_thumb_feedback(body)
+        elif path == "/api/thumb-approve":
+            self._handle_thumb_approve(body)
+        elif path == "/api/thumb-drive-upload":
+            self._handle_thumb_drive_upload(body)
         else:
             self._json({"error": "not found"}, 404)
 
@@ -293,12 +345,22 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 video_id = data["video_id"]
                 cuts_dir = OUTPUT_DIR / f"{video_id}_cuts"
                 has_cuts = cuts_dir.exists() and any(cuts_dir.glob("*.mp4"))
+                # Verifica se todos os clips foram enviados pro YouTube
+                all_uploaded = False
+                if has_cuts:
+                    state = load_state(cuts_dir)
+                    num_nutellas = len(data.get("nutellas", []))
+                    uploaded_count = sum(1 for k, v in state.items()
+                                        if not k.startswith("_") and v == "uploaded")
+                    all_uploaded = num_nutellas > 0 and uploaded_count >= num_nutellas
                 videos.append({
                     "video_id": video_id,
+                    "video_title": data.get("video_title", ""),
                     "url": data.get("youtube_url", ""),
                     "generated_at": data.get("generated_at", ""),
                     "nutellas_count": len(data.get("nutellas", [])),
                     "has_cuts": has_cuts,
+                    "all_uploaded": all_uploaded,
                 })
         self._json({"videos": videos})
 
@@ -438,7 +500,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         from upload import (load_credentials, get_youtube, upload_nutella,
-                            get_best_publish_times)
+                            upload_short, get_best_publish_times)
         try:
             creds = load_credentials()
             youtube = get_youtube(creds)
@@ -448,29 +510,360 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
 
         source_video_id = video_id
 
-        publish_times = []
+        # Slots data-driven: clips em qui/sex, shorts em ter/seg (jamais quarta)
+        clip_times  = []
+        short_times = []
         if schedule:
-            publish_times = get_best_publish_times(youtube, len(selected))
+            times = get_best_publish_times(youtube, len(selected), len(selected))
+            clip_times  = times["clips"]
+            short_times = times["shorts"]
             privacy = "private"
+
+        state = load_state(cuts_dir)
 
         results = []
         errors = []
         for i, meta in enumerate(selected):
-            pub_time = publish_times[i] if i < len(publish_times) else None
+            rank = meta["rank"]
+            clip_result = None
+            short_result = None
+
+            # Clip 16:9
+            pub_time = clip_times[i] if schedule and i < len(clip_times) else None
             try:
-                result = upload_nutella(
+                clip_result = upload_nutella(
                     meta, cuts_dir, youtube,
                     privacy=privacy, publish_at=pub_time,
                     source_video_id=source_video_id,
                 )
-                if result:
-                    results.append(result)
+                if clip_result:
+                    results.append(clip_result)
                 else:
-                    errors.append(f"#{meta['rank']} failed")
+                    errors.append(f"#{rank} failed")
             except Exception as e:
-                errors.append(f"#{meta['rank']}: {e}")
+                errors.append(f"#{rank}: {e}")
+
+            # Short 9:16
+            pub_time_s = short_times[i] if schedule and i < len(short_times) else None
+            try:
+                short_result = upload_short(
+                    meta, cuts_dir, youtube,
+                    privacy=privacy, publish_at=pub_time_s,
+                    source_video_id=source_video_id,
+                )
+                if short_result:
+                    results.append(short_result)
+            except Exception as e:
+                errors.append(f"#{rank} short: {e}")
+
+            # Persiste estado "uploaded" no state.json
+            if clip_result:
+                state[str(rank)] = "uploaded"
+                uploads = state.setdefault("_uploads", {})
+                uploads[str(rank)] = {
+                    "clip_url":      clip_result.get("url", ""),
+                    "clip_schedule": clip_result.get("publish_at", ""),
+                    "short_url":     short_result.get("url", "") if short_result else "",
+                    "short_schedule": short_result.get("publish_at", "") if short_result else "",
+                }
+                save_state(cuts_dir, state)
 
         self._json({"uploaded": results, "errors": errors})
+
+    # --- Auto-briefing ---
+
+    def _handle_auto_briefing(self, body: dict):
+        """POST /api/auto-briefing — transcreve vídeo e extrai q1/q2/q3 automaticamente."""
+        video_url = body.get("video_url", "").strip()
+        title     = body.get("title", "")
+        if not video_url:
+            self._json({"error": "video_url required"}, 400)
+            return
+        try:
+            from suggest import extract_video_id, get_transcript_with_timestamps, build_transcript_text
+            from thumb_live import auto_briefing_from_transcript, load_api_key
+
+            video_id = extract_video_id(video_url)
+            segments = get_transcript_with_timestamps(video_id)
+            transcript = build_transcript_text(segments, chunk_size=90)
+
+            api_key = load_api_key()
+            briefing = auto_briefing_from_transcript(transcript, title, api_key)
+            self._json({"ok": True, **briefing})
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
+    # --- Thumb Live Handlers ---
+
+    def _handle_thumb_queue(self):
+        """GET /api/thumb-queue — lista lives 'A Fazer' da planilha."""
+        try:
+            from thumb_live import fetch_queue, load_google_creds, load_state
+            creds = load_google_creds()
+            items = fetch_queue(creds)
+            state = load_state()
+            # Enriquece com estado local
+            for item in items:
+                live_id = item.get("_live_id", "")
+                local = state.get("items", {}).get(live_id, {})
+                item["_approved"] = local.get("approved", "")
+            self._json({"items": items, "count": len(items)})
+        except PermissionError as e:
+            self._json({"error": str(e), "code": "no_sheets_scope"}, 403)
+        except FileNotFoundError as e:
+            self._json({"error": str(e), "code": "no_token"}, 401)
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
+    def _handle_thumb_guest_check(self, query_string: str):
+        """GET /api/thumb-guest-check?title=... — detecta convidado pelo número da live."""
+        from urllib.parse import parse_qs
+        params  = parse_qs(query_string)
+        title   = params.get("title", [""])[0]
+        if not title:
+            self._json({"found": False, "error": "title required"})
+            return
+        try:
+            from thumb_live import find_guest_by_live_number
+            result = find_guest_by_live_number(title)
+            # Injeta preview_url para cada convidado
+            if result.get("found"):
+                for g in result.get("all_guests", []):
+                    g["preview_url"] = f"/thumb-refs/convidados/{g['filename']}"
+            self._json(result)
+        except Exception as e:
+            self._json({"found": False, "error": str(e)}, 500)
+
+    def _handle_thumb_transcribe(self, body: dict):
+        """POST /api/thumb-transcribe — transcreve áudio base64, retorna q1/q2/q3."""
+        audio_b64 = body.get("audio_base64", "")
+        mime_type  = body.get("mime_type", "audio/m4a")
+        if not audio_b64:
+            self._json({"error": "audio_base64 required"}, 400)
+            return
+        try:
+            from thumb_live import transcribe_audio, load_api_key
+            api_key = load_api_key()
+            audio_bytes = base64.b64decode(audio_b64)
+            result = transcribe_audio(audio_bytes, api_key, mime_type)
+            self._json(result)
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
+    def _handle_thumb_generate(self, body: dict):
+        """POST /api/thumb-generate — inicia geração A+B, retorna job_id para SSE."""
+        briefing   = body.get("briefing", {})
+        live_id    = body.get("live_id", "")
+        divergence = int(body.get("divergence", 6))
+        if not live_id:
+            self._json({"error": "live_id required"}, 400)
+            return
+
+        job_id = _create_job()
+        self._json({"job_id": job_id})   # Responde imediatamente
+
+        def _run():
+            try:
+                from thumb_live import generate_ab, load_api_key, upsert_item
+
+                api_key = load_api_key()
+
+                upsert_item(live_id, {
+                    "live_id": live_id,
+                    "title": briefing.get("title", ""),
+                    "channel": briefing.get("channel", "fleet"),
+                    "briefing": briefing,
+                    "pasta_drive": body.get("pasta_drive", ""),
+                    "divergence": divergence,
+                })
+
+                def progress_cb(data: dict):
+                    _emit(job_id, "progress", data)
+
+                path_a, path_b = generate_ab(briefing, live_id, api_key, progress_cb,
+                                             divergence=divergence)
+
+                paths = {}
+                if path_a:
+                    paths["thumb_a"] = f"output/{path_a.name}"
+                    upsert_item(live_id, {"thumb_a": f"output/{path_a.name}"})
+                if path_b:
+                    paths["thumb_b"] = f"output/{path_b.name}"
+                    upsert_item(live_id, {"thumb_b": f"output/{path_b.name}"})
+
+                if not paths:
+                    _emit(job_id, "error", {"message": "Geração falhou para A e B"})
+                else:
+                    _emit(job_id, "complete", {"ok": True, **paths})
+
+            except Exception as e:
+                _emit(job_id, "error", {"message": str(e)})
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    def _handle_thumb_feedback(self, body: dict):
+        """POST /api/thumb-feedback — recebe feedback, regera 1 thumb."""
+        live_id  = body.get("live_id", "")
+        angle    = body.get("angle", "A")
+        feedback = body.get("feedback", "")
+        if not live_id or not feedback:
+            self._json({"error": "live_id and feedback required"}, 400)
+            return
+        try:
+            from thumb_live import (regenerate_one, load_api_key,
+                                     load_state, add_feedback, upsert_item)
+            api_key = load_api_key()
+            state   = load_state()
+            item    = state.get("items", {}).get(live_id, {})
+            briefing = item.get("briefing", {"live_id": live_id, "channel": "fleet"})
+
+            add_feedback(live_id, angle, feedback)
+            path = regenerate_one(briefing, live_id, angle, feedback, api_key)
+
+            if not path:
+                self._json({"error": "regeneration failed"}, 500)
+                return
+
+            key = f"thumb_{angle.lower()}"
+            upsert_item(live_id, {key: f"output/{path.name}"})
+            self._json({"ok": True, key: f"output/{path.name}"})
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
+    def _handle_thumb_approve(self, body: dict):
+        """POST /api/thumb-approve — salva aprovação."""
+        live_id = body.get("live_id", "")
+        choice  = body.get("choice", "")
+        path    = body.get("path", "")
+        if not live_id or choice not in ("A", "B"):
+            self._json({"error": "live_id and choice (A|B) required"}, 400)
+            return
+        try:
+            from thumb_live import approve_thumb
+            item = approve_thumb(live_id, choice, path)
+            self._json({"ok": True, "item": item})
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
+    def _handle_thumb_drive_upload(self, body: dict):
+        """POST /api/thumb-drive-upload — faz upload da thumb aprovada para o Drive."""
+        live_id = body.get("live_id", "")
+        angle   = body.get("angle", "").upper()
+        if not live_id or angle not in ("A", "B"):
+            self._json({"error": "live_id and angle (A|B) required"}, 400)
+            return
+        try:
+            from thumb_live import load_google_creds, load_state, upload_to_drive_folder
+            state = load_state()
+            item  = state.get("items", {}).get(live_id)
+            if not item:
+                self._json({"error": "item not found in state"}, 404)
+                return
+
+            key        = f"thumb_{angle.lower()}"
+            thumb_rel  = item.get(key, "")
+            if not thumb_rel:
+                self._json({"error": f"thumb_{angle.lower()} not found in state"}, 404)
+                return
+
+            # Caminho absoluto — pode ser "output/..." ou path completo
+            # Strip cache-busting query string (ex: "output/foo.png?t=123" → "output/foo.png")
+            from pathlib import Path
+            thumb_rel_clean = thumb_rel.split("?")[0]
+            if Path(thumb_rel_clean).is_absolute():
+                thumb_path = Path(thumb_rel_clean)
+            else:
+                rel = thumb_rel_clean.removeprefix("output/").lstrip("/")
+                thumb_path = OUTPUT_DIR / rel
+            if not thumb_path.exists():
+                self._json({"error": f"arquivo não encontrado: {thumb_path}"}, 404)
+                return
+
+            folder_link = item.get("pasta_drive", "")
+            if not folder_link:
+                self._json({"error": "Pasta Drive não definida para este item. Verifique a planilha."}, 400)
+                return
+
+            creds  = load_google_creds()
+            result = upload_to_drive_folder(thumb_path, folder_link, creds)
+            self._json({"ok": True, "drive": result})
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
+    def _handle_thumb_upload_guest_multipart(self, raw: bytes, content_type: str):
+        """POST /api/thumb-upload-guest (multipart) — salva foto de convidado."""
+        try:
+            boundary = ""
+            for part in content_type.split(";"):
+                part = part.strip()
+                if part.startswith("boundary="):
+                    boundary = part[len("boundary="):].strip('"')
+                    break
+
+            if not boundary:
+                self._json({"error": "boundary not found"}, 400)
+                return
+
+            # Parse manual de multipart simples
+            fields = {}
+            files  = {}
+            delimiter = f"--{boundary}".encode()
+            parts_raw = raw.split(delimiter)
+
+            for p in parts_raw[1:]:
+                if p.strip() in (b"", b"--", b"--\r\n"):
+                    continue
+                # Separa headers do body
+                if b"\r\n\r\n" in p:
+                    header_section, file_body = p.split(b"\r\n\r\n", 1)
+                    # Remove trailing --\r\n
+                    file_body = file_body.rstrip(b"\r\n--")
+                else:
+                    continue
+
+                header_str = header_section.decode("utf-8", errors="ignore")
+                # Extrai name e filename
+                name_match = re.search(r'name="([^"]+)"', header_str)
+                file_match = re.search(r'filename="([^"]+)"', header_str)
+                field_name = name_match.group(1) if name_match else ""
+
+                if file_match:
+                    files[field_name] = {
+                        "filename": file_match.group(1),
+                        "data": file_body,
+                    }
+                else:
+                    fields[field_name] = file_body.decode("utf-8", errors="ignore").strip()
+
+            live_id    = fields.get("live_id", "")
+            guest_name = fields.get("guest_name", "Convidado")
+            title_type = fields.get("title_type", "convidado")
+
+            # Se live_id parece um YouTube video ID (não número), não serve pra save_guest_photo
+            # Tenta extrair número da live do guest_name ou usa live_id como está
+            import re as _re
+            if not _re.match(r'^\d+$', live_id):
+                # Tenta pegar do título via campo extra "title" no multipart
+                title_for_num = fields.get("title", "")
+                m = _re.search(r'\bLive\s+(\d+)\b', title_for_num, _re.IGNORECASE)
+                if m:
+                    live_id = m.group(1)
+
+            if "photo" not in files:
+                self._json({"error": "photo field required"}, 400)
+                return
+
+            photo_file = files["photo"]
+            ext = "." + photo_file["filename"].rsplit(".", 1)[-1].lower() if "." in photo_file["filename"] else ".jpg"
+
+            from thumb_live import save_guest_photo
+            path = save_guest_photo(
+                photo_file["data"], live_id, guest_name, title_type, ext
+            )
+            self._json({"ok": True, "path": str(path), "name": path.name})
+
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
 
     # --- SSE Stream ---
 
@@ -539,8 +932,12 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def log_message(self, fmt, *args):
-        if "/api/" in (args[0] if args else ""):
-            print(f"  API: {args[0]}")
+        try:
+            first = str(args[0]) if args else ""
+            if "/api/" in first:
+                print(f"  API: {first}")
+        except Exception:
+            pass
 
 
 # -------------------------------------------------------------------

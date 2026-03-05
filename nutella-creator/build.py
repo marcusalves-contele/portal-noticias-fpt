@@ -54,6 +54,8 @@ SW, SH = 1080, 1920
 SCREEN_FIT_H = (SW * H // W // 2) * 2   # 608 (full 16:9 at 1080w, even)
 FACE_FIT_H   = SH - SCREEN_FIT_H         # 1312
 
+FREEZE_DURATION = 1.5  # segundos de freeze frame no início do Short
+
 # macOS system fonts (tenta em ordem)
 FONT_CANDIDATES = [
     "/System/Library/Fonts/Supplemental/Arial.ttf",
@@ -155,7 +157,8 @@ def detect_layout(video_path: Path, start_sec: float, end_sec: float) -> dict:
     Retorna dict com cx, cy, fw, fh do rosto principal e tipo de layout.
     Fallback: centro do frame (letterbox).
     """
-    fallback = {"type": "no_face", "cx": W // 2, "cy": H // 2, "fw": 120, "fh": 120}
+    fallback = {"type": "no_face", "cx": W // 2, "cy": H // 2, "fw": 120, "fh": 120,
+                "best_frame_sec": start_sec}
     try:
         face_det = mp.solutions.face_detection.FaceDetection(
             model_selection=1, min_detection_confidence=0.4
@@ -167,6 +170,9 @@ def detect_layout(video_path: Path, start_sec: float, end_sec: float) -> dict:
         start_f = int(start_sec * fps)
         end_f   = int(end_sec * fps)
         detections = []  # (cx, cy, fw, fh)
+
+        best_frame_sec   = start_sec
+        best_frame_score = 0.0
 
         cap.set(cv2.CAP_PROP_POS_FRAMES, start_f)
         frame_idx = start_f
@@ -190,6 +196,13 @@ def detect_layout(video_path: Path, start_sec: float, end_sec: float) -> dict:
                 fw = int(box.width  * W)
                 fh = int(box.height * H)
                 detections.append((cx, cy, fw, fh))
+
+                # Rastrear melhor frame: maior área × confiança mediapipe
+                score = best.score[0] if best.score else 0.5
+                if score * fw * fh > best_frame_score:
+                    best_frame_score = score * fw * fh
+                    best_frame_sec   = frame_idx / fps
+
             frame_idx += sample_interval
             cap.set(cv2.CAP_PROP_POS_FRAMES, frame_idx)
 
@@ -211,7 +224,9 @@ def detect_layout(video_path: Path, start_sec: float, end_sec: float) -> dict:
         face_ratio = (fw * fh) / (W * H)
         layout_type = "screen_share" if face_ratio < 0.06 else "multi_face"
         print(f"  Layout: {layout_type} | face ({cx},{cy}) {fw}×{fh} | {len(detections)} amostras")
-        return {"type": layout_type, "cx": cx, "cy": cy, "fw": fw, "fh": fh}
+        print(f"  Melhor frame: {best_frame_sec:.1f}s (score×área={best_frame_score:.0f})")
+        return {"type": layout_type, "cx": cx, "cy": cy, "fw": fw, "fh": fh,
+                "best_frame_sec": best_frame_sec}
 
     except Exception as e:
         print(f"  Layout erro: {e} → letterbox")
@@ -359,6 +374,86 @@ def compose_clip(
         ], desc=desc)
 
 
+def make_freeze_frame(
+    source: Path,
+    best_sec: float,
+    layout: dict,
+    out: Path,
+    tmp_dir: Path,
+    duration: float = FREEZE_DURATION,
+) -> None:
+    """
+    Extrai o melhor frame do clip, aplica o mesmo crop 9:16 do Short,
+    e gera um vídeo estático com áudio silencioso para prefixar ao Short.
+    YouTube usa o frame 0 como capa de Shorts → esse é o hack.
+    """
+    lay = layout or {}
+    has_face = lay.get("type", "no_face") != "no_face"
+
+    # Step 1: extrai o melhor frame como PNG puro (sem filtros)
+    frame_png = tmp_dir / f"freeze_{out.stem}.png"
+    run([
+        "ffmpeg", "-y",
+        "-ss", str(best_sec), "-i", str(source),
+        "-vframes", "1",
+        str(frame_png),
+    ], desc=f"extract best frame @ {best_sec:.1f}s")
+
+    # Step 2: aplica filtro 9:16 idêntico ao compose_clip + loop + silêncio
+    if has_face:
+        face_cx = lay["cx"]
+        face_cy = lay["cy"]
+        face_fw = lay["fw"]
+        face_fh = lay["fh"]
+
+        face_h_s   = FACE_FIT_H
+        screen_h_s = SCREEN_FIT_H
+        src_ratio  = SW / face_h_s
+
+        is_ss  = lay.get("type") == "screen_share"
+        mult   = 2.5 if is_ss else 5
+        crop_w = max(int(face_fw * mult), 280)
+        crop_w = min(crop_w, W // 4 if is_ss else W)
+        crop_w = (crop_w // 2) * 2
+        crop_h = (int(crop_w / src_ratio) // 2) * 2
+        crop_h = min(crop_h, H)
+        crop_w = (int(crop_h * src_ratio) // 2) * 2
+
+        face_top      = face_cy - face_fh // 2
+        padding_above = max(int(face_fh * 0.6), 30)
+        fc_y = max(0, face_top - padding_above)
+        fc_y = min(fc_y, H - crop_h)
+        fc_x = max(0, min(face_cx - crop_w // 2, W - crop_w))
+
+        # split=2 pois o PNG só tem 1 stream mas é usado em face e screen
+        filter_complex = (
+            f"[0:v]scale={W}:{H}:force_original_aspect_ratio=disable,split=2[va][vb];"
+            f"[va]crop={crop_w}:{crop_h}:{fc_x}:{fc_y},scale={SW}:{face_h_s}[face];"
+            f"[vb]scale={SW}:{screen_h_s}[screen];"
+            f"[face][screen]vstack,setsar=1,fps={FPS}[vfinal]"
+        )
+    else:
+        filter_complex = (
+            f"[0:v]scale={W}:{H}:force_original_aspect_ratio=disable,split=2[va][vb];"
+            f"[va]scale={SW}:-2[main];"
+            f"[vb]scale={SW}:{SH},boxblur=20:5[blur];"
+            f"[blur][main]overlay=(W-w)/2:(H-h)/2,setsar=1,fps={FPS}[vfinal]"
+        )
+
+    run([
+        "ffmpeg", "-y",
+        "-loop", "1", "-i", str(frame_png),
+        "-f", "lavfi", "-i", "anullsrc=r=44100:cl=stereo",
+        "-filter_complex", filter_complex,
+        "-map", "[vfinal]", "-map", "1:a",
+        "-t", str(duration),
+        "-c:v", "libx264", "-preset", "fast", "-crf", "18",
+        "-c:a", "aac", "-ar", "44100", "-ac", "2",
+        str(out),
+    ], desc=f"freeze frame 9:16 ({duration}s)")
+    frame_png.unlink(missing_ok=True)
+
+
 def concat_segments(parts: list[Path], out: Path) -> None:
     """Concatena segmentos em ordem via concat demuxer."""
     list_file = out.with_suffix(".txt")
@@ -428,13 +523,23 @@ def build_nutella(
 
     shorts_possivel = n.get("shorts_possivel", True)
     if make_shorts and shorts_possivel and not out_s.exists():
-        # Short = corte puro, sem intro e sem CTA
         s_start = t2s(n.get("shorts_entrada") or n["clip_entrada"])
         s_end   = t2s(n.get("shorts_saida")   or n["clip_saida"])
 
         layout = detect_layout(source, s_start, s_end)
-        compose_clip(source, s_start, s_end, out_s,
+
+        # Freeze frame do melhor momento → frame 0 = capa do Short no YouTube
+        freeze_s = tmp_dir / f"nut_{rank}_freeze.mp4"
+        make_freeze_frame(source, layout.get("best_frame_sec", s_start),
+                          layout, freeze_s, tmp_dir)
+
+        # Clip 9:16 composto (vai para temp, não direto no out_s)
+        clip_s = tmp_dir / f"nut_{rank}_clip_9x16.mp4"
+        compose_clip(source, s_start, s_end, clip_s,
                      SW, SH, layout=layout, crop_mode=True)
+
+        # Concat: [freeze] + [clip] → Short final
+        concat_segments([freeze_s, clip_s], out_s)
         print(f"  ✓ 9:16 → {name_s}")
     elif not make_shorts or not shorts_possivel:
         if not shorts_possivel:

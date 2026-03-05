@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nutella Creator</title>
+  <title>PRISM OS</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --purple: #8B23E5;
@@ -32,6 +33,7 @@
       --blue-dim: rgba(59, 130, 246, 0.12);
       --font-display: 'Instrument Sans', sans-serif;
       --font-mono: 'IBM Plex Mono', monospace;
+      --font-brand: 'Syne', sans-serif;
       --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
       --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -94,33 +96,42 @@
 
     .topbar-icon {
       width: 28px; height: 28px;
-      background: var(--purple);
+      background: var(--surface-2);
+      border: 1px solid rgba(139, 35, 229, 0.35);
       border-radius: 6px;
       display: grid;
       place-items: center;
       position: relative;
       overflow: hidden;
+      flex-shrink: 0;
     }
+    /* Triângulo do prisma */
     .topbar-icon::before {
       content: '';
-      width: 12px; height: 12px;
-      border: 2px solid #fff;
-      border-radius: 2px;
-      transform: rotate(45deg);
+      width: 0; height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-bottom: 12px solid var(--purple);
+      margin-top: -3px;
     }
+    /* Dispersão de luz (arco-íris) */
     .topbar-icon::after {
       content: '';
       position: absolute;
-      width: 4px; height: 4px;
-      background: #fff;
-      border-radius: 50%;
-      top: 6px; right: 6px;
+      bottom: 5px; left: 2px;
+      width: 24px; height: 3px;
+      background: linear-gradient(90deg,
+        #f43f5e 0%, #f59e0b 30%, #2dd4a0 60%, #3b82f6 80%, #8B23E5 100%
+      );
+      border-radius: 2px;
+      opacity: 0.85;
     }
 
     .topbar-title {
-      font-weight: 700;
+      font-family: var(--font-brand);
+      font-weight: 800;
       font-size: 15px;
-      letter-spacing: -0.02em;
+      letter-spacing: 0.05em;
       color: var(--text-primary);
     }
 
@@ -154,6 +165,7 @@
     .topbar-pill:hover { border-color: var(--border-hover); color: var(--text-secondary); }
     .topbar-pill.approved { border-color: var(--green); color: var(--green); background: var(--green-dim); }
     .topbar-pill.rejected { border-color: var(--red); color: var(--red); background: var(--red-dim); opacity: 0.5; }
+    .topbar-pill.uploaded { border-color: #3b82f6; color: #3b82f6; background: rgba(59,130,246,0.12); }
     .topbar-pill.active { border-color: var(--purple); color: var(--purple); }
 
     .topbar-actions {
@@ -247,6 +259,131 @@
       text-align: center;
     }
 
+    /* ===== PRISM HERO LOGO ===== */
+    .prism-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 28px;
+      animation: fadeUp 0.6s var(--ease-out) 0.1s both;
+    }
+
+    .prism-hero-icon {
+      width: 80px; height: 80px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: visible;
+    }
+
+    /* Canvas do prisma animado */
+    #prism-canvas {
+      display: block;
+      filter: drop-shadow(0 0 18px rgba(139,35,229,0.35));
+    }
+
+    /* ===== MIND INFO — easter egg canto inferior direito ===== */
+    .mind-info {
+      position: absolute;
+      bottom: 24px;
+      right: 28px;
+      z-index: 10;
+    }
+
+    .mind-info-trigger {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      border: 1px solid rgba(139,35,229,0.35);
+      background: rgba(18,6,36,0.6);
+      backdrop-filter: blur(8px);
+      color: rgba(139,35,229,0.7);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      display: grid;
+      place-items: center;
+      cursor: default;
+      transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+      user-select: none;
+    }
+
+    .mind-info:hover .mind-info-trigger {
+      border-color: rgba(139,35,229,0.7);
+      color: rgba(200,140,255,1);
+      box-shadow: 0 0 12px rgba(139,35,229,0.25);
+    }
+
+    .mind-info-panel {
+      position: absolute;
+      bottom: 36px;
+      right: 0;
+      width: 270px;
+      background: rgba(14,6,28,0.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(139,35,229,0.25);
+      border-radius: 12px;
+      padding: 18px 20px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(6px);
+      transition: opacity 0.25s, transform 0.25s;
+    }
+
+    .mind-info:hover .mind-info-panel {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .mind-info-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(139,35,229,0.8);
+      margin-bottom: 12px;
+    }
+
+    .mind-info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 9px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: rgba(200,190,220,0.75);
+    }
+
+    .mind-info-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    .mind-info-footer {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(139,35,229,0.12);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(139,35,229,0.45);
+      font-style: italic;
+    }
+
+    /* Canvas de partículas — fundo da home */
+    #prism-mind-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
     .home-badge {
       display: inline-flex;
       align-items: center;
@@ -275,19 +412,20 @@
     }
 
     .home h1 {
-      font-size: 48px;
-      font-weight: 700;
-      letter-spacing: -0.04em;
-      line-height: 1.1;
+      font-family: var(--font-brand);
+      font-size: 64px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      line-height: 1;
       margin-bottom: 12px;
       animation: fadeUp 0.6s var(--ease-out) 0.2s both;
     }
     .home h1 span { color: var(--purple); }
 
     .home-sub {
-      font-size: 16px;
+      font-size: 15px;
       color: var(--text-secondary);
-      margin-bottom: 40px;
+      margin-bottom: 0;
       animation: fadeUp 0.6s var(--ease-out) 0.3s both;
     }
 
@@ -304,6 +442,7 @@
       border-radius: 12px;
       overflow: hidden;
       transition: border-color 0.3s;
+      margin-top: 28px;
       animation: fadeUp 0.6s var(--ease-out) 0.4s both;
     }
     .home-input-group:focus-within {
@@ -382,6 +521,7 @@
     }
     .history-dot.ready { background: var(--green); }
     .history-dot.analyzed { background: var(--amber); }
+    .history-dot.uploaded { background: #3b82f6; }
 
     .history-info { flex: 1; min-width: 0; }
 
@@ -670,6 +810,7 @@
     }
     .nutella-card.approved { border-color: rgba(45, 212, 160, 0.4); }
     .nutella-card.rejected { border-color: rgba(244, 63, 94, 0.3); opacity: 0.5; }
+    .nutella-card.uploaded { border-color: rgba(59,130,246,0.5); }
 
     .card-header {
       display: flex;
@@ -732,6 +873,7 @@
     }
     .status-tag.approved { background: var(--green-dim); color: var(--green); }
     .status-tag.rejected { background: var(--red-dim); color: var(--red); }
+    .status-tag.uploaded { background: rgba(59,130,246,0.15); color: #3b82f6; }
 
     .card-body {
       display: grid;
@@ -1126,6 +1268,345 @@
       .card-players { flex-direction: column; }
       .player-wrapper.short { flex: unset; }
     }
+
+    /* ===== MODE SELECTOR ===== */
+    .mode-selector {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 28px;
+      margin-bottom: 0;
+      animation: fadeUp 0.6s var(--ease-out) 0.35s both;
+    }
+    .mode-tab {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .mode-tab:hover { border-color: var(--border-hover); color: var(--text-secondary); }
+    .mode-tab.active {
+      border-color: var(--purple);
+      color: var(--purple);
+      background: var(--purple-subtle);
+    }
+
+    /* ===== THUMBNAILS LIVE SCREEN ===== */
+    .tl-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 32px 80px;
+    }
+
+    .tl-topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(20px) saturate(1.4);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .tl-step-header {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    /* Queue cards */
+    .tl-queue-list { display: flex; flex-direction: column; gap: 10px; }
+    .tl-queue-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tl-queue-card:hover { border-color: var(--purple); background: var(--surface-2); }
+    .tl-queue-card.selected { border-color: var(--purple); background: var(--purple-subtle); }
+    .tl-queue-card.has-approved { border-color: var(--green); }
+
+    .tl-channel-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .tl-channel-badge.fleet { background: rgba(139, 35, 229, 0.2); color: var(--purple); }
+    .tl-channel-badge.teams { background: rgba(245, 158, 11, 0.15); color: var(--amber); }
+
+    .tl-queue-info { flex: 1; min-width: 0; }
+    .tl-queue-title { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tl-queue-meta { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+    .tl-approved-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--green);
+      border: 1px solid var(--green);
+      border-radius: 4px;
+      padding: 2px 7px;
+    }
+
+    /* Briefing form */
+    .tl-briefing-form { display: flex; flex-direction: column; gap: 20px; }
+    .tl-field { display: flex; flex-direction: column; gap: 8px; }
+    .tl-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+    }
+    .tl-input, .tl-textarea {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: var(--font-display);
+      font-size: 14px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .tl-input:focus, .tl-textarea:focus { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-glow); }
+    .tl-textarea { resize: vertical; min-height: 80px; }
+
+    .tl-audio-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--surface-2);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tl-audio-row:hover { border-color: var(--purple); }
+    .tl-audio-icon { font-size: 18px; }
+    .tl-audio-label { font-size: 13px; color: var(--text-secondary); }
+    .tl-audio-label strong { color: var(--text-primary); }
+
+    .tl-guest-upload {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--surface-2);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tl-guest-upload:hover { border-color: var(--amber); }
+    .tl-guest-name-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 13px;
+      color: var(--text-primary);
+      font-family: var(--font-display);
+    }
+    .tl-guest-name-input::placeholder { color: var(--text-muted); }
+
+    /* AB review */
+    .tl-ab-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 700px) { .tl-ab-grid { grid-template-columns: 1fr; } }
+
+    .tl-thumb-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .tl-thumb-card.approved-a { border-color: var(--green); }
+    .tl-thumb-card.approved-b { border-color: var(--green); }
+
+    .tl-thumb-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding: 10px 14px 6px;
+      letter-spacing: 0.1em;
+    }
+
+    .tl-thumb-img-area {
+      position: relative;
+      aspect-ratio: 16/9;
+      background: var(--surface-3);
+      overflow: hidden;
+    }
+    .tl-thumb-img-area img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+    .tl-thumb-spinner {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface-3);
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .tl-thumb-placeholder {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: var(--text-muted);
+      text-align: center; padding: 20px;
+    }
+
+    .tl-thumb-actions {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .tl-feedback-input {
+      width: 100%;
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-family: var(--font-display);
+      font-size: 12px;
+      color: var(--text-primary);
+      outline: none;
+      resize: none;
+    }
+    .tl-feedback-input:focus { border-color: var(--amber); }
+    .tl-btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .tl-approve-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      padding-top: 8px;
+    }
+
+    .tl-approved-banner {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--green);
+      padding: 16px;
+      background: var(--green-dim);
+      border: 1px solid rgba(45, 212, 160, 0.3);
+      border-radius: 10px;
+      margin-top: 8px;
+    }
+
+    /* Generation step log */
+    .tl-step {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      animation: stepFadeIn 0.2s ease;
+    }
+    @keyframes stepFadeIn { from { opacity:0; transform:translateY(4px) } to { opacity:1; transform:none } }
+    .tl-step.running { color: var(--text-primary); }
+    .tl-step.done    { color: var(--text-secondary); }
+    .tl-step.error   { color: var(--red, #f87171); }
+    .tl-step-icon { width: 14px; flex-shrink: 0; text-align: center; }
+    .tl-step-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--purple);
+      animation: dotPulse 1s ease-in-out infinite;
+    }
+    @keyframes dotPulse {
+      0%,100% { opacity:1; transform:scale(1) }
+      50%      { opacity:0.4; transform:scale(0.7) }
+    }
+    .tl-step-text { flex: 1; }
+    .tl-step-time { color: var(--text-muted); font-size: 10px; flex-shrink:0; }
+    .tl-step-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-left: 22px;
+      margin-top: 2px;
+      font-family: var(--font-mono);
+    }
+
+    /* Loading state */
+    .tl-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      gap: 16px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .tl-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .tl-section {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .tl-back-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+    .tl-back-btn:hover { color: var(--text-primary); }
   </style>
 </head>
 <body>
@@ -1134,10 +1615,51 @@
   <div class="screen active" id="screen-home">
     <div class="home">
       <div class="home-bg"></div>
+      <canvas id="prism-mind-canvas"></canvas>
+
+      <!-- Easter egg: o que é essa mente? -->
+      <div class="mind-info">
+        <div class="mind-info-trigger">◈</div>
+        <div class="mind-info-panel">
+          <div class="mind-info-title">O que você está vendo</div>
+          <div class="mind-info-row">
+            <span class="mind-info-dot" style="background:#8B23E5"></span>
+            <span><strong style="color:#C084FC">70 partículas</strong> em 7 cores do espectro. Cada uma com fase, velocidade e tamanho únicos.</span>
+          </div>
+          <div class="mind-info-row">
+            <span class="mind-info-dot" style="background:#4DDBFF"></span>
+            <span><strong style="color:#C084FC">Atração gravitacional</strong> suave ao centro — tudo orbita em torno de um ponto invisível.</span>
+          </div>
+          <div class="mind-info-row">
+            <span class="mind-info-dot" style="background:#6BCB77"></span>
+            <span><strong style="color:#C084FC">Força orbital perpendicular</strong> impede a convergência. As partículas nunca chegam ao centro.</span>
+          </div>
+          <div class="mind-info-row">
+            <span class="mind-info-dot" style="background:#FFD93D"></span>
+            <span><strong style="color:#C084FC">Conexões neurais</strong> emergem quando duas partículas se aproximam. Nenhuma foi programada — elas se formam.</span>
+          </div>
+          <div class="mind-info-row">
+            <span class="mind-info-dot" style="background:#FF6B6B"></span>
+            <span><strong style="color:#C084FC">Velocidade mínima garantida</strong> — se uma partícula parar, recebe um impulso aleatório. A mente nunca dorme.</span>
+          </div>
+          <div class="mind-info-footer">PRISM OS · campo de partículas v1</div>
+        </div>
+      </div>
+
       <div class="home-content">
-        <div class="home-badge">PIPELINE ATIVO</div>
-        <h1>Nutella <span>Creator</span></h1>
-        <p class="home-sub">Clips virais de lives — análise, corte, thumbnail e upload</p>
+        <div class="prism-hero">
+          <div class="prism-hero-icon">
+            <canvas id="prism-canvas" width="90" height="80"></canvas>
+          </div>
+        </div>
+        <div class="home-badge">CONTENT OS</div>
+        <h1>PRISM <span>OS</span></h1>
+        <p class="home-sub">From brief to viral, by design.</p>
+
+        <div class="mode-selector">
+          <button class="mode-tab active" id="mode-tab-cortes" onclick="setMode('cortes')">▶ Cortes de Lives</button>
+          <button class="mode-tab" id="mode-tab-thumbs" onclick="setMode('thumbs')">&#9646; Thumbnails de Live</button>
+        </div>
 
         <div class="home-input-group">
           <input class="home-input" id="url-input" type="text"
@@ -1239,7 +1761,7 @@
     <div class="topbar" id="review-topbar">
       <div class="topbar-brand" onclick="goHome()">
         <div class="topbar-icon"></div>
-        <span class="topbar-title">Nutella Creator</span>
+        <span class="topbar-title">PRISM OS</span>
       </div>
       <div class="topbar-sep"></div>
       <div class="topbar-nav" id="review-nav"></div>
@@ -1260,7 +1782,7 @@
     <div class="topbar">
       <div class="topbar-brand" onclick="goHome()">
         <div class="topbar-icon"></div>
-        <span class="topbar-title">Nutella Creator</span>
+        <span class="topbar-title">PRISM OS</span>
       </div>
       <div class="topbar-sep"></div>
       <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">UPLOAD</span>
@@ -1277,6 +1799,189 @@
         <button class="btn btn-upload" onclick="doUpload(true)">Agendar Publicação</button>
       </div>
       <div class="upload-results" id="upload-results"></div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 6: THUMBNAILS LIVE ===== -->
+  <div class="screen" id="screen-thumb-live">
+    <div class="tl-topbar">
+      <div class="topbar-brand" onclick="goHome()">
+        <div class="topbar-icon"></div>
+        <span class="topbar-title">PRISM OS</span>
+      </div>
+      <div class="topbar-sep"></div>
+      <span style="font-family:var(--font-mono);font-size:12px;color:var(--purple)">THUMBNAILS DE LIVE</span>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost btn-sm" onclick="tlResetToQueue()">Fila</button>
+      </div>
+    </div>
+
+    <!-- Step 1: Queue -->
+    <div id="tl-step-queue">
+      <div class="tl-container">
+        <div class="tl-step-header">STEP 1 — FILA DE THUMBNAILS</div>
+
+        <div style="display:flex;gap:12px;margin-bottom:24px">
+          <button class="btn btn-primary" onclick="tlFetchQueue()">Buscar da Planilha</button>
+          <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);display:flex;align-items:center" id="tl-queue-count"></span>
+        </div>
+
+        <div id="tl-queue-content">
+          <div class="tl-empty">Clique em "Buscar da Planilha" para carregar as lives com status A Fazer.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Briefing -->
+    <div id="tl-step-briefing" style="display:none">
+      <div class="tl-container">
+        <button class="tl-back-btn" onclick="tlResetToQueue()">← Voltar para fila</button>
+
+        <div class="tl-step-header">STEP 2 — BRIEFING</div>
+
+        <div class="tl-section" id="tl-briefing-header">
+          <!-- preenchido por JS -->
+        </div>
+
+        <!-- Auto-briefing: só aparece quando a live tem URL YouTube -->
+        <div id="tl-auto-briefing-row" style="display:none;margin-bottom:16px">
+          <button class="btn btn-primary" id="tl-btn-auto-briefing" onclick="tlAutoBriefing()" style="background:transparent;border-color:var(--purple);color:var(--purple)">
+            &#9889; Auto-preencher do vídeo
+          </button>
+          <span id="tl-auto-briefing-status" style="margin-left:12px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono)"></span>
+        </div>
+
+        <div class="tl-section">
+          <!-- Audio upload -->
+          <div class="tl-field" style="margin-bottom:16px">
+            <div class="tl-label">ÁUDIO DE BRIEFING (OPCIONAL)</div>
+            <label class="tl-audio-row" for="tl-audio-file">
+              <span class="tl-audio-icon">&#127908;</span>
+              <div>
+                <div class="tl-audio-label"><strong>Carregar áudio</strong> — transcrição automática preenche as 3 respostas</div>
+                <div id="tl-audio-name" style="font-family:var(--font-mono);font-size:11px;color:var(--purple);margin-top:4px"></div>
+              </div>
+            </label>
+            <input type="file" id="tl-audio-file" accept="audio/*" style="display:none" onchange="tlAudioSelected(this)">
+          </div>
+
+          <div class="tl-briefing-form" id="tl-briefing-form">
+            <div class="tl-field">
+              <div class="tl-label">Q1 — QUEM ASSISTE? (Perfil do público)</div>
+              <textarea class="tl-textarea" id="tl-q1" placeholder="Ex: gestores de frotas com 10-50 veículos, sem sistema de rastreamento..."></textarea>
+            </div>
+            <div class="tl-field">
+              <div class="tl-label">Q2 — OBJETIVO (O que queremos que o espectador sinta/faça)</div>
+              <textarea class="tl-textarea" id="tl-q2" placeholder="Ex: sentir que precisa resolver esse problema agora, clicar no vídeo completo..."></textarea>
+            </div>
+            <div class="tl-field">
+              <div class="tl-label">Q3 — CONTEÚDO (O que acontece na live)</div>
+              <textarea class="tl-textarea" id="tl-q3" placeholder="Ex: Julio demonstra ao vivo como reduzir 30% do custo de combustível usando relatórios..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guest photo upload -->
+        <div class="tl-section">
+          <div class="tl-label" style="margin-bottom:12px">FOTO DO CONVIDADO (OPCIONAL)</div>
+          <label class="tl-guest-upload" for="tl-guest-file" id="tl-guest-label">
+            <span style="font-size:18px">&#128100;</span>
+            <input class="tl-guest-name-input" id="tl-guest-name" type="text" placeholder="Nome do convidado (ex: Nelson Margarido)" onclick="event.stopPropagation()">
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);flex-shrink:0" id="tl-guest-filename"></span>
+          </label>
+          <input type="file" id="tl-guest-file" accept="image/*" style="display:none" onchange="tlGuestFileSelected(this)">
+          <!-- Convidados detectados automaticamente -->
+          <div id="tl-guest-detected" style="display:none;margin-top:10px;gap:10px;flex-wrap:wrap"></div>
+        </div>
+
+        <!-- Divergence slider -->
+        <div style="margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)">DIVERGENCIA A vs B</span>
+            <span id="tl-div-label" style="font-size:12px;font-weight:700;color:var(--purple);font-family:var(--font-mono)">6 — Moderado</span>
+          </div>
+          <input type="range" id="tl-divergence" min="1" max="10" value="6"
+            style="width:100%;accent-color:var(--purple);cursor:pointer"
+            oninput="tlUpdateDivLabel(this.value)">
+          <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--text-muted)">
+            <span>Sutil</span><span>Moderado</span><span>Alto</span><span>Maximo</span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px">
+          <button class="btn btn-primary" id="tl-btn-generate" onclick="tlGenerate()">
+            Gerar Thumbnails A e B
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3/4: Review A/B -->
+    <div id="tl-step-review" style="display:none">
+      <div class="tl-container">
+        <button class="tl-back-btn" onclick="tlBackToBriefing()">← Voltar para briefing</button>
+
+        <div class="tl-step-header">STEP 3 — REVIEW A/B</div>
+
+        <div class="tl-section" id="tl-review-header">
+          <!-- preenchido por JS -->
+        </div>
+
+        <!-- Generating progress (streaming) -->
+        <div id="tl-generating-spinner" style="display:none;flex-direction:column;gap:0;padding:20px 4px">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:14px;letter-spacing:0.1em">NANO BANANA v2 — gemini-3.1-flash-image-preview</div>
+          <div id="tl-gen-log" style="display:flex;flex-direction:column;gap:5px"></div>
+        </div>
+
+        <!-- AB grid -->
+        <div class="tl-ab-grid" id="tl-ab-grid">
+          <!-- Thumb A -->
+          <div class="tl-thumb-card" id="tl-card-a">
+            <div class="tl-thumb-label">ÂNGULO A</div>
+            <div class="tl-thumb-img-area">
+              <div class="tl-thumb-placeholder" id="tl-ph-a">A gerar...</div>
+              <div class="tl-thumb-spinner" id="tl-spin-a" style="display:none">
+                <div class="spinner-ring"></div><span>Gerando A...</span>
+              </div>
+              <img id="tl-img-a" style="display:none" onclick="openOverlay(this.src)">
+            </div>
+            <div class="tl-thumb-actions">
+              <textarea class="tl-feedback-input" id="tl-feedback-a" rows="2" placeholder="Ex: texto maior, fundo mais escuro, expressão mais séria..."></textarea>
+              <div class="tl-btn-row">
+                <button class="btn btn-amber btn-sm" onclick="tlRegenerateOne('A')">Ajustar A</button>
+                <a class="btn btn-ghost btn-sm" id="tl-download-a" style="text-decoration:none;display:none" download>Download A</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thumb B -->
+          <div class="tl-thumb-card" id="tl-card-b">
+            <div class="tl-thumb-label">ÂNGULO B</div>
+            <div class="tl-thumb-img-area">
+              <div class="tl-thumb-placeholder" id="tl-ph-b">A gerar...</div>
+              <div class="tl-thumb-spinner" id="tl-spin-b" style="display:none">
+                <div class="spinner-ring"></div><span>Gerando B...</span>
+              </div>
+              <img id="tl-img-b" style="display:none" onclick="openOverlay(this.src)">
+            </div>
+            <div class="tl-thumb-actions">
+              <textarea class="tl-feedback-input" id="tl-feedback-b" rows="2" placeholder="Ex: composição mais dinâmica, cores mais vibrantes..."></textarea>
+              <div class="tl-btn-row">
+                <button class="btn btn-amber btn-sm" onclick="tlRegenerateOne('B')">Ajustar B</button>
+                <a class="btn btn-ghost btn-sm" id="tl-download-b" style="text-decoration:none;display:none" download>Download B</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Approve row -->
+        <div class="tl-approve-row" id="tl-approve-row">
+          <button class="btn btn-approve" id="tl-btn-approve-a" onclick="tlApprove('A')">Aprovar A</button>
+          <button class="btn btn-approve" id="tl-btn-approve-b" onclick="tlApprove('B')">Aprovar B</button>
+        </div>
+
+        <div id="tl-approved-banner" style="display:none;margin-top:12px"></div>
+      </div>
     </div>
   </div>
 
@@ -1340,13 +2045,13 @@
 
         list.innerHTML = data.videos.map(v => {
           const date = v.generated_at ? new Date(v.generated_at).toLocaleDateString('pt-BR') : '';
-          const status = v.has_cuts ? 'ready' : 'analyzed';
-          const statusLabel = v.has_cuts ? 'Clips prontos' : 'Analisado';
+          const status = v.all_uploaded ? 'uploaded' : v.has_cuts ? 'ready' : 'analyzed';
+          const statusLabel = v.all_uploaded ? 'No YouTube' : v.has_cuts ? 'Clips prontos' : 'Analisado';
           return `
             <div class="history-item" onclick="loadVideo('${v.video_id}', ${v.has_cuts})">
               <div class="history-dot ${status}"></div>
               <div class="history-info">
-                <div class="history-id">${v.video_id}</div>
+                <div class="history-id">${v.video_id}${v.video_title ? ' — ' + v.video_title : ''}</div>
                 <div class="history-meta">${date} · ${statusLabel}</div>
               </div>
               <div class="history-count">${v.nutellas_count} nutellas</div>
@@ -1646,9 +2351,9 @@
             </div>
             ${m.tipo ? `<div class="tipo-badge ${m.tipo}">${m.tipo.replace('_',' ')}</div>` : ''}
             <div class="card-actions">
-              <button class="btn btn-approve btn-sm ${st === 'approved' ? 'active' : ''}" onclick="setApproval(${rank}, 'approved')">Aprovar</button>
-              <button class="btn btn-reject btn-sm ${st === 'rejected' ? 'active' : ''}" onclick="setApproval(${rank}, 'rejected')">Rejeitar</button>
-              <div class="status-tag ${st}" id="status-${rank}">${st || 'pendente'}</div>
+              <button class="btn btn-approve btn-sm ${st === 'approved' || st === 'uploaded' ? 'active' : ''}" onclick="setApproval(${rank}, 'approved')" ${st === 'uploaded' ? 'disabled' : ''}>Aprovar</button>
+              <button class="btn btn-reject btn-sm ${st === 'rejected' ? 'active' : ''}" onclick="setApproval(${rank}, 'rejected')" ${st === 'uploaded' ? 'disabled' : ''}>Rejeitar</button>
+              <div class="status-tag ${st}" id="status-${rank}">${{approved:'aprovada',rejected:'rejeitada',uploaded:'no youtube'}[st] || 'pendente'}</div>
             </div>
           </div>
 
@@ -1744,7 +2449,7 @@
 
         // Update card UI
         const card = document.getElementById('card-' + rank);
-        card.classList.remove('approved', 'rejected');
+        card.classList.remove('approved', 'rejected', 'uploaded');
         if (newStatus !== 'pending') card.classList.add(newStatus);
 
         // Update buttons
@@ -1754,7 +2459,8 @@
         // Update status tag
         const tag = document.getElementById('status-' + rank);
         tag.className = 'status-tag ' + (newStatus === 'pending' ? '' : newStatus);
-        tag.textContent = newStatus === 'pending' ? 'pendente' : (newStatus === 'approved' ? 'aprovada' : 'rejeitada');
+        const tagLabels = { approved: 'aprovada', rejected: 'rejeitada', uploaded: 'no youtube' };
+        tag.textContent = tagLabels[newStatus] || 'pendente';
 
         // Update nav pill
         const nav = document.getElementById('nav-' + rank);
@@ -1765,12 +2471,9 @@
 
         updateReviewCounter();
 
-        // Auto-generate thumb on approve
-        if (newStatus === 'approved') {
-          const img = document.getElementById('thumb-img-' + rank);
-          if (!img.src || img.style.display === 'none') {
-            generateThumb(rank);
-          }
+        // Auto-generate thumb on approve (usa estado real, não DOM)
+        if (newStatus === 'approved' && !currentThumbs[String(rank)]) {
+          generateThumb(rank);
         }
 
         toast('#' + rank + ' ' + (newStatus === 'pending' ? 'pendente' : newStatus), 'success');
@@ -1942,6 +2645,19 @@
           results.style.display = 'block';
           document.getElementById('upload-actions').style.display = 'none';
           toast(data.uploaded.length + ' vídeos publicados', 'success');
+
+          // Atualiza cards para status "uploaded" (azul)
+          const uploadedRanks = [...new Set(data.uploaded.map(v => v.rank))];
+          uploadedRanks.forEach(rank => {
+            currentState[String(rank)] = 'uploaded';
+            const card = document.getElementById('card-' + rank);
+            if (card) { card.classList.remove('approved','rejected'); card.classList.add('uploaded'); }
+            const tag = document.getElementById('status-' + rank);
+            if (tag) { tag.className = 'status-tag uploaded'; tag.textContent = 'no youtube'; }
+            const nav = document.getElementById('nav-' + rank);
+            if (nav) { nav.classList.remove('approved','rejected'); nav.classList.add('uploaded'); }
+          });
+          updateReviewCounter();
         } else {
           toast('Erro: ' + (data.error || data.errors?.join(', ') || 'falha'), 'error');
         }
@@ -1950,6 +2666,909 @@
         toast('Erro: ' + e.message, 'error');
       }
     }
+
+    // ===== MODE SELECTOR =====
+    let currentMode = 'cortes';
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById('mode-tab-cortes').classList.toggle('active', mode === 'cortes');
+      document.getElementById('mode-tab-thumbs').classList.toggle('active', mode === 'thumbs');
+      if (mode === 'thumbs') {
+        showScreen('thumb-live');
+        tlResetToQueue();
+      } else {
+        showScreen('home');
+        loadHistory();
+      }
+    }
+
+    // ===== THUMBNAILS LIVE STATE =====
+    let tlQueueItems    = [];    // array dos itens carregados da planilha
+    let tlCurrentItem   = null;  // item da fila selecionado
+    let tlCurrentLiveId = '';
+    let tlCurrentBriefing = {};
+    let tlApprovedAngles = new Set();
+
+    function tlUpdateDivLabel(val) {
+      val = parseInt(val);
+      const label = val <= 3 ? 'Sutil' : val <= 6 ? 'Moderado' : val <= 8 ? 'Alto' : 'Maximo';
+      document.getElementById('tl-div-label').textContent = `${val} — ${label}`;
+    }
+    let tlGuestFileData = null;
+    let tlGuestFileMime = '';
+    let tlGuestFileName = '';
+
+    // ===== TL: NAVIGATION =====
+    function tlShowStep(step) {
+      document.getElementById('tl-step-queue').style.display    = step === 'queue'    ? '' : 'none';
+      document.getElementById('tl-step-briefing').style.display = step === 'briefing' ? '' : 'none';
+      document.getElementById('tl-step-review').style.display   = step === 'review'   ? '' : 'none';
+    }
+
+    function tlResetToQueue() {
+      tlShowStep('queue');
+    }
+
+    function tlBackToBriefing() {
+      tlShowStep('briefing');
+    }
+
+    // ===== TL: STEP 1 — QUEUE =====
+    async function tlFetchQueue() {
+      const content = document.getElementById('tl-queue-content');
+      const counter = document.getElementById('tl-queue-count');
+      content.innerHTML = '<div class="tl-loading"><div class="spinner-ring"></div><span>Buscando planilha...</span></div>';
+      counter.textContent = '';
+
+      try {
+        const resp = await fetch('/api/thumb-queue');
+        const data = await resp.json();
+
+        if (data.error) {
+          if (data.code === 'no_sheets_scope') {
+            content.innerHTML = '<div class="tl-empty" style="color:var(--amber)">Token sem scope Sheets. Rode: <code>python3 reauth_sheets.py</code></div>';
+          } else {
+            content.innerHTML = `<div class="tl-empty" style="color:var(--red)">${data.error}</div>`;
+          }
+          return;
+        }
+
+        tlQueueItems = data.items || [];
+        counter.textContent = `${tlQueueItems.length} item${tlQueueItems.length !== 1 ? 's' : ''} A Fazer`;
+
+        if (!tlQueueItems.length) {
+          content.innerHTML = '<div class="tl-empty">Nenhuma live com status "A Fazer" na planilha.</div>';
+          return;
+        }
+
+        content.innerHTML = '<div class="tl-queue-list">' +
+          tlQueueItems.map((item, idx) => {
+            const channel   = item._channel || 'fleet';
+            const title     = item['title'] || item['Título'] || item._live_id || 'Sem título';
+            const type      = item['type'] || '';
+            const tema      = item['tema'] || '';
+            const convidado = item['Convidado'] || '';
+            const approved  = item._approved ? `<span class="tl-approved-badge">✓ ${item._approved}</span>` : '';
+            const hasApproved = item._approved ? 'has-approved' : '';
+            return `
+              <div class="tl-queue-card ${hasApproved}" onclick="tlSelectByIdx(${idx})">
+                <div class="tl-queue-info">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+                    <span class="tl-channel-badge ${channel}">${channel}</span>
+                    ${type ? `<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;border:1px solid var(--border);padding:1px 6px;border-radius:4px">${type}</span>` : ''}
+                    ${convidado ? `<span style="font-family:var(--font-mono);font-size:10px;color:var(--amber)">+ ${convidado}</span>` : ''}
+                    ${approved}
+                  </div>
+                  ${tema ? `<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:3px;letter-spacing:0.05em">TEMA: ${tema}</div>` : ''}
+                  <div class="tl-queue-title">${title}</div>
+                </div>
+                <button class="btn btn-primary btn-sm" style="flex-shrink:0" onclick="event.stopPropagation();tlSelectByIdx(${idx})">Selecionar</button>
+              </div>
+            `;
+          }).join('') + '</div>';
+
+      } catch (e) {
+        content.innerHTML = `<div class="tl-empty" style="color:var(--red)">Erro: ${e.message}</div>`;
+      }
+    }
+
+    function tlSelectByIdx(idx) {
+      tlSelectItem(tlQueueItems[idx]);
+    }
+
+    function tlSelectItem(item) {
+      tlCurrentItem   = item;
+      tlCurrentLiveId = item._live_id || '';
+
+      const channel   = item._channel || 'fleet';
+      const title     = item['title'] || item['Título'] || tlCurrentLiveId || 'Sem título';
+      const type      = item['type'] || '';
+      const tema      = item['tema'] || '';
+      const thumbText = item['Texto da thumb'] || '';
+      const summary   = item['summary'] || item['Resumo (200 palavras)'] || '';
+
+      // Preenche header do briefing
+      document.getElementById('tl-briefing-header').innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span class="tl-channel-badge ${channel}">${channel}</span>
+          ${type ? `<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase">${type}</span>` : ''}
+          ${tema ? `<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted)">${tema}</span>` : ''}
+        </div>
+        <div style="font-weight:600;font-size:15px;line-height:1.3">${title}</div>
+        ${thumbText ? `<div style="font-family:var(--font-mono);font-size:11px;color:var(--purple);margin-top:6px">Texto sugerido: "${thumbText}"</div>` : ''}
+      `;
+
+      // Pré-preenche form
+      document.getElementById('tl-q3').value = summary || '';
+      document.getElementById('tl-q1').value = '';
+      document.getElementById('tl-q2').value = '';
+      // Reset convidado
+      document.getElementById('tl-guest-name').value = '';
+      document.getElementById('tl-guest-filename').textContent = '';
+      document.getElementById('tl-audio-name').textContent = '';
+      document.getElementById('tl-guest-detected').style.display = 'none';
+      document.getElementById('tl-guest-detected').innerHTML = '';
+      tlGuestFileData = null;
+
+      // Extrai número da live do título (ex: "| Live 317" → "317")
+      const liveNumMatch = title.match(/\bLive\s+(\d+)\b/i);
+      const liveNum = liveNumMatch ? liveNumMatch[1] : '';
+
+      tlShowStep('briefing');
+      tlCurrentBriefing = {
+        title, channel,
+        live_id: tlCurrentLiveId,
+        live_num: liveNum,
+        thumb_text: thumbText,
+        guest: '',
+      };
+
+      // Mostra botão Auto-preencher se a live tem URL YouTube
+      const videoUrl = item['url'] || item['URL'] || item['link'] || item['Link'] || '';
+      const autoRow = document.getElementById('tl-auto-briefing-row');
+      if (videoUrl && videoUrl.includes('youtube')) {
+        autoRow.style.display = '';
+        autoRow.dataset.videoUrl = videoUrl;
+      } else {
+        autoRow.style.display = 'none';
+      }
+      document.getElementById('tl-auto-briefing-status').textContent = '';
+
+      // Auto-detecta convidado pela pasta de refs
+      tlCheckGuest(title);
+    }
+
+    async function tlAutoBriefing() {
+      const btn       = document.getElementById('tl-btn-auto-briefing');
+      const statusEl  = document.getElementById('tl-auto-briefing-status');
+      const videoUrl  = document.getElementById('tl-auto-briefing-row').dataset.videoUrl || '';
+      if (!videoUrl) return;
+
+      btn.disabled = true;
+      statusEl.textContent = 'Transcrevendo...';
+
+      try {
+        const resp = await fetch('/api/auto-briefing', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            video_url: videoUrl,
+            title: tlCurrentBriefing.title || '',
+          })
+        });
+        const data = await resp.json();
+        if (data.error) {
+          statusEl.textContent = 'Erro: ' + data.error;
+          btn.disabled = false;
+          return;
+        }
+        if (data.q1) document.getElementById('tl-q1').value = data.q1;
+        if (data.q2) document.getElementById('tl-q2').value = data.q2;
+        if (data.q3) document.getElementById('tl-q3').value = data.q3;
+        statusEl.textContent = 'Preenchido automaticamente';
+        btn.disabled = false;
+        toast('Briefing preenchido do vídeo!', 'success');
+      } catch (e) {
+        statusEl.textContent = 'Erro: ' + e.message;
+        btn.disabled = false;
+      }
+    }
+
+    async function tlCheckGuest(title) {
+      const detectedEl = document.getElementById('tl-guest-detected');
+      const nameEl     = document.getElementById('tl-guest-name');
+      try {
+        const res  = await fetch(`/api/thumb-guest-check?title=${encodeURIComponent(title)}`);
+        const data = await res.json();
+        if (!data.found) return;
+
+        const guests = data.all_guests || [];
+        detectedEl.innerHTML = '';
+
+        guests.forEach(g => {
+          const chip = document.createElement('div');
+          chip.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;transition:all 0.2s';
+          chip.innerHTML = `
+            <img src="${g.preview_url}" style="width:36px;height:36px;object-fit:cover;border-radius:50%;border:2px solid var(--purple)" onerror="this.style.display='none'">
+            <span style="font-size:13px;color:var(--text-primary)">${g.name}</span>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted)">refs</span>
+          `;
+          chip.addEventListener('mouseenter', () => chip.style.borderColor = 'var(--purple)');
+          chip.addEventListener('mouseleave', () => chip.style.borderColor = 'rgba(255,255,255,0.1)');
+          chip.addEventListener('click', () => {
+            nameEl.value = g.name;
+            // Marca chip selecionado
+            detectedEl.querySelectorAll('div').forEach(c => c.style.borderColor = 'rgba(255,255,255,0.1)');
+            chip.style.borderColor = 'var(--purple)';
+            chip.style.background  = 'rgba(139,35,229,0.15)';
+          });
+          detectedEl.appendChild(chip);
+        });
+
+        detectedEl.style.display = 'flex';
+
+        // Auto-seleciona o único convidado
+        if (guests.length === 1) {
+          nameEl.value = guests[0].name;
+          if (detectedEl.firstChild) {
+            detectedEl.firstChild.style.borderColor = 'var(--purple)';
+            detectedEl.firstChild.style.background  = 'rgba(139,35,229,0.15)';
+          }
+        }
+      } catch(e) {
+        console.warn('guest check failed', e);
+      }
+    }
+
+    // ===== TL: STEP 2 — AUDIO TRANSCRIPTION =====
+    async function tlAudioSelected(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const audioLabel = document.getElementById('tl-audio-name');
+      const btn        = document.getElementById('tl-btn-generate');
+      const fieldIds   = ['tl-q1', 'tl-q2', 'tl-q3'];
+
+      audioLabel.textContent = `Processando "${file.name}"...`;
+      audioLabel.style.color = 'var(--purple)';
+      btn.disabled = true;
+      fieldIds.forEach(id => {
+        document.getElementById(id).disabled = true;
+        document.getElementById(id).style.opacity = '0.4';
+      });
+
+      try {
+        // Converte para base64 em chunks (evita stack overflow em arquivos grandes)
+        const buffer = await file.arrayBuffer();
+        const bytes  = new Uint8Array(buffer);
+        let binary   = '';
+        const chunk  = 8192;
+        for (let i = 0; i < bytes.length; i += chunk) {
+          binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+        }
+        const b64  = btoa(binary);
+        const mime = file.type || 'audio/m4a';
+
+        audioLabel.textContent = 'Analisando com IA...';
+
+        const resp = await fetch('/api/thumb-transcribe', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({audio_base64: b64, mime_type: mime})
+        });
+        const data = await resp.json();
+
+        if (data.error) {
+          audioLabel.textContent = `Erro: ${data.error}`;
+          audioLabel.style.color = 'var(--red)';
+          return;
+        }
+
+        let filled = 0;
+        if (data.q1) { document.getElementById('tl-q1').value = data.q1; filled++; }
+        if (data.q2) { document.getElementById('tl-q2').value = data.q2; filled++; }
+        if (data.q3) { document.getElementById('tl-q3').value = data.q3; filled++; }
+
+        if (filled > 0) {
+          audioLabel.textContent = `✓ ${file.name} — ${filled} campos preenchidos`;
+          audioLabel.style.color = 'var(--green)';
+          toast(`Briefing preenchido (${filled}/3 campos)`, 'success');
+        } else {
+          // Transcrição voltou mas não extraiu campos — mostra texto bruto
+          audioLabel.textContent = `⚠ Transcrição sem campos estruturados`;
+          audioLabel.style.color = 'var(--amber, #f59e0b)';
+          if (data.raw_text) {
+            document.getElementById('tl-q3').value = data.raw_text.slice(0, 400);
+          }
+          toast('Transcrição retornou texto livre — revisar Q3', 'warning');
+        }
+
+      } catch (err) {
+        audioLabel.textContent = `Erro: ${err.message}`;
+        audioLabel.style.color = 'var(--red)';
+      } finally {
+        btn.disabled = false;
+        fieldIds.forEach(id => {
+          document.getElementById(id).disabled = false;
+          document.getElementById(id).style.opacity = '';
+        });
+      }
+    }
+
+    function tlGuestFileSelected(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      // Auto-extrai nome do arquivo: "Shelton De Lima.jpeg" → "Shelton De Lima"
+      const nameField = document.getElementById('tl-guest-name');
+      if (!nameField.value.trim()) {
+        const stem = file.name.replace(/\.[^.]+$/, '');  // remove extensão
+        // Remove prefixo "convidado_live-NNN-" se existir
+        const clean = stem.replace(/^[^-_]*_live-\d+-/, '').replace(/[-_]/g, ' ');
+        const guessedName = clean.trim()
+          .split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        if (guessedName && guessedName.length > 1) nameField.value = guessedName;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        tlGuestFileData = e.target.result;
+        tlGuestFileMime = file.type;
+        tlGuestFileName = file.name;
+        document.getElementById('tl-guest-filename').textContent = file.name;
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // ===== TL: STEP 3 — GENERATE =====
+    async function tlGenerate() {
+      const q1 = document.getElementById('tl-q1').value.trim();
+      const q2 = document.getElementById('tl-q2').value.trim();
+      const q3 = document.getElementById('tl-q3').value.trim();
+
+      if (!q1 && !q2 && !q3 && !tlCurrentBriefing.thumb_text) {
+        toast('Preencha ao menos um campo do briefing', 'error');
+        return;
+      }
+
+      const guestName = document.getElementById('tl-guest-name').value.trim();
+      tlCurrentBriefing = {
+        ...tlCurrentBriefing, q1, q2, q3,
+        guest: guestName,
+      };
+
+      // Upload foto de convidado se tiver
+      if (tlGuestFileData && guestName) {
+        await tlUploadGuestPhoto(guestName);
+      }
+
+      // Vai para review e mostra spinner
+      tlShowStep('review');
+
+      // Preenche header do review
+      const channel = tlCurrentBriefing.channel || 'fleet';
+      const title   = tlCurrentBriefing.title || '';
+      document.getElementById('tl-review-header').innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+          <span class="tl-channel-badge ${channel}">${channel}</span>
+        </div>
+        <div style="font-weight:600;font-size:16px">${title}</div>
+      `;
+
+      // Reset thumbnails
+      tlResetThumbUI('A');
+      tlResetThumbUI('B');
+      tlApprovedAngles = new Set();
+      document.getElementById('tl-approved-banner').style.display = 'none';
+      document.getElementById('tl-approved-banner').innerHTML = '';
+      document.getElementById('tl-approve-row').style.display = '';
+      ['a','b'].forEach(a => document.getElementById(`tl-btn-approve-${a}`)?.classList.remove('active'));
+      document.getElementById('tl-generating-spinner').style.display = 'flex';
+
+      const btn = document.getElementById('tl-btn-generate');
+      btn.disabled = true;
+
+      // Inicia job e conecta SSE
+      const logEl = document.getElementById('tl-gen-log');
+      logEl.innerHTML = '';
+      const stepEls = {};  // step_id → {el, startMs}
+
+      function addStep(id, text, status = 'running') {
+        const el = document.createElement('div');
+        el.className = `tl-step ${status}`;
+        el.dataset.start = Date.now();
+        const icon = status === 'running'
+          ? `<span class="tl-step-dot"></span>`
+          : (status === 'done' ? `<span style="color:var(--green)">✓</span>` : `<span style="color:var(--red,#f87171)">✗</span>`);
+        el.innerHTML = `<span class="tl-step-icon">${icon}</span><span class="tl-step-text">${text}</span>`;
+        logEl.appendChild(el);
+        stepEls[id] = el;
+        return el;
+      }
+
+      function updateStep(id, text, status = 'done', elapsed = null) {
+        const el = stepEls[id];
+        if (!el) { addStep(id, text, status); return; }
+        const secs = elapsed !== null ? elapsed : ((Date.now() - parseInt(el.dataset.start)) / 1000).toFixed(1);
+        const icon = status === 'done'
+          ? `<span style="color:var(--green)">✓</span>`
+          : `<span style="color:var(--red,#f87171)">✗</span>`;
+        el.className = `tl-step ${status}`;
+        el.innerHTML = `<span class="tl-step-icon">${icon}</span><span class="tl-step-text">${text}</span><span class="tl-step-time">${secs}s</span>`;
+      }
+
+      try {
+        const divergence = parseInt(document.getElementById('tl-divergence')?.value || '6');
+        const resp = await fetch('/api/thumb-generate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            briefing: tlCurrentBriefing,
+            live_id: tlCurrentLiveId,
+            pasta_drive: tlCurrentItem ? (tlCurrentItem['Pasta Drive'] || '') : '',
+            divergence,
+          })
+        });
+        const init = await resp.json();
+
+        if (init.error) {
+          document.getElementById('tl-generating-spinner').style.display = 'none';
+          toast('Erro: ' + init.error, 'error');
+          btn.disabled = false;
+          return;
+        }
+
+        // SSE — acompanha progresso
+        const evtSrc = new EventSource(`/api/progress/${init.job_id}`);
+
+        evtSrc.addEventListener('progress', (e) => {
+          const d = JSON.parse(e.data);
+          const step = d.step || '';
+          const msg  = d.msg  || '';
+
+          if (step === 'refs_host')      addStep('refs_host', msg, 'done');
+          if (step === 'refs_guest')     addStep('refs_guest', msg, d.found ? 'done' : 'done');
+          if (step === 'angles_start')   addStep('angles', msg, 'running');
+          if (step === 'angles_done')    updateStep('angles', msg, 'done', d.elapsed);
+          if (step === 'gen_parallel')   addStep('gen_parallel', msg, 'running');
+          if (step === 'gen_a_start')    addStep('gen_a', msg, 'running');
+          if (step === 'gen_b_start')    addStep('gen_b', msg, 'running');
+          if (step === 'gen_a_done')     updateStep('gen_a', msg, d.error ? 'error' : 'done', d.elapsed);
+          if (step === 'gen_b_done')     updateStep('gen_b', msg, d.error ? 'error' : 'done', d.elapsed);
+          if (step === 'gen_a_done' || step === 'gen_b_done') {
+            if (stepEls['gen_parallel']) updateStep('gen_parallel', 'Gerando A e B em paralelo', 'done');
+          }
+        });
+
+        evtSrc.addEventListener('complete', (e) => {
+          evtSrc.close();
+          const d = JSON.parse(e.data);
+          document.getElementById('tl-generating-spinner').style.display = 'none';
+          if (d.thumb_a) tlShowThumb('A', '/' + d.thumb_a);
+          if (d.thumb_b) tlShowThumb('B', '/' + d.thumb_b);
+          toast('Thumbnails geradas!', 'success');
+          btn.disabled = false;
+        });
+
+        evtSrc.addEventListener('error', (e) => {
+          evtSrc.close();
+          let msg = 'Erro na geração';
+          try { msg = JSON.parse(e.data).message || msg; } catch(_) {}
+          document.getElementById('tl-generating-spinner').style.display = 'none';
+          toast('Erro: ' + msg, 'error');
+          btn.disabled = false;
+        });
+
+        evtSrc.onerror = () => {
+          evtSrc.close();
+          document.getElementById('tl-generating-spinner').style.display = 'none';
+          toast('Conexão SSE perdida', 'error');
+          btn.disabled = false;
+        };
+
+      } catch (e) {
+        document.getElementById('tl-generating-spinner').style.display = 'none';
+        toast('Erro: ' + e.message, 'error');
+        btn.disabled = false;
+      }
+    }
+
+    async function tlUploadGuestPhoto(guestName) {
+      try {
+        const formData = new FormData();
+        const blob = new Blob([tlGuestFileData], {type: tlGuestFileMime});
+        const ext  = tlGuestFileName.split('.').pop() || 'jpg';
+        formData.append('photo', blob, `photo.${ext}`);
+        formData.append('live_id', tlCurrentBriefing.live_num || tlCurrentLiveId);
+        formData.append('guest_name', guestName);
+        formData.append('title_type', 'convidado');
+        formData.append('title', tlCurrentBriefing.title || '');
+
+        const resp = await fetch('/api/thumb-upload-guest', {method: 'POST', body: formData});
+        const data = await resp.json();
+        if (data.ok) toast(`Foto de ${guestName} salva`, 'success');
+      } catch (e) {
+        console.warn('Guest photo upload failed:', e);
+      }
+    }
+
+    // ===== TL: STEP 4 — REVIEW =====
+    function tlResetThumbUI(angle) {
+      const a = angle.toLowerCase();
+      const ph   = document.getElementById(`tl-ph-${a}`);
+      const spin = document.getElementById(`tl-spin-${a}`);
+      const img  = document.getElementById(`tl-img-${a}`);
+      const dl   = document.getElementById(`tl-download-${a}`);
+      if (ph)   ph.style.display   = '';
+      if (spin) spin.style.display = 'none';
+      if (img)  { img.style.display = 'none'; img.src = ''; }
+      if (dl)   dl.style.display   = 'none';
+    }
+
+    function tlShowThumb(angle, src) {
+      const a = angle.toLowerCase();
+      const ph   = document.getElementById(`tl-ph-${a}`);
+      const spin = document.getElementById(`tl-spin-${a}`);
+      const img  = document.getElementById(`tl-img-${a}`);
+      const dl   = document.getElementById(`tl-download-${a}`);
+      if (ph)   ph.style.display   = 'none';
+      if (spin) spin.style.display = 'none';
+      if (img)  { img.src = src + '?t=' + Date.now(); img.style.display = 'block'; }
+      if (dl)   { dl.href = src; dl.style.display = ''; }
+    }
+
+    function tlShowSpinner(angle) {
+      const a = angle.toLowerCase();
+      document.getElementById(`tl-ph-${a}`).style.display   = 'none';
+      document.getElementById(`tl-spin-${a}`).style.display = 'flex';
+      const img = document.getElementById(`tl-img-${a}`);
+      if (img) img.style.display = 'none';
+    }
+
+    async function tlRegenerateOne(angle) {
+      const a = angle.toLowerCase();
+      const feedback = document.getElementById(`tl-feedback-${a}`).value.trim();
+      if (!feedback) {
+        toast('Escreva um feedback antes de ajustar', 'error');
+        return;
+      }
+
+      tlShowSpinner(angle);
+
+      try {
+        const resp = await fetch('/api/thumb-feedback', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            live_id: tlCurrentLiveId,
+            angle: angle,
+            feedback: feedback,
+          })
+        });
+        const data = await resp.json();
+
+        if (data.error) {
+          toast('Erro: ' + data.error, 'error');
+          tlResetThumbUI(angle);
+          return;
+        }
+
+        const key = `thumb_${a}`;
+        if (data[key]) {
+          tlShowThumb(angle, '/' + data[key]);
+          document.getElementById(`tl-feedback-${a}`).value = '';
+          toast(`Thumb ${angle} ajustada`, 'success');
+        }
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+        tlResetThumbUI(angle);
+      }
+    }
+
+    async function tlApprove(choice) {
+      const img = document.getElementById(`tl-img-${choice.toLowerCase()}`);
+      if (!img || img.style.display === 'none') {
+        toast(`Gere a thumbnail ${choice} primeiro`, 'error'); return;
+      }
+      const path = img.src.replace(window.location.origin + '/', '');
+
+      try {
+        const resp = await fetch('/api/thumb-approve', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({live_id: tlCurrentLiveId, choice, path})
+        });
+        const data = await resp.json();
+        if (data.error) { toast('Erro: ' + data.error, 'error'); return; }
+
+        tlApprovedAngles.add(choice);
+
+        // Botão fica verde (active) mas a linha NÃO some
+        document.getElementById(`tl-btn-approve-${choice.toLowerCase()}`).classList.add('active');
+
+        // Destaca card
+        document.getElementById('tl-card-a').classList.toggle('approved-a', tlApprovedAngles.has('A'));
+        document.getElementById('tl-card-b').classList.toggle('approved-b', tlApprovedAngles.has('B'));
+
+        // Mostra botão Drive para este ângulo (se ainda não existe)
+        const banner = document.getElementById('tl-approved-banner');
+        banner.style.display = '';
+        const rowId = `tl-drive-row-${choice.toLowerCase()}`;
+        if (!document.getElementById(rowId)) {
+          const row = document.createElement('div');
+          row.id = rowId;
+          row.style.cssText = 'margin-bottom:8px;display:flex;align-items:center;gap:10px';
+          row.innerHTML = `<button class="btn btn-primary btn-sm" onclick="tlUploadToDrive('${choice}')" id="tl-drive-btn-${choice.toLowerCase()}">&#9650; Subir ${choice} pro Drive</button><span id="tl-drive-result-${choice.toLowerCase()}" style="font-family:var(--font-mono);font-size:11px"></span>`;
+          banner.appendChild(row);
+        }
+
+        toast(`Thumbnail ${choice} aprovada!`, 'success');
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+      }
+    }
+
+    async function tlUploadToDrive(choice) {
+      const a = choice.toLowerCase();
+      const btn = document.getElementById(`tl-drive-btn-${a}`);
+      if (btn) { btn.disabled = true; btn.textContent = 'Subindo...'; }
+      try {
+        const resp = await fetch('/api/thumb-drive-upload', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({live_id: tlCurrentLiveId, angle: choice})
+        });
+        const data = await resp.json();
+        if (data.error) {
+          toast('Erro Drive: ' + data.error, 'error');
+          if (btn) { btn.disabled = false; btn.textContent = `▲ Subir ${choice} pro Drive`; }
+          return;
+        }
+        const link = data.drive?.link || '';
+        const result = document.getElementById(`tl-drive-result-${a}`);
+        if (result) {
+          result.innerHTML = `<span style="color:var(--success)">&#10003; ${link ? `<a href="${link}" target="_blank" style="color:var(--purple)">${data.drive.name}</a>` : data.drive?.name || 'ok'}</span>`;
+        }
+        if (btn) btn.remove();
+        toast(`Thumb ${choice} subida pro Drive!`, 'success');
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+        if (btn) { btn.disabled = false; btn.textContent = `▲ Subir ${choice} pro Drive`; }
+      }
+    }
+
+    // ===== PRISM MIND — BACKGROUND PARTICLE FIELD =====
+    (function initPrismMind() {
+      const canvas = document.getElementById('prism-mind-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const COLORS = ['#FF6B6B','#FFD93D','#6BCB77','#4DDBFF','#8B23E5','#C084FC','#F9A8D4'];
+      const N = 70;
+      let W, H, cx, cy;
+
+      function resize() {
+        const home = canvas.parentElement;
+        W = canvas.width  = home.offsetWidth;
+        H = canvas.height = home.offsetHeight;
+        cx = W / 2; cy = H / 2;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      // Partículas
+      const pts = Array.from({length: N}, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.4 + 0.4,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        vx: (Math.random() - 0.5) * 0.18,
+        vy: (Math.random() - 0.5) * 0.18,
+        alpha: Math.random() * 0.4 + 0.15,
+        phase: Math.random() * Math.PI * 2,
+        // atração suave ao centro
+        pull: 0.00015 + Math.random() * 0.0001,
+      }));
+
+      let t = 0;
+
+      function drawMind() {
+        ctx.clearRect(0, 0, W, H);
+        t += 0.008;
+
+        // Conexões neurais — linhas entre partículas próximas
+        for (let i = 0; i < pts.length; i++) {
+          for (let j = i + 1; j < pts.length; j++) {
+            const dx = pts[i].x - pts[j].x;
+            const dy = pts[i].y - pts[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+              const alpha = (1 - dist / 120) * 0.06;
+              ctx.beginPath();
+              ctx.moveTo(pts[i].x, pts[i].y);
+              ctx.lineTo(pts[j].x, pts[j].y);
+              ctx.strokeStyle = `rgba(139,35,229,${alpha})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+
+        // Partículas
+        pts.forEach(p => {
+          const dx = cx - p.x;
+          const dy = cy - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+          // Atração radial suave (pull pro centro)
+          p.vx += (dx / dist) * p.pull * 0.6;
+          p.vy += (dy / dist) * p.pull * 0.6;
+
+          // Força orbital perpendicular — partículas orbitam em vez de convergir
+          p.vx += (-dy / dist) * p.pull * 0.8;
+          p.vy += ( dx / dist) * p.pull * 0.8;
+
+          // Velocidade mínima — nunca para
+          const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+          if (speed < 0.08) {
+            const angle = Math.random() * Math.PI * 2;
+            p.vx += Math.cos(angle) * 0.12;
+            p.vy += Math.sin(angle) * 0.12;
+          }
+          // Velocidade máxima — não acelera indefinidamente
+          if (speed > 0.6) {
+            p.vx = (p.vx / speed) * 0.6;
+            p.vy = (p.vy / speed) * 0.6;
+          }
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          // Wrap nas bordas
+          if (p.x < -10) p.x = W + 10;
+          if (p.x > W + 10) p.x = -10;
+          if (p.y < -10) p.y = H + 10;
+          if (p.y > H + 10) p.y = -10;
+
+          const pulse = p.alpha * (0.7 + Math.sin(t * 1.2 + p.phase) * 0.3);
+
+          // Glow halo
+          const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 5);
+          g.addColorStop(0, p.color + Math.round(pulse * 180).toString(16).padStart(2,'0'));
+          g.addColorStop(1, 'transparent');
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * 5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Núcleo
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.color + Math.round(pulse * 255).toString(16).padStart(2,'0');
+          ctx.fill();
+        });
+
+        requestAnimationFrame(drawMind);
+      }
+      drawMind();
+    })();
+
+    // ===== PRISM ICON — PRISMA ANIMADO =====
+    (function initPrismIcon() {
+      const canvas = document.getElementById('prism-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const W = 90, H = 80;
+      const SPECTRUM = ['#FF6B6B','#FFD93D','#6BCB77','#4DDBFF','#8B23E5'];
+      // Geometria do prisma
+      const apex = {x: 45, y: 6};
+      const bl   = {x: 8,  y: 72};
+      const br   = {x: 82, y: 72};
+      // Ponto de refração (centro do lado esquerdo do prisma)
+      const hit  = {x: 30, y: 42};
+      // Raios saindo — ângulos em graus a partir do hit
+      const rayAngles = [-28, -14, 0, 14, 28];
+      const rayLen = 50;
+      // Partículas nos raios
+      const rayPts = SPECTRUM.map((c, i) => ({color: c, t: i / SPECTRUM.length, speed: 0.006 + i * 0.001}));
+      // Feixe entrando
+      let beamT = 0;
+      let t = 0;
+
+      function drawPrism() {
+        ctx.clearRect(0, 0, W, H);
+        t += 0.018;
+
+        // Glow de fundo pulsando
+        const pulse = 0.10 + Math.sin(t * 1.4) * 0.04;
+        const bg = ctx.createRadialGradient(45, 45, 0, 45, 45, 55);
+        bg.addColorStop(0, `rgba(139,35,229,${pulse})`);
+        bg.addColorStop(1, 'transparent');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // Prisma
+        ctx.beginPath();
+        ctx.moveTo(apex.x, apex.y);
+        ctx.lineTo(br.x, br.y);
+        ctx.lineTo(bl.x, bl.y);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(18, 6, 36, 0.88)';
+        ctx.fill();
+        const borderAlpha = 0.45 + Math.sin(t * 1.4) * 0.2;
+        ctx.strokeStyle = `rgba(139,35,229,${borderAlpha})`;
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+
+        // Feixe entrando (esquerda → hit)
+        const beamSx = 0, beamSy = 38;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(beamSx, beamSy);
+        ctx.lineTo(hit.x, hit.y);
+        ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
+
+        // Partícula viajando no feixe
+        beamT = (beamT + 0.022) % 1;
+        const bx = beamSx + (hit.x - beamSx) * beamT;
+        const by = beamSy + (hit.y - beamSy) * beamT;
+        ctx.beginPath();
+        ctx.arc(bx, by, 1.8, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.95)';
+        ctx.fill();
+
+        // Raios do espectro
+        SPECTRUM.forEach((color, i) => {
+          const rad = rayAngles[i] * Math.PI / 180;
+          const ex = hit.x + Math.cos(rad) * rayLen;
+          const ey = hit.y + Math.sin(rad) * rayLen;
+
+          // Linha do raio (sutil)
+          ctx.beginPath();
+          ctx.moveTo(hit.x, hit.y);
+          ctx.lineTo(ex, ey);
+          ctx.strokeStyle = color + '44';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          // Partícula viajando
+          const rp = rayPts[i];
+          rp.t = (rp.t + rp.speed) % 1;
+          const rpx = hit.x + Math.cos(rad) * rayLen * rp.t;
+          const rpy = hit.y + Math.sin(rad) * rayLen * rp.t;
+
+          // Glow
+          const g = ctx.createRadialGradient(rpx, rpy, 0, rpx, rpy, 6);
+          g.addColorStop(0, color + 'cc');
+          g.addColorStop(1, 'transparent');
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(rpx, rpy, 6, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Núcleo
+          ctx.beginPath();
+          ctx.arc(rpx, rpy, 2, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+        });
+
+        // Ponto de refração — glow branco pulsando
+        const hg = ctx.createRadialGradient(hit.x, hit.y, 0, hit.x, hit.y, 10);
+        hg.addColorStop(0, `rgba(255,255,255,${0.6 + Math.sin(t * 2) * 0.2})`);
+        hg.addColorStop(1, 'transparent');
+        ctx.fillStyle = hg;
+        ctx.beginPath();
+        ctx.arc(hit.x, hit.y, 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        requestAnimationFrame(drawPrism);
+      }
+      drawPrism();
+    })();
 
     // ===== INIT =====
     document.getElementById('url-input').addEventListener('keydown', e => {
