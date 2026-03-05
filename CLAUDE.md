@@ -44,6 +44,12 @@ growth/
 │   │   └── ReferralForm.tsx     # Form principal (257 LOC)
 │   └── services/
 │       └── webhookService.ts    # Integração n8n
+└── prism-os/                    # PRISM OS — Content Production OS
+    ├── CLAUDE.md                # Bíblia do sistema (entry point)
+    ├── docs/
+    │   └── prism-os-flow.html   # Diagrama completo do sistema
+    ├── nutella-creator/         # Dashboard: URL → cortes + thumbnails
+    └── thumbnail-ai-creator/    # CLI: thumbnails Fleet + Teams
 ```
 
 ## Key Components
@@ -171,6 +177,15 @@ npm run preview  # Serve SPA com fallback
 
 ---
 
+## PRISM OS
+
+Sistema operacional de produção de conteúdo — agrupa Nutella Creator, Thumbnail AI Creator e (futuramente) SEO, agendamento e distribuição.
+
+**Entry point**: `prism-os/CLAUDE.md`
+**Diagrama**: `prism-os/docs/prism-os-flow.html`
+
+---
+
 ## SEO de Títulos YouTube
 
 Sistema de geração de títulos SEO para os canais Fleet e Teams.
@@ -224,7 +239,7 @@ Com o briefing em mãos:
 ## Thumbnail AI Creator
 
 Sistema de geração de thumbnails YouTube com Gemini (`gemini-3-pro-image-preview`).
-Doc completo: `thumbnail-ai-creator/CLAUDE.md`
+Doc completo: `prism-os/thumbnail-ai-creator/CLAUDE.md`
 
 ### Planilhas de Conteúdo (fonte de dados)
 | Canal | Spreadsheet ID | Sheet |
@@ -251,17 +266,17 @@ Linhas com "Tarefa no Asana" preenchido = thumbs pendentes de criação.
 ## Nutella Creator
 
 Sistema de identificação de clips virais a partir de lives. Extrai trechos de alto potencial de compartilhamento com timestamps precisos.
-Doc completo: `nutella-creator/CLAUDE.md`
+Doc completo: `prism-os/nutella-creator/CLAUDE.md`
 
 ### Fluxo
 1. URL do vídeo → transcrição oficial com timestamps (`YouTubeTranscriptApi`)
 2. Gemini analisa e sugere 3-5 nutellas com: entrada/saída, título, texto de thumb, por que viraliza
-3. Guia enviado no grupo **IA - Growth Contele** (`120363424539843742@g.us`) — 1 msg por nutella
+3. Dashboard local (`python3 prism-os/nutella-creator/dashboard.py`) para build, review, thumbnails A/B e upload Drive
 
-### Comando
+### Comando (dashboard)
 ```bash
-cd nutella-creator
-python3 suggest.py https://youtube.com/watch?v=VIDEO_ID
+cd prism-os/nutella-creator
+python3 dashboard.py   # http://127.0.0.1:8765
 ```
 
 ### Tipos de nutella

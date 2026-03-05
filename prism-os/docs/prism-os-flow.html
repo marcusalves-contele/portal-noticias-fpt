@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRISM OS — Flow</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #08040f;
+    color: #f0eaf8;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── PRISM LIGHT BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -10%;
+    width: 60%;
+    height: 200%;
+    background: conic-gradient(
+      from 270deg at 30% 50%,
+      #ff003c10 0deg,
+      #ff6a0010 30deg,
+      #ffe00010 60deg,
+      #00ff8c10 90deg,
+      #00b4ff10 120deg,
+      #8b23e520 150deg,
+      #ff003c10 180deg,
+      transparent 180deg
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 60px 48px 80px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 72px;
+    gap: 32px;
+  }
+
+  .logo-area {}
+
+  .logo-word {
+    font-size: 72px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    background: linear-gradient(90deg,
+      #ff003c 0%,
+      #ff6a00 16%,
+      #ffe000 32%,
+      #00ff8c 48%,
+      #00b4ff 64%,
+      #c96aff 80%,
+      #ff003c 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo-os {
+    font-size: 72px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: #f0eaf8;
+  }
+
+  .tagline {
+    margin-top: 12px;
+    font-size: 18px;
+    color: #9b7ec8;
+    font-style: italic;
+    letter-spacing: 0.5px;
+  }
+
+  .header-meta {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 8px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-stack { background: #1a0f2e; border: 1px solid #3d1f6e; color: #c096f0; }
+  .badge-channel { background: #0a1a10; border: 1px solid #1a5c2a; color: #4ade80; }
+  .badge-v2 { background: #1a1000; border: 1px solid #5c4000; color: #fbbf24; }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  /* ── PIPELINE ── */
+  .pipeline {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr 40px 1fr;
+    gap: 0;
+    align-items: start;
+  }
+
+  .arrow-col {
+    display: flex;
+    align-items: flex-start;
+    padding-top: 80px;
+    justify-content: center;
+  }
+
+  .arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .arrow-line {
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(180deg, #3d1f6e, #8b23e5);
+  }
+
+  .arrow-head {
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 10px solid #8b23e5;
+  }
+
+  /* ── ACT CARD ── */
+  .act {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid transparent;
+  }
+
+  .act-pre { border-color: #1e3a5f; background: linear-gradient(160deg, #0d1f35 0%, #060c15 100%); }
+  .act-prod { border-color: #2d1a4a; background: linear-gradient(160deg, #140a25 0%, #060408 100%); }
+  .act-post { border-color: #1a3825; background: linear-gradient(160deg, #0a1f14 0%, #050c07 100%); }
+
+  .act-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .act-phase {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .act-pre .act-phase { color: #60a5fa; }
+  .act-prod .act-phase { color: #c084fc; }
+  .act-post .act-phase { color: #34d399; }
+
+  .act-title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .act-subtitle {
+    font-size: 13px;
+    color: #6b5f80;
+    margin-top: 4px;
+  }
+
+  .act-body {
+    padding: 24px 28px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ── STEP ── */
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .step-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .act-pre .step-icon { background: #0d2040; border: 1px solid #1e3a5f; }
+  .act-prod .step-icon { background: #1a0d30; border: 1px solid #2d1a4a; }
+  .act-post .step-icon { background: #0a1a10; border: 1px solid #1a3825; }
+
+  .step-content {}
+  .step-title { font-size: 14px; font-weight: 700; line-height: 1.3; }
+  .step-desc { font-size: 12px; color: #7a6d8a; margin-top: 3px; line-height: 1.5; }
+
+  .step-tag {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .tag-blue { background: #0d2040; color: #60a5fa; border: 1px solid #1e3a5f; }
+  .tag-purple { background: #1a0d30; color: #c084fc; border: 1px solid #2d1a4a; }
+  .tag-green { background: #0a1a10; color: #34d399; border: 1px solid #1a3825; }
+  .tag-yellow { background: #1a1000; color: #fbbf24; border: 1px solid #3d2700; }
+  .tag-red { background: #1a0505; color: #f87171; border: 1px solid #3d0d0d; }
+
+  /* ── INPUT / OUTPUT BOXES ── */
+  .io-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .io-box {
+    border-radius: 16px;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .io-input {
+    background: #0d1f35;
+    border: 1px solid #1e3a5f;
+  }
+
+  .io-output {
+    background: #0a1a10;
+    border: 1px solid #1a3825;
+  }
+
+  .io-icon {
+    font-size: 36px;
+    flex-shrink: 0;
+  }
+
+  .io-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .io-input .io-label { color: #60a5fa; }
+  .io-output .io-label { color: #34d399; }
+
+  .io-title { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+  .io-desc { font-size: 13px; color: #7a6d8a; margin-top: 4px; }
+
+  .output-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .output-pill {
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .pill-clip { background: #0d2040; color: #60a5fa; border: 1px solid #1e3a5f; }
+  .pill-short { background: #1a0d30; color: #c084fc; border: 1px solid #2d1a4a; }
+  .pill-thumb { background: #1a1000; color: #fbbf24; border: 1px solid #3d2700; }
+  .pill-seo { background: #0a1a10; color: #34d399; border: 1px solid #1a3825; }
+  .pill-schedule { background: #1a0505; color: #f87171; border: 1px solid #3d0d0d; }
+
+  /* ── ANALYTICS STRIP ── */
+  .analytics-strip {
+    margin-top: 48px;
+    border-radius: 16px;
+    background: linear-gradient(90deg, #0d1520 0%, #090810 50%, #0a1510 100%);
+    border: 1px solid #1a1530;
+    padding: 28px 36px;
+  }
+
+  .strip-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #6b5f80;
+    margin-bottom: 20px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+  }
+
+  .stat {
+    padding: 0 20px;
+    border-right: 1px solid #1a1530;
+  }
+
+  .stat:first-child { padding-left: 0; }
+  .stat:last-child { border-right: none; }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: #6b5f80;
+    margin-top: 5px;
+    line-height: 1.4;
+  }
+
+  .stat-note {
+    font-size: 10px;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  /* ── STACK FOOTER ── */
+  .stack-section {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .stack-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #4a3d5a;
+  }
+
+  .stack-pill {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #0f0a1a;
+    border: 1px solid #2a1850;
+    color: #9b7ec8;
+  }
+
+  /* ── DIVIDER ── */
+  .prism-divider {
+    height: 2px;
+    background: linear-gradient(90deg,
+      #ff003c 0%,
+      #ff6a00 16%,
+      #ffe000 32%,
+      #00ff8c 48%,
+      #00b4ff 64%,
+      #c96aff 80%,
+      #ff003c 100%
+    );
+    border-radius: 2px;
+    margin: 48px 0;
+    opacity: 0.4;
+  }
+
+  /* ── HIGHLIGHT ── */
+  .highlight-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 48px;
+  }
+
+  .highlight-card {
+    border-radius: 14px;
+    padding: 20px 24px;
+    background: #0d0918;
+    border: 1px solid #1e1035;
+  }
+
+  .hl-icon { font-size: 28px; margin-bottom: 10px; }
+  .hl-title { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+  .hl-desc { font-size: 12px; color: #7a6d8a; line-height: 1.6; }
+  .hl-value { font-size: 22px; font-weight: 900; color: #c084fc; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-area">
+      <div>
+        <span class="logo-word">PRISM</span><span class="logo-os"> OS</span>
+      </div>
+      <div class="tagline">From brief to viral, by design.</div>
+    </div>
+    <div class="header-meta">
+      <span class="badge badge-channel"><span class="dot"></span>Frota Para Todos — Julio Cesar</span>
+      <span class="badge badge-stack"><span class="dot"></span>Python + Gemini + ffmpeg + YouTube API</span>
+      <span class="badge badge-v2"><span class="dot"></span>v2 — Dashboard Web</span>
+    </div>
+  </div>
+
+  <!-- INPUT / OUTPUT -->
+  <div class="io-section">
+    <div class="io-box io-input">
+      <div class="io-icon">🎬</div>
+      <div>
+        <div class="io-label">Input</div>
+        <div class="io-title">URL do Video YouTube</div>
+        <div class="io-desc">Live semanal ou video com roteiro — um unico link entra no sistema</div>
+      </div>
+    </div>
+    <div class="io-box io-output">
+      <div class="io-icon">🚀</div>
+      <div>
+        <div class="io-label">Output</div>
+        <div class="io-title">Conteudo Pronto para Publicar</div>
+        <div class="output-pills">
+          <span class="output-pill pill-clip">Clips 16:9</span>
+          <span class="output-pill pill-short">Shorts 9:16</span>
+          <span class="output-pill pill-thumb">Thumbnails AI</span>
+          <span class="output-pill pill-seo">SEO Completo</span>
+          <span class="output-pill pill-schedule">Agendamento</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIPELINE -->
+  <div class="pipeline">
+
+    <!-- ACT 1: PRE -->
+    <div class="act act-pre">
+      <div class="act-header">
+        <div class="act-phase">Ato 01</div>
+        <div class="act-title">Plan</div>
+        <div class="act-subtitle">Pre-producao — antes de ligar a camera</div>
+      </div>
+      <div class="act-body">
+
+        <div class="step">
+          <div class="step-icon">🔍</div>
+          <div class="step-content">
+            <div class="step-title">SEO e Keyword Research</div>
+            <div class="step-desc">Gemini analisa tendencias do nicho frota e identifica termos de alta conversao</div>
+            <span class="step-tag tag-blue">Gemini API</span>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">✍️</div>
+          <div class="step-content">
+            <div class="step-title">Titulo Otimizado</div>
+            <div class="step-desc">Titulo gerado com foco em CTR e busca organica — baseado nos top 10 por inscrito</div>
+            <span class="step-tag tag-blue">IA</span>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">🖼️</div>
+          <div class="step-content">
+            <div class="step-title">Conceito de Thumbnail</div>
+            <div class="step-desc">Briefing definido antes da gravacao — face-lock Julio, composicao, cores, texto</div>
+            <span class="step-tag tag-blue">Briefing</span>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">📝</div>
+          <div class="step-content">
+            <div class="step-title">Descricao e Tags</div>
+            <div class="step-desc">Template estruturado com capitulos, CTA e hashtags priorizadas por volume</div>
+            <span class="step-tag tag-blue">Template</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ARROW 1 -->
+    <div class="arrow-col">
+      <div class="arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-head"></div>
+      </div>
+    </div>
+
+    <!-- ACT 2: PRODUCTION -->
+    <div class="act act-prod">
+      <div class="act-header">
+        <div class="act-phase">Ato 02</div>
+        <div class="act-title">Shoot</div>
+        <div class="act-subtitle">Producao — a camera liga</div>
+      </div>
+      <div class="act-body">
+
+        <div class="step">
+          <div class="step-icon">📡</div>
+          <div class="step-content">
+            <div class="step-title">Live Semanal</div>
+            <div class="step-desc">Quarta-feira 8h BRT — automaticamente publicada no YouTube. Nunca cortar clips na quarta</div>
+            <span class="step-tag tag-purple">Quarta 8h</span>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">🎥</div>
+          <div class="step-content">
+            <div class="step-title">Video com Roteiro</div>
+            <div class="step-desc">Conteudo gravado fora da live — maior retenção e conversao. Publica quinta 15h</div>
+            <span class="step-tag tag-purple">Roteirizado</span>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">⏱️</div>
+          <div class="step-content">
+            <div class="step-title">Formato e Duracao</div>
+            <div class="step-desc">74% da audiencia e mobile. Texto na thumbnail: maximo 4 palavras, fonte grande</div>
+            <span class="step-tag tag-purple">Mobile First</span>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">👤</div>
+          <div class="step-content">
+            <div class="step-title">Apresentador Julio Cesar</div>
+            <div class="step-desc">Publico: homens 35-44, gestor experiente. Conteudo educacional focado em resultado</div>
+            <span class="step-tag tag-purple">Persona</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ARROW 2 -->
+    <div class="arrow-col">
+      <div class="arrow">
+        <div class="arrow-line"></div>
+        <div class="arrow-head"></div>
+      </div>
+    </div>
+
+    <!-- ACT 3: POST -->
+    <div class="act act-post">
+      <div class="act-header">
+        <div class="act-phase">Ato 03</div>
+        <div class="act-title">Multiply</div>
+        <div class="act-subtitle">Pos-producao — um video vira muitos</div>
+      </div>
+      <div class="act-body">
+
+        <div class="step">
+          <div class="step-icon">🤖</div>
+          <div class="step-content">
+            <div class="step-title">Analise de Transcricao IA</div>
+            <div class="step-desc">Gemini le a transcricao completa e identifica os melhores momentos — score por viralidade</div>
+            <span class="step-tag tag-green">Gemini</span>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">✂️</div>
+          <div class="step-content">
+            <div class="step-title">Corte Automatico</div>
+            <div class="step-desc">ffmpeg recorta os momentos selecionados em Clips 16:9 (Nutellas) e Shorts 9:16 com deteccao facial</div>
+            <span class="step-tag tag-green">ffmpeg</span>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">🖼️</div>
+          <div class="step-content">
+            <div class="step-title">Thumbnail AI — Face-Lock</div>
+            <div class="step-desc">Gemini Pro Image + referencias do Julio. Temperature=0 para consistencia facial. 3 variacoes geradas</div>
+            <span class="step-tag tag-green">Gemini Pro Image</span>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-icon">📅</div>
+          <div class="step-content">
+            <div class="step-title">Agendamento Inteligente</div>
+            <div class="step-desc">Slots otimizados via 2.873 videos historicos. Clips: qui 15h / sex 17h. Shorts: ter 18h</div>
+            <span class="step-tag tag-green">YouTube Analytics</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="prism-divider"></div>
+
+  <!-- ANALYTICS STRIP -->
+  <div class="analytics-strip">
+    <div class="strip-title">Dados que guiam o sistema — base: 2.873 videos + 687k views</div>
+    <div class="stats-grid">
+
+      <div class="stat">
+        <div class="stat-value" style="color:#60a5fa">9.121</div>
+        <div class="stat-label">views avg<br>qui 15h (melhor slot)</div>
+        <div class="stat-note" style="color:#60a5fa">PRIMARIO</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value" style="color:#a78bfa">2.035</div>
+        <div class="stat-label">views avg<br>sex 17h (mais confiavel)</div>
+        <div class="stat-note" style="color:#a78bfa">ALTERNATIVO</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value" style="color:#34d399">74%</div>
+        <div class="stat-label">audiencia<br>mobile</div>
+        <div class="stat-note" style="color:#34d399">DESIGN REGRA</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value" style="color:#fbbf24">4,8%</div>
+        <div class="stat-label">taxa conv.<br>video iniciante</div>
+        <div class="stat-note" style="color:#fbbf24">TOP CONTENT</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value" style="color:#f87171">37%</div>
+        <div class="stat-label">views pagas<br>ads (oportunidade SEO)</div>
+        <div class="stat-note" style="color:#f87171">GAPS ORGANICO</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-value" style="color:#c084fc">+270</div>
+        <div class="stat-label">inscritos/mes<br>media historica</div>
+        <div class="stat-note" style="color:#c084fc">CRESCIMENTO</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- HIGHLIGHT CARDS -->
+  <div class="highlight-row">
+
+    <div class="highlight-card">
+      <div class="hl-icon">🧠</div>
+      <div class="hl-title">Backlog de 24 Lives</div>
+      <div class="hl-desc">Fila priorizadas por score de viralidade. 9 semanas de publicacao pre-agendadas ate maio/2026. Experimento de slots em andamento — revisao em mai/2026.</div>
+      <div class="hl-value">24 lives</div>
+    </div>
+
+    <div class="highlight-card">
+      <div class="hl-icon">⚡</div>
+      <div class="hl-title">1 Input → N Outputs</div>
+      <div class="hl-desc">Uma live gera 2 Clips + 3 Shorts + 2 Thumbnails + SEO completo + 5 slots agendados. Pipeline completo roda em uma sessao.</div>
+      <div class="hl-value">1 → 5+ videos</div>
+    </div>
+
+    <div class="highlight-card">
+      <div class="hl-icon">🚫</div>
+      <div class="hl-title">Regra: Nunca na Quarta</div>
+      <div class="hl-desc">Quarta e dia da live ao vivo. Nenhum clip ou short e publicado nesse dia. O sistema bloqueia automaticamente no agendamento.</div>
+      <div class="hl-value">Regra hard</div>
+    </div>
+
+  </div>
+
+  <!-- STACK -->
+  <div class="stack-section">
+    <span class="stack-label">Stack</span>
+    <span class="stack-pill">Python 3</span>
+    <span class="stack-pill">Gemini 3 Pro Image</span>
+    <span class="stack-pill">Gemini Flash (analise)</span>
+    <span class="stack-pill">ffmpeg</span>
+    <span class="stack-pill">YouTube Data API v3</span>
+    <span class="stack-pill">YouTube Analytics v2</span>
+    <span class="stack-pill">Dashboard Web</span>
+  </div>
+
+</div>
+</body>
+</html>
