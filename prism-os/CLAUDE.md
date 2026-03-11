@@ -122,6 +122,22 @@ Linhas com "Tarefa no Asana" preenchido = pendentes.
 
 ---
 
+## Issues Abertas (GitHub #1-#4, commit 9e1a917, 11/mar/2026)
+
+Codigo implementado, falta testar no dashboard e fechar:
+
+- [ ] **#1** Separacao briefing x script (3 steps: Source > Briefing > Review)
+- [ ] **#2** Selecao inteligente de fotos (catalogo.json + select_best_refs)
+- [ ] **#3** Botoes publicacao (Drive + YouTube) na tela de review
+- [ ] **#4** Campo observacao criativa (prompt humano, HIGHEST PRIORITY)
+
+Agents de execucao e QA em `.claude/agents/prism-*.md`.
+Apos validar, fechar issues no GitHub e marcar checkboxes aqui.
+
+Token YouTube OAuth (`token_youtube_write.pickle`) precisa validar scope `thumbnails.set` pro botao de thumb funcionar.
+
+---
+
 ## Roadmap (próximas funções)
 
 - [ ] SEO de títulos integrado ao dashboard
