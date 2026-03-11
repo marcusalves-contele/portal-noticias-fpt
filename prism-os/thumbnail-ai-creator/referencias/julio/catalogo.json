@@ -1,0 +1,146 @@
+[
+  {
+    "filename": "julio-polo-preta-bracos-cruzados.jpg",
+    "expressao": ["confiante", "assertivo", "serio", "ironico"],
+    "pose": "bracos cruzados",
+    "roupa": "polo preta",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 4,
+    "tags": ["autoridade", "confronto", "desafio", "corporativo"]
+  },
+  {
+    "filename": "julio-polo-preta-com-celular.jpg",
+    "expressao": ["explicando", "assertivo"],
+    "pose": "segurando celular mostrando tela",
+    "roupa": "polo preta",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 4,
+    "tags": ["tecnologia", "app", "demonstracao", "digital"]
+  },
+  {
+    "filename": "julio-polo-preta-dedo-para-cima.jpg",
+    "expressao": ["assertivo", "explicando", "confiante"],
+    "pose": "dedo indicador para cima",
+    "roupa": "polo preta",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 4,
+    "tags": ["atencao", "dica", "numero-um", "destaque"]
+  },
+  {
+    "filename": "julio-polo-preta-frontal-neutro.jpg",
+    "expressao": ["serio", "neutro", "profissional"],
+    "pose": "frontal neutro",
+    "roupa": "polo preta",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 4,
+    "tags": ["institucional", "baseline", "neutro"]
+  },
+  {
+    "filename": "julio-polo-preta-gesto-explicando.jpg",
+    "expressao": ["explicando", "assertivo", "confiante"],
+    "pose": "gesto explicando com maos",
+    "roupa": "polo preta",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 4,
+    "tags": ["tutorial", "passo-a-passo", "ensino", "didatico"]
+  },
+  {
+    "filename": "julio-polo-preta-mao-aberta-atencao.jpg",
+    "expressao": ["surpreso", "assertivo", "explicando"],
+    "pose": "mao aberta chamando atencao",
+    "roupa": "polo preta",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 4,
+    "tags": ["alerta", "atencao", "pare", "urgente"]
+  },
+  {
+    "filename": "julio-polo-preta-pensativo-mao-queixo.jpg",
+    "expressao": ["pensativo", "serio", "reflexivo"],
+    "pose": "mao no queixo pensativo",
+    "roupa": "polo preta",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 4,
+    "tags": ["reflexao", "duvida", "analise", "questionamento"]
+  },
+  {
+    "filename": "julio-polo-preta-perfil-3-4.jpg",
+    "expressao": ["serio", "ironico", "pensativo"],
+    "pose": "perfil 3/4",
+    "roupa": "polo preta",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 4,
+    "tags": ["cinematico", "misterio", "lateral", "dramatico"]
+  },
+  {
+    "filename": "julio-polo-preta-sorrindo-maos-cintura.jpg",
+    "expressao": ["sorrindo", "confiante", "empolgado"],
+    "pose": "sorrindo com maos na cintura",
+    "roupa": "polo preta",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 5,
+    "tags": ["positivo", "vitoria", "resultado", "conquista"]
+  },
+  {
+    "filename": "julio-polo-preta-surpreso.jpg",
+    "expressao": ["surpreso", "chocado", "alarmado"],
+    "pose": "expressao surpresa",
+    "roupa": "polo preta",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 5,
+    "tags": ["urgencia", "alarme", "choque", "noticia", "polmica"]
+  },
+  {
+    "filename": "julio-ref-primary-1.jpg",
+    "expressao": ["neutro", "profissional"],
+    "pose": "frontal neutro closeup",
+    "roupa": "polo preta",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 5,
+    "tags": ["ancora-facial", "identidade", "primary", "referencia"]
+  },
+  {
+    "filename": "julio_gray_blazzer.png",
+    "expressao": ["confiante", "profissional", "serio", "assertivo"],
+    "pose": "frontal profissional",
+    "roupa": "blazer cinza",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 4,
+    "tags": ["autoridade", "institucional", "evento", "palestra", "formal"]
+  },
+  {
+    "filename": "julio_polo_navy.png",
+    "expressao": ["neutro", "profissional", "confiante"],
+    "pose": "frontal profissional",
+    "roupa": "polo azul marinho",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 4,
+    "tags": ["casual-profissional", "dia-a-dia", "variacao-roupa"]
+  },
+  {
+    "filename": "julio_polo_white.png",
+    "expressao": ["neutro", "profissional", "sorrindo"],
+    "pose": "frontal profissional",
+    "roupa": "polo branca",
+    "fundo": "estudio cinza neutro",
+    "qualidade": 4,
+    "tags": ["leveza", "positivo", "clean", "variacao-roupa"]
+  },
+  {
+    "filename": "julio-dedo-para-cima-studio_v1.png",
+    "expressao": ["assertivo", "explicando", "confiante"],
+    "pose": "dedo indicador para cima",
+    "roupa": "polo preta",
+    "fundo": "estudio editado IA",
+    "qualidade": 3,
+    "tags": ["atencao", "dica", "ia-gerada", "studio"]
+  },
+  {
+    "filename": "julio-pensativo-mao-queixo-studio_v1.png",
+    "expressao": ["pensativo", "serio", "reflexivo"],
+    "pose": "mao no queixo pensativo",
+    "roupa": "polo preta",
+    "fundo": "estudio editado IA",
+    "qualidade": 3,
+    "tags": ["reflexao", "duvida", "ia-gerada", "studio"]
+  }
+]

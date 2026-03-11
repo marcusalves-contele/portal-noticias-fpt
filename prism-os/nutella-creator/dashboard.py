@@ -245,6 +245,10 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(STATIC_DIR), **kwargs)
 
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
+        super().end_headers()
+
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
@@ -320,6 +324,10 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_regenerate_thumb(body)
         elif path == "/api/upload-youtube":
             self._handle_upload(body)
+        elif path == "/api/generate-titles":
+            self._handle_generate_titles(body)
+        elif path == "/api/briefing-from-text":
+            self._handle_briefing_from_text(body)
         elif path == "/api/thumb-transcribe":
             self._handle_thumb_transcribe(body)
         elif path == "/api/thumb-generate":
@@ -330,6 +338,12 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_thumb_approve(body)
         elif path == "/api/thumb-drive-upload":
             self._handle_thumb_drive_upload(body)
+        elif path == "/api/upload-drive":
+            self._handle_upload_drive(body)
+        elif path == "/api/youtube-update-title":
+            self._handle_youtube_update_title(body)
+        elif path == "/api/youtube-update-thumb":
+            self._handle_youtube_update_thumb(body)
         else:
             self._json({"error": "not found"}, 404)
 
@@ -589,7 +603,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
 
             api_key = load_api_key()
             briefing = auto_briefing_from_transcript(transcript, title, api_key)
-            self._json({"ok": True, **briefing})
+            self._json({"ok": True, **briefing, "transcript": transcript[:8000]})
         except Exception as e:
             self._json({"error": str(e)}, 500)
 
@@ -634,6 +648,185 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         except Exception as e:
             self._json({"found": False, "error": str(e)}, 500)
 
+    def _handle_generate_titles(self, body: dict):
+        """POST /api/generate-titles — gera 3 sugestões de título com estratégias diferentes."""
+        q1       = body.get("q1", "")
+        q2       = body.get("q2", "")
+        q3       = body.get("q3", "")
+        channel  = body.get("channel", "fleet")
+        tema     = body.get("tema", "")
+        current  = body.get("current_title", "")
+        script   = body.get("script", "")  # roteiro/transcricao se disponivel
+
+        if not q1 and not q2 and not q3 and not tema and not script:
+            self._json({"error": "Preencha o briefing ou tema antes"}, 400)
+            return
+
+        channel_context = {
+            "fleet": """CANAL: Frota Para Todos (FPT)
+- Nicho: gestao de frotas B2B (transporte, logistica, entregas)
+- Apresentador: Julio Cesar (autoridade no setor, 300+ lives)
+- Publico: gestores de frota, donos de transportadora, coordenadores de logistica, diretores de operacoes
+- Tom: direto, pratico, sem enrolacao. Fala como quem ja resolveu o problema
+- Palavras-chave do nicho: frota, rastreamento, combustivel, manutencao, gestao de frotas, motorista, custo operacional, telemetria, abastecimento
+- Concorrentes fracos no YouTube: FPT domina o nicho em portugues
+- Formato tipico de titulo: frase curta que revela o beneficio ou o problema. Ex: "Como reduzir 30%% do combustivel", "O erro que custa R$5 mil por mes na sua frota"
+- NUNCA usar jargao academico. Usar linguagem de quem gerencia frota no dia a dia""",
+            "teams": """CANAL: Contele Teams
+- Nicho: gestao de equipes externas/campo B2B
+- Apresentador: Leonardo Gazolli
+- Publico: gestores de equipes de campo, supervisores, donos de empresas de servicos (manutencao, limpeza, telecom, seguranca)
+- Tom: moderno, tecnico mas acessivel
+- Palavras-chave: equipe externa, produtividade, roteirizacao, ordem de servico, gestao de campo
+- Formato tipico: foco em resultado mensuravel e dor do gestor"""
+        }
+
+        # Monta bloco de contexto do video
+        video_context_parts = []
+        if script:
+            video_context_parts.append(f"ROTEIRO/TRANSCRICAO (trecho):\n{script[:6000]}")
+        if q1:
+            video_context_parts.append(f"PUBLICO-ALVO (Q1): {q1}")
+        if q2:
+            video_context_parts.append(f"OBJETIVO DO VIDEO (Q2): {q2}")
+        if q3:
+            video_context_parts.append(f"CONTEUDO DO VIDEO (Q3): {q3}")
+        if tema:
+            video_context_parts.append(f"TEMA: {tema}")
+        if current:
+            video_context_parts.append(f"TITULO ATUAL (pode melhorar): {current}")
+
+        creative_note = body.get("creative_note", "")
+        if creative_note:
+            video_context_parts.append(f"DIRECAO CRIATIVA DO PRODUTOR (PRIORIDADE ALTA): {creative_note}")
+
+        video_context = "\n".join(video_context_parts)
+
+        prompt = f"""Voce e um diretor criativo de YouTube especializado em CTR e SEO para canais B2B.
+
+{channel_context.get(channel, channel_context['fleet'])}
+
+--- CONTEXTO DO VIDEO ---
+{video_context}
+
+--- SUA TAREFA ---
+
+Gere EXATAMENTE 3 titulos para este video. Cada um com uma estrategia diferente:
+
+1. **CTR** (strategy: "ctr")
+   Maximiza cliques no feed/recomendados. Usa curiosidade, urgencia, contraste ou revelacao parcial.
+   O titulo deve criar um "gap de informacao" que so se fecha assistindo.
+   Funciona melhor com: numeros, superlativos, consequencias, "como/por que".
+
+2. **SEO** (strategy: "seo")
+   Otimizado para busca no YouTube e Google. Contem a palavra-chave principal de forma natural nos primeiros 40 caracteres.
+   Prioriza termos que o publico realmente digita (pense como gestor de frota pesquisando).
+   Funciona melhor com: "como + verbo", "o que e", "guia", palavra-chave exata.
+
+3. **AUTORIDADE** (strategy: "authority")
+   Posiciona o apresentador como referencia no assunto. Tom serio, confiante, de quem ja resolveu.
+   Ideal para quem ja conhece o canal e respeita a opiniao do apresentador.
+   Funciona melhor com: afirmacoes diretas, dados, perspectiva unica.
+
+--- PASSO 1: ANTES DE ESCREVER QUALQUER TITULO ---
+Leia o roteiro/transcricao e identifique:
+- Numeros e dados concretos mencionados (valores, porcentagens, datas)
+- Nomes proprios, eventos, lugares especificos
+- O DIFERENCIAL unico deste video vs outros sobre o mesmo tema
+- A emocao dominante do apresentador (medo, urgencia, oportunidade, ironia)
+Cada titulo DEVE usar pelo menos um desses elementos. Titulo generico = titulo ruim.
+
+BAD: "Como economizar combustivel na frota" (serve pra qualquer video)
+GOOD: "Diesel subiu 75 centavos e voce vai pagar R$300 a mais" (so serve pra ESTE video)
+
+--- REGRAS ABSOLUTAS ---
+- Maximo 60 caracteres (YouTube CORTA apos isso, titulo fica ilegivel)
+- DEVE conter dado especifico do video (numero, nome, fato)
+- Portugues BR natural (como gestor de frota fala, nao como academico escreve)
+- Sem emojis
+- Primeira letra maiuscula, resto minusculo (exceto siglas como FPT, GPS, KM)
+- NAO usar dois-pontos (reformule com virgula ou reestruture)
+- NAO repetir palavras entre os 3 titulos
+- O titulo COMPLEMENTA a thumbnail (nao repete). Titulo e thumb sao um PAR que funciona junto.
+- "why" DEVE ter no maximo 10 palavras
+
+--- FORMATO ---
+JSON puro, sem markdown. "why" curto (max 10 palavras):
+{{"titles": [{{"title": "...", "strategy": "ctr", "why": "max 10 palavras"}}, {{"title": "...", "strategy": "seo", "why": "max 10 palavras"}}, {{"title": "...", "strategy": "authority", "why": "max 10 palavras"}}]}}"""
+
+        try:
+            from thumb_live import load_api_key, FLASH_URL
+            import requests as _requests
+
+            api_key = load_api_key()
+            headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
+
+            # Retry ate 2x se JSON invalido
+            for attempt in range(2):
+                payload = {
+                    "contents": [{"parts": [{"text": prompt}]}],
+                    "generationConfig": {
+                        "temperature": 0.7 if attempt == 0 else 0.3,
+                        "maxOutputTokens": 4000,
+                    },
+                }
+                resp = _requests.post(FLASH_URL, headers=headers, json=payload, timeout=30)
+                result = resp.json()
+
+                if "candidates" not in result:
+                    continue
+
+                parts = result["candidates"][0]["content"]["parts"]
+                raw = ""
+                for part in parts:
+                    if "text" in part:
+                        raw += part["text"]
+                raw = raw.strip()
+                import re as _re
+                # Limpa markdown code fences se existirem
+                raw = _re.sub(r'^```json\s*', '', raw)
+                raw = _re.sub(r'\s*```\s*$', '', raw)
+
+                m = _re.search(r'\{[\s\S]*\}', raw)
+                if m:
+                    json_str = m.group()
+                    # Tenta parsear, com fixes pra JSON truncado
+                    data = None
+                    for suffix in ['', '"}]}', '}]}', ']}']:
+                        try:
+                            data = json.loads(json_str + suffix)
+                            break
+                        except (json.JSONDecodeError, ValueError):
+                            pass
+                    if data and "titles" in data and len(data["titles"]) >= 2:
+                        # Normaliza strategy
+                        for i, t in enumerate(data["titles"]):
+                            s = t.get("strategy", "").lower().strip()
+                            if s not in ("ctr", "seo", "authority"):
+                                s = ["ctr", "seo", "authority"][i] if i < 3 else "ctr"
+                            t["strategy"] = s
+                        self._json({"ok": True, **data})
+                        return
+
+            self._json({"error": "Gemini nao retornou titulos validos apos 2 tentativas"}, 500)
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
+    def _handle_briefing_from_text(self, body: dict):
+        """POST /api/briefing-from-text — extrai q1/q2/q3 de roteiro/transcrição em texto."""
+        text  = body.get("text", "").strip()
+        title = body.get("title", "")
+        if not text:
+            self._json({"error": "text required"}, 400)
+            return
+        try:
+            from thumb_live import auto_briefing_from_transcript, load_api_key
+            api_key = load_api_key()
+            briefing = auto_briefing_from_transcript(text, title, api_key)
+            self._json({"ok": True, **briefing})
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
     def _handle_thumb_transcribe(self, body: dict):
         """POST /api/thumb-transcribe — transcreve áudio base64, retorna q1/q2/q3."""
         audio_b64 = body.get("audio_base64", "")
@@ -653,11 +846,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
     def _handle_thumb_generate(self, body: dict):
         """POST /api/thumb-generate — inicia geração A+B, retorna job_id para SSE."""
         briefing   = body.get("briefing", {})
-        live_id    = body.get("live_id", "")
+        live_id    = body.get("live_id", "") or f"roteiro-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
         divergence = int(body.get("divergence", 6))
-        if not live_id:
-            self._json({"error": "live_id required"}, 400)
-            return
 
         job_id = _create_job()
         self._json({"job_id": job_id})   # Responde imediatamente
@@ -789,6 +979,125 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._json({"ok": True, "drive": result})
         except Exception as e:
             self._json({"error": str(e)}, 500)
+
+    def _handle_upload_drive(self, body: dict):
+        """POST /api/upload-drive — upload genérico de arquivo para pasta no Drive."""
+        image_path = body.get("image_path", "")
+        folder_id  = body.get("folder_id", "")
+        filename   = body.get("filename", "")
+        if not image_path or not folder_id:
+            self._json({"error": "image_path and folder_id required"}, 400)
+            return
+        try:
+            from thumb_live import load_google_creds, upload_to_drive_folder
+            p = Path(image_path)
+            if not p.is_absolute():
+                p = PROJECT_DIR / p
+            if not p.exists():
+                self._json({"error": f"arquivo nao encontrado: {p}"}, 404)
+                return
+
+            # Se filename fornecido, renomear temporariamente para upload
+            actual_path = p
+            renamed = False
+            if filename and filename != p.name:
+                tmp = p.parent / filename
+                import shutil
+                shutil.copy2(p, tmp)
+                actual_path = tmp
+                renamed = True
+
+            creds  = load_google_creds()
+            result = upload_to_drive_folder(actual_path, folder_id, creds)
+
+            if renamed and actual_path.exists():
+                actual_path.unlink()
+
+            self._json({"success": True, "link": result.get("link", ""), "drive": result})
+        except FileNotFoundError as e:
+            self._json({"success": False, "error": "Google Drive credentials not configured"}, 500)
+        except Exception as e:
+            self._json({"success": False, "error": str(e)}, 500)
+
+    def _handle_youtube_update_title(self, body: dict):
+        """POST /api/youtube-update-title — atualiza titulo de video no YouTube."""
+        video_id  = body.get("video_id", "")
+        new_title = body.get("new_title", "")
+        if not video_id or not new_title:
+            self._json({"error": "video_id and new_title required"}, 400)
+            return
+        try:
+            from upload import load_credentials, get_youtube
+            creds   = load_credentials()
+            youtube = get_youtube(creds)
+
+            # Busca snippet atual para preservar campos obrigatorios
+            resp = youtube.videos().list(part="snippet", id=video_id).execute()
+            items = resp.get("items", [])
+            if not items:
+                self._json({"success": False, "error": f"Video {video_id} nao encontrado"}, 404)
+                return
+
+            snippet = items[0]["snippet"]
+            snippet["title"] = new_title
+            # categoryId é obrigatório no update
+            youtube.videos().update(
+                part="snippet",
+                body={"id": video_id, "snippet": snippet}
+            ).execute()
+
+            self._json({"success": True})
+        except FileNotFoundError:
+            self._json({"success": False, "error": "YouTube credentials not configured. Rode reauth_youtube_analytics.py"}, 500)
+        except SystemExit:
+            self._json({"success": False, "error": "YouTube token invalido. Rode reauth_youtube_analytics.py"}, 500)
+        except Exception as e:
+            self._json({"success": False, "error": str(e)}, 500)
+
+    def _handle_youtube_update_thumb(self, body: dict):
+        """POST /api/youtube-update-thumb — atualiza thumbnail de video no YouTube."""
+        video_id   = body.get("video_id", "")
+        image_path = body.get("image_path", "")
+        if not video_id or not image_path:
+            self._json({"error": "video_id and image_path required"}, 400)
+            return
+        try:
+            from upload import load_credentials, get_youtube
+            from googleapiclient.http import MediaFileUpload
+
+            p = Path(image_path)
+            if not p.is_absolute():
+                p = PROJECT_DIR / p
+            if not p.exists():
+                self._json({"success": False, "error": f"arquivo nao encontrado: {p}"}, 404)
+                return
+
+            # Redimensiona se > 2MB
+            if p.stat().st_size > 2 * 1024 * 1024:
+                from PIL import Image
+                img = Image.open(p)
+                img.thumbnail((1280, 720), Image.LANCZOS)
+                resized = p.parent / f"_resized_{p.name}"
+                img.save(resized, quality=90)
+                p = resized
+
+            creds   = load_credentials()
+            youtube = get_youtube(creds)
+
+            media = MediaFileUpload(str(p), mimetype="image/png", resumable=False)
+            youtube.thumbnails().set(videoId=video_id, media_body=media).execute()
+
+            # Limpa arquivo temporário se redimensionado
+            if p.name.startswith("_resized_") and p.exists():
+                p.unlink()
+
+            self._json({"success": True})
+        except FileNotFoundError:
+            self._json({"success": False, "error": "YouTube credentials not configured. Rode reauth_youtube_analytics.py"}, 500)
+        except SystemExit:
+            self._json({"success": False, "error": "YouTube token invalido. Rode reauth_youtube_analytics.py"}, 500)
+        except Exception as e:
+            self._json({"success": False, "error": str(e)}, 500)
 
     def _handle_thumb_upload_guest_multipart(self, raw: bytes, content_type: str):
         """POST /api/thumb-upload-guest (multipart) — salva foto de convidado."""

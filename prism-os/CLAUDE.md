@@ -6,8 +6,6 @@ Sistema operacional de produção de conteúdo do canal Frota Para Todos (Julio 
 
 Hoje o sistema cobre Plan → Shoot → Multiply. Quando crescer o suficiente, vira repositório independente.
 
-**Diagrama do sistema**: `docs/prism-os-flow.html`
-
 ---
 
 ## Submodules

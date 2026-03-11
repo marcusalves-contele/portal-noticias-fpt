@@ -12,6 +12,7 @@ Módulo usado pelo dashboard.py. Funções principais:
   - approve_thumb(live_id, choice, path)    → salva aprovação no state
 """
 
+import os
 import json
 import base64
 import pickle
@@ -30,7 +31,22 @@ THUMB_PROJECT = PROJECT_DIR.parent / "thumbnail-ai-creator"
 REFS_DIR      = THUMB_PROJECT / "referencias"
 GUESTS_DIR    = REFS_DIR / "convidados"
 STATE_FILE    = OUTPUT_DIR / "thumb_live_state.json"
-TOKEN_PATH    = PROJECT_DIR.parent.parent / "assistant-sexta-feira" / "token_youtube_write.pickle"
+
+def _read_env_token_path() -> str | None:
+    """Lê YOUTUBE_TOKEN_PATH do .env local (sem python-dotenv)."""
+    env_file = PROJECT_DIR / ".env"
+    if env_file.exists():
+        with open(env_file) as f:
+            for line in f:
+                if line.startswith("YOUTUBE_TOKEN_PATH"):
+                    return line.split("=", 1)[1].strip().strip('"')
+    return None
+
+TOKEN_PATH = Path(
+    os.getenv("YOUTUBE_TOKEN_PATH")
+    or _read_env_token_path()
+    or str(PROJECT_DIR.parent.parent.parent / "assistant-sexta-feira" / "token_youtube_write.pickle")
+)
 
 SPREADSHEET_ID = "1lluvZ8SKQNThV4o4OzWqmsttP-BgRC1FU3AqwvfJbqI"
 SHEET_GID      = "25167001"
@@ -318,46 +334,242 @@ def save_guest_photo(image_bytes: bytes, live_number: str, guest_name: str,
 # Refs
 # -------------------------------------------------------------------
 
-def get_host_refs(channel: str) -> list[Path]:
-    """Retorna lista de referências do apresentador baseado no canal."""
+CATALOG_FILE = {
+    "fleet": REFS_DIR / "julio" / "catalogo.json",
+    "teams": REFS_DIR / "leonardo" / "catalogo.json",
+}
+
+# Identity anchors: always available as Image 2 fallback
+IDENTITY_REF = {
+    "fleet": "julio-ref-primary-1.jpg",
+    "teams": "leo-ref-primary.png",
+}
+
+
+def _load_catalog(channel: str) -> list[dict] | None:
+    """Load catalogo.json for a channel. Returns None if not found."""
+    catalog_path = CATALOG_FILE.get(channel)
+    if not catalog_path or not catalog_path.exists():
+        return None
+    try:
+        with open(catalog_path, encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, IOError) as e:
+        print(f"  [catalog] WARN: failed to load {catalog_path}: {e}")
+        return None
+
+
+def select_best_refs(angle_data: dict, channel: str, catalog: list | None = None) -> list[Path] | None:
+    """AI-driven reference photo selection based on angle creative direction.
+
+    Matches angle_data.expressao_host against catalog expressions.
+    Returns [expression_match, face_identity_ref] or None on failure (triggers fallback).
+
+    Scoring logic:
+      1. Exact expression match in catalog entry's expressao list = +10 pts
+      2. Partial keyword match (e.g. "surpreso" in "chocado/surpreso") = +5 pts
+      3. Tag relevance bonus from angle background/rationale = +2 pts per tag hit
+      4. Quality bonus = qualidade score
+      5. Exclude studio_v1 (AI-generated, lower fidelity)
+    """
+    if catalog is None:
+        catalog = _load_catalog(channel)
+    if not catalog:
+        return None
+
+    host_dir_name = "julio" if channel == "fleet" else "leonardo"
+    host_dir = REFS_DIR / host_dir_name
+    if not host_dir.exists():
+        return None
+
+    expressao = (angle_data.get("expressao_host") or "").lower().strip()
+    if not expressao:
+        return None
+
+    # Build context keywords from angle for tag matching
+    context_words = set()
+    for field in ("background", "rationale", "cor_dominante", "iluminacao"):
+        text = (angle_data.get(field) or "").lower()
+        context_words.update(w for w in text.split() if len(w) > 3)
+
+    identity_filename = IDENTITY_REF.get(channel, "")
+
+    scored = []
+    for entry in catalog:
+        filename = entry.get("filename", "")
+
+        # Skip identity ref from scoring (it goes as Image 2 separately)
+        if filename == identity_filename:
+            continue
+
+        # Skip low-quality AI-generated if originals exist
+        if "studio_v1" in filename or "studio_v2" in filename:
+            continue
+
+        score = 0
+        entry_expressions = [e.lower().strip() for e in entry.get("expressao", [])]
+        entry_tags = [t.lower().strip() for t in entry.get("tags", [])]
+
+        # Exact expression match (bonus for being first/primary expression)
+        if expressao in entry_expressions:
+            position = entry_expressions.index(expressao)
+            score += 10 + max(0, 5 - position * 2)  # 1st=+15, 2nd=+13, 3rd=+11, ...
+
+        # Partial match: expression keyword appears in any catalog expression
+        elif any(expressao in ce or ce in expressao for ce in entry_expressions):
+            score += 5
+
+        # Tag relevance from angle context
+        for tag in entry_tags:
+            if tag in context_words:
+                score += 2
+
+        # Quality bonus
+        score += entry.get("qualidade", 3)
+
+        if score > 3:  # minimum threshold (quality alone)
+            scored.append((score, filename, entry))
+
+    if not scored:
+        return None
+
+    # Sort by score descending
+    scored.sort(key=lambda x: x[0], reverse=True)
+
+    best_score, best_file, best_entry = scored[0]
+    best_path = host_dir / best_file
+
+    if not best_path.exists():
+        print(f"  [catalog] WARN: best match {best_file} not found on disk")
+        return None
+
+    # Image 2: identity anchor
+    identity_path = host_dir / identity_filename
+    if not identity_path.exists():
+        # Fallback: use best match as both
+        result = [best_path]
+    elif best_path == identity_path:
+        result = [best_path]
+    else:
+        result = [best_path, identity_path]
+
+    # Log selection reasoning
+    expr_list = ", ".join(best_entry.get("expressao", []))
+    print(f"  [catalog] Selected: {best_file} (score={best_score}, "
+          f"expressions=[{expr_list}], pose={best_entry.get('pose', '?')}) "
+          f"for expressao_host='{expressao}'")
+    print(f"  [catalog] Identity anchor: {identity_filename}")
+
+    return result
+
+
+def get_host_refs(channel: str, expressao: str = "") -> list[Path]:
+    """Retorna lista de referências do apresentador baseado no canal e expressão.
+
+    Para Fleet (Julio): sempre inclui ref-primary como âncora facial,
+    depois seleciona a foto que melhor combina com a expressão pedida.
+    Isso garante que cada ângulo A/B use uma pose diferente do Julio.
+    """
     if channel == "fleet":
         julio_dir = REFS_DIR / "julio"
         if not julio_dir.exists():
             return []
         # Exclui AI-geradas (studio_v1)
-        refs = [
+        all_refs = [
             f for f in julio_dir.iterdir()
             if f.suffix.lower() in (".jpg", ".jpeg", ".png")
             and "studio_v1" not in f.name
         ]
-        # Prioriza ref-primary, depois frontal-neutro, depois outros
-        primary = [r for r in refs if "ref-primary" in r.name]
-        frontal = [r for r in refs if "frontal-neutro" in r.name and "ref-primary" not in r.name]
-        others  = [r for r in refs if "ref-primary" not in r.name and "frontal-neutro" not in r.name]
-        return (primary + frontal + others)[:3]
+        primary = [r for r in all_refs if "ref-primary" in r.name]
+        pose_refs = [r for r in all_refs if "ref-primary" not in r.name]
+
+        # Mapeia expressão → keyword no nome do arquivo
+        EXPR_MAP = {
+            "serio":      ["frontal-neutro", "bracos-cruzados", "perfil"],
+            "surpreso":   ["surpreso", "mao-aberta"],
+            "pensativo":  ["pensativo", "mao-queixo"],
+            "assertivo":  ["dedo-para-cima", "gesto-explicando", "bracos-cruzados"],
+            "sorrindo":   ["sorrindo", "maos-cintura"],
+            "ironico":    ["perfil", "bracos-cruzados"],
+            "confiante":  ["bracos-cruzados", "maos-cintura", "frontal-neutro"],
+            "explicando": ["gesto-explicando", "mao-aberta", "dedo-para-cima"],
+        }
+
+        expr_lower = expressao.lower().strip() if expressao else ""
+        matched = []
+        if expr_lower and expr_lower in EXPR_MAP:
+            keywords = EXPR_MAP[expr_lower]
+            for kw in keywords:
+                for r in pose_refs:
+                    if kw in r.name and r not in matched:
+                        matched.append(r)
+                        break
+                if matched:
+                    break
+
+        # POSE PRIMEIRO (Image 1) → modelo copia expressão/pose
+        # PRIMARY DEPOIS (Image 2) → confirma identidade facial
+        # Gemini dá mais peso pra Image 1, então a pose domina a expressão
+        if matched:
+            result = matched + primary
+        else:
+            frontal = [r for r in pose_refs if "frontal-neutro" in r.name]
+            result = primary + frontal  # sem pose específica, primary lidera
+
+        return result[:3]
 
     elif channel == "teams":
         leo_dir = REFS_DIR / "leonardo"
         if not leo_dir.exists():
             return []
-        # Busca primary em jpg ou png
-        for ext in (".png", ".jpg", ".jpeg"):
-            primary = leo_dir / f"leo-ref-primary{ext}"
-            if primary.exists():
-                return [primary]
-        # Fallback: fotos reais (exclui studio_v*)
-        refs = [
+
+        # Exclui AI-geradas (studio_v*)
+        all_refs = [
             f for f in leo_dir.iterdir()
             if f.suffix.lower() in (".jpg", ".jpeg", ".png")
             and "studio_v" not in f.name
         ]
-        return refs[:3]
+        primary = [r for r in all_refs if "ref-primary" in r.name]
+        pose_refs = [r for r in all_refs if "ref-primary" not in r.name]
+
+        LEO_EXPR_MAP = {
+            "serio":      ["perfil-3-4", "frontal"],
+            "surpreso":   ["maos-cabeca-surpreso", "celular-mostrando"],
+            "pensativo":  ["perfil-3-4", "falando-telefone"],
+            "assertivo":  ["dedo-para-cima", "punho-levantado"],
+            "sorrindo":   ["sorrindo-frontal", "sorrindo-relaxado"],
+            "ironico":    ["polegar-baixo", "perfil-3-4"],
+            "confiante":  ["punho-levantado", "dedo-para-cima"],
+            "explicando": ["celular-mostrando", "dedo-para-cima"],
+            "negativo":   ["polegar-baixo", "maos-cabeca-surpreso"],
+            "empolgado":  ["punho-levantado", "sorrindo-frontal"],
+        }
+
+        expr_lower = expressao.lower().strip() if expressao else ""
+        matched = []
+        if expr_lower and expr_lower in LEO_EXPR_MAP:
+            keywords = LEO_EXPR_MAP[expr_lower]
+            for kw in keywords:
+                for r in pose_refs:
+                    if kw in r.name and r not in matched:
+                        matched.append(r)
+                        break
+                if matched:
+                    break
+
+        # POSE PRIMEIRO → modelo copia expressao; PRIMARY depois → confirma identidade
+        if matched:
+            result = matched + primary
+        else:
+            result = primary + pose_refs[:1]
+
+        return result[:3]
 
     return []
 
 
 def get_guest_refs(live_number: str) -> list[Path]:
-    """Busca foto de convidado para uma live específica."""
+    """Busca TODAS as fotos de convidados para uma live específica."""
     import re
     if not GUESTS_DIR.exists():
         return []
@@ -366,10 +578,8 @@ def get_guest_refs(live_number: str) -> list[Path]:
         rf'^(\w+)_live-{re.escape(str(live_number))}-(.+)\.(jpg|jpeg|png|webp)$',
         re.IGNORECASE
     )
-    for f in GUESTS_DIR.iterdir():
-        if pattern.match(f.name):
-            return [f]
-    return []
+    matches = sorted(f for f in GUESTS_DIR.iterdir() if pattern.match(f.name))
+    return matches
 
 
 def image_to_part(path: Path) -> dict:
@@ -429,59 +639,68 @@ Retorne SOMENTE JSON válido, sem markdown:
 # Angle generation
 # -------------------------------------------------------------------
 
-ANGLE_SYSTEM_PROMPT = """You are a YouTube thumbnail creative director for B2B live stream content.
+ANGLE_SYSTEM_PROMPT = """You are a YouTube thumbnail creative director for B2B channels about fleet and field team management.
 
-Given the channel, briefing, and guest info, generate 2 visually DISTINCT thumbnail angles (A and B) that stop the target viewer from scrolling.
+Your job: generate 2 visually DISTINCT thumbnail angles (A and B) that make the RIGHT viewer stop scrolling.
+
+STEP 1 — EXTRACT DIFFERENTIALS (mandatory before creating angles):
+Read the script/transcript AND briefing. Identify:
+- SPECIFIC numbers, data, percentages mentioned (e.g. "+75 centavos", "R$300/mes", "US$100/barril")
+- SPECIFIC events, names, places (e.g. "Canal de Ormuz", "Ira", "Petrobras")
+- The UNIQUE insight this video has that 50 other videos on the same topic do NOT
+- The emotional hook the presenter uses (fear, urgency, opportunity, irony)
+
+STEP 2 — BUILD ANGLES AROUND DIFFERENTIALS:
+The title on the thumbnail MUST use at least one specific differential. NEVER use generic titles that could apply to any video on the topic.
+
+BAD (generic): "ALTA DO DIESEL", "ECONOMIZE COMBUSTIVEL", "GESTAO DE FROTA"
+GOOD (specific): "+75 CENTAVOS NO DIESEL", "R$300 A MAIS POR CAMINHAO", "ORMUZ FECHOU"
 
 CHANNEL VISUAL LANGUAGE:
-- fleet (Frota Para Todos): trucking/fleet B2B. Dark fleet yards, trucks, industrial tools. Red/orange/crimson dramatic lighting. Feels powerful, urgent, serious.
-- teams (Contele Teams): field team management B2B. Modern offices, tech dashboards, smartphones. Purple/magenta/electric-blue lighting. Feels innovative, forward-looking.
-
-CORE PRINCIPLE — THUMBNAIL SHOWS THE RESULT:
-The image communicates what the viewer WILL GET, not just teases curiosity.
-Use Q1/Q2/Q3 to decide visuals:
-- Q1 (who's watching) → choose visuals from THEIR daily reality
-- Q2 (what they'll gain) → background/elements EMBODY that outcome
-- Q3 (what happens) → pick props/background directly from the content discussed
+- fleet (Frota Para Todos): trucking/fleet B2B. Dark fleet yards, trucks, industrial. Red/orange/crimson dramatic lighting. Powerful, urgent, serious.
+- teams (Contele Teams): field team management B2B. Modern offices, tech, smartphones. Purple/magenta/electric-blue. Innovative, forward-looking.
 
 ANGLE RULES:
-- A: declarative — title shows THE ANSWER/RESULT; visual confirms the payoff
-- B: tension — title names THE PROBLEM/CHALLENGE; visual shows the stakes
+- A: declarative/solution — title shows SPECIFIC RESULT or DATA; visual confirms the payoff
+- B: tension/problem — title names SPECIFIC THREAT or COST; visual shows the stakes
 Both must be visually distinct: different background, color palette, positioning, 3D elements.
 
 TITLE RULES:
-- titulo: 2-5 words, ALL CAPS, Portuguese, SPECIFIC (NOT generic "COMO FAZER" — say WHAT exactly)
-- subtitulo: 2-4 words, accent color, complements title (can be empty string)
+- titulo: 2-6 words, ALL CAPS, Portuguese. MUST include a specific number, name, or fact from the video. NOT generic.
+- subtitulo: 2-5 words, accent color, complements titulo with a second layer of specificity (can be empty string)
 
-3D ELEMENTS: 2-3 max, small, directly related to content (steering wheel, GPS, speedometer, document, smartphone, truck icon, wrench, tablet, etc.). NOT competing with faces.
+3D ELEMENTS: 2-3 max, small, directly related to SPECIFIC content from the video (not generic fleet icons). If video mentions fuel pump, use fuel pump. If mentions app screen, use phone with app. Match the actual content.
+
+EXPRESSION: Match the emotional tone. Alarmist content = surpreso/preocupado. Authority = confiante/assertivo. Teaching = explicando. Ironic = ironico.
 
 Output ONLY valid JSON, no markdown fences:
 {
+  "differentials_found": ["list", "of", "specific", "facts", "from", "script"],
   "angle_a": {
-    "titulo": "EXACT TITLE IN CAPS",
-    "subtitulo": "SUBTITLE OR EMPTY STRING",
+    "titulo": "SPECIFIC TITLE WITH DATA/FACT",
+    "subtitulo": "COMPLEMENTARY SPECIFIC DETAIL",
     "host_posicao": "left|center|right",
     "guest_posicao": "left|center|right|null",
-    "expressao_host": "serio|surpreso|pensativo|assertivo|sorrindo|ironico|confiante",
+    "expressao_host": "serio|surpreso|pensativo|assertivo|sorrindo|ironico|confiante|explicando",
     "expressao_guest": "expression keyword or null",
-    "background": "detailed background that visually represents the content result — scene, objects, atmosphere",
-    "cor_dominante": "specific color palette e.g. dark navy with red/orange drama",
-    "iluminacao": "lighting style e.g. dramatic red side-light from left, warm orange haze",
-    "elementos_3d": ["content-related prop 1", "content-related prop 2"],
-    "rationale": "1 sentence: why this shows the viewer what they will get"
+    "background": "detailed background using SPECIFIC elements from the video content",
+    "cor_dominante": "specific color palette",
+    "iluminacao": "lighting style that matches the emotional tone",
+    "elementos_3d": ["content-specific prop 1", "content-specific prop 2"],
+    "rationale": "Why THIS angle works for THIS specific video (not generic)"
   },
   "angle_b": {
-    "titulo": "DIFFERENT TITLE FROM A",
-    "subtitulo": "SUBTITLE OR EMPTY STRING",
+    "titulo": "DIFFERENT SPECIFIC TITLE",
+    "subtitulo": "DIFFERENT COMPLEMENTARY DETAIL",
     "host_posicao": "left|center|right",
     "guest_posicao": "left|center|right|null",
-    "expressao_host": "serio|surpreso|pensativo|assertivo|sorrindo|ironico|confiante",
+    "expressao_host": "serio|surpreso|pensativo|assertivo|sorrindo|ironico|confiante|explicando",
     "expressao_guest": "expression keyword or null",
-    "background": "DIFFERENT background from A — distinct visual story",
+    "background": "DIFFERENT background, still specific to video content",
     "cor_dominante": "DIFFERENT palette from A",
-    "iluminacao": "DIFFERENT lighting style from A",
-    "elementos_3d": ["different prop 1", "different prop 2"],
-    "rationale": "1 sentence: why this shows the problem/challenge"
+    "iluminacao": "DIFFERENT lighting from A",
+    "elementos_3d": ["different content-specific prop 1", "different prop 2"],
+    "rationale": "Why THIS angle works for THIS specific video (not generic)"
   }
 }"""
 
@@ -549,12 +768,24 @@ def generate_angles(briefing: dict, api_key: str, divergence: int = 6) -> dict:
     q3 = briefing.get('q3', '').strip()
     thumb_text = briefing.get('thumb_text', '').strip()
 
+    script = briefing.get('script', '').strip()
+
+    # Script/transcript goes FIRST — it's the primary source of specificity
+    if script:
+        script_block = (
+            f"=== VIDEO SCRIPT/TRANSCRIPT (PRIMARY SOURCE — extract specific data, numbers, names, events) ===\n"
+            f"{script[:6000]}\n"
+            f"=== END SCRIPT ==="
+        )
+    else:
+        script_block = ""
+
     if q1 or q2 or q3:
         briefing_block = (
-            f"Briefing (use to decide visual style — what the viewer will GET from this live):\n"
-            f"Q1 — Quem assiste: {q1}\n"
-            f"Q2 — O que vão ganhar: {q2}\n"
-            f"Q3 — O que acontece na live: {q3}"
+            f"=== CREATIVE DIRECTION (human briefing) ===\n"
+            f"Q1 — Target audience: {q1}\n"
+            f"Q2 — Desired outcome: {q2}\n"
+            f"Q3 — Video content summary: {q3}"
         )
     else:
         # Nutella sem briefing — usa título + hook sugerido como âncora criativa
@@ -563,6 +794,19 @@ def generate_angles(briefing: dict, api_key: str, divergence: int = 6) -> dict:
             f"No detailed briefing available. Use the title and channel context to infer the visuals.\n"
             + (f"{hook_line}\n" if hook_line else "")
             + "Focus on the concrete result the viewer will achieve."
+        )
+
+    # Combine: script first (specificity), then briefing (direction)
+    if script_block:
+        briefing_block = f"{script_block}\n\n{briefing_block}"
+
+    # Human creative direction — highest priority override
+    creative_note = briefing.get('creative_note', '').strip()
+    if creative_note:
+        briefing_block += (
+            f"\n\n=== HUMAN CREATIVE DIRECTION (HIGHEST PRIORITY — override automatic choices when conflict) ===\n"
+            f"{creative_note}\n"
+            f"=== END CREATIVE DIRECTION ==="
         )
 
     user_msg = f"""Live title: {briefing.get('title', 'Untitled')}
@@ -578,7 +822,7 @@ Generate angles A and B following the divergence level above."""
     payload = {
         "contents": [{"parts": [{"text": user_msg}]}],
         "systemInstruction": {"parts": [{"text": ANGLE_SYSTEM_PROMPT}]},
-        "generationConfig": {"temperature": 0.7, "maxOutputTokens": 1500},
+        "generationConfig": {"temperature": 0.7, "maxOutputTokens": 3000},
     }
     headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
 
@@ -684,13 +928,24 @@ def build_live_prompt(briefing: dict, angle: str, angle_data: dict,
 
     # ---- CRITICAL face block ------------------------------------------------
     face_lines = []
+    host_expr = angle_data.get("expressao_host", "")
     if host_ref_count == 1:
-        face_lines.append(f"- Image 1: {host_name} (host) — copy this exact face")
-    else:
+        face_lines.append(f"- Image 1: {host_name} (host) — copy this exact face and expression")
+    elif host_ref_count >= 2:
         face_lines.append(
-            f"- Images 1-{host_ref_count}: {host_name} (host) — "
-            "copy this exact face from ALL reference photos"
+            f"- Image 1: {host_name} POSE/EXPRESSION reference — "
+            f"COPY THIS EXACT POSE AND EXPRESSION ({host_expr}). "
+            "The body language, hand position, and facial expression in Image 1 is what you MUST reproduce."
         )
+        face_lines.append(
+            f"- Image 2: {host_name} FACE IDENTITY reference — "
+            "use this to confirm facial features (face shape, beard, hair). "
+            "But the EXPRESSION and POSE must come from Image 1, NOT Image 2."
+        )
+        if host_ref_count > 2:
+            face_lines.append(
+                f"- Image 3: {host_name} additional reference"
+            )
 
     guest_names = []
     for i, g_path in enumerate(guest_refs):
@@ -929,19 +1184,20 @@ def generate_ab(briefing: dict, live_id: str, api_key: str,
     m = re.search(r'\bLive\s+(\d+)\b', title, re.IGNORECASE)
     live_number = m.group(1) if m else ""
 
-    # Refs do host
-    host_refs = get_host_refs(channel)
+    # Refs do host (iniciais, sem expressão — depois refina por ângulo)
+    host_refs_default = get_host_refs(channel)
     host_label = "Julio (Fleet)" if channel == "fleet" else "Leonardo (Teams)"
-    ref_names  = [r.name for r in host_refs]
+    ref_names  = [r.name for r in host_refs_default]
     emit("refs_host", f"{host_label}: {', '.join(ref_names[:2])}{'…' if len(ref_names)>2 else ''}",
-         count=len(host_refs), names=ref_names[:3])
+         count=len(host_refs_default), names=ref_names[:3])
 
-    # Refs do convidado
+    # Refs dos convidados (agora retorna TODOS)
     guest_refs = get_guest_refs(live_number) if live_number else []
     if guest_refs:
-        guest_label = _parse_guest_name(guest_refs[0])
-        emit("refs_guest", f"Convidado: {guest_label}", found=True, file=guest_refs[0].name)
-        # Enriquecer briefing com nome do convidado (se não veio do frontend)
+        guest_names_detected = [_parse_guest_name(g) for g in guest_refs]
+        guest_label = " + ".join(guest_names_detected)
+        emit("refs_guest", f"Convidado(s): {guest_label} ({len(guest_refs)} foto(s))",
+             found=True, files=[g.name for g in guest_refs])
         if not briefing.get("guest"):
             briefing = {**briefing, "guest": guest_label}
     else:
@@ -952,8 +1208,7 @@ def generate_ab(briefing: dict, live_id: str, api_key: str,
              (f" (nome no briefing: {guest_label_from_briefing})" if guest_label_from_briefing else ""),
              found=False)
 
-    all_refs = host_refs + guest_refs
-    if not all_refs:
+    if not host_refs_default and not guest_refs:
         emit("refs_host", f"AVISO: nenhuma referência para canal '{channel}'")
 
     # Gera ângulos com IA
@@ -973,21 +1228,51 @@ def generate_ab(briefing: dict, live_id: str, api_key: str,
     path_a  = OUTPUT_DIR / f"thumb_live_{safe_id}_a.png"
     path_b  = OUTPUT_DIR / f"thumb_live_{safe_id}_b.png"
 
+    # Seleciona refs do host POR EXPRESSÃO de cada ângulo (A/B usam poses diferentes)
+    # Tenta catalog-based selection primeiro, fallback para get_host_refs()
+    expr_a = angle_a.get("expressao_host", "")
+    expr_b = angle_b.get("expressao_host", "")
+
+    catalog = _load_catalog(channel)
+    refs_source_a = "catalog"
+    refs_source_b = "catalog"
+
+    host_refs_a = select_best_refs(angle_a, channel, catalog=catalog) if catalog else None
+    if host_refs_a is None:
+        host_refs_a = get_host_refs(channel, expressao=expr_a)
+        refs_source_a = "fallback"
+
+    host_refs_b = select_best_refs(angle_b, channel, catalog=catalog) if catalog else None
+    if host_refs_b is None:
+        host_refs_b = get_host_refs(channel, expressao=expr_b)
+        refs_source_b = "fallback"
+
+    emit("refs_expr",
+         f"A: {expr_a} → {[r.name for r in host_refs_a]} ({refs_source_a}) | "
+         f"B: {expr_b} → {[r.name for r in host_refs_b]} ({refs_source_b})",
+         refs_a=[r.name for r in host_refs_a],
+         refs_b=[r.name for r in host_refs_b],
+         source_a=refs_source_a,
+         source_b=refs_source_b)
+
+    all_refs_a = host_refs_a + guest_refs
+    all_refs_b = host_refs_b + guest_refs
+
     prompt_a = build_live_prompt(briefing, "A", angle_a,
-                                 host_ref_count=len(host_refs),
+                                 host_ref_count=len(host_refs_a),
                                  guest_refs=guest_refs,
                                  live_number=live_number)
     prompt_b = build_live_prompt(briefing, "B", angle_b,
-                                 host_ref_count=len(host_refs),
+                                 host_ref_count=len(host_refs_b),
                                  guest_refs=guest_refs,
                                  live_number=live_number)
 
     emit("gen_parallel", f"Gerando A e B em paralelo — {MODEL_IMAGE}...")
 
-    def _gen_with_progress(angle_label: str, prompt: str, out_path: Path) -> Path | None:
+    def _gen_with_progress(angle_label: str, prompt: str, out_path: Path, refs: list[Path]) -> Path | None:
         emit(f"gen_{angle_label.lower()}_start", f"Gerando Thumbnail {angle_label}...")
         _ts = _time.time()
-        path = _generate_one(api_key, prompt, all_refs, out_path, angle_label)
+        path = _generate_one(api_key, prompt, refs, out_path, angle_label)
         _elapsed = round(_time.time() - _ts, 1)
         if path:
             size_kb = path.stat().st_size // 1024
@@ -1000,8 +1285,8 @@ def generate_ab(briefing: dict, live_id: str, api_key: str,
         return path
 
     with ThreadPoolExecutor(max_workers=2) as pool:
-        fut_a = pool.submit(_gen_with_progress, "A", prompt_a, path_a)
-        fut_b = pool.submit(_gen_with_progress, "B", prompt_b, path_b)
+        fut_a = pool.submit(_gen_with_progress, "A", prompt_a, path_a, all_refs_a)
+        fut_b = pool.submit(_gen_with_progress, "B", prompt_b, path_b, all_refs_b)
         result_a = fut_a.result()
         result_b = fut_b.result()
 
@@ -1031,13 +1316,22 @@ def regenerate_one(briefing: dict, live_id: str, angle: str,
     title = briefing.get("title", "")
     _m = _re.search(r'\bLive\s+(\d+)\b', title, _re.IGNORECASE)
     live_number = _m.group(1) if _m else briefing.get("live_num", "")
-    host_refs  = get_host_refs(channel)
+
+    # Recupera expressão do ângulo pra selecionar ref correta
+    angles_data = item.get("angles", {})
+    angle_data = angles_data.get(f"angle_{angle.lower()}", {})
+    expressao = angle_data.get("expressao_host", "")
+
+    # Catalog-based selection with fallback
+    host_refs = select_best_refs(angle_data, channel) if angle_data else None
+    if host_refs is None:
+        host_refs = get_host_refs(channel, expressao=expressao)
     guest_refs = get_guest_refs(live_number) if live_number else []
 
     if not original_prompt:
-        # Reconstrói o prompt
-        angles = item.get("angles", generate_angles(briefing, api_key))
-        angle_data = angles.get(f"angle_{angle.lower()}", {})
+        if not angle_data:
+            angles_data = generate_angles(briefing, api_key)
+            angle_data = angles_data.get(f"angle_{angle.lower()}", {})
         original_prompt = build_live_prompt(
             briefing, angle.upper(), angle_data,
             host_ref_count=len(host_refs),

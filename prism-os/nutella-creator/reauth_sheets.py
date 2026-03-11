@@ -14,6 +14,7 @@ Uso (uma única vez):
 O browser abre automaticamente. Faça login com a conta do canal Frota Para Todos.
 """
 
+import os
 import pickle
 import sys
 from pathlib import Path
@@ -31,7 +32,23 @@ CREDENTIALS_FILE = Path("/Users/marcofassa/Documents/credenciais-somente-LOCAL/"
                          "client_secret_621578997991-29tf5n699oov060gsoq1id1javnm8hbb"
                          ".apps.googleusercontent.com.json")
 
-TOKEN_PATH = Path(__file__).parent.parent.parent / "assistant-sexta-feira" / "token_youtube_write.pickle"
+_PROJECT_DIR = Path(__file__).parent
+
+def _read_env_token_path() -> str | None:
+    """Lê YOUTUBE_TOKEN_PATH do .env local (sem python-dotenv)."""
+    env_file = _PROJECT_DIR / ".env"
+    if env_file.exists():
+        with open(env_file) as f:
+            for line in f:
+                if line.startswith("YOUTUBE_TOKEN_PATH"):
+                    return line.split("=", 1)[1].strip().strip('"')
+    return None
+
+TOKEN_PATH = Path(
+    os.getenv("YOUTUBE_TOKEN_PATH")
+    or _read_env_token_path()
+    or str(_PROJECT_DIR.parent.parent.parent / "assistant-sexta-feira" / "token_youtube_write.pickle")
+)
 
 
 def main():

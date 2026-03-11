@@ -1298,6 +1298,26 @@
       background: var(--purple-subtle);
     }
 
+    /* ===== ROTEIRO SCREEN ===== */
+    .rot-channel-btn, .rot-src-tab {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .rot-channel-btn:hover, .rot-src-tab:hover { border-color: var(--border-hover); color: var(--text-secondary); }
+    .rot-channel-btn.active, .rot-src-tab.active {
+      border-color: var(--purple);
+      color: var(--purple);
+      background: var(--purple-subtle);
+    }
+
     /* ===== THUMBNAILS LIVE SCREEN ===== */
     .tl-container {
       max-width: 900px;
@@ -1480,6 +1500,8 @@
       font-size: 13px;
       color: var(--text-muted);
     }
+    .tl-thumb-col { flex: 1; min-width: 280px; }
+    .tl-thumb-col .tl-thumb-img-area img { display: none; }
     .tl-thumb-placeholder {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
@@ -1659,6 +1681,7 @@
         <div class="mode-selector">
           <button class="mode-tab active" id="mode-tab-cortes" onclick="setMode('cortes')">▶ Cortes de Lives</button>
           <button class="mode-tab" id="mode-tab-thumbs" onclick="setMode('thumbs')">&#9646; Thumbnails de Live</button>
+          <button class="mode-tab" id="mode-tab-roteiro" onclick="setMode('roteiro')">&#9998; Thumb de Roteiro</button>
         </div>
 
         <div class="home-input-group">
@@ -1878,20 +1901,34 @@
               <div class="tl-label">Q3 — CONTEÚDO (O que acontece na live)</div>
               <textarea class="tl-textarea" id="tl-q3" placeholder="Ex: Julio demonstra ao vivo como reduzir 30% do custo de combustível usando relatórios..."></textarea>
             </div>
+            <div class="tl-field">
+              <div class="tl-label">OBSERVACAO CRIATIVA (OPCIONAL)</div>
+              <textarea class="tl-textarea" id="tl-creative-note" rows="2"
+                placeholder="Ex: explorar angulo da guerra, tom ironico, focar no R$300/mes, nao usar vermelho..."></textarea>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px;font-family:var(--font-mono)">
+                Direcao extra para a IA. Quando preenchido, tem prioridade sobre escolhas automaticas.
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Guest photo upload -->
+        <!-- Guest photo upload (multi-guest) -->
         <div class="tl-section">
-          <div class="tl-label" style="margin-bottom:12px">FOTO DO CONVIDADO (OPCIONAL)</div>
-          <label class="tl-guest-upload" for="tl-guest-file" id="tl-guest-label">
-            <span style="font-size:18px">&#128100;</span>
-            <input class="tl-guest-name-input" id="tl-guest-name" type="text" placeholder="Nome do convidado (ex: Nelson Margarido)" onclick="event.stopPropagation()">
-            <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);flex-shrink:0" id="tl-guest-filename"></span>
-          </label>
-          <input type="file" id="tl-guest-file" accept="image/*" style="display:none" onchange="tlGuestFileSelected(this)">
-          <!-- Convidados detectados automaticamente -->
-          <div id="tl-guest-detected" style="display:none;margin-top:10px;gap:10px;flex-wrap:wrap"></div>
+          <div class="tl-label" style="margin-bottom:12px">CONVIDADOS (OPCIONAL)</div>
+          <!-- Convidados detectados automaticamente — multi-select -->
+          <div id="tl-guest-detected" style="display:none;margin-top:0;margin-bottom:10px;gap:10px;flex-wrap:wrap"></div>
+          <!-- Lista de convidados selecionados -->
+          <div id="tl-guest-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px"></div>
+          <!-- Adicionar convidado manualmente -->
+          <div style="display:flex;gap:8px;align-items:center">
+            <label class="tl-guest-upload" for="tl-guest-file" id="tl-guest-label" style="flex:1;margin:0">
+              <span style="font-size:18px">&#128100;</span>
+              <input class="tl-guest-name-input" id="tl-guest-name" type="text" placeholder="Nome do convidado" onclick="event.stopPropagation()">
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);flex-shrink:0" id="tl-guest-filename"></span>
+            </label>
+            <input type="file" id="tl-guest-file" accept="image/*" style="display:none" onchange="tlGuestFileSelected(this)">
+            <button type="button" onclick="tlAddGuest()" style="padding:8px 14px;background:var(--purple);color:white;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;letter-spacing:1px">+ ADD</button>
+          </div>
         </div>
 
         <!-- Divergence slider -->
@@ -1981,6 +2018,310 @@
         </div>
 
         <div id="tl-approved-banner" style="display:none;margin-top:12px"></div>
+
+        <!-- Publish Actions (aparecem apos aprovacao) -->
+        <div id="tl-publish-actions" style="display:none;margin-top:16px">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.1em">PUBLICAR</div>
+          <!-- YouTube -->
+          <div id="tl-yt-row" style="display:none;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-sm" id="tl-btn-yt-title" onclick="tlUpdateYtTitle()" style="border-color:var(--red);color:var(--red)">Atualizar Titulo no YT</button>
+              <button class="btn btn-sm" id="tl-btn-yt-thumb" onclick="tlUpdateYtThumb()" style="border-color:var(--red);color:var(--red)">Atualizar Thumb no YT</button>
+            </div>
+            <span id="tl-yt-title-status" style="font-family:var(--font-mono);font-size:11px;display:block;margin-top:4px"></span>
+            <span id="tl-yt-thumb-status" style="font-family:var(--font-mono);font-size:11px;display:block;margin-top:2px"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: THUMB ROTEIRO ===== -->
+  <div class="screen" id="screen-roteiro">
+    <div class="tl-topbar">
+      <div class="topbar-brand" onclick="goHome()">
+        <div class="topbar-icon"></div>
+        <span class="topbar-title">PRISM OS</span>
+      </div>
+      <div class="topbar-sep"></div>
+      <span style="font-family:var(--font-mono);font-size:12px;color:var(--purple)">THUMB DE ROTEIRO</span>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost btn-sm" onclick="rotShowStep('source')">Inicio</button>
+      </div>
+    </div>
+
+    <!-- ==================== STEP 1: SELECIONAR VIDEO ==================== -->
+    <div id="rot-step-source">
+      <div class="tl-container">
+        <div class="tl-step-header">STEP 1 — SELECIONAR O VIDEO</div>
+
+        <!-- Canal -->
+        <div class="tl-section">
+          <div class="tl-field" style="margin-bottom:16px">
+            <div class="tl-label">CANAL</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm rot-channel-btn active" id="rot-ch-fleet" onclick="rotSetChannel('fleet')">Fleet</button>
+              <button class="btn btn-sm rot-channel-btn" id="rot-ch-teams" onclick="rotSetChannel('teams')">Teams</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab selector: fontes do video -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="btn btn-sm rot-src-tab active" id="rot-tab-planilha" onclick="rotSetSource('planilha')">Buscar da planilha</button>
+          <button class="btn btn-sm rot-src-tab" id="rot-tab-url" onclick="rotSetSource('url')">URL YouTube</button>
+          <button class="btn btn-sm rot-src-tab" id="rot-tab-text" onclick="rotSetSource('text')">Colar roteiro/transcricao</button>
+        </div>
+
+        <!-- Source: Planilha -->
+        <div id="rot-src-planilha" class="tl-section">
+          <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+            <button class="btn btn-primary" onclick="rotFetchQueue()">Buscar da Planilha</button>
+            <span id="rot-queue-count" style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)"></span>
+          </div>
+          <div id="rot-queue-content">
+            <div class="tl-empty">Clique em "Buscar da Planilha" para carregar os itens.</div>
+          </div>
+        </div>
+
+        <!-- Source: URL YouTube -->
+        <div id="rot-src-url" class="tl-section" style="display:none">
+          <div class="tl-field">
+            <div class="tl-label">URL DO YOUTUBE</div>
+            <input class="home-input" id="rot-url-input" type="text"
+                   placeholder="https://youtube.com/watch?v=..."
+                   style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px">
+          </div>
+          <div class="tl-field" style="margin-top:12px">
+            <div class="tl-label">TITULO DO VIDEO</div>
+            <input class="home-input" id="rot-url-title" type="text"
+                   placeholder="Titulo do video (opcional, sera preenchido automaticamente)"
+                   style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px">
+          </div>
+          <button class="btn btn-primary" onclick="rotSelectFromUrl()" style="margin-top:12px">
+            Selecionar video
+          </button>
+        </div>
+
+        <!-- Source: Text (roteiro/transcricao) -->
+        <div id="rot-src-text" class="tl-section" style="display:none">
+          <div class="tl-field">
+            <div class="tl-label">TITULO DO VIDEO</div>
+            <input class="home-input" id="rot-text-title" type="text"
+                   placeholder="Titulo do video"
+                   style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px;margin-bottom:12px">
+          </div>
+          <div class="tl-field">
+            <div class="tl-label">ROTEIRO OU TRANSCRICAO</div>
+            <textarea class="tl-textarea" id="rot-text-input" rows="8"
+                      placeholder="Cole aqui o roteiro, script ou transcricao do video..."></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="rotSelectFromText()" style="margin-top:12px">
+            Selecionar video
+          </button>
+        </div>
+
+        <!-- Banner item selecionado -->
+        <div id="rot-selected-banner" style="display:none;background:var(--surface-2);border:1px solid var(--purple);border-radius:10px;padding:14px 18px;margin-top:16px"></div>
+
+      </div>
+    </div>
+
+    <!-- ==================== STEP 2: BRIEFING ==================== -->
+    <div id="rot-step-briefing" style="display:none">
+      <div class="tl-container">
+        <button class="tl-back-btn" onclick="rotShowStep('source')">&#8592; Voltar para selecao</button>
+
+        <div class="tl-step-header">STEP 2 — BRIEFING</div>
+
+        <!-- Info do video selecionado -->
+        <div class="tl-section" id="rot-briefing-header"></div>
+
+        <!-- Auto-fill do video (se URL disponivel) -->
+        <div id="rot-auto-briefing-row" style="display:none;margin-bottom:16px">
+          <button class="btn btn-primary" id="rot-btn-auto-briefing" onclick="rotAutoBriefing()" style="background:transparent;border-color:var(--purple);color:var(--purple)">
+            &#9889; Auto-preencher do video
+          </button>
+          <span id="rot-auto-briefing-status" style="margin-left:12px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono)"></span>
+        </div>
+
+        <div class="tl-section">
+          <!-- Audio upload -->
+          <div class="tl-field" style="margin-bottom:16px">
+            <div class="tl-label">AUDIO DE BRIEFING (OPCIONAL)</div>
+            <label class="tl-audio-row" for="rot-audio-file">
+              <span class="tl-audio-icon">&#127908;</span>
+              <div>
+                <div class="tl-audio-label"><strong>Carregar audio</strong> — transcreve e preenche Q1, Q2, Q3</div>
+                <div id="rot-audio-name" style="font-family:var(--font-mono);font-size:11px;color:var(--purple);margin-top:4px"></div>
+              </div>
+            </label>
+            <input type="file" id="rot-audio-file" accept="audio/*" style="display:none" onchange="rotAudioSelected(this)">
+            <div id="rot-audio-status" style="font-size:12px;color:var(--text-muted);font-family:var(--font-mono);margin-top:6px"></div>
+          </div>
+
+          <!-- Q1, Q2, Q3 -->
+          <div class="tl-briefing-form">
+            <div class="tl-field">
+              <div class="tl-label">Q1 — QUEM ASSISTE? (Perfil do publico)</div>
+              <textarea class="tl-textarea" id="rot-q1" placeholder="Ex: gestores de frotas preocupados com custo de combustivel..."></textarea>
+            </div>
+            <div class="tl-field">
+              <div class="tl-label">Q2 — OBJETIVO (O que queremos que o espectador entenda/decida)</div>
+              <textarea class="tl-textarea" id="rot-q2" placeholder="Ex: entender que passividade diante da crise o tornara anticompetitivo..."></textarea>
+            </div>
+            <div class="tl-field">
+              <div class="tl-label">Q3 — CONTEUDO (O que acontece no video)</div>
+              <textarea class="tl-textarea" id="rot-q3" placeholder="Ex: alerta sobre preco do petroleo, calculo do impacto nas frotas, solucoes praticas..."></textarea>
+            </div>
+            <div class="tl-field">
+              <div class="tl-label">OBSERVACAO CRIATIVA (OPCIONAL)</div>
+              <textarea class="tl-textarea" id="rot-creative-note" rows="2"
+                placeholder="Ex: explorar angulo da guerra, tom ironico, focar no R$300/mes, nao usar vermelho..."></textarea>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px;font-family:var(--font-mono)">
+                Direcao extra para a IA. Quando preenchido, tem prioridade sobre escolhas automaticas.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guest photo -->
+        <div class="tl-section">
+          <div class="tl-label" style="margin-bottom:12px">CONVIDADOS (OPCIONAL)</div>
+          <div id="rot-guest-detected" style="display:none;margin-top:0;margin-bottom:10px;gap:10px;flex-wrap:wrap"></div>
+          <div id="rot-guest-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px"></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <label class="tl-guest-upload" for="rot-guest-file" style="flex:1;margin:0">
+              <span style="font-size:18px">&#128100;</span>
+              <input class="tl-guest-name-input" id="rot-guest-name" type="text" placeholder="Nome do convidado" onclick="event.stopPropagation()">
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);flex-shrink:0" id="rot-guest-filename"></span>
+            </label>
+            <input type="file" id="rot-guest-file" accept="image/*" style="display:none" onchange="rotGuestFileSelected(this)">
+            <button type="button" onclick="rotAddGuest()" style="padding:8px 14px;background:var(--purple);color:white;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;letter-spacing:1px">+ ADD</button>
+          </div>
+        </div>
+
+        <!-- Divergence -->
+        <div style="margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <span style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)">DIVERGENCIA A vs B</span>
+            <span id="rot-div-label" style="font-size:12px;font-weight:700;color:var(--purple);font-family:var(--font-mono)">6 — Moderado</span>
+          </div>
+          <input type="range" id="rot-divergence" min="1" max="10" value="6"
+            style="width:100%;accent-color:var(--purple);cursor:pointer"
+            oninput="rotUpdateDivLabel(this.value)">
+          <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--text-muted)">
+            <span>Sutil</span><span>Moderado</span><span>Alto</span><span>Maximo</span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px">
+          <button class="btn btn-primary" id="rot-btn-generate" onclick="rotGenerate()">
+            Gerar Thumbnails A e B
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== STEP 3: REVIEW A/B ==================== -->
+    <div id="rot-step-review" style="display:none">
+      <div class="tl-container">
+        <button class="tl-back-btn" onclick="rotShowStep('briefing')">&#8592; Voltar para briefing</button>
+        <div class="tl-step-header">STEP 3 — REVIEW A/B</div>
+        <div class="tl-section" id="rot-review-header"></div>
+
+        <!-- Generating progress (streaming) -->
+        <div id="rot-generating-spinner" style="display:none;flex-direction:column;gap:0;padding:20px 4px">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:14px;letter-spacing:0.1em">NANO BANANA v2 — gemini-3.1-flash-image-preview</div>
+          <div id="rot-gen-log" style="display:flex;flex-direction:column;gap:5px"></div>
+        </div>
+
+        <!-- AB grid (reuses same classes as thumb-live) -->
+        <div class="tl-ab-grid" id="rot-ab-grid">
+          <!-- Thumb A -->
+          <div class="tl-thumb-card" id="rot-card-a">
+            <div class="tl-thumb-label">ANGULO A</div>
+            <div class="tl-thumb-img-area">
+              <div class="tl-thumb-placeholder" id="rot-ph-a">A gerar...</div>
+              <div class="tl-thumb-spinner" id="rot-spinner-a" style="display:none">
+                <div class="spinner-ring"></div><span>Gerando A...</span>
+              </div>
+              <img id="rot-img-a" style="display:none" onclick="openOverlay(this.src)">
+            </div>
+            <div class="tl-thumb-actions">
+              <textarea class="tl-feedback-input" id="rot-feedback-a" rows="2" placeholder="Ex: texto maior, fundo mais escuro, expressao mais seria..."></textarea>
+              <div class="tl-btn-row">
+                <button class="btn btn-amber btn-sm" onclick="rotRegenerateOne('A')">Ajustar A</button>
+                <a class="btn btn-ghost btn-sm" id="rot-download-a" style="text-decoration:none;display:none" download>Download A</a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Thumb B -->
+          <div class="tl-thumb-card" id="rot-card-b">
+            <div class="tl-thumb-label">ANGULO B</div>
+            <div class="tl-thumb-img-area">
+              <div class="tl-thumb-placeholder" id="rot-ph-b">A gerar...</div>
+              <div class="tl-thumb-spinner" id="rot-spinner-b" style="display:none">
+                <div class="spinner-ring"></div><span>Gerando B...</span>
+              </div>
+              <img id="rot-img-b" style="display:none" onclick="openOverlay(this.src)">
+            </div>
+            <div class="tl-thumb-actions">
+              <textarea class="tl-feedback-input" id="rot-feedback-b" rows="2" placeholder="Ex: composicao mais dinamica, cores mais vibrantes..."></textarea>
+              <div class="tl-btn-row">
+                <button class="btn btn-amber btn-sm" onclick="rotRegenerateOne('B')">Ajustar B</button>
+                <a class="btn btn-ghost btn-sm" id="rot-download-b" style="text-decoration:none;display:none" download>Download B</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Approve row -->
+        <div class="tl-approve-row" id="rot-approve-row" style="display:none">
+          <button class="btn btn-approve" id="rot-btn-approve-a" onclick="rotApprove('A')">Aprovar A</button>
+          <button class="btn btn-approve" id="rot-btn-approve-b" onclick="rotApprove('B')">Aprovar B</button>
+        </div>
+
+        <!-- Titulo do video (aparece apos thumbs geradas) -->
+        <div id="rot-title-section" style="display:none;margin-top:24px">
+          <div class="tl-section">
+            <div class="tl-step-header">TITULO DO VIDEO</div>
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Titulo que complementa a thumbnail. Gerado com base no briefing, roteiro e thumb.</p>
+
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+              <input class="home-input" id="rot-review-title" type="text"
+                     style="flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-size:14px"
+                     placeholder="Titulo do video...">
+              <button class="btn btn-sm" id="rot-review-btn-titles" onclick="rotGenerateTitlesFromReview()"
+                      style="white-space:nowrap;border-color:var(--purple);color:var(--purple);background:transparent;font-family:var(--font-mono);font-size:10px;padding:10px 14px">
+                GERAR TITULOS
+              </button>
+            </div>
+            <div id="rot-review-titles-picker" style="display:none;flex-direction:column;gap:6px"></div>
+          </div>
+        </div>
+
+        <div id="rot-approved-banner" style="display:none;margin-top:12px"></div>
+
+        <!-- Publish Actions (aparecem apos aprovacao) -->
+        <div id="rot-publish-actions" style="display:none;margin-top:16px">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:10px;letter-spacing:0.1em">PUBLICAR</div>
+          <!-- Drive -->
+          <div id="rot-drive-row" style="display:none;margin-bottom:8px;align-items:center;gap:10px">
+            <button class="btn btn-primary btn-sm" id="rot-btn-drive" onclick="rotUploadDrive()">Enviar pro Drive</button>
+            <span id="rot-drive-status" style="font-family:var(--font-mono);font-size:11px"></span>
+          </div>
+          <!-- YouTube -->
+          <div id="rot-yt-row" style="display:none;margin-bottom:8px">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-sm" id="rot-btn-yt-title" onclick="rotUpdateYtTitle()" style="border-color:var(--red);color:var(--red)">Atualizar Titulo no YT</button>
+              <button class="btn btn-sm" id="rot-btn-yt-thumb" onclick="rotUpdateYtThumb()" style="border-color:var(--red);color:var(--red)">Atualizar Thumb no YT</button>
+            </div>
+            <span id="rot-yt-title-status" style="font-family:var(--font-mono);font-size:11px;display:block;margin-top:4px"></span>
+            <span id="rot-yt-thumb-status" style="font-family:var(--font-mono);font-size:11px;display:block;margin-top:2px"></span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -2674,9 +3015,13 @@
       currentMode = mode;
       document.getElementById('mode-tab-cortes').classList.toggle('active', mode === 'cortes');
       document.getElementById('mode-tab-thumbs').classList.toggle('active', mode === 'thumbs');
+      document.getElementById('mode-tab-roteiro').classList.toggle('active', mode === 'roteiro');
       if (mode === 'thumbs') {
         showScreen('thumb-live');
         tlResetToQueue();
+      } else if (mode === 'roteiro') {
+        showScreen('roteiro');
+        rotShowStep('source');
       } else {
         showScreen('home');
         loadHistory();
@@ -2698,6 +3043,44 @@
     let tlGuestFileData = null;
     let tlGuestFileMime = '';
     let tlGuestFileName = '';
+    let tlGuestsList = []; // [{name, hasFile, fileData, fileMime, fileName}]
+
+    function tlAddGuest() {
+      const nameEl = document.getElementById('tl-guest-name');
+      const name = nameEl.value.trim();
+      if (!name) { toast('Digite o nome do convidado', 'error'); return; }
+      if (tlGuestsList.find(g => g.name === name)) { toast('Convidado ja adicionado', 'error'); return; }
+      tlGuestsList.push({
+        name,
+        hasFile: !!tlGuestFileData,
+        fileData: tlGuestFileData,
+        fileMime: tlGuestFileMime,
+        fileName: tlGuestFileName,
+      });
+      // Reset inputs
+      nameEl.value = '';
+      document.getElementById('tl-guest-filename').textContent = '';
+      tlGuestFileData = null; tlGuestFileMime = ''; tlGuestFileName = '';
+      document.getElementById('tl-guest-file').value = '';
+      tlRenderGuestList();
+    }
+
+    function tlRemoveGuest(idx) {
+      tlGuestsList.splice(idx, 1);
+      tlRenderGuestList();
+    }
+
+    function tlRenderGuestList() {
+      const container = document.getElementById('tl-guest-list');
+      container.innerHTML = tlGuestsList.map((g, i) => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(139,35,229,0.12);border:1px solid var(--purple);border-radius:8px">
+          <span style="font-size:14px">${g.hasFile ? '&#128247;' : '&#128100;'}</span>
+          <span style="flex:1;font-size:13px;color:var(--text-primary);font-weight:600">${g.name}</span>
+          ${g.hasFile ? '<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted)">foto</span>' : '<span style="font-family:var(--font-mono);font-size:10px;color:var(--amber)">sem foto (usar refs)</span>'}
+          <button onclick="tlRemoveGuest(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px;padding:0 4px">&times;</button>
+        </div>
+      `).join('');
+    }
 
     // ===== TL: NAVIGATION =====
     function tlShowStep(step) {
@@ -2803,13 +3186,15 @@
       document.getElementById('tl-q3').value = summary || '';
       document.getElementById('tl-q1').value = '';
       document.getElementById('tl-q2').value = '';
-      // Reset convidado
+      // Reset convidados
       document.getElementById('tl-guest-name').value = '';
       document.getElementById('tl-guest-filename').textContent = '';
       document.getElementById('tl-audio-name').textContent = '';
       document.getElementById('tl-guest-detected').style.display = 'none';
       document.getElementById('tl-guest-detected').innerHTML = '';
+      document.getElementById('tl-guest-list').innerHTML = '';
       tlGuestFileData = null;
+      tlGuestsList = [];
 
       // Extrai número da live do título (ex: "| Live 317" → "317")
       const liveNumMatch = title.match(/\bLive\s+(\d+)\b/i);
@@ -2877,14 +3262,14 @@
 
     async function tlCheckGuest(title) {
       const detectedEl = document.getElementById('tl-guest-detected');
-      const nameEl     = document.getElementById('tl-guest-name');
       try {
         const res  = await fetch(`/api/thumb-guest-check?title=${encodeURIComponent(title)}`);
         const data = await res.json();
         if (!data.found) return;
 
         const guests = data.all_guests || [];
-        detectedEl.innerHTML = '';
+        detectedEl.innerHTML = '<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;width:100%">Convidados detectados (clique pra selecionar):</div>';
+        const selectedNames = new Set();
 
         guests.forEach(g => {
           const chip = document.createElement('div');
@@ -2893,29 +3278,37 @@
             <img src="${g.preview_url}" style="width:36px;height:36px;object-fit:cover;border-radius:50%;border:2px solid var(--purple)" onerror="this.style.display='none'">
             <span style="font-size:13px;color:var(--text-primary)">${g.name}</span>
             <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted)">refs</span>
+            <span class="tl-chip-check" style="display:none;color:var(--green);font-size:16px;font-weight:700">&#10003;</span>
           `;
-          chip.addEventListener('mouseenter', () => chip.style.borderColor = 'var(--purple)');
-          chip.addEventListener('mouseleave', () => chip.style.borderColor = 'rgba(255,255,255,0.1)');
+          chip.addEventListener('mouseenter', () => { if (!selectedNames.has(g.name)) chip.style.borderColor = 'var(--purple)'; });
+          chip.addEventListener('mouseleave', () => { if (!selectedNames.has(g.name)) chip.style.borderColor = 'rgba(255,255,255,0.1)'; });
           chip.addEventListener('click', () => {
-            nameEl.value = g.name;
-            // Marca chip selecionado
-            detectedEl.querySelectorAll('div').forEach(c => c.style.borderColor = 'rgba(255,255,255,0.1)');
-            chip.style.borderColor = 'var(--purple)';
-            chip.style.background  = 'rgba(139,35,229,0.15)';
+            if (selectedNames.has(g.name)) {
+              // Deselect
+              selectedNames.delete(g.name);
+              chip.style.borderColor = 'rgba(255,255,255,0.1)';
+              chip.style.background  = 'rgba(255,255,255,0.05)';
+              chip.querySelector('.tl-chip-check').style.display = 'none';
+              tlGuestsList = tlGuestsList.filter(x => x.name !== g.name);
+            } else {
+              // Select
+              selectedNames.add(g.name);
+              chip.style.borderColor = 'var(--purple)';
+              chip.style.background  = 'rgba(139,35,229,0.15)';
+              chip.querySelector('.tl-chip-check').style.display = '';
+              if (!tlGuestsList.find(x => x.name === g.name)) {
+                tlGuestsList.push({ name: g.name, hasFile: false, fileData: null, fileMime: '', fileName: '' });
+              }
+            }
+            tlRenderGuestList();
           });
           detectedEl.appendChild(chip);
         });
 
         detectedEl.style.display = 'flex';
 
-        // Auto-seleciona o único convidado
-        if (guests.length === 1) {
-          nameEl.value = guests[0].name;
-          if (detectedEl.firstChild) {
-            detectedEl.firstChild.style.borderColor = 'var(--purple)';
-            detectedEl.firstChild.style.background  = 'rgba(139,35,229,0.15)';
-          }
-        }
+        // Auto-seleciona TODOS os convidados detectados
+        detectedEl.querySelectorAll('div[style*="cursor:pointer"]').forEach(chip => chip.click());
       } catch(e) {
         console.warn('guest check failed', e);
       }
@@ -3026,21 +3419,35 @@
       const q1 = document.getElementById('tl-q1').value.trim();
       const q2 = document.getElementById('tl-q2').value.trim();
       const q3 = document.getElementById('tl-q3').value.trim();
+      const creativeNote = document.getElementById('tl-creative-note')?.value?.trim() || '';
 
       if (!q1 && !q2 && !q3 && !tlCurrentBriefing.thumb_text) {
         toast('Preencha ao menos um campo do briefing', 'error');
         return;
       }
 
-      const guestName = document.getElementById('tl-guest-name').value.trim();
+      // Adiciona convidado pendente no input (se nao clicou ADD)
+      const pendingName = document.getElementById('tl-guest-name').value.trim();
+      if (pendingName && !tlGuestsList.find(g => g.name === pendingName)) {
+        tlGuestsList.push({ name: pendingName, hasFile: !!tlGuestFileData, fileData: tlGuestFileData, fileMime: tlGuestFileMime, fileName: tlGuestFileName });
+      }
+
+      const guestNames = tlGuestsList.map(g => g.name).filter(Boolean);
       tlCurrentBriefing = {
         ...tlCurrentBriefing, q1, q2, q3,
-        guest: guestName,
+        creative_note: creativeNote,
+        guest: guestNames.join(', '),
+        guests: guestNames,
       };
 
-      // Upload foto de convidado se tiver
-      if (tlGuestFileData && guestName) {
-        await tlUploadGuestPhoto(guestName);
+      // Upload fotos de convidados que tenham arquivo
+      for (const g of tlGuestsList) {
+        if (g.hasFile && g.fileData && g.name) {
+          tlGuestFileData = g.fileData;
+          tlGuestFileMime = g.fileMime;
+          tlGuestFileName = g.fileName;
+          await tlUploadGuestPhoto(g.name);
+        }
       }
 
       // Vai para review e mostra spinner
@@ -3062,6 +3469,10 @@
       tlApprovedAngles = new Set();
       document.getElementById('tl-approved-banner').style.display = 'none';
       document.getElementById('tl-approved-banner').innerHTML = '';
+      document.getElementById('tl-publish-actions').style.display = 'none';
+      document.getElementById('tl-yt-row').style.display = 'none';
+      document.getElementById('tl-yt-title-status').innerHTML = '';
+      document.getElementById('tl-yt-thumb-status').innerHTML = '';
       document.getElementById('tl-approve-row').style.display = '';
       ['a','b'].forEach(a => document.getElementById(`tl-btn-approve-${a}`)?.classList.remove('active'));
       document.getElementById('tl-generating-spinner').style.display = 'flex';
@@ -3304,8 +3715,95 @@
         }
 
         toast(`Thumbnail ${choice} aprovada!`, 'success');
+
+        // Mostra YouTube publish actions
+        tlShowPublishActions();
       } catch (e) {
         toast('Erro: ' + e.message, 'error');
+      }
+    }
+
+    function tlShowPublishActions() {
+      const actions = document.getElementById('tl-publish-actions');
+      actions.style.display = '';
+
+      // YouTube: mostra se item tem URL YouTube
+      const ytRow = document.getElementById('tl-yt-row');
+      const videoUrl = tlCurrentItem ? (tlCurrentItem['url'] || tlCurrentItem['URL'] || tlCurrentItem['link'] || tlCurrentItem['Link'] || '') : '';
+      const videoId = _extractYtVideoId(videoUrl);
+      if (videoId) {
+        ytRow.style.display = '';
+      } else {
+        ytRow.style.display = 'none';
+      }
+    }
+
+    function _getTlApprovedThumbPath() {
+      // Retorna path da ultima thumb aprovada
+      for (const side of ['a', 'b']) {
+        if (tlApprovedAngles.has(side.toUpperCase())) {
+          const img = document.getElementById(`tl-img-${side}`);
+          if (img && img.src) return img.src.replace(window.location.origin + '/', '');
+        }
+      }
+      return '';
+    }
+
+    async function tlUpdateYtTitle() {
+      const btn = document.getElementById('tl-btn-yt-title');
+      const status = document.getElementById('tl-yt-title-status');
+      const videoUrl = tlCurrentItem ? (tlCurrentItem['url'] || tlCurrentItem['URL'] || tlCurrentItem['link'] || tlCurrentItem['Link'] || '') : '';
+      const videoId = _extractYtVideoId(videoUrl);
+      if (!videoId) { toast('URL YouTube nao encontrada', 'error'); return; }
+
+      const newTitle = tlCurrentBriefing.title || '';
+      if (!newTitle) { toast('Titulo nao definido', 'error'); return; }
+
+      btn.disabled = true; btn.textContent = 'Atualizando...';
+      status.innerHTML = '';
+      try {
+        const resp = await fetch('/api/youtube-update-title', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ video_id: videoId, new_title: newTitle })
+        });
+        const data = await resp.json();
+        if (!data.success) { toast('Erro YT: ' + (data.error || 'desconhecido'), 'error'); btn.disabled = false; btn.textContent = 'Atualizar Titulo no YT'; return; }
+        status.innerHTML = `<span style="color:var(--green)">&#10003; Titulo atualizado</span>`;
+        btn.disabled = false; btn.textContent = 'Atualizar Titulo no YT';
+        toast('Titulo atualizado no YouTube!', 'success');
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+        btn.disabled = false; btn.textContent = 'Atualizar Titulo no YT';
+      }
+    }
+
+    async function tlUpdateYtThumb() {
+      const btn = document.getElementById('tl-btn-yt-thumb');
+      const status = document.getElementById('tl-yt-thumb-status');
+      const videoUrl = tlCurrentItem ? (tlCurrentItem['url'] || tlCurrentItem['URL'] || tlCurrentItem['link'] || tlCurrentItem['Link'] || '') : '';
+      const videoId = _extractYtVideoId(videoUrl);
+      if (!videoId) { toast('URL YouTube nao encontrada', 'error'); return; }
+
+      const thumbPath = _getTlApprovedThumbPath();
+      if (!thumbPath) { toast('Nenhuma thumb aprovada', 'error'); return; }
+
+      btn.disabled = true; btn.textContent = 'Enviando...';
+      status.innerHTML = '';
+      try {
+        const resp = await fetch('/api/youtube-update-thumb', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ video_id: videoId, image_path: thumbPath })
+        });
+        const data = await resp.json();
+        if (!data.success) { toast('Erro YT: ' + (data.error || 'desconhecido'), 'error'); btn.disabled = false; btn.textContent = 'Atualizar Thumb no YT'; return; }
+        status.innerHTML = `<span style="color:var(--green)">&#10003; Thumbnail atualizada</span>`;
+        btn.disabled = false; btn.textContent = 'Atualizar Thumb no YT';
+        toast('Thumbnail atualizada no YouTube!', 'success');
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+        btn.disabled = false; btn.textContent = 'Atualizar Thumb no YT';
       }
     }
 
@@ -3569,6 +4067,727 @@
       }
       drawPrism();
     })();
+
+    // ===== ROTEIRO (THUMB DE VIDEO COM ROTEIRO) =====
+    let rotChannel = 'fleet';
+    let rotSource = 'planilha';
+    let rotGuestsList = [];
+    let rotGuestFileData = null;
+    let rotGuestFileMime = '';
+    let rotGuestFileName = '';
+    let rotVideoTitle = '';
+    let rotVideoUrl = '';
+    let rotScriptText = '';
+
+    function rotShowStep(step) {
+      ['source', 'briefing', 'review'].forEach(s => {
+        const el = document.getElementById(`rot-step-${s}`);
+        if (el) el.style.display = s === step ? '' : 'none';
+      });
+      if (step === 'source') {
+        // Reset state
+        rotVideoTitle = '';
+        rotVideoUrl = '';
+        rotScriptText = '';
+        rotSelectedItem = null;
+        rotApprovedSide = '';
+        document.getElementById('rot-selected-banner').style.display = 'none';
+        document.getElementById('rot-approved-banner').style.display = 'none';
+        document.getElementById('rot-publish-actions').style.display = 'none';
+        document.getElementById('rot-drive-row').style.display = 'none';
+        document.getElementById('rot-yt-row').style.display = 'none';
+        document.getElementById('rot-drive-status').innerHTML = '';
+        document.getElementById('rot-yt-title-status').innerHTML = '';
+        document.getElementById('rot-yt-thumb-status').innerHTML = '';
+      }
+    }
+
+    function rotSetChannel(ch) {
+      rotChannel = ch;
+      document.getElementById('rot-ch-fleet').classList.toggle('active', ch === 'fleet');
+      document.getElementById('rot-ch-teams').classList.toggle('active', ch === 'teams');
+    }
+
+    function rotSetSource(src) {
+      rotSource = src;
+      ['planilha', 'text', 'url'].forEach(s => {
+        document.getElementById(`rot-tab-${s}`).classList.toggle('active', s === src);
+        const el = document.getElementById(`rot-src-${s}`);
+        if (el) el.style.display = s === src ? '' : 'none';
+      });
+    }
+
+    // Selecionar video via URL YouTube
+    function rotSelectFromUrl() {
+      const url = document.getElementById('rot-url-input').value.trim();
+      if (!url) { toast('Cole a URL do YouTube', 'error'); return; }
+      rotVideoUrl = url;
+      rotVideoTitle = document.getElementById('rot-url-title').value.trim() || '';
+      rotScriptText = '';
+      rotGoToBriefing();
+    }
+
+    // Selecionar video via texto (roteiro/transcricao)
+    function rotSelectFromText() {
+      const text = document.getElementById('rot-text-input').value.trim();
+      const title = document.getElementById('rot-text-title').value.trim();
+      if (!text && !title) { toast('Preencha o titulo ou cole o roteiro', 'error'); return; }
+      rotVideoTitle = title;
+      rotVideoUrl = '';
+      rotScriptText = text;
+      rotGoToBriefing();
+    }
+
+    // Navega pro Step 2 (briefing) com video selecionado
+    function rotGoToBriefing() {
+      // Header com info do video
+      const header = document.getElementById('rot-briefing-header');
+      header.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span class="tl-channel-badge ${rotChannel}">${rotChannel}</span>
+          <strong style="font-size:15px">${rotVideoTitle || 'Video sem titulo'}</strong>
+          ${rotVideoUrl ? `<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted)">${rotVideoUrl.substring(0, 50)}...</span>` : ''}
+          ${rotScriptText ? `<span style="font-family:var(--font-mono);font-size:10px;color:var(--purple)">roteiro colado</span>` : ''}
+        </div>
+      `;
+
+      // Mostra auto-fill se tem URL ou script
+      const autoRow = document.getElementById('rot-auto-briefing-row');
+      if (rotVideoUrl || rotScriptText) {
+        autoRow.style.display = '';
+        document.getElementById('rot-btn-auto-briefing').textContent = rotVideoUrl
+          ? '\u26A1 Auto-preencher do video'
+          : '\u26A1 Extrair briefing do roteiro';
+      } else {
+        autoRow.style.display = 'none';
+      }
+
+      // Se veio da planilha com URL, auto-transcreve em background
+      if (rotVideoUrl && rotSelectedItem) {
+        rotAutoBriefing();
+      }
+
+      rotShowStep('briefing');
+    }
+
+    // Auto-preencher briefing (URL ou texto)
+    async function rotAutoBriefing() {
+      const btn = document.getElementById('rot-btn-auto-briefing');
+      const status = document.getElementById('rot-auto-briefing-status');
+      btn.disabled = true;
+      status.textContent = 'Processando...';
+
+      try {
+        let data;
+        if (rotVideoUrl) {
+          const resp = await fetch('/api/auto-briefing', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ video_url: rotVideoUrl, title: rotVideoTitle })
+          });
+          data = await resp.json();
+          if (data.transcript) rotScriptText = data.transcript;
+        } else if (rotScriptText) {
+          const resp = await fetch('/api/briefing-from-text', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ text: rotScriptText, title: rotVideoTitle })
+          });
+          data = await resp.json();
+        }
+
+        if (data && !data.error) {
+          document.getElementById('rot-q1').value = data.q1 || '';
+          document.getElementById('rot-q2').value = data.q2 || '';
+          document.getElementById('rot-q3').value = data.q3 || '';
+          status.textContent = 'Preenchido!';
+          toast('Briefing preenchido automaticamente', 'success');
+        } else {
+          status.textContent = 'Erro';
+          toast('Erro: ' + (data?.error || 'falha'), 'error');
+        }
+      } catch (e) {
+        status.textContent = 'Erro';
+        toast('Erro: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    let rotAudioB64 = '';
+    let rotAudioMime = '';
+
+    function rotAudioSelected(input) {
+      const file = input.files[0];
+      if (!file) return;
+      document.getElementById('rot-audio-name').textContent = file.name;
+      rotAudioMime = file.type || 'audio/m4a';
+      const reader = new FileReader();
+      reader.onload = () => {
+        rotAudioB64 = reader.result.split(',')[1];
+        // Auto-trigger transcription
+        rotTranscribeAudio();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function rotTranscribeAudio() {
+      if (!rotAudioB64) { toast('Selecione um audio primeiro', 'error'); return; }
+
+      const status = document.getElementById('rot-audio-status');
+      status.textContent = 'Transcrevendo com Gemini...';
+
+      try {
+        const resp = await fetch('/api/thumb-transcribe', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ audio_base64: rotAudioB64, mime_type: rotAudioMime })
+        });
+        const data = await resp.json();
+        if (data.error) { toast('Erro: ' + data.error, 'error'); status.textContent = 'Erro'; return; }
+
+        document.getElementById('rot-q1').value = data.q1 || '';
+        document.getElementById('rot-q2').value = data.q2 || '';
+        document.getElementById('rot-q3').value = data.q3 || '';
+        status.textContent = 'Preenchido!';
+        toast('Briefing extraido do audio', 'success');
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+        status.textContent = 'Erro';
+      }
+    }
+
+    let rotQueueItems = [];
+
+    async function rotFetchQueue() {
+      const content = document.getElementById('rot-queue-content');
+      const counter = document.getElementById('rot-queue-count');
+      content.innerHTML = '<div class="tl-loading"><div class="spinner-ring"></div><span>Buscando planilha...</span></div>';
+      counter.textContent = '';
+
+      try {
+        const resp = await fetch('/api/thumb-queue');
+        const data = await resp.json();
+
+        if (data.error) {
+          content.innerHTML = `<div class="tl-empty" style="color:var(--red)">${data.error}</div>`;
+          return;
+        }
+
+        rotQueueItems = data.items || [];
+        counter.textContent = `${rotQueueItems.length} item${rotQueueItems.length !== 1 ? 's' : ''}`;
+
+        if (!rotQueueItems.length) {
+          content.innerHTML = '<div class="tl-empty">Nenhum item na planilha.</div>';
+          return;
+        }
+
+        content.innerHTML = '<div class="tl-queue-list">' +
+          rotQueueItems.map((item, idx) => {
+            const channel   = item._channel || 'fleet';
+            const title     = item['title'] || item['Título'] || item._live_id || 'Sem titulo';
+            const type      = item['type'] || '';
+            const tema      = item['tema'] || '';
+            const convidado = item['Convidado'] || '';
+            return `
+              <div class="tl-queue-card" onclick="rotSelectItem(${idx})">
+                <div class="tl-queue-info">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+                    <span class="tl-channel-badge ${channel}">${channel}</span>
+                    ${type ? `<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;border:1px solid var(--border);padding:1px 6px;border-radius:4px">${type}</span>` : ''}
+                    ${convidado ? `<span style="font-family:var(--font-mono);font-size:10px;color:var(--amber)">+ ${convidado}</span>` : ''}
+                  </div>
+                  ${tema ? `<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:3px">TEMA: ${tema}</div>` : ''}
+                  <div class="tl-queue-title">${title}</div>
+                </div>
+                <button class="btn btn-primary btn-sm" style="flex-shrink:0" onclick="event.stopPropagation();rotSelectItem(${idx})">Selecionar</button>
+              </div>
+            `;
+          }).join('') + '</div>';
+
+      } catch (e) {
+        content.innerHTML = `<div class="tl-empty" style="color:var(--red)">Erro: ${e.message}</div>`;
+      }
+    }
+
+    function rotSelectItem(idx) {
+      const item = rotQueueItems[idx];
+      const channel = item._channel || 'fleet';
+      const tema    = item['tema'] || '';
+      const title   = item['title'] || item['Título'] || tema || item._live_id || '';
+      const summary = item['summary'] || item['Resumo (200 palavras)'] || '';
+      const convidado = item['Convidado'] || '';
+      const videoUrl = item['url'] || item['URL'] || item['link'] || item['Link'] || '';
+
+      rotSetChannel(channel);
+      rotSelectedItem = item;
+      rotVideoTitle = title;
+      rotVideoUrl = videoUrl;
+      rotScriptText = '';
+
+      // Pre-fill Q3 com summary se tiver
+      if (summary) {
+        document.getElementById('rot-q3').value = summary;
+      }
+
+      // Pre-fill guest
+      if (convidado) {
+        rotGuestsList = [{ name: convidado, hasFile: false, fileData: null, fileMime: '', fileName: '' }];
+        rotRenderGuestList();
+      }
+
+      // Navega pro briefing
+      rotGoToBriefing();
+    }
+
+    let rotSelectedItem = null;
+
+    function rotClearSelection() {
+      rotSelectedItem = null;
+      document.getElementById('rot-selected-banner').style.display = 'none';
+      rotSetSource('planilha');
+    }
+
+    function rotUpdateDivLabel(val) {
+      val = parseInt(val);
+      const label = val <= 3 ? 'Sutil' : val <= 6 ? 'Moderado' : val <= 8 ? 'Alto' : 'Maximo';
+      document.getElementById('rot-div-label').textContent = `${val} — ${label}`;
+    }
+
+    function rotGuestFileSelected(input) {
+      const file = input.files[0];
+      if (!file) return;
+      rotGuestFileName = file.name;
+      rotGuestFileMime = file.type;
+      document.getElementById('rot-guest-filename').textContent = file.name;
+      const reader = new FileReader();
+      reader.onload = () => { rotGuestFileData = reader.result.split(',')[1]; };
+      reader.readAsDataURL(file);
+    }
+
+    function rotAddGuest() {
+      const nameEl = document.getElementById('rot-guest-name');
+      const name = nameEl.value.trim();
+      if (!name) { toast('Digite o nome do convidado', 'error'); return; }
+      if (rotGuestsList.find(g => g.name === name)) { toast('Convidado ja adicionado', 'error'); return; }
+      rotGuestsList.push({ name, hasFile: !!rotGuestFileData, fileData: rotGuestFileData, fileMime: rotGuestFileMime, fileName: rotGuestFileName });
+      nameEl.value = '';
+      document.getElementById('rot-guest-filename').textContent = '';
+      rotGuestFileData = null; rotGuestFileMime = ''; rotGuestFileName = '';
+      document.getElementById('rot-guest-file').value = '';
+      rotRenderGuestList();
+    }
+
+    function rotRenderGuestList() {
+      const container = document.getElementById('rot-guest-list');
+      container.innerHTML = rotGuestsList.map((g, i) => `
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface-2);border-radius:6px;font-size:12px">
+          <span>&#128100;</span>
+          <span style="font-weight:600">${g.name}</span>
+          ${g.hasFile ? '<span style="color:var(--green);font-family:var(--font-mono);font-size:10px">foto</span>' : ''}
+          <button onclick="rotGuestsList.splice(${i},1);rotRenderGuestList()" style="margin-left:auto;background:none;border:none;color:var(--red);cursor:pointer;font-size:14px">x</button>
+        </div>
+      `).join('');
+    }
+
+    // Gera titulos na tela de review (com thumb visivel)
+    async function rotGenerateTitlesFromReview() {
+      const q1 = document.getElementById('rot-q1').value.trim();
+      const q2 = document.getElementById('rot-q2').value.trim();
+      const q3 = document.getElementById('rot-q3').value.trim();
+      const creativeNote = document.getElementById('rot-creative-note')?.value?.trim() || '';
+      const tema = rotSelectedItem ? (rotSelectedItem['tema'] || '') : '';
+      const current = document.getElementById('rot-review-title').value.trim();
+      const script = rotScriptText || '';
+
+      const btn = document.getElementById('rot-review-btn-titles');
+      btn.disabled = true;
+      btn.textContent = 'GERANDO...';
+
+      try {
+        const resp = await fetch('/api/generate-titles', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ q1, q2, q3, channel: rotChannel, tema, current_title: current, script, creative_note: creativeNote })
+        });
+        const data = await resp.json();
+        if (data.error) { toast('Erro: ' + data.error, 'error'); return; }
+
+        const picker = document.getElementById('rot-review-titles-picker');
+        const strategyLabels = { ctr: 'CTR', seo: 'SEO', authority: 'AUTORIDADE' };
+        const strategyColors = { ctr: 'var(--red)', seo: 'var(--green)', authority: 'var(--blue)' };
+
+        picker.style.display = 'flex';
+        picker.innerHTML = (data.titles || []).map(t => `
+          <div onclick="rotPickReviewTitle(this, '${t.title.replace(/'/g, "\\'")}')"
+               style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s"
+               onmouseover="this.style.borderColor='var(--purple)'" onmouseout="if(!this.classList.contains('picked'))this.style.borderColor='var(--border)'">
+            <span style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 8px;border-radius:4px;background:${strategyColors[t.strategy] || 'var(--purple)'};color:#fff;flex-shrink:0">${strategyLabels[t.strategy] || t.strategy}</span>
+            <span style="font-size:13px;font-weight:600;flex:1">${t.title}</span>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);max-width:220px">${t.why || ''}</span>
+          </div>
+        `).join('');
+        toast('3 titulos gerados!', 'success');
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'GERAR TITULOS';
+      }
+    }
+
+    function rotPickReviewTitle(el, title) {
+      document.getElementById('rot-review-title').value = title;
+      el.parentElement.querySelectorAll('div').forEach(d => { d.style.borderColor = 'var(--border)'; d.style.background = 'var(--surface-2)'; d.classList.remove('picked'); });
+      el.style.borderColor = 'var(--purple)';
+      el.style.background = 'var(--purple-subtle)';
+      el.classList.add('picked');
+      toast('Titulo selecionado', 'success');
+    }
+
+    function rotBackToInput() {
+      rotShowStep('briefing');
+    }
+
+    let rotApprovedSide = '';
+
+    function rotApprove(side) {
+      const img = document.getElementById(`rot-img-${side.toLowerCase()}`);
+      if (!img.src) { toast('Thumb ainda nao gerada', 'error'); return; }
+
+      rotApprovedSide = side;
+      document.getElementById(`rot-btn-approve-${side.toLowerCase()}`).classList.add('active');
+
+      const banner = document.getElementById('rot-approved-banner');
+      banner.style.display = '';
+      banner.innerHTML = `
+        <div style="background:var(--green);color:#000;padding:12px 18px;border-radius:8px;font-weight:700;font-size:14px;text-align:center">
+          Thumb ${side} aprovada!
+        </div>
+      `;
+      toast('Thumb ' + side + ' aprovada!', 'success');
+
+      // Mostra publish actions
+      rotShowPublishActions();
+    }
+
+    function rotShowPublishActions() {
+      const actions = document.getElementById('rot-publish-actions');
+      actions.style.display = '';
+
+      // Drive: mostra se item tem pasta drive
+      const driveRow = document.getElementById('rot-drive-row');
+      const driveFolder = rotSelectedItem ? (rotSelectedItem['Pasta Drive'] || rotSelectedItem['pasta_drive'] || '') : '';
+      if (driveFolder) {
+        driveRow.style.display = 'flex';
+      } else {
+        driveRow.style.display = 'none';
+      }
+
+      // YouTube: mostra se tem URL YouTube
+      const ytRow = document.getElementById('rot-yt-row');
+      const videoId = _extractYtVideoId(rotVideoUrl);
+      if (videoId) {
+        ytRow.style.display = '';
+      } else {
+        ytRow.style.display = 'none';
+      }
+    }
+
+    function _extractYtVideoId(url) {
+      if (!url) return '';
+      let m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+      if (m) return m[1];
+      m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+      if (m) return m[1];
+      m = url.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+      if (m) return m[1];
+      return '';
+    }
+
+    function _getRotApprovedThumbPath() {
+      if (!rotApprovedSide) return '';
+      const img = document.getElementById(`rot-img-${rotApprovedSide.toLowerCase()}`);
+      if (!img || !img.src) return '';
+      return img.src.replace(window.location.origin + '/', '');
+    }
+
+    async function rotUploadDrive() {
+      const btn = document.getElementById('rot-btn-drive');
+      const status = document.getElementById('rot-drive-status');
+      const thumbPath = _getRotApprovedThumbPath();
+      if (!thumbPath) { toast('Nenhuma thumb aprovada', 'error'); return; }
+
+      const folderId = rotSelectedItem ? (rotSelectedItem['Pasta Drive'] || rotSelectedItem['pasta_drive'] || '') : '';
+      if (!folderId) { toast('Pasta Drive nao definida', 'error'); return; }
+
+      const title = document.getElementById('rot-review-title').value.trim() || rotVideoTitle || 'thumb';
+      const filename = `thumb-${title.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 50)}.png`;
+
+      btn.disabled = true; btn.textContent = 'Subindo...';
+      status.innerHTML = '';
+      try {
+        const resp = await fetch('/api/upload-drive', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ image_path: thumbPath, folder_id: folderId, filename })
+        });
+        const data = await resp.json();
+        if (!data.success) { toast('Erro Drive: ' + (data.error || 'desconhecido'), 'error'); btn.disabled = false; btn.textContent = 'Enviar pro Drive'; return; }
+        status.innerHTML = `<span style="color:var(--green)">&#10003; <a href="${data.link}" target="_blank" style="color:var(--purple)">Abrir no Drive</a></span>`;
+        btn.remove();
+        toast('Thumb enviada pro Drive!', 'success');
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+        btn.disabled = false; btn.textContent = 'Enviar pro Drive';
+      }
+    }
+
+    async function rotUpdateYtTitle() {
+      const btn = document.getElementById('rot-btn-yt-title');
+      const status = document.getElementById('rot-yt-title-status');
+      const videoId = _extractYtVideoId(rotVideoUrl);
+      if (!videoId) { toast('URL YouTube nao encontrada', 'error'); return; }
+
+      const newTitle = document.getElementById('rot-review-title').value.trim();
+      if (!newTitle) { toast('Preencha o titulo antes de atualizar', 'error'); return; }
+
+      btn.disabled = true; btn.textContent = 'Atualizando...';
+      status.innerHTML = '';
+      try {
+        const resp = await fetch('/api/youtube-update-title', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ video_id: videoId, new_title: newTitle })
+        });
+        const data = await resp.json();
+        if (!data.success) { toast('Erro YT: ' + (data.error || 'desconhecido'), 'error'); btn.disabled = false; btn.textContent = 'Atualizar Titulo no YT'; return; }
+        status.innerHTML = `<span style="color:var(--green)">&#10003; Titulo atualizado</span>`;
+        btn.disabled = false; btn.textContent = 'Atualizar Titulo no YT';
+        toast('Titulo atualizado no YouTube!', 'success');
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+        btn.disabled = false; btn.textContent = 'Atualizar Titulo no YT';
+      }
+    }
+
+    async function rotUpdateYtThumb() {
+      const btn = document.getElementById('rot-btn-yt-thumb');
+      const status = document.getElementById('rot-yt-thumb-status');
+      const videoId = _extractYtVideoId(rotVideoUrl);
+      if (!videoId) { toast('URL YouTube nao encontrada', 'error'); return; }
+
+      const thumbPath = _getRotApprovedThumbPath();
+      if (!thumbPath) { toast('Nenhuma thumb aprovada', 'error'); return; }
+
+      btn.disabled = true; btn.textContent = 'Enviando...';
+      status.innerHTML = '';
+      try {
+        const resp = await fetch('/api/youtube-update-thumb', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ video_id: videoId, image_path: thumbPath })
+        });
+        const data = await resp.json();
+        if (!data.success) { toast('Erro YT: ' + (data.error || 'desconhecido'), 'error'); btn.disabled = false; btn.textContent = 'Atualizar Thumb no YT'; return; }
+        status.innerHTML = `<span style="color:var(--green)">&#10003; Thumbnail atualizada</span>`;
+        btn.disabled = false; btn.textContent = 'Atualizar Thumb no YT';
+        toast('Thumbnail atualizada no YouTube!', 'success');
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+        btn.disabled = false; btn.textContent = 'Atualizar Thumb no YT';
+      }
+    }
+
+    async function rotRegenerateOne(side) {
+      // TODO: implement single-side regeneration with feedback
+      const feedback = document.getElementById(`rot-feedback-${side.toLowerCase()}`).value.trim();
+      toast('Regeneracao individual em breve. Feedback: ' + (feedback || 'nenhum'), 'info');
+    }
+
+    async function rotGenerate() {
+      const title = rotVideoTitle;
+      const q1 = document.getElementById('rot-q1').value.trim();
+      const q2 = document.getElementById('rot-q2').value.trim();
+      const q3 = document.getElementById('rot-q3').value.trim();
+      const creativeNote = document.getElementById('rot-creative-note')?.value?.trim() || '';
+
+      if (!q1 && !q2 && !q3) {
+        toast('Preencha ao menos um campo do briefing', 'error');
+        return;
+      }
+      if (!title) {
+        toast('Volte e selecione um video com titulo', 'error');
+        return;
+      }
+
+      // Upload guest photos
+      const pendingName = document.getElementById('rot-guest-name').value.trim();
+      if (pendingName && !rotGuestsList.find(g => g.name === pendingName)) {
+        rotGuestsList.push({ name: pendingName, hasFile: !!rotGuestFileData, fileData: rotGuestFileData, fileMime: rotGuestFileMime, fileName: rotGuestFileName });
+      }
+
+      for (const g of rotGuestsList) {
+        if (g.hasFile && g.fileData && g.name) {
+          tlGuestFileData = g.fileData;
+          tlGuestFileMime = g.fileMime;
+          tlGuestFileName = g.fileName;
+          await tlUploadGuestPhoto(g.name);
+        }
+      }
+
+      const guestNames = rotGuestsList.map(g => g.name).filter(Boolean);
+      const briefing = {
+        title,
+        channel: rotChannel,
+        q1, q2, q3,
+        creative_note: creativeNote,
+        guest: guestNames.join(', '),
+        guests: guestNames,
+        script: rotScriptText,
+      };
+
+      // Show review step
+      rotShowStep('review');
+
+      document.getElementById('rot-review-header').innerHTML = `
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+          <span class="tl-channel-badge ${rotChannel}">${rotChannel}</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--amber);text-transform:uppercase">ROTEIRO</span>
+        </div>
+        <div style="font-weight:600;font-size:16px">${title}</div>
+      `;
+
+      // Reset thumbs
+      ['a', 'b'].forEach(a => {
+        const ph = document.getElementById(`rot-ph-${a}`);
+        if (ph) ph.style.display = 'none';
+        document.getElementById(`rot-spinner-${a}`).style.display = 'flex';
+        const img = document.getElementById(`rot-img-${a}`);
+        img.style.display = 'none';
+        img.src = '';
+      });
+      document.getElementById('rot-generating-spinner').style.display = 'flex';
+      document.getElementById('rot-approve-row').style.display = 'none';
+      document.getElementById('rot-title-section').style.display = 'none';
+
+      const btn = document.getElementById('rot-btn-generate');
+      btn.disabled = true;
+
+      const logEl = document.getElementById('rot-gen-log');
+      logEl.innerHTML = '';
+      const stepEls = {};
+
+      function addStep(id, text, status = 'running') {
+        const el = document.createElement('div');
+        el.className = `tl-step ${status}`;
+        el.dataset.start = Date.now();
+        const icon = status === 'running'
+          ? `<span class="tl-step-dot"></span>`
+          : (status === 'done' ? `<span style="color:var(--green)">&#10003;</span>` : `<span style="color:var(--red)">&#10007;</span>`);
+        el.innerHTML = `<span class="tl-step-icon">${icon}</span><span class="tl-step-text">${text}</span>`;
+        logEl.appendChild(el);
+        stepEls[id] = el;
+      }
+
+      function updateStep(id, text, status = 'done', elapsed = null) {
+        const el = stepEls[id];
+        if (!el) { addStep(id, text, status); return; }
+        const secs = elapsed !== null ? elapsed : ((Date.now() - parseInt(el.dataset.start)) / 1000).toFixed(1);
+        const icon = status === 'done'
+          ? `<span style="color:var(--green)">&#10003;</span>`
+          : `<span style="color:var(--red)">&#10007;</span>`;
+        el.className = `tl-step ${status}`;
+        el.innerHTML = `<span class="tl-step-icon">${icon}</span><span class="tl-step-text">${text}</span><span class="tl-step-time">${secs}s</span>`;
+      }
+
+      try {
+        const divergence = parseInt(document.getElementById('rot-divergence')?.value || '6');
+        const resp = await fetch('/api/thumb-generate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ briefing, divergence })
+        });
+        const init = await resp.json();
+
+        if (init.error) {
+          document.getElementById('rot-generating-spinner').style.display = 'none';
+          toast('Erro: ' + init.error, 'error');
+          btn.disabled = false;
+          return;
+        }
+
+        const evtSrc = new EventSource(`/api/progress/${init.job_id}`);
+
+        evtSrc.addEventListener('progress', (e) => {
+          const d = JSON.parse(e.data);
+          const step = d.step || '';
+          const msg  = d.msg  || '';
+          if (step === 'refs_host')      addStep('refs_host', msg, 'done');
+          if (step === 'refs_guest')     addStep('refs_guest', msg, 'done');
+          if (step === 'angles_start')   addStep('angles', msg, 'running');
+          if (step === 'angles_done')    updateStep('angles', msg, 'done', d.elapsed);
+          if (step === 'gen_parallel')   addStep('gen_parallel', msg, 'running');
+          if (step === 'gen_a_start')    addStep('gen_a', msg, 'running');
+          if (step === 'gen_b_start')    addStep('gen_b', msg, 'running');
+          if (step === 'gen_a_done')     updateStep('gen_a', msg, d.error ? 'error' : 'done', d.elapsed);
+          if (step === 'gen_b_done')     updateStep('gen_b', msg, d.error ? 'error' : 'done', d.elapsed);
+          if (step === 'gen_a_done' || step === 'gen_b_done') {
+            if (stepEls['gen_parallel']) updateStep('gen_parallel', 'Gerando A e B em paralelo', 'done');
+          }
+        });
+
+        evtSrc.addEventListener('complete', (e) => {
+          evtSrc.close();
+          const d = JSON.parse(e.data);
+          document.getElementById('rot-generating-spinner').style.display = 'none';
+          if (d.thumb_a) {
+            const imgA = document.getElementById('rot-img-a');
+            imgA.src = '/' + d.thumb_a + '?t=' + Date.now();
+            imgA.style.display = 'block';
+            document.getElementById('rot-spinner-a').style.display = 'none';
+            const dlA = document.getElementById('rot-download-a');
+            dlA.href = '/' + d.thumb_a; dlA.style.display = '';
+          }
+          if (d.thumb_b) {
+            const imgB = document.getElementById('rot-img-b');
+            imgB.src = '/' + d.thumb_b + '?t=' + Date.now();
+            imgB.style.display = 'block';
+            document.getElementById('rot-spinner-b').style.display = 'none';
+            const dlB = document.getElementById('rot-download-b');
+            dlB.href = '/' + d.thumb_b; dlB.style.display = '';
+          }
+          // Mostra approve row e seção de titulo
+          document.getElementById('rot-approve-row').style.display = '';
+          const titleSection = document.getElementById('rot-title-section');
+          titleSection.style.display = '';
+          document.getElementById('rot-review-title').value = rotVideoTitle || '';
+          setTimeout(() => titleSection.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+          toast('Thumbnails geradas! Defina o titulo.', 'success');
+          btn.disabled = false;
+        });
+
+        evtSrc.addEventListener('error', (e) => {
+          evtSrc.close();
+          let msg = 'Erro na geracao';
+          try { msg = JSON.parse(e.data).message || msg; } catch(_) {}
+          document.getElementById('rot-generating-spinner').style.display = 'none';
+          toast('Erro: ' + msg, 'error');
+          btn.disabled = false;
+        });
+
+        evtSrc.onerror = () => {
+          evtSrc.close();
+          document.getElementById('rot-generating-spinner').style.display = 'none';
+          toast('Conexao SSE perdida', 'error');
+          btn.disabled = false;
+        };
+      } catch (e) {
+        document.getElementById('rot-generating-spinner').style.display = 'none';
+        toast('Erro: ' + e.message, 'error');
+        btn.disabled = false;
+      }
+    }
 
     // ===== INIT =====
     document.getElementById('url-input').addEventListener('keydown', e => {

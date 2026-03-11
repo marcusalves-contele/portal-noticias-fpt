@@ -15,6 +15,7 @@ Uso:
   python3 upload.py output/ra-GUivQnso_cuts/ --rank 1 --public
 """
 
+import os
 import sys
 import json
 import pickle
@@ -31,8 +32,23 @@ from googleapiclient.http import MediaFileUpload
 # -------------------------------------------------------------------
 
 PROJECT_DIR = Path(__file__).parent
-SEXTA_DIR   = PROJECT_DIR.parent.parent / "assistant-sexta-feira"
-TOKEN_PATH  = SEXTA_DIR / "token_youtube_write.pickle"
+SEXTA_DIR   = PROJECT_DIR.parent.parent.parent / "assistant-sexta-feira"
+
+def _read_env_token_path() -> str | None:
+    """Lê YOUTUBE_TOKEN_PATH do .env local (sem python-dotenv)."""
+    env_file = PROJECT_DIR / ".env"
+    if env_file.exists():
+        with open(env_file) as f:
+            for line in f:
+                if line.startswith("YOUTUBE_TOKEN_PATH"):
+                    return line.split("=", 1)[1].strip().strip('"')
+    return None
+
+TOKEN_PATH = Path(
+    os.getenv("YOUTUBE_TOKEN_PATH")
+    or _read_env_token_path()
+    or str(SEXTA_DIR / "token_youtube_write.pickle")
+)
 
 CHANNEL_ID  = "UCz31CtOANqSFuLEdFTi1iCQ"  # Frota Para Todos
 CATEGORY_EDUCATION = "27"
