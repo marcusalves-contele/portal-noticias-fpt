@@ -124,7 +124,7 @@ Estado de aprovação: `{cuts_dir}/state.json` (server-side, não localStorage).
 
 | Campo | Descrição |
 |-------|-----------|
-| `clip_entrada` / `clip_saida` | Timestamps 16:9 (mín 90s) |
+| `clip_entrada` / `clip_saida` | Timestamps 16:9 (mín 3min, ideal 5-10min) |
 | `shorts_entrada` / `shorts_saida` | Timestamps 9:16 (mín 30s) |
 | `titulo_seo` | Keyword primária nos primeiros 40 chars |
 | `titulo_ctr` | Hook emocional na primeira palavra |

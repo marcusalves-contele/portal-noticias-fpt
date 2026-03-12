@@ -163,22 +163,28 @@ def load_credentials():
 
 def get_youtube(creds):
     yt = build("youtube", "v3", credentials=creds)
-    # Validar que o token pertence ao canal correto
+    # Validar que o token pertence ao canal correto (fail-closed)
     try:
         resp = yt.channels().list(mine=True, part="id,snippet").execute()
         items = resp.get("items", [])
-        if items:
-            token_channel = items[0]["id"]
-            token_name = items[0]["snippet"]["title"]
-            if token_channel != CHANNEL_ID:
-                print(f"ERRO CRITICO: Token autenticado como '{token_name}' ({token_channel})")
-                print(f"  Esperado: Frota Para Todos ({CHANNEL_ID})")
-                print(f"  Token path: {TOKEN_PATH}")
-                print(f"  ABORTANDO para nao subir video no canal errado.")
-                sys.exit(1)
-            print(f"  Canal validado: {token_name} ({token_channel})")
+        if not items:
+            print(f"ERRO CRITICO: Token nao retornou nenhum canal.")
+            print(f"  Token path: {TOKEN_PATH}")
+            print(f"  ABORTANDO. Re-autentique como julio.cesar@contele.com.br.")
+            sys.exit(1)
+        token_channel = items[0]["id"]
+        token_name = items[0]["snippet"]["title"]
+        if token_channel != CHANNEL_ID:
+            print(f"ERRO CRITICO: Token autenticado como '{token_name}' ({token_channel})")
+            print(f"  Esperado: Frota Para Todos ({CHANNEL_ID})")
+            print(f"  Token path: {TOKEN_PATH}")
+            print(f"  ABORTANDO para nao subir video no canal errado.")
+            sys.exit(1)
+        print(f"  Canal validado: {token_name} ({token_channel})")
     except Exception as e:
-        print(f"  AVISO: Nao foi possivel validar canal: {e}")
+        print(f"ERRO CRITICO: Nao foi possivel validar canal: {e}")
+        print(f"  ABORTANDO. Sem validacao, upload nao e seguro.")
+        sys.exit(1)
     return yt
 
 
