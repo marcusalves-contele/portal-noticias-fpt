@@ -1,5 +1,7 @@
 # PRISM OS — Content Production OS
 
+**Versao atual**: v0.3.0-dev | **Changelog**: `CHANGELOG.md`
+
 Sistema operacional de produção de conteúdo do canal Frota Para Todos (Julio César).
 
 **Visão**: URL de uma live entra → clips, shorts, thumbnails A/B, SEO e agendamento saem. Zero trabalho manual no meio.

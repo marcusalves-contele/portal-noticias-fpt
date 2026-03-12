@@ -693,6 +693,109 @@
       100% { opacity: 0; }
     }
 
+    /* ===== STREAM LOG (Claude Code style) ===== */
+    .stream-panel {
+      margin-top: 28px;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .stream-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stream-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stream-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-dot 2s ease infinite;
+    }
+
+    .stream-dot.idle { background: var(--text-muted); animation: none; }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .stream-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .stream-timer {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--purple);
+      letter-spacing: 0.5px;
+    }
+
+    .stream-body {
+      padding: 12px 16px;
+      max-height: 200px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+
+    .stream-body::-webkit-scrollbar { width: 4px; }
+    .stream-body::-webkit-scrollbar-track { background: transparent; }
+    .stream-body::-webkit-scrollbar-thumb { background: var(--surface-4); border-radius: 2px; }
+
+    .stream-line {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding: 3px 0;
+      animation: stream-in 0.3s ease;
+    }
+
+    @keyframes stream-in {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stream-ts {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      min-width: 42px;
+    }
+
+    .stream-icon {
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+
+    .stream-msg {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .stream-line.done .stream-msg { color: var(--green); }
+    .stream-line.error .stream-msg { color: var(--red); }
+    .stream-line.info .stream-msg { color: var(--text-primary); }
+
     /* Nutellas selection (after analysis) */
     .nutellas-select {
       margin-top: 32px;
@@ -2607,6 +2710,18 @@
           </div>
         </div>
 
+        <!-- Stream Log (Claude Code style) -->
+        <div class="stream-panel" id="analyze-stream">
+          <div class="stream-header">
+            <div class="stream-header-left">
+              <div class="stream-dot" id="analyze-stream-dot"></div>
+              <span class="stream-label">pipeline</span>
+            </div>
+            <span class="stream-timer" id="analyze-timer">00:00</span>
+          </div>
+          <div class="stream-body" id="analyze-log"></div>
+        </div>
+
         <div class="nutellas-select" id="nutellas-select" style="display:none">
           <div class="nutellas-select-title">Nutellas identificadas</div>
           <div id="nutellas-select-list"></div>
@@ -2647,6 +2762,18 @@
 
         <div class="progress-bar-container" style="margin-top:24px">
           <div class="progress-bar-fill" id="build-bar" style="width:0%"></div>
+        </div>
+
+        <!-- Stream Log (Claude Code style) -->
+        <div class="stream-panel" id="build-stream">
+          <div class="stream-header">
+            <div class="stream-header-left">
+              <div class="stream-dot" id="build-stream-dot"></div>
+              <span class="stream-label">ffmpeg</span>
+            </div>
+            <span class="stream-timer" id="build-timer">00:00</span>
+          </div>
+          <div class="stream-body" id="build-log"></div>
         </div>
       </div>
     </div>
@@ -3415,7 +3542,12 @@
           return;
         }
 
-        // Connect SSE
+        // Connect SSE + Stream Log
+        clearStream('analyze-log');
+        startStreamTimer('analyze-timer');
+        setStreamActive('analyze-stream-dot', true);
+        streamLog('analyze-log', 'Pipeline iniciado', 'info');
+
         const es = new EventSource('/api/progress/' + data.job_id);
 
         es.addEventListener('progress', e => {
@@ -3423,19 +3555,28 @@
           if (d.step === 'transcript') {
             activateStep('step-transcript');
             document.querySelector('#step-transcript .step-detail').textContent = d.message;
+            streamLog('analyze-log', d.message);
           } else if (d.step === 'analysis') {
             completeStep('step-transcript');
             activateStep('step-analysis');
             document.querySelector('#step-analysis .step-detail').textContent = d.message;
+            streamLog('analyze-log', d.message);
+            // Add flavor verbs
+            const verbs = _streamVerbs['analysis'];
+            verbs.forEach((v, i) => setTimeout(() => streamLog('analyze-log', v), (i+1) * 3000));
           }
         });
 
         es.addEventListener('complete', e => {
           es.close();
+          stopStreamTimer('analyze-timer');
+          setStreamActive('analyze-stream-dot', false);
           const d = JSON.parse(e.data);
           completeStep('step-analysis');
           completeStep('step-complete');
           document.querySelector('#step-complete .step-detail').textContent = d.count + ' nutellas identificadas';
+          streamLog('analyze-log', d.count + ' nutellas identificadas', 'done');
+          streamLog('analyze-log', 'Pipeline completo', 'done');
           document.getElementById('btn-analyze').disabled = false;
           currentVideoId = d.video_id;
 
@@ -3449,15 +3590,20 @@
         });
 
         es.addEventListener('error', e => {
+          stopStreamTimer('analyze-timer');
+          setStreamActive('analyze-stream-dot', false);
           if (e.data) {
             const d = JSON.parse(e.data);
             toast('Erro: ' + d.message, 'error');
+            streamLog('analyze-log', d.message, 'error');
           }
           es.close();
           document.getElementById('btn-analyze').disabled = false;
         });
 
         es.onerror = () => {
+          stopStreamTimer('analyze-timer');
+          setStreamActive('analyze-stream-dot', false);
           es.close();
           document.getElementById('btn-analyze').disabled = false;
         };
@@ -3534,6 +3680,11 @@
         });
         const data = await resp.json();
 
+        clearStream('build-log');
+        startStreamTimer('build-timer');
+        setStreamActive('build-stream-dot', true);
+        streamLog('build-log', 'Build iniciado', 'info');
+
         const es = new EventSource('/api/progress/' + data.job_id);
 
         es.addEventListener('progress', e => {
@@ -3542,11 +3693,13 @@
             activateStep('bstep-download');
             document.querySelector('#bstep-download .step-detail').textContent = d.message;
             document.getElementById('build-bar').style.width = '15%';
+            streamLog('build-log', d.message);
           } else if (d.step === 'build') {
             completeStep('bstep-download');
             activateStep('bstep-build');
             document.getElementById('build-detail').textContent = d.message;
             document.getElementById('build-status-label').textContent = d.message;
+            streamLog('build-log', d.message);
             if (d.current && d.total) {
               const pct = 15 + (d.current / d.total) * 85;
               document.getElementById('build-bar').style.width = pct + '%';
@@ -3556,8 +3709,11 @@
 
         es.addEventListener('complete', e => {
           es.close();
+          stopStreamTimer('build-timer');
+          setStreamActive('build-stream-dot', false);
           document.getElementById('build-bar').style.width = '100%';
           completeStep('bstep-build');
+          streamLog('build-log', 'Todos os clips renderizados', 'done');
           toast('Clips construídos', 'success');
           // Auto go to review
           setTimeout(async () => {
@@ -3567,18 +3723,70 @@
         });
 
         es.addEventListener('error', e => {
+          stopStreamTimer('build-timer');
+          setStreamActive('build-stream-dot', false);
           if (e.data) {
             const d = JSON.parse(e.data);
             toast('Erro: ' + d.message, 'error');
+            streamLog('build-log', d.message, 'error');
           }
           es.close();
         });
 
-        es.onerror = () => { es.close(); };
+        es.onerror = () => { stopStreamTimer('build-timer'); setStreamActive('build-stream-dot', false); es.close(); };
 
       } catch (e) {
         toast('Erro: ' + e.message, 'error');
       }
+    }
+
+    // ===== STREAM LOG + TIMER (Claude Code style) =====
+    const _timers = {};
+
+    function startStreamTimer(timerId) {
+      const el = document.getElementById(timerId);
+      if (!el) return;
+      const t0 = Date.now();
+      _timers[timerId] = setInterval(() => {
+        const s = Math.floor((Date.now() - t0) / 1000);
+        const m = Math.floor(s / 60);
+        const ss = s % 60;
+        el.textContent = String(m).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
+      }, 1000);
+    }
+
+    function stopStreamTimer(timerId) {
+      if (_timers[timerId]) { clearInterval(_timers[timerId]); delete _timers[timerId]; }
+    }
+
+    const _streamVerbs = {
+      'transcript': ['Extraindo legendas', 'Decodificando audio stream', 'Parsing timestamps'],
+      'analysis': ['Tokenizando transcrição', 'Inferindo momentos virais', 'Scoring engagement potential', 'Ranqueando clips por CTR'],
+      'download': ['Resolvendo CDN', 'Baixando stream principal', 'Verificando integridade'],
+      'build': ['Cortando segmento', 'Encoding H.264', 'Mixando audio track', 'Renderizando overlay'],
+    };
+
+    function streamLog(logId, msg, type = '') {
+      const body = document.getElementById(logId);
+      if (!body) return;
+      const now = new Date();
+      const ts = String(now.getMinutes()).padStart(2,'0') + ':' + String(now.getSeconds()).padStart(2,'0');
+      const icons = { done: '✓', error: '✗', info: '→', '': '·' };
+      const line = document.createElement('div');
+      line.className = 'stream-line ' + type;
+      line.innerHTML = `<span class="stream-ts">${ts}</span><span class="stream-icon">${icons[type] || '·'}</span><span class="stream-msg">${msg}</span>`;
+      body.appendChild(line);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function clearStream(logId) {
+      const body = document.getElementById(logId);
+      if (body) body.innerHTML = '';
+    }
+
+    function setStreamActive(dotId, active) {
+      const dot = document.getElementById(dotId);
+      if (dot) dot.classList.toggle('idle', !active);
     }
 
     // ===== STEP HELPERS =====

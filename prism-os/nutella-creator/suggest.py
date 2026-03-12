@@ -347,10 +347,11 @@ PÚBLICO: Gestores de frota/equipes, 35-55 anos, cargo médio/alto, buscam solu�
 - Gatilhos: GRÁTIS, SIMPLES, CUIDADO, Passo a Passo, Antes de Comprar
 
 ### 5. DURAÇÃO — REGRAS OBRIGATÓRIAS
-- **Clip horizontal (16:9)**: MÍNIMO 90 segundos (1:30), ideal 2-4 minutos
+- **Clip horizontal (16:9)**: PREFERÊNCIA >5 minutos. Mínimo absoluto: 3 minutos.
+  - O clip deve agregar conhecimento REAL ao gestor sem precisar assistir a live toda
+  - Se o conteúdo for consultivo/direto e ensinar rápido, clips de 3-5 min são aceitáveis
+  - Clips de 5-10 minutos são o ideal: profundidade sem cansar
   - Vídeos publicados adicionam ~2min de intro+CTA ao clip
-  - Clip < 90s ficaria com mais wrapper que conteúdo → PROIBIDO
-  - Se o trecho bom tem < 90s, EXPANDA incluindo contexto antes e depois
 - **Shorts vertical (9:16)**: MÍNIMO 30 segundos, ideal 45-60 segundos
   - Shorts < 30s perdem potencial de retenção
   - Se não conseguir 30s de conteúdo bom, marque shorts_possivel: false
@@ -377,8 +378,14 @@ PÚBLICO: Gestores de frota/equipes, 35-55 anos, cargo médio/alto, buscam solu�
 
 ---
 
+## REGRAS DE CONTEÚDO
+- Cada clip DEVE ser EDUCATIVO (agrega conhecimento ao gestor) ou PROMOCIONAL (Contele ou parceiro oficial indicado na live)
+- O clip deve funcionar como conteúdo AUTÔNOMO: quem assiste entende o assunto sem precisar ver a live toda
+- NUNCA cortar no meio de um assunto, raciocínio ou palavra. Início e fim devem ser naturais.
+- Prefira trechos onde o Julio explica um conceito completo, conta um caso real, ou resolve uma dúvida com clareza
+
 ## TAREFA:
-Identifique de 4 a 6 nutellas. Para cada uma, retorne JSON com:
+Identifique de 2 a 3 nutellas (MÁXIMO 3). Priorize qualidade e profundidade sobre quantidade. Para cada uma, retorne JSON com:
 
 ```json
 [
@@ -414,8 +421,10 @@ Identifique de 4 a 6 nutellas. Para cada uma, retorne JSON com:
 ```
 
 REGRAS FINAIS:
-- Cada clip DEVE ter MÍNIMO 90 segundos (clip_saida - clip_entrada >= 1:30)
-- Se um trecho bom é curto demais, INCLUA contexto antes/depois para atingir 90s
+- MÁXIMO 3 nutellas. Prefira 2 excelentes a 3 medianas.
+- Cada clip DEVE ter PREFERENCIALMENTE >5 minutos (clip_saida - clip_entrada >= 5:00). Mínimo absoluto: 3 minutos.
+- Se um trecho bom é curto, EXPANDA incluindo contexto antes/depois para atingir 5 minutos
+- NUNCA cortar no meio de frase, palavra ou raciocínio. O início deve ser um começo natural e o fim uma conclusão natural.
 - Shorts DEVEM ter MÍNIMO 30 segundos
 - tags_especificas: 5-8 tags específicas do TEMA deste clip (não genéricas)
 - thumbnail_composicao: MÁXIMO 2 elementos visuais (Julio + 1 coisa)

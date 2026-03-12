@@ -139,7 +139,7 @@ EXPERIMENT_SHORTS = [
 # -------------------------------------------------------------------
 
 def load_credentials():
-    """Carrega e renova token OAuth do YouTube."""
+    """Carrega e renova token OAuth do YouTube. Valida canal."""
     if not TOKEN_PATH.exists():
         print(f"ERRO: Token nao encontrado em {TOKEN_PATH}")
         sys.exit(1)
@@ -162,7 +162,24 @@ def load_credentials():
 
 
 def get_youtube(creds):
-    return build("youtube", "v3", credentials=creds)
+    yt = build("youtube", "v3", credentials=creds)
+    # Validar que o token pertence ao canal correto
+    try:
+        resp = yt.channels().list(mine=True, part="id,snippet").execute()
+        items = resp.get("items", [])
+        if items:
+            token_channel = items[0]["id"]
+            token_name = items[0]["snippet"]["title"]
+            if token_channel != CHANNEL_ID:
+                print(f"ERRO CRITICO: Token autenticado como '{token_name}' ({token_channel})")
+                print(f"  Esperado: Frota Para Todos ({CHANNEL_ID})")
+                print(f"  Token path: {TOKEN_PATH}")
+                print(f"  ABORTANDO para nao subir video no canal errado.")
+                sys.exit(1)
+            print(f"  Canal validado: {token_name} ({token_channel})")
+    except Exception as e:
+        print(f"  AVISO: Nao foi possivel validar canal: {e}")
+    return yt
 
 
 # -------------------------------------------------------------------

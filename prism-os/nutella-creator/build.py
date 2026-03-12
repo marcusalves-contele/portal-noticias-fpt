@@ -479,16 +479,16 @@ def compose_clip(
     badge_path: Path | None = None,  # badge dinâmico (se None, usa estático)
 ) -> None:
     """
-    16:9 → vídeo full + badge de identidade no rodapé.
+    16:9 → vídeo full + badge de identidade no topo.
     9:16 → split-screen: rosto (topo) + tela (base), sem badge.
            Fallback letterbox quando não há rosto detectado.
     """
     duration = end_sec - start_sec
 
     if not crop_mode:
-        # 16:9: vídeo full + badge no rodapé (y = H - BADGE_H)
+        # 16:9: vídeo full + badge no topo (v0.3.0) com suporte a badge dinâmico
         actual_badge = badge_path or BADGE
-        badge_y = target_h - BADGE_H
+        badge_y = 0
         filter_complex = (
             f"[0:v]scale={target_w}:{target_h},fps={FPS}[vid];"
             f"[1:v]scale={target_w}:{BADGE_H},format=rgba[badge];"
