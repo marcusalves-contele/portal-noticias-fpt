@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Funil Ads: Fleet & Teams | Atualizado 13/mar/26</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0a0a1a; color: #e0e0e0; padding: 24px; max-width: 1400px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; color: #fff; margin-bottom: 4px; }
+  .subtitle { color: #888; font-size: 0.85rem; margin-bottom: 32px; }
+  h2 { font-size: 1.2rem; color: #fff; margin: 32px 0 16px; border-left: 3px solid #8B23E5; padding-left: 12px; }
+  h3 { font-size: 1rem; color: #aaa; margin: 20px 0 12px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 1100px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .grid-3 { grid-template-columns: 1fr; } }
+
+  .card { background: #12122a; border: 1px solid #1e1e3a; border-radius: 12px; padding: 20px; }
+  .card-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 12px; }
+  .card-full { grid-column: 1 / -1; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th { text-align: left; padding: 8px 10px; color: #888; font-weight: 500; border-bottom: 1px solid #1e1e3a; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 8px 10px; border-bottom: 1px solid #0e0e22; }
+  tr:hover td { background: #1a1a35; }
+  tr.row-current td { background: #1a1030; border-left: 2px solid #8B23E5; }
+
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .highlight { color: #8B23E5; font-weight: 600; }
+  .good { color: #22c55e; }
+  .bad { color: #ef4444; }
+  .warn { color: #f59e0b; }
+  .muted { color: #555; }
+  .bold { font-weight: 600; color: #fff; }
+
+  .kpi-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .kpi { background: #12122a; border: 1px solid #1e1e3a; border-radius: 10px; padding: 16px 20px; flex: 1; min-width: 140px; }
+  .kpi-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 4px; }
+  .kpi-value { font-size: 1.5rem; font-weight: 700; color: #fff; }
+  .kpi-sub { font-size: 1.1rem; }
+  .kpi-delta { font-size: 0.75rem; margin-top: 2px; }
+
+  .insight { background: #1a1020; border-left: 3px solid #8B23E5; padding: 16px; margin: 16px 0; border-radius: 0 8px 8px 0; font-size: 0.85rem; line-height: 1.6; }
+  .insight strong { color: #fff; }
+  .insight-bad { border-left-color: #ef4444; background: #1a1015; }
+  .insight-good { border-left-color: #22c55e; background: #101a15; }
+  .insight-warn { border-left-color: #f59e0b; background: #1a1810; }
+
+  .section-divider { border: none; border-top: 1px solid #1e1e3a; margin: 40px 0; }
+
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+  .tag-google { background: #1e2a4f; color: #60a5fa; }
+  .tag-bing { background: #0e2a3f; color: #38bdf8; }
+  .tag-meta { background: #2a1e3f; color: #c084fc; }
+  .tag-organic { background: #1a3a1a; color: #4ade80; }
+  .tag-partial { background: #2a2a1a; color: #fbbf24; font-size: 0.65rem; }
+
+  .bar { display: inline-block; height: 8px; border-radius: 4px; vertical-align: middle; }
+  .bar-google { background: #4285f4; }
+  .bar-bing { background: #00a4ef; }
+  .bar-meta { background: #e1306c; }
+
+  .mini-chart { display: flex; align-items: flex-end; gap: 3px; height: 40px; }
+  .mini-bar { width: 24px; border-radius: 3px 3px 0 0; background: #8B23E5; opacity: 0.7; transition: all 0.2s; }
+  .mini-bar:hover { opacity: 1; }
+
+  .alert-box { background: #1a0e0e; border: 1px solid #3a1515; border-radius: 8px; padding: 16px; margin: 12px 0; }
+  .alert-box .title { color: #ef4444; font-weight: 600; font-size: 0.85rem; margin-bottom: 8px; }
+  .alert-box p { font-size: 0.82rem; color: #ccc; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<h1>Dashboard de Geracao de Leads</h1>
+<p class="subtitle">Contele Fleet & Teams · Out/2025 a Mar/2026 · Atualizado 13/mar/2026 · Fonte: custos-ads + comparativo-leads + GA4</p>
+
+<!-- ==================== CONSOLIDADO ==================== -->
+<h2>Consolidado (Fleet + Teams)</h2>
+
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="kpi-label">Investimento Total Ads (out/25-fev/26)</div>
+    <div class="kpi-value">R$ 173k</div>
+    <div class="kpi-delta muted">Fleet R$82k + Teams R$80k</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Leads CRM (out/25-fev/26)</div>
+    <div class="kpi-value">1.189</div>
+    <div class="kpi-delta muted">Fleet 583 + Teams 606</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">CPL Medio Consolidado</div>
+    <div class="kpi-value">R$ 146</div>
+    <div class="kpi-delta warn">+14% vs out/25 (R$127)</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Mar/26 (parcial: 12 dias)</div>
+    <div class="kpi-value kpi-sub">R$ 11.5k</div>
+    <div class="kpi-delta muted">110 leads (27 Fleet + 83 Teams)</div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ==================== FLEET ==================== -->
+<h2>FLEET (Rastreamento de Veiculos)</h2>
+
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="kpi-label">Investimento Ads (6m)</div>
+    <div class="kpi-value">R$ 82.0k</div>
+    <div class="kpi-delta muted">out/25 a fev/26</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Leads Ads (6m)</div>
+    <div class="kpi-value">583</div>
+    <div class="kpi-delta muted">~117/mes</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">SQL de Ads (6m)</div>
+    <div class="kpi-value">208</div>
+    <div class="kpi-delta good">35.7% Lead>SQL</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">CPL Medio Fleet</div>
+    <div class="kpi-value">R$ 141</div>
+    <div class="kpi-delta warn">+17% out>fev</div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom: 24px;">
+  <div class="card-title">Investimento e Performance por Canal: Fleet</div>
+  <table>
+    <tr>
+      <th>Mes</th>
+      <th class="num">Google Ads</th>
+      <th class="num">G.CPL</th>
+      <th class="num">Meta Ads</th>
+      <th class="num">M.CPL</th>
+      <th class="num">Bing Ads</th>
+      <th class="num">B.CPL</th>
+      <th class="num">Total Inv.</th>
+      <th class="num">Total Leads</th>
+      <th class="num">CPL</th>
+      <th class="num">MQL</th>
+      <th class="num">SQL</th>
+    </tr>
+    <tr>
+      <td>out/25</td>
+      <td class="num">R$9.256</td><td class="num">R$111</td>
+      <td class="num">R$2.359</td><td class="num">R$197</td>
+      <td class="num">R$2.382</td><td class="num">R$95</td>
+      <td class="num bold">R$13.997</td>
+      <td class="num bold">120</td>
+      <td class="num">R$117</td>
+      <td class="num">103</td>
+      <td class="num">41</td>
+    </tr>
+    <tr>
+      <td>nov/25</td>
+      <td class="num">R$9.803</td><td class="num">R$144</td>
+      <td class="num">R$1.880</td><td class="num">R$209</td>
+      <td class="num">R$2.308</td><td class="num">R$110</td>
+      <td class="num bold">R$13.991</td>
+      <td class="num bold">98</td>
+      <td class="num">R$143</td>
+      <td class="num">93</td>
+      <td class="num">31</td>
+    </tr>
+    <tr>
+      <td>dez/25</td>
+      <td class="num">R$10.033</td><td class="num">R$145</td>
+      <td class="num">R$2.724</td><td class="num">R$143</td>
+      <td class="num">R$3.394</td><td class="num">R$170</td>
+      <td class="num bold">R$16.151</td>
+      <td class="num bold">108</td>
+      <td class="num">R$150</td>
+      <td class="num">90</td>
+      <td class="num">33</td>
+    </tr>
+    <tr>
+      <td>jan/26</td>
+      <td class="num">R$14.498</td><td class="num bad">R$138</td>
+      <td class="num">R$3.506</td><td class="num good">R$121</td>
+      <td class="num">R$3.689</td><td class="num">R$168</td>
+      <td class="num bold">R$21.693</td>
+      <td class="num bold">156</td>
+      <td class="num">R$139</td>
+      <td class="num">144</td>
+      <td class="num">55</td>
+    </tr>
+    <tr>
+      <td>fev/26</td>
+      <td class="num">R$12.700</td><td class="num bad">R$161</td>
+      <td class="num">R$838</td><td class="num">R$168</td>
+      <td class="num">R$2.623</td><td class="num">R$175</td>
+      <td class="num bold">R$16.161</td>
+      <td class="num bold">99</td>
+      <td class="num warn">R$163</td>
+      <td class="num">92</td>
+      <td class="num">48</td>
+    </tr>
+    <tr class="row-current">
+      <td>mar/26* <span class="tag tag-partial">13d</span></td>
+      <td class="num">R$3.900</td><td class="num bad">R$244</td>
+      <td class="num">R$291</td><td class="num good">R$58</td>
+      <td class="num">R$877</td><td class="num">R$146</td>
+      <td class="num bold">R$5.068</td>
+      <td class="num bold">27</td>
+      <td class="num bad">R$188</td>
+      <td class="num">25</td>
+      <td class="num">13</td>
+    </tr>
+  </table>
+</div>
+
+<div class="insight insight-bad">
+  <strong>ALERTA Fleet Google Ads mar/26:</strong> CPL disparou para R$244 (era R$138 em jan, R$161 em fev).
+  Apenas 16 leads do Google em 13 dias. Projecao do mes: ~38 leads por ~R$9.3k.
+  Se confirmado, seria o pior mes desde que acompanhamos.
+</div>
+
+<div class="insight insight-good">
+  <strong>Meta Ads Fleet surpreendeu:</strong> CPL R$58 em mar/26 (5 leads por R$291). Melhor CPL do historico Fleet.
+  Paradoxo: cortaram de R$3.5k (jan) pra R$838 (fev) pra R$291 (mar), justo quando a performance melhorou.
+</div>
+
+<hr class="section-divider">
+
+<!-- ==================== TEAMS ==================== -->
+<h2>TEAMS (Gestao de Equipes Externas)</h2>
+
+<div class="kpi-row">
+  <div class="kpi">
+    <div class="kpi-label">Investimento Ads (6m)</div>
+    <div class="kpi-value">R$ 80.0k</div>
+    <div class="kpi-delta muted">out/25 a fev/26</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">Leads Ads (6m)</div>
+    <div class="kpi-value">606</div>
+    <div class="kpi-delta muted">~121/mes</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">SQL de Ads (6m)</div>
+    <div class="kpi-value">193</div>
+    <div class="kpi-delta muted">31.8% Lead>SQL</div>
+  </div>
+  <div class="kpi">
+    <div class="kpi-label">CPL Medio Teams</div>
+    <div class="kpi-value">R$ 132</div>
+    <div class="kpi-delta bad">+51% out>fev (R$137>R$144)</div>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom: 24px;">
+  <div class="card-title">Investimento e Performance por Canal: Teams</div>
+  <table>
+    <tr>
+      <th>Mes</th>
+      <th class="num">Google Ads</th>
+      <th class="num">G.CPL</th>
+      <th class="num">Bing Ads</th>
+      <th class="num">B.CPL</th>
+      <th class="num">Meta Ads</th>
+      <th class="num">LinkedIn</th>
+      <th class="num">Total Inv.</th>
+      <th class="num">Total Leads</th>
+      <th class="num">CPL</th>
+      <th class="num">MQL</th>
+      <th class="num">SQL</th>
+    </tr>
+    <tr>
+      <td>out/25</td>
+      <td class="num">R$12.626</td><td class="num">R$124</td>
+      <td class="num">R$1.369</td><td class="num">R$124</td>
+      <td class="num bad">R$207 (0)</td>
+      <td class="num bad">R$1.274 (0)</td>
+      <td class="num bold">R$15.476</td>
+      <td class="num bold">113</td>
+      <td class="num">R$137</td>
+      <td class="num">58</td>
+      <td class="num">41</td>
+    </tr>
+    <tr>
+      <td>nov/25</td>
+      <td class="num">R$9.732</td><td class="num">R$130</td>
+      <td class="num">R$1.338</td><td class="num">R$103</td>
+      <td class="num bad">R$300 (0)</td>
+      <td class="num bad">R$507 (0)</td>
+      <td class="num bold">R$11.877</td>
+      <td class="num bold">88</td>
+      <td class="num">R$135</td>
+      <td class="num">49</td>
+      <td class="num">31</td>
+    </tr>
+    <tr>
+      <td>dez/25</td>
+      <td class="num">R$9.500</td><td class="num">R$123</td>
+      <td class="num">R$1.787</td><td class="num">R$137</td>
+      <td class="num bad">R$310 (0)</td>
+      <td class="num muted">R$0</td>
+      <td class="num bold">R$11.597</td>
+      <td class="num bold">90</td>
+      <td class="num">R$129</td>
+      <td class="num">55</td>
+      <td class="num">24</td>
+    </tr>
+    <tr>
+      <td>jan/26</td>
+      <td class="num">R$17.398</td><td class="num bad">R$149</td>
+      <td class="num">R$1.701</td><td class="num">R$213</td>
+      <td class="num bad">R$304 (0)</td>
+      <td class="num muted">R$0</td>
+      <td class="num bold">R$19.403</td>
+      <td class="num bold">125</td>
+      <td class="num warn">R$155</td>
+      <td class="num">66</td>
+      <td class="num">36</td>
+    </tr>
+    <tr>
+      <td>fev/26</td>
+      <td class="num">R$20.364</td><td class="num bad">R$149</td>
+      <td class="num">R$589</td><td class="num good">R$59</td>
+      <td class="num bad">R$278 (0)</td>
+      <td class="num muted">R$0</td>
+      <td class="num bold">R$21.231</td>
+      <td class="num bold">147</td>
+      <td class="num">R$144</td>
+      <td class="num">80</td>
+      <td class="num">50</td>
+    </tr>
+    <tr class="row-current">
+      <td>mar/26* <span class="tag tag-partial">13d</span></td>
+      <td class="num">R$6.190</td><td class="num good">R$76</td>
+      <td class="num">R$175</td><td class="num">R$88</td>
+      <td class="num bad">R$90 (0)</td>
+      <td class="num muted">R$0</td>
+      <td class="num bold">R$6.455</td>
+      <td class="num bold">83</td>
+      <td class="num good">R$78</td>
+      <td class="num">50</td>
+      <td class="num">10</td>
+    </tr>
+  </table>
+</div>
+
+<div class="insight insight-warn">
+  <strong>Meta Ads Teams: 7 meses seguidos com ZERO leads.</strong>
+  R$1.896 jogados fora (out/25 a mar/26). Campanha precisa ser pausada ou completamente reformulada.
+</div>
+
+<div class="insight">
+  <strong>Teams mar/26 Google Ads CPL caiu para R$76</strong> (era R$149 em jan-fev). 81 leads em 13 dias.
+  Projecao: ~193 leads no mes, mas SQL baixo (10). Qualidade dos leads pode estar diluida.
+  MQL rate: 60% (50/83), abaixo da media Fleet (93%) e historico Teams (53-58%).
+</div>
+
+<hr class="section-divider">
+
+<!-- ==================== COMPARATIVO CPL POR CANAL ==================== -->
+<h2>Comparativo: CPL por Canal (6 meses)</h2>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-title">Fleet: CPL por Canal</div>
+    <table>
+      <tr>
+        <th>Canal</th>
+        <th class="num">Investido</th>
+        <th class="num">Leads</th>
+        <th class="num">CPL</th>
+        <th class="num">SQL</th>
+        <th class="num">CPL/SQL</th>
+      </tr>
+      <tr>
+        <td><span class="tag tag-google">Google Ads</span></td>
+        <td class="num">R$60.290</td>
+        <td class="num">434</td>
+        <td class="num">R$139</td>
+        <td class="num">158</td>
+        <td class="num">R$381</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-meta">Meta Ads</span></td>
+        <td class="num">R$11.680</td>
+        <td class="num">64</td>
+        <td class="num">R$183</td>
+        <td class="num">15</td>
+        <td class="num">R$779</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-bing">Bing Ads</span></td>
+        <td class="num">R$14.396</td>
+        <td class="num">101</td>
+        <td class="num good">R$143</td>
+        <td class="num">30</td>
+        <td class="num">R$480</td>
+      </tr>
+    </table>
+    <div class="insight" style="margin-top: 12px; font-size: 0.78rem;">
+      Google = 74% leads, 76% SQL. Meta = custo alto, volume baixo.
+      Bing = CPL competitivo, mas SQL rate (30%) pior que Google (36%).
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Teams: CPL por Canal</div>
+    <table>
+      <tr>
+        <th>Canal</th>
+        <th class="num">Investido</th>
+        <th class="num">Leads</th>
+        <th class="num">CPL</th>
+        <th class="num">SQL</th>
+        <th class="num">CPL/SQL</th>
+      </tr>
+      <tr>
+        <td><span class="tag tag-google">Google Ads</span></td>
+        <td class="num">R$69.620</td>
+        <td class="num">508</td>
+        <td class="num">R$137</td>
+        <td class="num">172</td>
+        <td class="num">R$405</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-bing">Bing Ads</span></td>
+        <td class="num">R$6.871</td>
+        <td class="num">55</td>
+        <td class="num good">R$125</td>
+        <td class="num">10</td>
+        <td class="num bad">R$687</td>
+      </tr>
+      <tr>
+        <td><span class="tag tag-meta">Meta Ads</span></td>
+        <td class="num bad">R$1.596</td>
+        <td class="num bad">0</td>
+        <td class="num bad">--</td>
+        <td class="num bad">0</td>
+        <td class="num bad">--</td>
+      </tr>
+      <tr>
+        <td>LinkedIn</td>
+        <td class="num">R$1.781</td>
+        <td class="num">0</td>
+        <td class="num bad">--</td>
+        <td class="num">0</td>
+        <td class="num bad">--</td>
+      </tr>
+    </table>
+    <div class="insight insight-bad" style="margin-top: 12px; font-size: 0.78rem;">
+      Meta + LinkedIn: R$3.377 investidos com ZERO leads em 6 meses. Cortar ambos imediatamente.
+      Bing Teams: CPL R$125 parece bom, mas SQL rate 18% e CPL/SQL R$687.
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ==================== ELASTICIDADE: Mais verba = Mais leads? ==================== -->
+<h2>Elasticidade: Mais Verba = Mais Leads?</h2>
+
+<div class="card" style="margin-bottom: 24px;">
+  <div class="card-title">Google Ads Fleet: Investimento vs Volume vs CPL</div>
+  <table>
+    <tr>
+      <th>Mes</th>
+      <th class="num">Investimento</th>
+      <th class="num">Var. Inv.</th>
+      <th class="num">Leads</th>
+      <th class="num">Var. Leads</th>
+      <th class="num">CPL</th>
+      <th class="num">Var. CPL</th>
+      <th>Diagnostico</th>
+    </tr>
+    <tr>
+      <td>out/25</td>
+      <td class="num">R$9.256</td><td class="num muted">base</td>
+      <td class="num">83</td><td class="num muted">base</td>
+      <td class="num">R$111</td><td class="num muted">base</td>
+      <td class="muted">Referencia</td>
+    </tr>
+    <tr>
+      <td>nov/25</td>
+      <td class="num">R$9.803</td><td class="num">+6%</td>
+      <td class="num">68</td><td class="num bad">-18%</td>
+      <td class="num">R$144</td><td class="num bad">+30%</td>
+      <td class="bad">Pior em tudo</td>
+    </tr>
+    <tr>
+      <td>dez/25</td>
+      <td class="num">R$10.033</td><td class="num">+8%</td>
+      <td class="num">69</td><td class="num bad">-17%</td>
+      <td class="num">R$145</td><td class="num bad">+31%</td>
+      <td class="bad">Gastou mais, recebeu menos</td>
+    </tr>
+    <tr>
+      <td>jan/26</td>
+      <td class="num">R$14.498</td><td class="num warn">+57%</td>
+      <td class="num">105</td><td class="num good">+27%</td>
+      <td class="num">R$138</td><td class="num warn">+24%</td>
+      <td class="warn">Escalou, mas CPL subiu</td>
+    </tr>
+    <tr>
+      <td>fev/26</td>
+      <td class="num">R$12.700</td><td class="num">+37%</td>
+      <td class="num">79</td><td class="num bad">-5%</td>
+      <td class="num bad">R$161</td><td class="num bad">+45%</td>
+      <td class="bad">Gastou 37% mais, gerou 5% menos</td>
+    </tr>
+    <tr class="row-current">
+      <td>mar/26*</td>
+      <td class="num">R$3.900</td><td class="num muted">13d</td>
+      <td class="num">16</td><td class="num muted">13d</td>
+      <td class="num bad">R$244</td><td class="num bad">+120%</td>
+      <td class="bad">CPL +120% vs base</td>
+    </tr>
+  </table>
+</div>
+
+<div class="card" style="margin-bottom: 24px;">
+  <div class="card-title">Google Ads Teams: Investimento vs Volume vs CPL</div>
+  <table>
+    <tr>
+      <th>Mes</th>
+      <th class="num">Investimento</th>
+      <th class="num">Var. Inv.</th>
+      <th class="num">Leads</th>
+      <th class="num">Var. Leads</th>
+      <th class="num">CPL</th>
+      <th class="num">Var. CPL</th>
+      <th>Diagnostico</th>
+    </tr>
+    <tr>
+      <td>out/25</td>
+      <td class="num">R$12.626</td><td class="num muted">base</td>
+      <td class="num">102</td><td class="num muted">base</td>
+      <td class="num">R$124</td><td class="num muted">base</td>
+      <td class="muted">Referencia</td>
+    </tr>
+    <tr>
+      <td>nov/25</td>
+      <td class="num">R$9.732</td><td class="num">-23%</td>
+      <td class="num">75</td><td class="num">-26%</td>
+      <td class="num">R$130</td><td class="num warn">+5%</td>
+      <td class="muted">Proporcional, CPL estavel</td>
+    </tr>
+    <tr>
+      <td>dez/25</td>
+      <td class="num">R$9.500</td><td class="num">-25%</td>
+      <td class="num">77</td><td class="num">-25%</td>
+      <td class="num good">R$123</td><td class="num good">-1%</td>
+      <td class="good">CPL identico a base</td>
+    </tr>
+    <tr>
+      <td>jan/26</td>
+      <td class="num">R$17.398</td><td class="num warn">+38%</td>
+      <td class="num">117</td><td class="num">+15%</td>
+      <td class="num bad">R$149</td><td class="num bad">+20%</td>
+      <td class="warn">Escalou verba 38%, leads so 15%</td>
+    </tr>
+    <tr>
+      <td>fev/26</td>
+      <td class="num">R$20.364</td><td class="num bad">+61%</td>
+      <td class="num">137</td><td class="num">+34%</td>
+      <td class="num bad">R$149</td><td class="num bad">+20%</td>
+      <td class="warn">Escalou 61%, leads 34%, CPL fixo alto</td>
+    </tr>
+    <tr class="row-current">
+      <td>mar/26*</td>
+      <td class="num">R$6.190</td><td class="num muted">13d</td>
+      <td class="num">81</td><td class="num muted">13d</td>
+      <td class="num good">R$76</td><td class="num good">-39%</td>
+      <td class="good">CPL caiu forte. Campanha nova?</td>
+    </tr>
+  </table>
+</div>
+
+<div class="insight">
+  <strong>Conclusao Elasticidade:</strong><br>
+  Fleet Google Ads: escalar verba NAO escalou leads proporcionalmente. CPL subiu de R$111 para R$244 (+120%). A curva de rendimentos decrescentes e clara.<br>
+  Teams Google Ads: escalou melhor (61% verba > 34% leads), mas CPL fixou em R$149. Mar/26 surpreende com CPL R$76, mas precisamos confirmar se a qualidade se mantem (SQL rate so 11% ate agora vs 30% historico).
+</div>
+
+<hr class="section-divider">
+
+<!-- ==================== GA4 TRAFEGO ==================== -->
+<h2>Trafego GA4: Sessoes por Canal</h2>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-title">Fleet (contelerastreador.com.br) · property 319948806</div>
+    <table>
+      <tr>
+        <th>Mes</th>
+        <th class="num">Paid Search</th>
+        <th class="num">Organic Search</th>
+        <th class="num">Organic Video</th>
+        <th class="num">Direct</th>
+        <th class="num">Paid Social</th>
+        <th class="num">Referral</th>
+        <th class="num">Total*</th>
+      </tr>
+      <tr>
+        <td>out/25</td>
+        <td class="num">2.512</td><td class="num">1.167</td><td class="num">903</td>
+        <td class="num">1.198</td><td class="num">250</td><td class="num">409</td>
+        <td class="num bold">9.898</td>
+      </tr>
+      <tr>
+        <td>nov/25</td>
+        <td class="num">2.455</td><td class="num">662</td><td class="num">783</td>
+        <td class="num">1.098</td><td class="num">215</td><td class="num">336</td>
+        <td class="num bold">6.686</td>
+      </tr>
+      <tr>
+        <td>dez/25</td>
+        <td class="num">2.967</td><td class="num">661</td><td class="num">1.109</td>
+        <td class="num">892</td><td class="num">209</td><td class="num">83</td>
+        <td class="num bold">6.698</td>
+      </tr>
+      <tr>
+        <td>jan/26</td>
+        <td class="num">3.038</td><td class="num">754</td><td class="num">623</td>
+        <td class="num">1.030</td><td class="num">271</td><td class="num">270</td>
+        <td class="num bold">6.859</td>
+      </tr>
+      <tr>
+        <td>fev/26</td>
+        <td class="num">2.473</td><td class="num good">1.382</td><td class="num">649</td>
+        <td class="num">1.241</td><td class="num bad">73</td><td class="num">239</td>
+        <td class="num bold">7.259</td>
+      </tr>
+      <tr class="row-current">
+        <td>mar/26*</td>
+        <td class="num">1.188</td><td class="num good">834</td><td class="num">348</td>
+        <td class="num">558</td><td class="num">32</td><td class="num">92</td>
+        <td class="num bold">3.686</td>
+      </tr>
+    </table>
+    <div class="insight insight-good" style="margin-top: 12px; font-size: 0.78rem;">
+      Organic Search Fleet crescendo: 661 (dez) > 754 (jan) > 1.382 (fev) > 834 (13d mar, projecao ~1.989). SEO em tendencia alta.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Teams (conteleteams.com.br) · property 319908091</div>
+    <table>
+      <tr>
+        <th>Mes</th>
+        <th class="num">Paid Search</th>
+        <th class="num">Organic Search</th>
+        <th class="num">Organic Video</th>
+        <th class="num">Direct</th>
+        <th class="num">Referral</th>
+        <th class="num">Total*</th>
+      </tr>
+      <tr>
+        <td>out/25</td>
+        <td class="num">10.140</td><td class="num">10.574</td><td class="num">1.250</td>
+        <td class="num">42.888</td><td class="num">7.202</td>
+        <td class="num bold">76.369</td>
+      </tr>
+      <tr>
+        <td>nov/25</td>
+        <td class="num">4.679</td><td class="num">8.169</td><td class="num">996</td>
+        <td class="num">38.281</td><td class="num">5.259</td>
+        <td class="num bold">62.977</td>
+      </tr>
+      <tr>
+        <td>dez/25</td>
+        <td class="num">4.639</td><td class="num">8.011</td><td class="num">1.602</td>
+        <td class="num">34.733</td><td class="num">4.195</td>
+        <td class="num bold">56.386</td>
+      </tr>
+      <tr>
+        <td>jan/26</td>
+        <td class="num">5.644</td><td class="num">8.475</td><td class="num">836</td>
+        <td class="num">39.561</td><td class="num">4.864</td>
+        <td class="num bold">63.558</td>
+      </tr>
+      <tr>
+        <td>fev/26</td>
+        <td class="num">6.060</td><td class="num">7.412</td><td class="num bad">788</td>
+        <td class="num">35.990</td><td class="num">4.553</td>
+        <td class="num bold">59.034</td>
+      </tr>
+      <tr class="row-current">
+        <td>mar/26*</td>
+        <td class="num">4.010</td><td class="num">3.497</td><td class="num">398</td>
+        <td class="num">16.105</td><td class="num">2.181</td>
+        <td class="num bold">29.941</td>
+      </tr>
+    </table>
+    <div class="insight" style="margin-top: 12px; font-size: 0.78rem;">
+      Direct Teams (35-43k) e uso do app, nao aquisicao. Paid Search cresceu de 4.639 (dez) para 6.060 (fev), 4.010 (13d mar, proj ~9.562).
+      Organic Video caindo: 1.602 (dez) > 788 (fev). YouTube perdendo tracao.
+      Paid Social praticamente zero (0-7 sessoes/mes). Confirma Meta Ads sem efeito.
+    </div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ==================== DESPERDICIO ==================== -->
+<h2>Mapa de Desperdicio: Dinheiro Jogado Fora</h2>
+
+<div class="card" style="margin-bottom: 24px;">
+  <table>
+    <tr>
+      <th>Canal</th>
+      <th>Produto</th>
+      <th class="num">Investido (6m)</th>
+      <th class="num">Leads</th>
+      <th class="num">SQL</th>
+      <th class="num">Clientes</th>
+      <th>Status</th>
+    </tr>
+    <tr>
+      <td class="bad">Meta Ads</td>
+      <td>Teams</td>
+      <td class="num bad">R$1.596</td>
+      <td class="num bad">0</td>
+      <td class="num bad">0</td>
+      <td class="num bad">0</td>
+      <td class="bad">CORTAR IMEDIATAMENTE</td>
+    </tr>
+    <tr>
+      <td class="bad">LinkedIn Ads</td>
+      <td>Teams</td>
+      <td class="num bad">R$1.781</td>
+      <td class="num bad">0</td>
+      <td class="num bad">0</td>
+      <td class="num bad">0</td>
+      <td class="bad">CORTAR IMEDIATAMENTE</td>
+    </tr>
+    <tr>
+      <td class="warn">Meta Ads</td>
+      <td>Fleet</td>
+      <td class="num">R$11.680</td>
+      <td class="num">64</td>
+      <td class="num">15</td>
+      <td class="num muted">?</td>
+      <td class="warn">CPL R$183, alto. Reavaliar verba.</td>
+    </tr>
+    <tr>
+      <td>Bing Ads</td>
+      <td>Teams</td>
+      <td class="num">R$6.871</td>
+      <td class="num">55</td>
+      <td class="num">10</td>
+      <td class="num muted">?</td>
+      <td class="warn">CPL/SQL R$687. Volume baixo.</td>
+    </tr>
+  </table>
+  <div class="insight insight-bad" style="margin-top: 16px;">
+    <strong>Total desperdicado em canais sem resultado:</strong> R$3.377 (Meta Teams + LinkedIn Teams).
+    Em 7 meses nenhum lead. Nao e teste: e negligencia da agencia.<br><br>
+    <strong>Total em canais com ROI questionavel:</strong> R$18.551 (Meta Fleet R$11.7k + Bing Teams R$6.9k).
+    Geram leads, mas a taxas altas demais vs Google Ads.
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ==================== PROJECOES MAR/26 ==================== -->
+<h2>Projecao Mar/2026 (baseado em 13 dias)</h2>
+
+<div class="grid-3">
+  <div class="card">
+    <div class="card-title">Fleet Projecao (13d > 31d)</div>
+    <table>
+      <tr><td>Investimento</td><td class="num bold">~R$12.100</td></tr>
+      <tr><td>Leads Ads</td><td class="num bold">~64</td></tr>
+      <tr><td>CPL Projetado</td><td class="num bad">~R$189</td></tr>
+      <tr><td>SQL Projetado</td><td class="num">~31</td></tr>
+    </table>
+    <div style="margin-top: 8px; font-size: 0.75rem; color: #888;">
+      Se manter o ritmo, sera o pior CPL Fleet dos ultimos 6 meses.
+      Google CPL R$244 puxa a media pra cima.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Teams Projecao (13d > 31d)</div>
+    <table>
+      <tr><td>Investimento</td><td class="num bold">~R$15.400</td></tr>
+      <tr><td>Leads Ads</td><td class="num bold">~198</td></tr>
+      <tr><td>CPL Projetado</td><td class="num good">~R$78</td></tr>
+      <tr><td>SQL Projetado</td><td class="num warn">~24</td></tr>
+    </table>
+    <div style="margin-top: 8px; font-size: 0.75rem; color: #888;">
+      CPL excelente se confirmado. MAS: SQL rate de 12% (historico ~30%).
+      Pode ser volume inflado com qualidade baixa.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Consolidado Projecao</div>
+    <table>
+      <tr><td>Investimento Total</td><td class="num bold">~R$27.500</td></tr>
+      <tr><td>Leads Totais</td><td class="num bold">~262</td></tr>
+      <tr><td>CPL Consolidado</td><td class="num">~R$105</td></tr>
+      <tr><td>SQL Total</td><td class="num">~55</td></tr>
+    </table>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ==================== CONCLUSAO EXECUTIVA ==================== -->
+<h2>Conclusao Executiva: Avaliacao RMDigital</h2>
+
+<div class="alert-box">
+  <div class="title">1. CORTAR: Meta Ads Teams + LinkedIn Ads</div>
+  <p>R$3.377 desperdicados em 7 meses com ZERO leads. Nao existe justificativa tecnica para manter.
+  A agencia deveria ter pausado por conta propria apos o 2o mes sem conversao.</p>
+</div>
+
+<div class="alert-box">
+  <div class="title">2. INVESTIGAR: Fleet Google Ads CPL explodiu em mar/26</div>
+  <p>CPL saltou de R$111 (out/25) para R$244 (mar/26). Aumento de 120%.
+  Coincide com campanha de lancamento Fleet. A agencia precisa explicar:
+  campanhas novas em aprendizado? Audiencias exauridas? Competicao de leilao?</p>
+</div>
+
+<div class="alert-box">
+  <div class="title">3. VALIDAR: Teams Google Ads CPL caiu mas SQL tambem</div>
+  <p>CPL R$76 em mar/26 parece otimo, mas SQL rate caiu de 30% para 11%.
+  Se os leads nao convertem, CPL baixo nao vale nada. Precisa de 15-20 dias uteis para confirmar.</p>
+</div>
+
+<div class="insight">
+  <strong>4. Meta Fleet: cortaram no momento errado.</strong>
+  Reduziram de R$3.506 (jan) para R$291 (mar), justo quando o CPL era competitivo (R$58 em mar).
+  Meta Fleet historicamente teve o melhor CPL em set/25 (R$42). Reavaliar.
+</div>
+
+<div class="insight insight-good">
+  <strong>5. Organic Search Fleet: historia de sucesso silenciosa.</strong>
+  Sessoes organicas dobraram: 661 (dez) > 1.382 (fev). Projecao mar/26: ~1.989 (834 em 13d).
+  Leads organicos sao "gratis". Se SEO continuar crescendo, dependencia de Ads diminui naturalmente.
+</div>
+
+<div class="insight insight-warn">
+  <strong>6. Elasticidade negativa confirmada.</strong>
+  Fleet: +57% verba em jan/26 gerou apenas +27% leads. Em fev, +37% verba gerou -5% leads. Mar/26: CPL +120% vs base.
+  Teams: +61% verba gerou +34% leads. A curva de rendimentos decrescentes e clara em ambos.
+  Aumentar verba sem otimizar campanhas so piora o CPL.
+</div>
+
+<div style="margin-top: 32px; padding: 20px; background: #12122a; border: 1px solid #8B23E5; border-radius: 12px;">
+  <h3 style="color: #8B23E5; margin-bottom: 12px;">Proximos Passos (antes de confrontar RMDigital)</h3>
+  <ul style="font-size: 0.85rem; line-height: 2; padding-left: 20px;">
+    <li>Esperar mar/26 fechar (20+ dias uteis) para validar tendencias</li>
+    <li>Confirmar SQL rate do Teams mar/26 (atual 12%, precisa subir para 25%+ pra justificar)</li>
+    <li>Conectar Google Ads API (Basic Access pendente desde 09/mar) para ver dados de campanha por campanha</li>
+    <li>Conectar Bing Ads API (bloqueado por Azure AD, precisa de Global Admin ou conta pessoal Microsoft)</li>
+    <li>Cruzar dados ads-plataforma vs CRM: custos-ads mostra 147 leads Teams fev, CRM mostra 118. Onde estao 29 leads?</li>
+    <li>Preparar documento de cobranca com metricas claras e deadline de melhoria</li>
+  </ul>
+</div>
+
+<div style="margin-top: 24px; text-align: center; color: #444; font-size: 0.72rem;">
+  Dashboard gerado automaticamente · Sexta-Feira IA · Dados: Google Sheets (custos-ads + comparativo-leads) + GA4 Data API · 13/mar/2026
+</div>
+
+</body>
+</html>
