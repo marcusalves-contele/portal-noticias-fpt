@@ -1,10 +1,11 @@
 {
-  "$schema": "https://railway.app/railway.schema.json",
+  "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "cd /prism-os/nutella-creator && python3 boot.py && python3 dashboard.py",
-    "restartPolicyMaxRetries": 5
+    "startCommand": "cd nutella-creator && python3 boot.py && python3 dashboard.py",
+    "healthcheckPath": "/",
+    "restartPolicyType": "ON_FAILURE"
   }
 }

@@ -1,0 +1,5 @@
+nutella-creator/output/
+nutella-creator/downloads/
+thumbnail-ai-creator/output/
+*.pickle
+__pycache__/
