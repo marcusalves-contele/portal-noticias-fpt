@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Politica de Privacidade | Contele</title>
-  <meta name="description" content="Politica de Privacidade da Contele Solucoes Tecnologicas. Saiba como tratamos seus dados pessoais em conformidade com a LGPD.">
+  <title>Política de Privacidade | Contele</title>
+  <meta name="description" content="Política de Privacidade da Contele Soluções Tecnológicas. Saiba como tratamos seus dados pessoais em conformidade com a LGPD.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://contele.io/privacy">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,7 +47,6 @@
       color: var(--white);
     }
 
-    /* ─── HEADER ─── */
     header {
       position: sticky;
       top: 0;
@@ -68,15 +67,15 @@
     }
 
     .logo {
-      font-family: var(--sans);
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--white);
       text-decoration: none;
-      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
     }
 
-    .logo span { color: var(--purple); }
+    .logo img {
+      height: 32px;
+      width: auto;
+    }
 
     .header-tag {
       font-size: 10px;
@@ -90,7 +89,6 @@
       border-radius: 3px;
     }
 
-    /* ─── HERO ─── */
     .hero {
       position: relative;
       overflow: hidden;
@@ -180,7 +178,6 @@
       font-weight: 500;
     }
 
-    /* ─── LAYOUT ─── */
     .content {
       max-width: 900px;
       margin: 0 auto;
@@ -191,7 +188,6 @@
       align-items: start;
     }
 
-    /* ─── SIDEBAR TOC ─── */
     .toc {
       position: sticky;
       top: 80px;
@@ -233,7 +229,6 @@
       background: var(--purple-glow);
     }
 
-    /* ─── MAIN CONTENT ─── */
     .main {
       padding: 48px 0 96px;
       min-width: 0;
@@ -248,13 +243,9 @@
       border-bottom: 1px solid var(--border);
     }
 
-    .intro strong {
-      color: var(--text);
-    }
+    .intro strong { color: var(--text); }
 
-    section {
-      margin-bottom: 56px;
-    }
+    section { margin-bottom: 56px; }
 
     h2 {
       font-family: var(--serif);
@@ -306,11 +297,8 @@
       color: var(--text-dim);
     }
 
-    li strong {
-      color: var(--text);
-    }
+    li strong { color: var(--text); }
 
-    /* ─── TABLES ─── */
     .table-wrap {
       overflow-x: auto;
       margin-bottom: 20px;
@@ -343,18 +331,10 @@
       vertical-align: top;
     }
 
-    tbody td strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-
+    tbody td strong { color: var(--text); font-weight: 600; }
     tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: rgba(139, 35, 229, 0.03); }
 
-    tbody tr:hover {
-      background: rgba(139, 35, 229, 0.03);
-    }
-
-    /* ─── Q&A CARDS ─── */
     .qa-grid {
       display: flex;
       flex-direction: column;
@@ -369,9 +349,7 @@
       transition: border-color 0.2s;
     }
 
-    .qa:hover {
-      border-color: var(--border-hover);
-    }
+    .qa:hover { border-color: var(--border-hover); }
 
     .qa-q {
       font-weight: 600;
@@ -407,7 +385,6 @@
       line-height: 1.7;
     }
 
-    /* ─── CONTACT BOX ─── */
     .contact-box {
       background: var(--deep);
       border: 1px solid var(--border);
@@ -428,9 +405,7 @@
       background: linear-gradient(90deg, transparent, var(--purple), transparent);
     }
 
-    .contact-box h2 {
-      margin-bottom: 28px;
-    }
+    .contact-box h2 { margin-bottom: 28px; }
 
     .contact-grid {
       display: grid;
@@ -466,7 +441,6 @@
       color: var(--text-muted);
     }
 
-    /* ─── FOOTER ─── */
     footer {
       border-top: 1px solid var(--border);
       padding: 32px 0;
@@ -479,7 +453,6 @@
       margin-bottom: 4px;
     }
 
-    /* ─── APP SECTION HIGHLIGHT ─── */
     .app-section {
       background: var(--deep);
       border: 1px solid var(--border);
@@ -488,13 +461,8 @@
       margin-top: 8px;
     }
 
-    .app-section h3 {
-      margin-top: 24px;
-    }
-
-    .app-section h3:first-child {
-      margin-top: 0;
-    }
+    .app-section h3 { margin-top: 24px; }
+    .app-section h3:first-child { margin-top: 0; }
 
     .security-grid {
       display: grid;
@@ -514,45 +482,19 @@
       font-weight: 500;
     }
 
-    /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
-      .content {
-        grid-template-columns: 1fr;
-        gap: 0;
-      }
-
-      .toc {
-        position: relative;
-        top: 0;
-        padding: 32px 0 0;
-        border-bottom: 1px solid var(--border);
-        margin-bottom: 0;
-      }
-
-      .toc ol {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0;
-      }
-
-      .toc a {
-        border-left: none;
-        padding: 6px 8px;
-        font-size: 12px;
-      }
-
+      .content { grid-template-columns: 1fr; gap: 0; }
+      .toc { position: relative; top: 0; padding: 32px 0 0; border-bottom: 1px solid var(--border); margin-bottom: 0; }
+      .toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+      .toc a { border-left: none; padding: 6px 8px; font-size: 12px; }
       .hero-inner { padding: 48px 24px 40px; }
       .header-inner { padding: 14px 20px; }
       .content { padding: 0 20px; }
       .hero-meta { gap: 20px; }
-
       .contact-box { padding: 28px 20px; }
       .contact-grid { grid-template-columns: 1fr; }
-
       .security-grid { grid-template-columns: 1fr; }
-
       .app-section { padding: 24px 20px; }
-
       table { font-size: 13px; }
       thead th, tbody td { padding: 10px 14px; }
     }
@@ -567,7 +509,7 @@
 
 <header>
   <div class="header-inner">
-    <a href="https://contele.io" class="logo">contele</a>
+    <a href="https://contele.io" class="logo"><img src="/logo-contele-branco.png" alt="Contele"></a>
     <span class="header-tag">LGPD</span>
   </div>
 </header>
@@ -575,11 +517,11 @@
 <div class="hero">
   <div class="hero-inner">
     <div class="hero-label">Documento Legal</div>
-    <h1>Politica de Privacidade</h1>
-    <p class="hero-subtitle">Como a Contele trata seus dados pessoais em conformidade com a Lei Geral de Protecao de Dados (Lei 13.709/2018).</p>
+    <h1>Política de Privacidade</h1>
+    <p class="hero-subtitle">Como a Contele trata seus dados pessoais em conformidade com a Lei Geral de Proteção de Dados (Lei 13.709/2018).</p>
     <div class="hero-meta">
       <div class="meta-item">
-        <span class="meta-label">Versao</span>
+        <span class="meta-label">Versão</span>
         <span class="meta-value">2.0</span>
       </div>
       <div class="meta-item">
@@ -591,7 +533,7 @@
         <span class="meta-value">07.651.877/0001-91</span>
       </div>
       <div class="meta-item">
-        <span class="meta-label">Jurisdicao</span>
+        <span class="meta-label">Jurisdição</span>
         <span class="meta-value">BR-LGPD</span>
       </div>
     </div>
@@ -601,34 +543,35 @@
 <div class="content">
 
   <nav class="toc">
-    <div class="toc-title">Indice</div>
+    <div class="toc-title">Índice</div>
     <ol>
       <li><a href="#s1">Controladora e DPO</a></li>
       <li><a href="#s2">Dados coletados</a></li>
       <li><a href="#s3">Bases legais</a></li>
       <li><a href="#s4">Compartilhamento</a></li>
-      <li><a href="#s5">Retencao e exclusao</a></li>
+      <li><a href="#s5">Retenção e exclusão</a></li>
       <li><a href="#s6">Direitos do titular</a></li>
       <li><a href="#s7">Responsabilidades</a></li>
       <li><a href="#s8">Perguntas frequentes</a></li>
       <li><a href="#s9">App Contele Teams</a></li>
-      <li><a href="#s10">Canais de contato</a></li>
+      <li><a href="#s10">App Contele Fleet</a></li>
+      <li><a href="#s11">Canais de contato</a></li>
     </ol>
   </nav>
 
   <div class="main">
 
     <div class="intro">
-      <p>A Contele oferece solucoes SaaS para gestao de equipes externas e frotas (Contele Teams e Contele Fleet). Este documento consolida as informacoes essenciais sobre tratamento de dados, base legal, responsabilidades e contato do DPO.</p>
-      <p>A Contele atua como <strong>operadora</strong>, fornecendo a plataforma, controles de seguranca e suporte ao controlador. O cliente (contratante) e o <strong>controlador</strong> e define finalidade, categorias de dados coletados, base legal, parametrizacoes de retencao e comunicacao com os titulares. Ambas as partes precisam cumprir a LGPD.</p>
+      <p>A Contele oferece soluções SaaS para gestão de equipes externas e frotas (Contele Teams e Contele Fleet). Este documento consolida as informações essenciais sobre tratamento de dados, base legal, responsabilidades e contato do DPO.</p>
+      <p>A Contele atua como <strong>operadora</strong>, fornecendo a plataforma, controles de segurança e suporte ao controlador. O cliente (contratante) é o <strong>controlador</strong> e define finalidade, categorias de dados coletados, base legal, parametrizações de retenção e comunicação com os titulares. Ambas as partes precisam cumprir a LGPD.</p>
     </div>
 
     <section id="s1">
       <h2><span class="num">01</span>Controladora e DPO</h2>
       <ul>
-        <li><strong>Empresa (operadora de dados):</strong> Contele Solucoes Tecnologicas Ltda. (CNPJ 07.651.877/0001-91), sediada em Santos/SP.</li>
-        <li><strong>Produtos:</strong> Contele Teams (gestao de equipes externas) e Contele Fleet (gestao de frotas), com respectivos aplicativos moveis.</li>
-        <li><strong>DPO (Encarregado de Protecao de Dados):</strong> Eng. Marco Antonio Fassa da Silva Dias.</li>
+        <li><strong>Empresa (operadora de dados):</strong> Contele Soluções Tecnológicas Ltda. (CNPJ 07.651.877/0001-91), sediada em Santos/SP.</li>
+        <li><strong>Produtos:</strong> Contele Teams (gestão de equipes externas) e Contele Fleet (gestão de frotas), com respectivos aplicativos móveis.</li>
+        <li><strong>DPO (Encarregado de Proteção de Dados):</strong> Eng. Marco Antonio Fassa da Silva Dias.</li>
         <li><strong>Contato do DPO:</strong> <a href="mailto:marcoantonio@contele.com.br">marcoantonio@contele.com.br</a></li>
       </ul>
     </section>
@@ -646,61 +589,61 @@
           </thead>
           <tbody>
             <tr>
-              <td><strong>Identificacao do usuario</strong></td>
-              <td>Nome, CPF/CNPJ, razao social, e-mail, telefone</td>
-              <td>Cadastro e autenticacao na plataforma</td>
+              <td><strong>Identificação do usuário</strong></td>
+              <td>Nome, CPF/CNPJ, razão social, e-mail, telefone</td>
+              <td>Cadastro e autenticação na plataforma</td>
             </tr>
             <tr>
               <td><strong>Dados operacionais</strong></td>
-              <td>Geolocalizacao, registros de check-ins, rotas, jornada de trabalho, logs de acesso</td>
-              <td>Execucao dos servicos contratados, geracao de relatorios e auditoria</td>
+              <td>Geolocalização, registros de check-ins, rotas, jornada de trabalho, logs de acesso</td>
+              <td>Execução dos serviços contratados, geração de relatórios e auditoria</td>
             </tr>
             <tr>
               <td><strong>Dados de uso</strong></td>
-              <td>Cookies, IP, dispositivo, data/hora de acesso, paginas visitadas</td>
-              <td>Personalizacao de experiencia, seguranca e estatisticas</td>
+              <td>Cookies, IP, dispositivo, data/hora de acesso, páginas visitadas</td>
+              <td>Personalização de experiência, segurança e estatísticas</td>
             </tr>
             <tr>
-              <td><strong>Dados publicos</strong></td>
-              <td>CNPJ, informacoes de empresas em bases publicas</td>
-              <td>Conferencia cadastral</td>
+              <td><strong>Dados públicos</strong></td>
+              <td>CNPJ, informações de empresas em bases públicas</td>
+              <td>Conferência cadastral</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <p>Os dados sao coletados para cumprir o contrato de prestacao de servicos, assegurar o bom funcionamento das plataformas, atender obrigacoes legais e melhorar continuamente os produtos. A Contele nao coleta dados sensiveis por padrao; se o cliente inserir dados sensiveis no sistema, ele deve garantir a base legal e a conformidade.</p>
+      <p>Os dados são coletados para cumprir o contrato de prestação de serviços, assegurar o bom funcionamento das plataformas, atender obrigações legais e melhorar continuamente os produtos. A Contele não coleta dados sensíveis por padrão; se o cliente inserir dados sensíveis no sistema, ele deve garantir a base legal e a conformidade.</p>
     </section>
 
     <section id="s3">
       <h2><span class="num">03</span>Bases legais</h2>
-      <p>O tratamento de dados se apoia nas seguintes bases legais (art. 7&#186; da LGPD):</p>
+      <p>O tratamento de dados se apoia nas seguintes bases legais (art. 7º da LGPD):</p>
       <ul>
-        <li><strong>Execucao de contrato:</strong> dados necessarios para usar a plataforma (cadastro, operacionalizacao e suporte).</li>
-        <li><strong>Legitimo interesse:</strong> melhorias operacionais e metricas, apos analise de balanceamento de interesses.</li>
-        <li><strong>Obrigacao legal:</strong> cumprimento de obrigacoes regulatorias e judiciais (ex.: registros de acesso).</li>
-        <li><strong>Consentimento:</strong> funcionalidades opcionais que exijam consentimento (por exemplo, compartilhamento de dados com parceiros especificos).</li>
+        <li><strong>Execução de contrato:</strong> dados necessários para usar a plataforma (cadastro, operacionalização e suporte).</li>
+        <li><strong>Legítimo interesse:</strong> melhorias operacionais e métricas, após análise de balanceamento de interesses.</li>
+        <li><strong>Obrigação legal:</strong> cumprimento de obrigações regulatórias e judiciais (ex.: registros de acesso).</li>
+        <li><strong>Consentimento:</strong> funcionalidades opcionais que exijam consentimento (por exemplo, compartilhamento de dados com parceiros específicos).</li>
       </ul>
     </section>
 
     <section id="s4">
       <h2><span class="num">04</span>Compartilhamento e subprocessadores</h2>
-      <p>A Contele utiliza provedores e ferramentas para hospedar e operar seus servicos. Esses subprocessadores estao alinhados com boas praticas de seguranca e privacidade. Dados pessoais podem ser compartilhados de forma minimamente necessaria com:</p>
+      <p>A Contele utiliza provedores e ferramentas para hospedar e operar seus serviços. Esses subprocessadores estão alinhados com boas práticas de segurança e privacidade. Dados pessoais podem ser compartilhados de forma minimamente necessária com:</p>
       <ul>
-        <li><strong>Infraestrutura:</strong> Amazon Web Services (AWS), Google Cloud Platform (GCP) e Cloudflare. Provedores de computacao, armazenamento e CDN. Alguns servidores estao no Brasil e outros nos Estados Unidos; essa transferencia internacional segue clausulas contratuais e protecoes adequadas conforme o Art. 33 da LGPD.</li>
-        <li><strong>Ferramentas de relacionamento e CRM:</strong> Pipedrive, Chatwoot, API do WhatsApp e Vindi (cobranca). Utilizados para comunicacao com clientes, gestao comercial e faturamento; registros usam IDs internos e dados de empresa (CNPJ).</li>
-        <li><strong>Plataformas de IA:</strong> OpenAI e Google AI. Utilizados com dados minimizados e anonimizados para fins de insights estrategicos de produto e atendimento. Nao processamos dados pessoais identificaveis nesses ambientes.</li>
-        <li><strong>Autoridades publicas:</strong> quando houver obrigacao legal ou solicitacao judicial.</li>
+        <li><strong>Infraestrutura:</strong> Amazon Web Services (AWS), Google Cloud Platform (GCP) e Cloudflare. Provedores de computação, armazenamento e CDN. Alguns servidores estão no Brasil e outros nos Estados Unidos; essa transferência internacional segue cláusulas contratuais e proteções adequadas conforme o Art. 33 da LGPD.</li>
+        <li><strong>Ferramentas de relacionamento e CRM:</strong> Pipedrive, Chatwoot, API do WhatsApp (Zapster/Evolution) e Vindi (cobrança). Utilizados para comunicação com clientes, gestão comercial e faturamento; registros usam IDs internos e dados de empresa (CNPJ).</li>
+        <li><strong>Plataformas de IA:</strong> OpenAI e Google AI. Utilizados com dados minimizados e anonimizados para fins de insights estratégicos de produto e atendimento. Não processamos dados pessoais identificáveis nesses ambientes.</li>
+        <li><strong>Autoridades públicas:</strong> quando houver obrigação legal ou solicitação judicial.</li>
       </ul>
-      <p>O cliente tambem pode integrar a plataforma a sistemas de terceiros. Nesses casos, ele deve avaliar e estabelecer contratos apropriados com seus parceiros.</p>
+      <p>O cliente também pode integrar a plataforma a sistemas de terceiros. Nesses casos, ele deve avaliar e estabelecer contratos apropriados com seus parceiros.</p>
     </section>
 
     <section id="s5">
-      <h2><span class="num">05</span>Retencao e exclusao de dados</h2>
+      <h2><span class="num">05</span>Retenção e exclusão de dados</h2>
       <ul>
-        <li><strong>Enquanto cliente ativo:</strong> os dados sao mantidos para viabilizar o servico e relatorios historicos.</li>
-        <li><strong>Apos cancelamento:</strong> a Contele exclui os dados em ate um ano ou antes, caso o cliente solicite explicitamente a eliminacao durante o cancelamento. Dados de contas bloqueadas por inadimplencia sao preservados apenas para fins de regularizacao e comunicacao.</li>
-        <li><strong>Backups e logs:</strong> backups rotacionados por ate 365 dias; logs de acesso podem ser conservados por ate 5 anos para cumprimento de obrigacoes legais.</li>
-        <li><strong>Pedidos de eliminacao:</strong> o titular dos dados pode solicitar exclusao via canal de privacidade. O cliente, como controlador, e responsavel por autorizar ou solicitar a exclusao definitiva.</li>
+        <li><strong>Enquanto cliente ativo:</strong> os dados são mantidos para viabilizar o serviço e relatórios históricos.</li>
+        <li><strong>Após cancelamento:</strong> a Contele exclui os dados em até um ano ou antes, caso o cliente solicite explicitamente a eliminação durante o cancelamento. Dados de contas bloqueadas por inadimplência são preservados apenas para fins de regularização e comunicação.</li>
+        <li><strong>Backups e logs:</strong> backups rotacionados por até 365 dias; logs de acesso podem ser conservados por até 5 anos para cumprimento de obrigações legais.</li>
+        <li><strong>Pedidos de eliminação:</strong> o titular dos dados pode solicitar exclusão via canal de privacidade. O cliente, como controlador, é responsável por autorizar ou solicitar a exclusão definitiva.</li>
       </ul>
     </section>
 
@@ -709,12 +652,12 @@
       <p>Conforme o art. 18 da LGPD, os titulares podem exercer:</p>
       <ol>
         <li>Acesso aos dados e ao compartilhamento com terceiros</li>
-        <li>Correcao de dados incompletos, inexatos ou desatualizados</li>
-        <li>Anonimizacao, bloqueio ou eliminacao de dados desnecessarios, excessivos ou tratados em desconformidade</li>
-        <li>Portabilidade, mediante regulamentacao</li>
-        <li>Eliminacao de dados tratados com base no consentimento</li>
-        <li>Informacoes sobre entidades publicas e privadas com as quais a Contele compartilha dados</li>
-        <li>Revogacao do consentimento</li>
+        <li>Correção de dados incompletos, inexatos ou desatualizados</li>
+        <li>Anonimização, bloqueio ou eliminação de dados desnecessários, excessivos ou tratados em desconformidade</li>
+        <li>Portabilidade, mediante regulamentação</li>
+        <li>Eliminação de dados tratados com base no consentimento</li>
+        <li>Informações sobre entidades públicas e privadas com as quais a Contele compartilha dados</li>
+        <li>Revogação do consentimento</li>
       </ol>
       <p>Para exercer esses direitos, o titular deve contatar o controlador (cliente). A Contele auxilia o cliente a atender essas demandas.</p>
     </section>
@@ -732,24 +675,24 @@
           </thead>
           <tbody>
             <tr>
-              <td><strong>Gestao da plataforma</strong></td>
-              <td>Disponibiliza SaaS, atualizacoes, suporte e medidas de seguranca</td>
-              <td>Define parametrizacoes de uso, usuarios cadastrados e escopo de dados</td>
+              <td><strong>Gestão da plataforma</strong></td>
+              <td>Disponibiliza SaaS, atualizações, suporte e medidas de segurança</td>
+              <td>Define parametrizações de uso, usuários cadastrados e escopo de dados</td>
             </tr>
             <tr>
               <td><strong>Tratamento de dados</strong></td>
-              <td>Trata dados conforme instrucoes do controlador; implementa seguranca fisica e logica</td>
+              <td>Trata dados conforme instruções do controlador; implementa segurança física e lógica</td>
               <td>Define finalidade e base legal, decide quais dados coletar e por quanto tempo</td>
             </tr>
             <tr>
               <td><strong>Resposta a titulares</strong></td>
               <td>Disponibiliza ferramentas para exportar/analisar dados e apoia o controlador</td>
-              <td>Recebe, valida e responde as solicitacoes dos titulares</td>
+              <td>Recebe, valida e responde às solicitações dos titulares</td>
             </tr>
             <tr>
               <td><strong>Responsabilidade legal</strong></td>
-              <td>Executa obrigacoes de operadora e segue normas de protecao de dados</td>
-              <td>Responde pelas decisoes de tratamento e pelo cumprimento de direitos dos titulares</td>
+              <td>Executa obrigações de operadora e segue normas de proteção de dados</td>
+              <td>Responde pelas decisões de tratamento e pelo cumprimento de direitos dos titulares</td>
             </tr>
           </tbody>
         </table>
@@ -760,71 +703,109 @@
       <h2><span class="num">08</span>Perguntas frequentes</h2>
       <div class="qa-grid">
         <div class="qa">
-          <div class="qa-q">O que a Contele coleta dos usuarios?</div>
-          <p class="qa-a">Dados cadastrais (nome, CPF/CNPJ, contatos), geolocalizacao, logs de acesso e uso, e dados tecnicos de dispositivos.</p>
+          <div class="qa-q">O que a Contele coleta dos usuários?</div>
+          <p class="qa-a">Dados cadastrais (nome, CPF/CNPJ, contatos), geolocalização, logs de acesso e uso, e dados técnicos de dispositivos.</p>
         </div>
         <div class="qa">
-          <div class="qa-q">Quem define quais dados sao coletados?</div>
+          <div class="qa-q">Quem define quais dados são coletados?</div>
           <p class="qa-a">O cliente (controlador) determina as categorias de dados e a finalidade. A Contele apenas opera o sistema conforme definido.</p>
         </div>
         <div class="qa">
-          <div class="qa-q">Ha transferencia internacional de dados?</div>
-          <p class="qa-a">Sim. Parte da infraestrutura (AWS/GCP) localiza-se nos Estados Unidos. A Contele adota acordos e medidas de protecao adequados conforme o Art. 33 da LGPD.</p>
+          <div class="qa-q">Há transferência internacional de dados?</div>
+          <p class="qa-a">Sim. Parte da infraestrutura (AWS/GCP) localiza-se nos Estados Unidos. A Contele adota acordos e medidas de proteção adequados conforme o Art. 33 da LGPD.</p>
         </div>
         <div class="qa">
           <div class="qa-q">Por quanto tempo os dados ficam armazenados?</div>
-          <p class="qa-a">Durante todo o periodo de contratacao e, apos cancelamento, sao excluidos em ate 1 ano ou imediatamente quando solicitado pelo controlador. Backups e logs podem ser retidos por obrigacoes legais.</p>
+          <p class="qa-a">Durante todo o período de contratação e, após cancelamento, são excluídos em até 1 ano ou imediatamente quando solicitado pelo controlador. Backups e logs podem ser retidos por obrigações legais.</p>
         </div>
         <div class="qa">
           <div class="qa-q">Quem devo contatar para exercer meus direitos?</div>
-          <p class="qa-a">Primeiramente, o controlador (cliente). Caso precise de suporte adicional, envie sua solicitacao para o DPO da Contele pelo e-mail <a href="mailto:marcoantonio@contele.com.br">marcoantonio@contele.com.br</a>.</p>
+          <p class="qa-a">Primeiramente, o controlador (cliente). Caso precise de suporte adicional, envie sua solicitação pelo canal de privacidade da Contele.</p>
         </div>
       </div>
     </section>
 
     <section id="s9">
-      <h2><span class="num">09</span>Politica de Privacidade: App Contele Teams</h2>
-      <p>A Contele se compromete a proteger a privacidade e a seguranca dos dados dos usuarios do aplicativo Contele Teams, em conformidade com a LGPD (Lei 13.709/2018).</p>
+      <h2><span class="num">09</span>Política de Privacidade: App Contele Teams</h2>
+      <p>A Contele se compromete a proteger a privacidade e a segurança dos dados dos usuários do aplicativo Contele Teams. Esta seção explica como coletamos, utilizamos, compartilhamos e protegemos dados pessoais no contexto do aplicativo, em conformidade com a LGPD (Lei 13.709/2018).</p>
 
       <div class="app-section">
         <h3>9.1 Dados coletados</h3>
-        <p>Somente dados cadastrados pelo cliente sobre o usuario sao coletados e processados no aplicativo. Esses dados sao inseridos diretamente pelo cliente (controlador) e podem incluir: nome, e-mail, telefone, dados de localizacao (quando configurados pelo gestor) e outros dados cadastrados conforme necessidade.</p>
-        <p>O cliente (gestor) e responsavel por garantir que os dados coletados e parametrizacoes estejam em conformidade com a LGPD.</p>
+        <p>Somente dados cadastrados pelo cliente sobre o usuário são coletados e processados no aplicativo. Esses dados são inseridos diretamente pelo cliente (controlador) e podem incluir: nome, e-mail, telefone, dados de localização (quando configurados pelo gestor) e outros dados cadastrados conforme necessidade.</p>
+        <p>O cliente (gestor) é responsável por garantir que os dados coletados e parametrizações estejam em conformidade com a LGPD.</p>
 
-        <h3>9.2 Coleta de dados de localizacao</h3>
+        <h3>9.2 Coleta de dados de localização</h3>
         <ul>
-          <li>A coleta de localizacao em tempo real pode ser utilizada para funcionalidades como rastreamento de visitas, horarios de check-ins e rotas.</li>
-          <li>O gestor define horarios e necessidade do rastreamento diretamente na plataforma.</li>
-          <li>O rastreamento de localizacao so ocorre quando configurado pelo gestor.</li>
-          <li>A transparencia e garantida, e usuarios sao informados sobre o rastreamento.</li>
+          <li>A coleta de localização em tempo real pode ser utilizada para funcionalidades como rastreamento de visitas, horários de check-ins e rotas.</li>
+          <li>O gestor define horários e necessidade do rastreamento diretamente na plataforma.</li>
+          <li>O rastreamento de localização só ocorre quando configurado pelo gestor.</li>
+          <li>A transparência é garantida, e usuários são informados sobre o rastreamento.</li>
         </ul>
 
         <h3>9.3 Gerenciamento de chamadas</h3>
-        <p>A permissao de gerenciamento de chamadas e solicitada exclusivamente para permitir que o usuario toque no numero do cliente e realize a chamada pelo discador do dispositivo. Nao ha coleta, monitoramento ou gravacao de chamadas telefonicas pelo aplicativo.</p>
+        <p>A permissão de gerenciamento de chamadas é solicitada exclusivamente para permitir que o usuário toque no número do cliente e realize a chamada pelo discador do dispositivo. Não há coleta, monitoramento ou gravação de chamadas telefônicas pelo aplicativo.</p>
 
-        <h3>9.4 Armazenamento e sincronizacao</h3>
-        <p>Todos os dados coletados pelo Contele Teams sao sincronizados com os servidores da Contele. A Contele adota controles de seguranca para proteger os dados enquanto armazenados em sua infraestrutura.</p>
+        <h3>9.4 Armazenamento e sincronização</h3>
+        <p>Todos os dados coletados pelo Contele Teams são sincronizados com os servidores da Contele. A Contele adota controles de segurança para proteger os dados enquanto armazenados em sua infraestrutura.</p>
+        <p>Consulte a seção <a href="#s5">5. Retenção e exclusão de dados</a> para as regras gerais. O cliente (controlador) ou o titular podem solicitar exclusão de dados; a Contele apoia o controlador no atendimento ao pedido.</p>
 
-        <h3>9.5 Notificacoes push</h3>
-        <p>As notificacoes push informam sobre: disponibilidade de novas versoes, novas funcionalidades e status de sincronizacao/conectividade. O usuario pode desativar as notificacoes a qualquer momento nas configuracoes do app e/ou do sistema operacional.</p>
+        <h3>9.5 Notificações push</h3>
+        <p>As notificações push informam sobre: disponibilidade de novas versões, novas funcionalidades e status de sincronização/conectividade. O usuário pode desativar as notificações a qualquer momento nas configurações do app e/ou do sistema operacional.</p>
 
         <h3>9.6 Compartilhamento de dados</h3>
-        <p>A Contele nao compartilha dados de usuarios ou clientes com terceiros para fins de marketing ou analise comercial. Os dados podem transitar dentro da infraestrutura da Contele (entre servicos na AWS, GCP e Cloudflare) como parte do funcionamento da plataforma, mas nao sao vendidos ou compartilhados com terceiros.</p>
+        <p>A Contele não compartilha dados de usuários ou clientes com terceiros para fins de marketing ou análise comercial. Os dados podem transitar dentro da infraestrutura da Contele (entre serviços na AWS, GCP e Cloudflare) como parte do funcionamento da plataforma, mas não são vendidos ou compartilhados com terceiros.</p>
 
-        <h3>9.7 Seguranca dos dados</h3>
+        <h3>9.7 Segurança dos dados</h3>
         <div class="security-grid">
-          <div class="security-item">Criptografia em repouso e em transito</div>
+          <div class="security-item">Criptografia em repouso e em trânsito</div>
           <div class="security-item">Controles de acesso restritos</div>
           <div class="security-item">Backups regulares</div>
         </div>
 
-        <h3>9.8 Consentimento</h3>
-        <p>O consentimento do usuario sera solicitado explicitamente, quando aplicavel, especialmente para funcionalidades como coleta de dados de localizacao, uso de camera ou microfone. O usuario pode revogar o consentimento a qualquer momento, sem comprometer a experiencia essencial do aplicativo.</p>
+        <h3>9.8 Direitos do titular</h3>
+        <p>Os titulares têm direito de acesso, correção, exclusão e portabilidade, entre outros previstos na LGPD. Para exercer direitos, o titular deve contatar o controlador (cliente). A Contele fornece ferramentas e suporte ao controlador.</p>
+
+        <h3>9.9 Consentimento</h3>
+        <p>O consentimento do usuário será solicitado explicitamente, quando aplicável, especialmente para funcionalidades como coleta de dados de localização, uso de câmera ou microfone. O usuário pode revogar o consentimento a qualquer momento, sem comprometer a experiência essencial do aplicativo.</p>
       </div>
     </section>
 
-    <div class="contact-box" id="s10">
-      <h2><span class="num">10</span>Canais de contato</h2>
+    <section id="s10">
+      <h2><span class="num">10</span>Política de Privacidade: App Contele Fleet</h2>
+      <p>O Contele Fleet é a solução de gestão de frotas da Contele. Esta seção detalha o tratamento de dados específico do aplicativo e da plataforma Fleet.</p>
+
+      <div class="app-section">
+        <h3>10.1 Dados coletados</h3>
+        <p>Os dados coletados pelo Contele Fleet incluem informações do veículo, localização GPS em tempo real, dados de condução (velocidade, frenagens, acelerações), consumo de combustível e registros de manutenção. Todos os dados são inseridos ou parametrizados pelo cliente (controlador).</p>
+
+        <h3>10.2 Rastreamento veicular</h3>
+        <ul>
+          <li>O rastreamento GPS dos veículos opera em tempo real conforme configuração do gestor.</li>
+          <li>Dados de telemetria (velocidade, ignição, cercas virtuais) são coletados automaticamente pelo dispositivo embarcado no veículo.</li>
+          <li>O gestor define quais alertas, cercas e parâmetros de monitoramento são ativados.</li>
+        </ul>
+
+        <h3>10.3 Videotelemetria</h3>
+        <p>Quando o cliente utiliza câmeras embarcadas (dashcam), imagens e vídeos podem ser capturados. Esses dados são retidos por até 90 dias e tratados conforme a política de frotas do cliente (controlador). A Contele disponibiliza a infraestrutura de armazenamento e acesso, mas não visualiza ou utiliza esses dados de forma autônoma.</p>
+
+        <h3>10.4 Segurança e armazenamento</h3>
+        <div class="security-grid">
+          <div class="security-item">Criptografia em repouso e em trânsito</div>
+          <div class="security-item">Controles de acesso restritos</div>
+          <div class="security-item">Backups regulares</div>
+        </div>
+        <p>Consulte a seção <a href="#s5">5. Retenção e exclusão de dados</a> para as regras gerais de retenção.</p>
+
+        <h3>10.5 Direitos do titular</h3>
+        <p>Motoristas e demais titulares vinculados à frota têm os mesmos direitos previstos na seção <a href="#s6">6. Direitos do titular</a>. Para exercê-los, devem contatar o controlador (cliente). A Contele fornece ferramentas e suporte ao controlador.</p>
+
+        <h3>10.6 Consentimento</h3>
+        <p>O consentimento será solicitado explicitamente quando aplicável, especialmente para funcionalidades que envolvam câmera, microfone ou dados biométricos. O motorista pode revogar o consentimento a qualquer momento.</p>
+      </div>
+    </section>
+
+    <div class="contact-box" id="s11">
+      <h2><span class="num">11</span>Canais de contato</h2>
       <div class="contact-grid">
         <div class="contact-card">
           <span class="c-label">DPO</span>
@@ -835,19 +816,21 @@
           <span class="c-value"><a href="mailto:marcoantonio@contele.com.br">marcoantonio@contele.com.br</a></span>
         </div>
         <div class="contact-card">
-          <span class="c-label">Canal DSAR</span>
-          <span class="c-value"><a href="https://contele.io/privacy">contele.io/privacy</a></span>
+          <span class="c-label">Canal de privacidade (DSAR)</span>
+          <span class="c-value"><a href="mailto:marcoantonio@contele.com.br">marcoantonio@contele.com.br</a></span>
         </div>
       </div>
-      <p class="contact-note">Prazo de resposta: ate 15 dias uteis. Solicitacoes de acesso, correcao ou exclusao de dados devem ser encaminhadas pelo e-mail do DPO ou pelo canal de privacidade.</p>
+      <p class="contact-note">Prazo de resposta: até 15 dias. Solicitações de acesso, correção ou exclusão de dados devem ser encaminhadas pelo e-mail do DPO.</p>
     </div>
+
+    <p style="margin-top: 32px; font-size: 13px; color: var(--text-muted);">Última atualização: 14/08/2025</p>
 
   </div>
 </div>
 
 <footer>
   <div class="header-inner">
-    <p>&copy; 2025 Contele Solucoes Tecnologicas Ltda. CNPJ 07.651.877/0001-91</p>
+    <p>&copy; 2026 Contele Soluções Tecnológicas Ltda. CNPJ 07.651.877/0001-91</p>
     <p><a href="https://contele.io">contele.io</a></p>
   </div>
 </footer>
