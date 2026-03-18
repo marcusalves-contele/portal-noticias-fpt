@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Politica de Privacidade | Contele</title>
+  <meta name="description" content="Politica de Privacidade da Contele Solucoes Tecnologicas. Saiba como tratamos seus dados pessoais em conformidade com a LGPD.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://contele.io/privacy">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --void: #0c0c18;
+      --deep: #1a1a2e;
+      --mid: #252540;
+      --surface: #2d2d4a;
+      --border: rgba(139, 35, 229, 0.12);
+      --border-hover: rgba(139, 35, 229, 0.3);
+      --purple: #8B23E5;
+      --purple-light: #a855f7;
+      --purple-glow: rgba(139, 35, 229, 0.08);
+      --text: #e2e2ef;
+      --text-dim: #9595b2;
+      --text-muted: #6b6b88;
+      --white: #f5f5ff;
+      --serif: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+      --sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--void);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+      background: rgba(139, 35, 229, 0.35);
+      color: var(--white);
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(12, 12, 24, 0.85);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-family: var(--sans);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--purple); }
+
+    .header-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--purple);
+      background: rgba(139, 35, 229, 0.1);
+      border: 1px solid rgba(139, 35, 229, 0.2);
+      padding: 4px 14px;
+      border-radius: 3px;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(139, 35, 229, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 72px 32px 56px;
+      position: relative;
+    }
+
+    .hero-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-label::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--purple);
+    }
+
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(36px, 5vw, 52px);
+      font-weight: 400;
+      color: var(--white);
+      line-height: 1.15;
+      margin-bottom: 20px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-subtitle {
+      font-size: 17px;
+      color: var(--text-dim);
+      max-width: 580px;
+      line-height: 1.7;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-top: 36px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .meta-value {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* ─── LAYOUT ─── */
+    .content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    /* ─── SIDEBAR TOC ─── */
+    .toc {
+      position: sticky;
+      top: 80px;
+      padding: 32px 0;
+    }
+
+    .toc-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .toc ol {
+      list-style: none;
+      padding: 0;
+    }
+
+    .toc li {
+      margin-bottom: 2px;
+    }
+
+    .toc a {
+      display: block;
+      font-size: 13px;
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-left: 2px solid transparent;
+      border-radius: 0 4px 4px 0;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover {
+      color: var(--purple-light);
+      border-left-color: var(--purple);
+      background: var(--purple-glow);
+    }
+
+    /* ─── MAIN CONTENT ─── */
+    .main {
+      padding: 48px 0 96px;
+      min-width: 0;
+    }
+
+    .intro {
+      font-size: 16px;
+      color: var(--text-dim);
+      line-height: 1.8;
+      margin-bottom: 48px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .intro strong {
+      color: var(--text);
+    }
+
+    section {
+      margin-bottom: 56px;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-size: 26px;
+      font-weight: 400;
+      color: var(--white);
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    h2 .num {
+      color: var(--purple);
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+
+    h3 {
+      font-family: var(--sans);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--white);
+      margin: 32px 0 12px;
+    }
+
+    p {
+      margin-bottom: 16px;
+      color: var(--text-dim);
+    }
+
+    a {
+      color: var(--purple-light);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    a:hover { color: var(--white); }
+
+    ul, ol {
+      margin-bottom: 16px;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      color: var(--text-dim);
+    }
+
+    li strong {
+      color: var(--text);
+    }
+
+    /* ─── TABLES ─── */
+    .table-wrap {
+      overflow-x: auto;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead th {
+      background: var(--mid);
+      color: var(--text);
+      padding: 14px 18px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody td {
+      padding: 14px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text-dim);
+      vertical-align: top;
+    }
+
+    tbody td strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    tbody tr:hover {
+      background: rgba(139, 35, 229, 0.03);
+    }
+
+    /* ─── Q&A CARDS ─── */
+    .qa-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .qa {
+      background: var(--mid);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px 24px;
+      transition: border-color 0.2s;
+    }
+
+    .qa:hover {
+      border-color: var(--border-hover);
+    }
+
+    .qa-q {
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 8px;
+      font-size: 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .qa-q::before {
+      content: 'Q';
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background: rgba(139, 35, 229, 0.15);
+      color: var(--purple);
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-top: 1px;
+    }
+
+    .qa-a {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin: 0;
+      padding-left: 32px;
+      line-height: 1.7;
+    }
+
+    /* ─── CONTACT BOX ─── */
+    .contact-box {
+      background: var(--deep);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px;
+      margin-top: 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--purple), transparent);
+    }
+
+    .contact-box h2 {
+      margin-bottom: 28px;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+    }
+
+    .contact-card {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .contact-card .c-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .contact-card .c-value {
+      font-size: 15px;
+      color: var(--white);
+      font-weight: 500;
+    }
+
+    .contact-note {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    /* ─── APP SECTION HIGHLIGHT ─── */
+    .app-section {
+      background: var(--deep);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 36px;
+      margin-top: 8px;
+    }
+
+    .app-section h3 {
+      margin-top: 24px;
+    }
+
+    .app-section h3:first-child {
+      margin-top: 0;
+    }
+
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .security-item {
+      background: var(--mid);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      font-size: 13px;
+      color: var(--text-dim);
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .content {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .toc {
+        position: relative;
+        top: 0;
+        padding: 32px 0 0;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 0;
+      }
+
+      .toc ol {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+      }
+
+      .toc a {
+        border-left: none;
+        padding: 6px 8px;
+        font-size: 12px;
+      }
+
+      .hero-inner { padding: 48px 24px 40px; }
+      .header-inner { padding: 14px 20px; }
+      .content { padding: 0 20px; }
+      .hero-meta { gap: 20px; }
+
+      .contact-box { padding: 28px 20px; }
+      .contact-grid { grid-template-columns: 1fr; }
+
+      .security-grid { grid-template-columns: 1fr; }
+
+      .app-section { padding: 24px 20px; }
+
+      table { font-size: 13px; }
+      thead th, tbody td { padding: 10px 14px; }
+    }
+
+    @media (max-width: 480px) {
+      .toc ol { grid-template-columns: 1fr; }
+      .hero-meta { flex-direction: column; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="https://contele.io" class="logo">contele</a>
+    <span class="header-tag">LGPD</span>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Documento Legal</div>
+    <h1>Politica de Privacidade</h1>
+    <p class="hero-subtitle">Como a Contele trata seus dados pessoais em conformidade com a Lei Geral de Protecao de Dados (Lei 13.709/2018).</p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <span class="meta-label">Versao</span>
+        <span class="meta-value">2.0</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Atualizada em</span>
+        <span class="meta-value">14 de agosto de 2025</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">CNPJ</span>
+        <span class="meta-value">07.651.877/0001-91</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Jurisdicao</span>
+        <span class="meta-value">BR-LGPD</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <nav class="toc">
+    <div class="toc-title">Indice</div>
+    <ol>
+      <li><a href="#s1">Controladora e DPO</a></li>
+      <li><a href="#s2">Dados coletados</a></li>
+      <li><a href="#s3">Bases legais</a></li>
+      <li><a href="#s4">Compartilhamento</a></li>
+      <li><a href="#s5">Retencao e exclusao</a></li>
+      <li><a href="#s6">Direitos do titular</a></li>
+      <li><a href="#s7">Responsabilidades</a></li>
+      <li><a href="#s8">Perguntas frequentes</a></li>
+      <li><a href="#s9">App Contele Teams</a></li>
+      <li><a href="#s10">Canais de contato</a></li>
+    </ol>
+  </nav>
+
+  <div class="main">
+
+    <div class="intro">
+      <p>A Contele oferece solucoes SaaS para gestao de equipes externas e frotas (Contele Teams e Contele Fleet). Este documento consolida as informacoes essenciais sobre tratamento de dados, base legal, responsabilidades e contato do DPO.</p>
+      <p>A Contele atua como <strong>operadora</strong>, fornecendo a plataforma, controles de seguranca e suporte ao controlador. O cliente (contratante) e o <strong>controlador</strong> e define finalidade, categorias de dados coletados, base legal, parametrizacoes de retencao e comunicacao com os titulares. Ambas as partes precisam cumprir a LGPD.</p>
+    </div>
+
+    <section id="s1">
+      <h2><span class="num">01</span>Controladora e DPO</h2>
+      <ul>
+        <li><strong>Empresa (operadora de dados):</strong> Contele Solucoes Tecnologicas Ltda. (CNPJ 07.651.877/0001-91), sediada em Santos/SP.</li>
+        <li><strong>Produtos:</strong> Contele Teams (gestao de equipes externas) e Contele Fleet (gestao de frotas), com respectivos aplicativos moveis.</li>
+        <li><strong>DPO (Encarregado de Protecao de Dados):</strong> Eng. Marco Antonio Fassa da Silva Dias.</li>
+        <li><strong>Contato do DPO:</strong> <a href="mailto:marcoantonio@contele.com.br">marcoantonio@contele.com.br</a></li>
+      </ul>
+    </section>
+
+    <section id="s2">
+      <h2><span class="num">02</span>Dados coletados e finalidades</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Categoria</th>
+              <th>Exemplos</th>
+              <th>Finalidade</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Identificacao do usuario</strong></td>
+              <td>Nome, CPF/CNPJ, razao social, e-mail, telefone</td>
+              <td>Cadastro e autenticacao na plataforma</td>
+            </tr>
+            <tr>
+              <td><strong>Dados operacionais</strong></td>
+              <td>Geolocalizacao, registros de check-ins, rotas, jornada de trabalho, logs de acesso</td>
+              <td>Execucao dos servicos contratados, geracao de relatorios e auditoria</td>
+            </tr>
+            <tr>
+              <td><strong>Dados de uso</strong></td>
+              <td>Cookies, IP, dispositivo, data/hora de acesso, paginas visitadas</td>
+              <td>Personalizacao de experiencia, seguranca e estatisticas</td>
+            </tr>
+            <tr>
+              <td><strong>Dados publicos</strong></td>
+              <td>CNPJ, informacoes de empresas em bases publicas</td>
+              <td>Conferencia cadastral</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Os dados sao coletados para cumprir o contrato de prestacao de servicos, assegurar o bom funcionamento das plataformas, atender obrigacoes legais e melhorar continuamente os produtos. A Contele nao coleta dados sensiveis por padrao; se o cliente inserir dados sensiveis no sistema, ele deve garantir a base legal e a conformidade.</p>
+    </section>
+
+    <section id="s3">
+      <h2><span class="num">03</span>Bases legais</h2>
+      <p>O tratamento de dados se apoia nas seguintes bases legais (art. 7&#186; da LGPD):</p>
+      <ul>
+        <li><strong>Execucao de contrato:</strong> dados necessarios para usar a plataforma (cadastro, operacionalizacao e suporte).</li>
+        <li><strong>Legitimo interesse:</strong> melhorias operacionais e metricas, apos analise de balanceamento de interesses.</li>
+        <li><strong>Obrigacao legal:</strong> cumprimento de obrigacoes regulatorias e judiciais (ex.: registros de acesso).</li>
+        <li><strong>Consentimento:</strong> funcionalidades opcionais que exijam consentimento (por exemplo, compartilhamento de dados com parceiros especificos).</li>
+      </ul>
+    </section>
+
+    <section id="s4">
+      <h2><span class="num">04</span>Compartilhamento e subprocessadores</h2>
+      <p>A Contele utiliza provedores e ferramentas para hospedar e operar seus servicos. Esses subprocessadores estao alinhados com boas praticas de seguranca e privacidade. Dados pessoais podem ser compartilhados de forma minimamente necessaria com:</p>
+      <ul>
+        <li><strong>Infraestrutura:</strong> Amazon Web Services (AWS), Google Cloud Platform (GCP) e Cloudflare. Provedores de computacao, armazenamento e CDN. Alguns servidores estao no Brasil e outros nos Estados Unidos; essa transferencia internacional segue clausulas contratuais e protecoes adequadas conforme o Art. 33 da LGPD.</li>
+        <li><strong>Ferramentas de relacionamento e CRM:</strong> Pipedrive, Chatwoot, API do WhatsApp e Vindi (cobranca). Utilizados para comunicacao com clientes, gestao comercial e faturamento; registros usam IDs internos e dados de empresa (CNPJ).</li>
+        <li><strong>Plataformas de IA:</strong> OpenAI e Google AI. Utilizados com dados minimizados e anonimizados para fins de insights estrategicos de produto e atendimento. Nao processamos dados pessoais identificaveis nesses ambientes.</li>
+        <li><strong>Autoridades publicas:</strong> quando houver obrigacao legal ou solicitacao judicial.</li>
+      </ul>
+      <p>O cliente tambem pode integrar a plataforma a sistemas de terceiros. Nesses casos, ele deve avaliar e estabelecer contratos apropriados com seus parceiros.</p>
+    </section>
+
+    <section id="s5">
+      <h2><span class="num">05</span>Retencao e exclusao de dados</h2>
+      <ul>
+        <li><strong>Enquanto cliente ativo:</strong> os dados sao mantidos para viabilizar o servico e relatorios historicos.</li>
+        <li><strong>Apos cancelamento:</strong> a Contele exclui os dados em ate um ano ou antes, caso o cliente solicite explicitamente a eliminacao durante o cancelamento. Dados de contas bloqueadas por inadimplencia sao preservados apenas para fins de regularizacao e comunicacao.</li>
+        <li><strong>Backups e logs:</strong> backups rotacionados por ate 365 dias; logs de acesso podem ser conservados por ate 5 anos para cumprimento de obrigacoes legais.</li>
+        <li><strong>Pedidos de eliminacao:</strong> o titular dos dados pode solicitar exclusao via canal de privacidade. O cliente, como controlador, e responsavel por autorizar ou solicitar a exclusao definitiva.</li>
+      </ul>
+    </section>
+
+    <section id="s6">
+      <h2><span class="num">06</span>Direitos do titular</h2>
+      <p>Conforme o art. 18 da LGPD, os titulares podem exercer:</p>
+      <ol>
+        <li>Acesso aos dados e ao compartilhamento com terceiros</li>
+        <li>Correcao de dados incompletos, inexatos ou desatualizados</li>
+        <li>Anonimizacao, bloqueio ou eliminacao de dados desnecessarios, excessivos ou tratados em desconformidade</li>
+        <li>Portabilidade, mediante regulamentacao</li>
+        <li>Eliminacao de dados tratados com base no consentimento</li>
+        <li>Informacoes sobre entidades publicas e privadas com as quais a Contele compartilha dados</li>
+        <li>Revogacao do consentimento</li>
+      </ol>
+      <p>Para exercer esses direitos, o titular deve contatar o controlador (cliente). A Contele auxilia o cliente a atender essas demandas.</p>
+    </section>
+
+    <section id="s7">
+      <h2><span class="num">07</span>Responsabilidades: Contele x Cliente</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Contele (Operadora)</th>
+              <th>Cliente (Controlador)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Gestao da plataforma</strong></td>
+              <td>Disponibiliza SaaS, atualizacoes, suporte e medidas de seguranca</td>
+              <td>Define parametrizacoes de uso, usuarios cadastrados e escopo de dados</td>
+            </tr>
+            <tr>
+              <td><strong>Tratamento de dados</strong></td>
+              <td>Trata dados conforme instrucoes do controlador; implementa seguranca fisica e logica</td>
+              <td>Define finalidade e base legal, decide quais dados coletar e por quanto tempo</td>
+            </tr>
+            <tr>
+              <td><strong>Resposta a titulares</strong></td>
+              <td>Disponibiliza ferramentas para exportar/analisar dados e apoia o controlador</td>
+              <td>Recebe, valida e responde as solicitacoes dos titulares</td>
+            </tr>
+            <tr>
+              <td><strong>Responsabilidade legal</strong></td>
+              <td>Executa obrigacoes de operadora e segue normas de protecao de dados</td>
+              <td>Responde pelas decisoes de tratamento e pelo cumprimento de direitos dos titulares</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="s8">
+      <h2><span class="num">08</span>Perguntas frequentes</h2>
+      <div class="qa-grid">
+        <div class="qa">
+          <div class="qa-q">O que a Contele coleta dos usuarios?</div>
+          <p class="qa-a">Dados cadastrais (nome, CPF/CNPJ, contatos), geolocalizacao, logs de acesso e uso, e dados tecnicos de dispositivos.</p>
+        </div>
+        <div class="qa">
+          <div class="qa-q">Quem define quais dados sao coletados?</div>
+          <p class="qa-a">O cliente (controlador) determina as categorias de dados e a finalidade. A Contele apenas opera o sistema conforme definido.</p>
+        </div>
+        <div class="qa">
+          <div class="qa-q">Ha transferencia internacional de dados?</div>
+          <p class="qa-a">Sim. Parte da infraestrutura (AWS/GCP) localiza-se nos Estados Unidos. A Contele adota acordos e medidas de protecao adequados conforme o Art. 33 da LGPD.</p>
+        </div>
+        <div class="qa">
+          <div class="qa-q">Por quanto tempo os dados ficam armazenados?</div>
+          <p class="qa-a">Durante todo o periodo de contratacao e, apos cancelamento, sao excluidos em ate 1 ano ou imediatamente quando solicitado pelo controlador. Backups e logs podem ser retidos por obrigacoes legais.</p>
+        </div>
+        <div class="qa">
+          <div class="qa-q">Quem devo contatar para exercer meus direitos?</div>
+          <p class="qa-a">Primeiramente, o controlador (cliente). Caso precise de suporte adicional, envie sua solicitacao para o DPO da Contele pelo e-mail <a href="mailto:marcoantonio@contele.com.br">marcoantonio@contele.com.br</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="s9">
+      <h2><span class="num">09</span>Politica de Privacidade: App Contele Teams</h2>
+      <p>A Contele se compromete a proteger a privacidade e a seguranca dos dados dos usuarios do aplicativo Contele Teams, em conformidade com a LGPD (Lei 13.709/2018).</p>
+
+      <div class="app-section">
+        <h3>9.1 Dados coletados</h3>
+        <p>Somente dados cadastrados pelo cliente sobre o usuario sao coletados e processados no aplicativo. Esses dados sao inseridos diretamente pelo cliente (controlador) e podem incluir: nome, e-mail, telefone, dados de localizacao (quando configurados pelo gestor) e outros dados cadastrados conforme necessidade.</p>
+        <p>O cliente (gestor) e responsavel por garantir que os dados coletados e parametrizacoes estejam em conformidade com a LGPD.</p>
+
+        <h3>9.2 Coleta de dados de localizacao</h3>
+        <ul>
+          <li>A coleta de localizacao em tempo real pode ser utilizada para funcionalidades como rastreamento de visitas, horarios de check-ins e rotas.</li>
+          <li>O gestor define horarios e necessidade do rastreamento diretamente na plataforma.</li>
+          <li>O rastreamento de localizacao so ocorre quando configurado pelo gestor.</li>
+          <li>A transparencia e garantida, e usuarios sao informados sobre o rastreamento.</li>
+        </ul>
+
+        <h3>9.3 Gerenciamento de chamadas</h3>
+        <p>A permissao de gerenciamento de chamadas e solicitada exclusivamente para permitir que o usuario toque no numero do cliente e realize a chamada pelo discador do dispositivo. Nao ha coleta, monitoramento ou gravacao de chamadas telefonicas pelo aplicativo.</p>
+
+        <h3>9.4 Armazenamento e sincronizacao</h3>
+        <p>Todos os dados coletados pelo Contele Teams sao sincronizados com os servidores da Contele. A Contele adota controles de seguranca para proteger os dados enquanto armazenados em sua infraestrutura.</p>
+
+        <h3>9.5 Notificacoes push</h3>
+        <p>As notificacoes push informam sobre: disponibilidade de novas versoes, novas funcionalidades e status de sincronizacao/conectividade. O usuario pode desativar as notificacoes a qualquer momento nas configuracoes do app e/ou do sistema operacional.</p>
+
+        <h3>9.6 Compartilhamento de dados</h3>
+        <p>A Contele nao compartilha dados de usuarios ou clientes com terceiros para fins de marketing ou analise comercial. Os dados podem transitar dentro da infraestrutura da Contele (entre servicos na AWS, GCP e Cloudflare) como parte do funcionamento da plataforma, mas nao sao vendidos ou compartilhados com terceiros.</p>
+
+        <h3>9.7 Seguranca dos dados</h3>
+        <div class="security-grid">
+          <div class="security-item">Criptografia em repouso e em transito</div>
+          <div class="security-item">Controles de acesso restritos</div>
+          <div class="security-item">Backups regulares</div>
+        </div>
+
+        <h3>9.8 Consentimento</h3>
+        <p>O consentimento do usuario sera solicitado explicitamente, quando aplicavel, especialmente para funcionalidades como coleta de dados de localizacao, uso de camera ou microfone. O usuario pode revogar o consentimento a qualquer momento, sem comprometer a experiencia essencial do aplicativo.</p>
+      </div>
+    </section>
+
+    <div class="contact-box" id="s10">
+      <h2><span class="num">10</span>Canais de contato</h2>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <span class="c-label">DPO</span>
+          <span class="c-value">Eng. Marco Antonio Fassa da Silva Dias</span>
+        </div>
+        <div class="contact-card">
+          <span class="c-label">E-mail</span>
+          <span class="c-value"><a href="mailto:marcoantonio@contele.com.br">marcoantonio@contele.com.br</a></span>
+        </div>
+        <div class="contact-card">
+          <span class="c-label">Canal DSAR</span>
+          <span class="c-value"><a href="https://contele.io/privacy">contele.io/privacy</a></span>
+        </div>
+      </div>
+      <p class="contact-note">Prazo de resposta: ate 15 dias uteis. Solicitacoes de acesso, correcao ou exclusao de dados devem ser encaminhadas pelo e-mail do DPO ou pelo canal de privacidade.</p>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="header-inner">
+    <p>&copy; 2025 Contele Solucoes Tecnologicas Ltda. CNPJ 07.651.877/0001-91</p>
+    <p><a href="https://contele.io">contele.io</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
