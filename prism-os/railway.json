@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python3 nutella-creator/boot.py && python3 nutella-creator/dashboard.py",
+    "startCommand": "cd /prism-os/nutella-creator && python3 boot.py && python3 dashboard.py",
     "restartPolicyMaxRetries": 5
   }
 }
