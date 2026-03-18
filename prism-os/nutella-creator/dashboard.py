@@ -252,7 +252,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
 
     def _check_auth(self):
         """Check PRISM_AUTH_TOKEN if set. Returns True if authorized."""
-        token = os.environ.get("PRISM_AUTH_TOKEN")
+        token = (os.environ.get("PRISM_AUTH_TOKEN") or "").strip()
         if not token:
             return True  # No token set = local dev mode, allow all
         parsed = urlparse(self.path)
