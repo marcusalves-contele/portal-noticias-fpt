@@ -14,6 +14,15 @@ app.get('/privacidade', (req, res) => {
   res.redirect(301, '/privacy');
 });
 
+// Redirects legados (existiam no S3/servidor antigo)
+app.get('/whatsapp', (req, res) => {
+  res.redirect(301, 'https://api.whatsapp.com/send/?phone=5511971325108');
+});
+
+app.get('/atendimento', (req, res) => {
+  res.redirect(301, 'https://api.whatsapp.com/send/?phone=5511971325108');
+});
+
 app.listen(PORT, () => {
   console.log(`contele.io running on port ${PORT}`);
 });
