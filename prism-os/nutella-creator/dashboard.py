@@ -259,6 +259,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         path = parsed.path
         if not path.startswith("/api/"):
             return True  # Only protect API routes
+        if path == "/api/feedback":
+            return True  # Feedback widget must work without token (team access)
         # Check query param ?token=XXX
         qs = parse_qs(parsed.query)
         if qs.get("token", [None])[0] == token:
