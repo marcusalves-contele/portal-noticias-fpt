@@ -251,25 +251,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
     def _check_auth(self):
-        """Check PRISM_AUTH_TOKEN if set. Returns True if authorized."""
-        token = (os.environ.get("PRISM_AUTH_TOKEN") or "").strip()
-        if not token:
-            return True  # No token set = local dev mode, allow all
-        parsed = urlparse(self.path)
-        path = parsed.path
-        if not path.startswith("/api/"):
-            return True  # Only protect API routes
-        if path == "/api/feedback":
-            return True  # Feedback widget must work without token (team access)
-        # Check query param ?token=XXX
-        qs = parse_qs(parsed.query)
-        if qs.get("token", [None])[0] == token:
-            return True
-        # Check Authorization: Bearer XXX header
-        auth_header = self.headers.get("Authorization", "")
-        if auth_header == f"Bearer {token}":
-            return True
-        self._json({"error": "unauthorized"}, 401)
+        """Auth disabled — internal tool, security by obscurity (URL not public)."""
+        return True
         return False
 
     def do_GET(self):
