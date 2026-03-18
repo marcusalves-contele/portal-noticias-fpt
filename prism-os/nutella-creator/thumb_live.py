@@ -48,6 +48,12 @@ TOKEN_PATH = Path(
     or str(PROJECT_DIR.parent.parent.parent / "assistant-sexta-feira" / "token_youtube_write.pickle")
 )
 
+# Token separado para Sheets + Drive (conta Marco, nao afeta YouTube/Julio)
+SHEETS_TOKEN_PATH = Path(
+    os.environ.get("SHEETS_TOKEN_PATH")
+    or str(PROJECT_DIR / "token_sheets_marco.pickle")
+)
+
 SPREADSHEET_ID = "1lluvZ8SKQNThV4o4OzWqmsttP-BgRC1FU3AqwvfJbqI"
 SHEET_GID      = "25167001"
 
@@ -68,25 +74,33 @@ STATUS_AFAZER = "A Fazer"
 # -------------------------------------------------------------------
 
 def load_google_creds():
-    """Carrega credenciais OAuth do token pickle."""
+    """Carrega credenciais OAuth do token YouTube (Julio). Usado para YouTube API."""
     if not TOKEN_PATH.exists():
-        raise FileNotFoundError(f"Token não encontrado: {TOKEN_PATH}. Rode reauth_sheets.py.")
+        raise FileNotFoundError(f"Token não encontrado: {TOKEN_PATH}.")
     with open(TOKEN_PATH, "rb") as f:
         creds = pickle.load(f)
-
-    # Refresh se necessário
     if creds.expired and creds.refresh_token:
         from google.auth.transport.requests import Request
         creds.refresh(Request())
         with open(TOKEN_PATH, "wb") as f:
             pickle.dump(creds, f)
+    return creds
 
-    # Verifica scope Sheets
-    sheets_scope = "https://www.googleapis.com/auth/spreadsheets.readonly"
-    if hasattr(creds, "scopes") and creds.scopes and sheets_scope not in creds.scopes:
-        raise PermissionError(
-            "Token não possui scope Sheets. Rode: python3 reauth_sheets.py"
+
+def load_sheets_creds():
+    """Carrega credenciais Sheets/Drive (conta Marco). Separado do YouTube/Julio."""
+    if not SHEETS_TOKEN_PATH.exists():
+        raise FileNotFoundError(
+            f"Token Sheets não encontrado: {SHEETS_TOKEN_PATH}. "
+            "Rode: python3 reauth_sheets_marco.py"
         )
+    with open(SHEETS_TOKEN_PATH, "rb") as f:
+        creds = pickle.load(f)
+    if creds.expired and creds.refresh_token:
+        from google.auth.transport.requests import Request
+        creds.refresh(Request())
+        with open(SHEETS_TOKEN_PATH, "wb") as f:
+            pickle.dump(creds, f)
     return creds
 
 
@@ -131,7 +145,7 @@ def fetch_queue(creds=None) -> list[dict]:
     Mapeamento de colunas dinâmico pelo cabeçalho (row 0).
     """
     if creds is None:
-        creds = load_google_creds()
+        creds = load_sheets_creds()
 
     from googleapiclient.discovery import build
     sheets_svc = build("sheets", "v4", credentials=creds)
@@ -616,7 +630,11 @@ Retorne SOMENTE JSON válido, sem markdown:
 
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.3, "maxOutputTokens": 600},
+        "generationConfig": {
+            "temperature": 0.3,
+            "maxOutputTokens": 2048,
+            "thinkingConfig": {"thinkingBudget": 0},
+        },
     }
     headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
 
@@ -629,6 +647,10 @@ Retorne SOMENTE JSON válido, sem markdown:
             m = _re.search(r'\{[\s\S]*\}', raw)
             if m:
                 return json.loads(m.group())
+            else:
+                print(f"  auto_briefing: no JSON found in response: {raw[:200]}")
+        else:
+            print(f"  auto_briefing: no candidates: {json.dumps(result)[:300]}")
     except Exception as e:
         print(f"  auto_briefing error: {e}")
 

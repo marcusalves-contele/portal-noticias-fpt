@@ -1629,6 +1629,99 @@
       transition: color 0.2s;
     }
     .tl-back-btn:hover { color: var(--text-primary); }
+
+    /* Feedback Widget */
+    .feedback-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--purple);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(139, 35, 229, 0.4);
+      z-index: 9999;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feedback-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 24px rgba(139, 35, 229, 0.6);
+    }
+    .feedback-btn svg { width: 22px; height: 22px; fill: white; }
+
+    .feedback-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .feedback-overlay.active { display: flex; }
+
+    .feedback-modal {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 480px;
+    }
+    .feedback-modal h3 {
+      color: var(--text-primary);
+      margin: 0 0 16px 0;
+      font-family: 'Syne', sans-serif;
+    }
+    .feedback-modal label {
+      display: block;
+      color: var(--text-secondary);
+      font-size: 13px;
+      margin: 12px 0 4px 0;
+    }
+    .feedback-modal input,
+    .feedback-modal textarea,
+    .feedback-modal select {
+      width: 100%;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .feedback-modal textarea { min-height: 100px; resize: vertical; }
+    .feedback-modal .fb-actions {
+      display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end;
+    }
+    .feedback-modal .fb-submit {
+      background: var(--purple);
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .feedback-modal .fb-cancel {
+      background: var(--surface-3);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      padding: 8px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .feedback-modal .fb-success {
+      color: var(--green);
+      text-align: center;
+      padding: 20px;
+    }
   </style>
 </head>
 <body>
@@ -4118,12 +4211,25 @@
     }
 
     // Selecionar video via URL YouTube
-    function rotSelectFromUrl() {
+    async function rotSelectFromUrl() {
       const url = document.getElementById('rot-url-input').value.trim();
       if (!url) { toast('Cole a URL do YouTube', 'error'); return; }
       rotVideoUrl = url;
       rotVideoTitle = document.getElementById('rot-url-title').value.trim() || '';
       rotScriptText = '';
+
+      // Auto-fetch title if empty
+      if (!rotVideoTitle) {
+        try {
+          const resp = await fetch(`/api/video-title?url=${encodeURIComponent(url)}`);
+          const data = await resp.json();
+          if (data.title) {
+            rotVideoTitle = data.title;
+            document.getElementById('rot-url-title').value = data.title;
+          }
+        } catch (e) { /* ignore, user can fill manually */ }
+      }
+
       rotGoToBriefing();
     }
 
@@ -4796,5 +4902,100 @@
 
     loadHistory();
   </script>
+
+<!-- Feedback Widget -->
+<button class="feedback-btn" onclick="openFeedback()" title="Reportar bug ou sugestao">
+  <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+</button>
+
+<div class="feedback-overlay" id="feedbackOverlay">
+  <div class="feedback-modal">
+    <h3>Reportar Feedback</h3>
+    <div id="feedbackForm">
+      <label>Quem voce e?</label>
+      <select id="fbUser">
+        <option value="Rarissa">Rarissa</option>
+        <option value="Isa">Isa</option>
+        <option value="Cris">Cris</option>
+        <option value="Julio">Julio</option>
+        <option value="Marco">Marco</option>
+      </select>
+
+      <label>Tipo</label>
+      <select id="fbCategory">
+        <option value="bug">Bug</option>
+        <option value="enhancement">Sugestao de melhoria</option>
+        <option value="question">Duvida</option>
+      </select>
+
+      <label>Titulo (resumo curto)</label>
+      <input type="text" id="fbTitle" placeholder="Ex: Botao de gerar thumb nao funciona">
+
+      <label>Descricao (detalhe o que aconteceu)</label>
+      <textarea id="fbDescription" placeholder="O que voce estava fazendo? O que esperava? O que aconteceu?"></textarea>
+
+      <div class="fb-actions">
+        <button class="fb-cancel" onclick="closeFeedback()">Cancelar</button>
+        <button class="fb-submit" onclick="submitFeedback()">Enviar</button>
+      </div>
+    </div>
+    <div id="feedbackSuccess" style="display:none" class="fb-success">
+      <p>Feedback enviado com sucesso!</p>
+      <p id="feedbackIssueLink"></p>
+      <button class="fb-cancel" onclick="closeFeedback()" style="margin-top:12px">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openFeedback() {
+  document.getElementById('feedbackOverlay').classList.add('active');
+  document.getElementById('feedbackForm').style.display = 'block';
+  document.getElementById('feedbackSuccess').style.display = 'none';
+}
+function closeFeedback() {
+  document.getElementById('feedbackOverlay').classList.remove('active');
+}
+async function submitFeedback() {
+  const title = document.getElementById('fbTitle').value.trim();
+  const description = document.getElementById('fbDescription').value.trim();
+  const category = document.getElementById('fbCategory').value;
+  const userName = document.getElementById('fbUser').value;
+
+  if (!title) { alert('Preencha o titulo'); return; }
+
+  const btn = document.querySelector('.fb-submit');
+  btn.textContent = 'Enviando...';
+  btn.disabled = true;
+
+  try {
+    const resp = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ title, description, category, user_name: userName })
+    });
+    const data = await resp.json();
+    if (data.ok) {
+      document.getElementById('feedbackForm').style.display = 'none';
+      document.getElementById('feedbackSuccess').style.display = 'block';
+      document.getElementById('feedbackIssueLink').innerHTML =
+        '<a href="' + data.issue_url + '" target="_blank" style="color:var(--purple)">Ver issue #' + data.issue_number + '</a>';
+      document.getElementById('fbTitle').value = '';
+      document.getElementById('fbDescription').value = '';
+    } else {
+      alert('Erro: ' + (data.error || 'desconhecido'));
+    }
+  } catch(e) {
+    alert('Erro ao enviar: ' + e.message);
+  } finally {
+    btn.textContent = 'Enviar';
+    btn.disabled = false;
+  }
+}
+document.getElementById('feedbackOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeFeedback();
+});
+</script>
+
 </body>
 </html>

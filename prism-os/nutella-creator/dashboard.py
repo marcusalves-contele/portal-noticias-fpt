@@ -13,6 +13,7 @@ Uso:
   python3 dashboard.py --port 8800        # Porta custom
 """
 
+import os
 import sys
 import json
 import uuid
@@ -249,13 +250,40 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate')
         super().end_headers()
 
+    def _check_auth(self):
+        """Check PRISM_AUTH_TOKEN if set. Returns True if authorized."""
+        token = os.environ.get("PRISM_AUTH_TOKEN")
+        if not token:
+            return True  # No token set = local dev mode, allow all
+        parsed = urlparse(self.path)
+        path = parsed.path
+        if not path.startswith("/api/"):
+            return True  # Only protect API routes
+        if path == "/api/feedback":
+            return True  # Feedback widget must work without token (team access)
+        # Check query param ?token=XXX
+        qs = parse_qs(parsed.query)
+        if qs.get("token", [None])[0] == token:
+            return True
+        # Check Authorization: Bearer XXX header
+        auth_header = self.headers.get("Authorization", "")
+        if auth_header == f"Bearer {token}":
+            return True
+        self._json({"error": "unauthorized"}, 401)
+        return False
+
     def do_GET(self):
+        if not self._check_auth():
+            return
+
         parsed = urlparse(self.path)
         path = parsed.path
 
         # API routes
         if path == "/api/videos":
             self._handle_list_videos()
+        elif path == "/api/video-title":
+            self._handle_video_title(parsed.query)
         elif path == "/api/thumb-queue":
             self._handle_thumb_queue()
         elif path == "/api/thumb-guest-check":
@@ -291,6 +319,9 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             super().do_GET()
 
     def do_POST(self):
+        if not self._check_auth():
+            return
+
         path = urlparse(self.path).path
         content_type = self.headers.get("Content-Type", "")
         length = int(self.headers.get("Content-Length", 0))
@@ -344,6 +375,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_youtube_update_title(body)
         elif path == "/api/youtube-update-thumb":
             self._handle_youtube_update_thumb(body)
+        elif path == "/api/feedback":
+            self._handle_feedback(body)
         else:
             self._json({"error": "not found"}, 404)
 
@@ -584,6 +617,29 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
 
         self._json({"uploaded": results, "errors": errors})
 
+    # --- Video title ---
+
+    def _handle_video_title(self, query_string: str):
+        """GET /api/video-title?url=... — busca título do vídeo via yt-dlp."""
+        from urllib.parse import parse_qs as _pqs
+        params = _pqs(query_string)
+        url = (params.get("url") or [""])[0]
+        if not url:
+            self._json({"error": "url required"}, 400)
+            return
+        try:
+            from suggest import extract_video_id
+            video_id = extract_video_id(url)
+            import subprocess as _sp
+            r = _sp.run(
+                ["yt-dlp", "--get-title", f"https://youtube.com/watch?v={video_id}"],
+                capture_output=True, text=True, timeout=15
+            )
+            title = r.stdout.strip()
+            self._json({"title": title, "video_id": video_id})
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
     # --- Auto-briefing ---
 
     def _handle_auto_briefing(self, body: dict):
@@ -612,8 +668,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
     def _handle_thumb_queue(self):
         """GET /api/thumb-queue — lista lives 'A Fazer' da planilha."""
         try:
-            from thumb_live import fetch_queue, load_google_creds, load_state
-            creds = load_google_creds()
+            from thumb_live import fetch_queue, load_sheets_creds, load_state
+            creds = load_sheets_creds()
             items = fetch_queue(creds)
             state = load_state()
             # Enriquece com estado local
@@ -943,7 +999,7 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
             self._json({"error": "live_id and angle (A|B) required"}, 400)
             return
         try:
-            from thumb_live import load_google_creds, load_state, upload_to_drive_folder
+            from thumb_live import load_sheets_creds, load_state, upload_to_drive_folder
             state = load_state()
             item  = state.get("items", {}).get(live_id)
             if not item:
@@ -974,7 +1030,7 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
                 self._json({"error": "Pasta Drive não definida para este item. Verifique a planilha."}, 400)
                 return
 
-            creds  = load_google_creds()
+            creds  = load_sheets_creds()
             result = upload_to_drive_folder(thumb_path, folder_link, creds)
             self._json({"ok": True, "drive": result})
         except Exception as e:
@@ -989,7 +1045,7 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
             self._json({"error": "image_path and folder_id required"}, 400)
             return
         try:
-            from thumb_live import load_google_creds, upload_to_drive_folder
+            from thumb_live import load_sheets_creds, upload_to_drive_folder
             p = Path(image_path)
             if not p.is_absolute():
                 p = PROJECT_DIR / p
@@ -1007,7 +1063,7 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
                 actual_path = tmp
                 renamed = True
 
-            creds  = load_google_creds()
+            creds  = load_sheets_creds()
             result = upload_to_drive_folder(actual_path, folder_id, creds)
 
             if renamed and actual_path.exists():
@@ -1231,6 +1287,56 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
             while chunk := f.read(64 * 1024):
                 self.wfile.write(chunk)
 
+    def _handle_feedback(self, body: dict):
+        """POST /api/feedback -- creates GitHub issue from user feedback."""
+        title = body.get("title", "").strip()
+        description = body.get("description", "").strip()
+        category = body.get("category", "bug")  # bug, enhancement, question
+        user_name = body.get("user_name", "Anonimo")
+        screenshot_b64 = body.get("screenshot", "")
+
+        if not title:
+            self._json({"error": "title required"}, 400)
+            return
+
+        github_token = os.environ.get("GITHUB_TOKEN", "")
+        if not github_token:
+            self._json({"error": "GITHUB_TOKEN not configured"}, 500)
+            return
+
+        # Build issue body
+        issue_body = f"**Reportado por**: {user_name}\n"
+        issue_body += f"**Categoria**: {category}\n\n"
+        issue_body += f"## Descricao\n{description}\n"
+
+        if screenshot_b64:
+            issue_body += f"\n## Screenshot\n![screenshot](data:image/png;base64,{screenshot_b64[:100]}...)\n"
+            issue_body += "\n_Screenshot anexado como base64 (ver dados raw do issue)_\n"
+
+        label_map = {"bug": "bug", "enhancement": "enhancement", "question": "question"}
+        labels = ["prism-os", label_map.get(category, "bug")]
+
+        try:
+            import requests as req
+            resp = req.post(
+                "https://api.github.com/repos/contele/growth/issues",
+                headers={
+                    "Authorization": f"token {github_token}",
+                    "Accept": "application/vnd.github.v3+json",
+                },
+                json={
+                    "title": f"[Feedback] {title}",
+                    "body": issue_body,
+                    "labels": labels,
+                },
+                timeout=15,
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            self._json({"ok": True, "issue_url": data.get("html_url", ""), "issue_number": data.get("number")})
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
     def _json(self, data, code=200):
         body = json.dumps(data).encode()
         self.send_response(code)
@@ -1255,9 +1361,15 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
 
 def main():
     parser = argparse.ArgumentParser(description="Nutella Dashboard v2")
-    parser.add_argument("--port", type=int, default=8765, help="Porta do servidor")
+    parser.add_argument("--port", type=int, default=None, help="Porta do servidor")
     parser.add_argument("--no-open", action="store_true", help="Não abre browser")
     args = parser.parse_args()
+
+    port = args.port or int(os.environ.get("PORT", 8765))
+
+    # Bootstrap credentials in production
+    from boot import bootstrap
+    bootstrap()
 
     # Ensure directories exist
     OUTPUT_DIR.mkdir(exist_ok=True)
@@ -1270,21 +1382,21 @@ def main():
     server = None
     for attempt in range(5):
         try:
-            server = http.server.HTTPServer(("127.0.0.1", args.port + attempt), DashboardHandler)
-            args.port = args.port + attempt
+            server = http.server.ThreadingHTTPServer(("0.0.0.0", port + attempt), DashboardHandler)
+            port = port + attempt
             break
         except OSError:
             continue
     if not server:
-        print(f"ERRO: Não conseguiu bind em portas {args.port}-{args.port + 4}")
+        print(f"ERRO: Não conseguiu bind em portas {port}-{port + 4}")
         sys.exit(1)
 
-    url = f"http://127.0.0.1:{args.port}"
+    url = f"http://0.0.0.0:{port}"
     print(f"\nNutella Dashboard v2")
     print(f"Servidor: {url}")
     print(f"Output:   {OUTPUT_DIR}")
 
-    if not args.no_open:
+    if not args.no_open and not os.environ.get("RAILWAY_ENVIRONMENT"):
         webbrowser.open(url)
 
     print("Dashboard rodando (Ctrl+C para fechar)\n")
