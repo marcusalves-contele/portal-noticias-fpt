@@ -1,0 +1,6 @@
+# Original unoptimized images (keep WebP and SVG only)
+img/*.png
+img/*.jpg
+img/*.jpeg
+original.html
+node_modules/

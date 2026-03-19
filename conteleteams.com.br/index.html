@@ -1,0 +1,1963 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contele Teams: Gestão e Controle de Equipes Externas. Mais de 1.400 empresas em 7 países confiam no Contele para controle de visitas, roteirização, reembolso de KM e muito mais.">
+  <title>Contele Teams | Gestão de Equipes Externas</title>
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://www.googletagmanager.com">
+
+  <!-- Fonts: async load to avoid render-blocking -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap"></noscript>
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-TQNBWXFK');</script>
+
+  <style>
+    /* ===== CRITICAL CSS (inlined) ===== */
+    :root {
+      --blue-primary: #425DFC;
+      --blue-submit: #323FDD;
+      --blue-heading: #273896;
+      --bg-light: #f5f5f5;
+      --white: #ffffff;
+      --text-main: #333333;
+      --text-muted: #666666;
+      --radius: 12px;
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --shadow-hover: 0 8px 32px rgba(66,93,252,0.18);
+      --max-w: 1200px;
+      --section-pad: 80px 0;
+      --font-main: 'Nunito Sans', sans-serif;
+      --font-body: 'Roboto', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--text-main);
+      background: var(--white);
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    img { max-width: 100%; height: auto; display: block; }
+
+    a { color: var(--blue-primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ===== NAVBAR ===== */
+    #navbar {
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      background: var(--white);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+      transition: box-shadow 0.2s;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .nav-logo img { width: 170px; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .nav-login {
+      font-family: var(--font-main);
+      font-weight: 600;
+      color: var(--blue-heading);
+      font-size: 15px;
+    }
+
+    .btn {
+      display: inline-block;
+      font-family: var(--font-main);
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: background 0.18s, transform 0.12s, box-shadow 0.18s;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .btn-primary {
+      background: var(--blue-primary);
+      color: var(--white);
+      padding: 12px 22px;
+      font-size: 15px;
+    }
+
+    .btn-primary:hover {
+      background: #3550e8;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-hover);
+      text-decoration: none;
+      color: var(--white);
+    }
+
+    .btn-hero {
+      background: var(--blue-primary);
+      color: var(--white);
+      padding: 16px 32px;
+      font-size: 18px;
+      border-radius: 10px;
+    }
+
+    .btn-hero:hover {
+      background: #3550e8;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(66,93,252,0.30);
+      text-decoration: none;
+      color: var(--white);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--blue-primary);
+      border: 2px solid var(--blue-primary);
+      padding: 12px 24px;
+      font-size: 16px;
+    }
+
+    .btn-outline:hover {
+      background: var(--blue-primary);
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    /* ===== HERO ===== */
+    #hero {
+      background: linear-gradient(135deg, #eef0ff 0%, #f5f5f5 60%, #fff 100%);
+      padding: 80px 0 60px;
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-content h1 {
+      font-family: var(--font-main);
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--blue-heading);
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .hero-content p {
+      font-size: 18px;
+      color: #444;
+      margin-bottom: 32px;
+      line-height: 1.7;
+    }
+
+    .hero-subtext {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* YouTube Facade */
+    .yt-facade {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .yt-facade img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.2s;
+    }
+
+    .yt-facade:hover img { opacity: 0.85; }
+
+    .yt-play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 72px;
+      height: 72px;
+      background: rgba(255,255,255,0.92);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: transform 0.15s, box-shadow 0.15s;
+      pointer-events: none;
+    }
+
+    .yt-facade:hover .yt-play {
+      transform: translate(-50%,-50%) scale(1.08);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .yt-play svg { width: 32px; height: 32px; fill: #ff0000; margin-left: 4px; }
+
+    /* ===== SECTIONS COMMON ===== */
+    section { padding: var(--section-pad); }
+
+    .section-title {
+      font-family: var(--font-main);
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--blue-heading);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .section-sub {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      max-width: 700px;
+    }
+
+    .text-center { text-align: center; }
+    .text-center .section-sub { margin-left: auto; margin-right: auto; }
+
+    /* ===== CLIENT LOGOS ===== */
+    #logos { background: var(--white); padding: 60px 0; }
+
+    .logo-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px 32px;
+      align-items: center;
+      justify-content: center;
+      margin: 32px 0;
+    }
+
+    .logo-strip img {
+      height: 44px;
+      width: auto;
+      object-fit: contain;
+      filter: grayscale(60%);
+      opacity: 0.80;
+      transition: filter 0.2s, opacity 0.2s;
+    }
+
+    .logo-strip img:hover { filter: grayscale(0%); opacity: 1; }
+
+    .logos-bottom {
+      font-family: var(--font-main);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--blue-heading);
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    /* ===== DASHBOARD / KPI ===== */
+    #dashboard { background: var(--bg-light); }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+      align-items: center;
+    }
+
+    .two-col.reverse { direction: rtl; }
+    .two-col.reverse > * { direction: ltr; }
+
+    .checklist {
+      list-style: none;
+      margin: 20px 0 28px;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 16px;
+      color: #444;
+    }
+
+    .checklist li::before {
+      content: '';
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      background: var(--blue-primary);
+      border-radius: 50%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+      background-size: 14px;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    /* ===== RESOURCE CARDS ===== */
+    #recursos { background: var(--white); }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px 24px;
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-3px);
+    }
+
+    .card h3 {
+      font-family: var(--font-main);
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--blue-heading);
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .card .saiba-mais {
+      font-family: var(--font-main);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--blue-primary);
+    }
+
+    /* ===== FEATURE DETAIL SECTIONS ===== */
+    .feature-section { background: var(--white); padding: var(--section-pad); }
+    .feature-section:nth-child(even) { background: var(--bg-light); }
+
+    .feature-text h2 {
+      font-family: var(--font-main);
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--blue-heading);
+      margin-bottom: 16px;
+      line-height: 1.25;
+    }
+
+    .feature-text p {
+      font-size: 16px;
+      color: #444;
+      margin-bottom: 16px;
+      line-height: 1.75;
+    }
+
+    /* ===== CAROUSEL ===== */
+    .carousel-wrap { position: relative; }
+
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      gap: 16px;
+      padding-bottom: 12px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--blue-primary) #eee;
+      border-radius: var(--radius);
+    }
+
+    .carousel::-webkit-scrollbar { height: 4px; }
+    .carousel::-webkit-scrollbar-track { background: #eee; border-radius: 4px; }
+    .carousel::-webkit-scrollbar-thumb { background: var(--blue-primary); border-radius: 4px; }
+
+    .carousel img {
+      scroll-snap-align: start;
+      flex: 0 0 80%;
+      border-radius: var(--radius);
+      object-fit: cover;
+    }
+
+    /* Carousel nav dots */
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ddd;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .dot.active { background: var(--blue-primary); }
+
+    /* ===== INTEGRATIONS SECTION ===== */
+    .big-image-section { background: var(--bg-light); padding: var(--section-pad); }
+
+    /* ===== MID CTA ===== */
+    #mid-cta {
+      background: linear-gradient(135deg, var(--blue-primary) 0%, var(--blue-heading) 100%);
+      padding: 72px 0;
+      text-align: center;
+    }
+
+    #mid-cta h2 {
+      font-family: var(--font-main);
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 24px;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.3;
+    }
+
+    #mid-cta .btn-cta-white {
+      background: var(--white);
+      color: var(--blue-primary);
+      padding: 16px 36px;
+      font-size: 18px;
+      font-family: var(--font-main);
+      font-weight: 800;
+      border-radius: 10px;
+      cursor: pointer;
+      border: none;
+      transition: background 0.18s, transform 0.12s;
+    }
+
+    #mid-cta .btn-cta-white:hover {
+      background: #f0f3ff;
+      transform: translateY(-2px);
+    }
+
+    #mid-cta .sub-cta {
+      color: rgba(255,255,255,0.75);
+      font-size: 14px;
+      margin-top: 14px;
+    }
+
+    /* ===== BENEFITS ===== */
+    #beneficios { background: var(--white); }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .benefit-card {
+      background: var(--bg-light);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      border-left: 4px solid var(--blue-primary);
+    }
+
+    .benefit-card h3 {
+      font-family: var(--font-main);
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--blue-heading);
+      margin-bottom: 10px;
+    }
+
+    .benefit-card p { font-size: 15px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ===== COUNTERS ===== */
+    #counters {
+      background: linear-gradient(135deg, var(--blue-heading) 0%, #1a2872 100%);
+      padding: 60px 0;
+    }
+
+    .counters-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      text-align: center;
+    }
+
+    .counter-item { color: var(--white); }
+
+    .counter-number {
+      font-family: var(--font-main);
+      font-size: 52px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--white);
+      display: block;
+    }
+
+    .counter-label {
+      font-size: 16px;
+      color: rgba(255,255,255,0.80);
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    /* ===== PLANS ===== */
+    #planos { background: var(--bg-light); }
+
+    .plans-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 40px;
+    }
+
+    .plan-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px;
+      text-align: center;
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+
+    .plan-card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-3px);
+    }
+
+    .plan-card h3 {
+      font-family: var(--font-main);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--blue-heading);
+      margin-bottom: 20px;
+    }
+
+    .plan-card img { max-width: 100%; margin: 0 auto; }
+
+    /* ===== ACCORDION ===== */
+    #recursos-planos { background: var(--white); }
+
+    .accordion { max-width: 800px; margin: 0 auto; }
+
+    .accordion-item {
+      border: 1px solid #e5e7f0;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+
+    .accordion-trigger {
+      width: 100%;
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+      cursor: pointer;
+      font-family: var(--font-main);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--blue-heading);
+      text-align: left;
+      transition: background 0.15s;
+    }
+
+    .accordion-trigger:hover { background: #f0f3ff; }
+
+    .accordion-trigger.open { background: var(--blue-primary); color: var(--white); }
+
+    .accordion-icon {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      fill: currentColor;
+      transition: transform 0.25s;
+    }
+
+    .accordion-trigger.open .accordion-icon { transform: rotate(180deg); }
+
+    .accordion-body {
+      display: none;
+      padding: 16px 20px 20px;
+      background: #f8f9ff;
+      color: #444;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .accordion-body.open { display: block; }
+
+    .accordion-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* ===== TESTIMONIALS ===== */
+    #depoimentos { background: var(--bg-light); }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .yt-thumb {
+      position: relative;
+      aspect-ratio: 16/9;
+      background: #000;
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: box-shadow 0.2s, transform 0.15s;
+    }
+
+    .yt-thumb:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-3px);
+    }
+
+    .yt-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.2s;
+    }
+
+    .yt-thumb:hover img { opacity: 0.82; }
+
+    .yt-thumb .yt-play {
+      width: 56px;
+      height: 56px;
+    }
+
+    .yt-thumb .yt-play svg { width: 26px; height: 26px; }
+
+    .testimonials-cta {
+      text-align: center;
+      margin-top: 56px;
+    }
+
+    .testimonials-cta h3 {
+      font-family: var(--font-main);
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--blue-heading);
+      margin-bottom: 20px;
+      max-width: 660px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.35;
+    }
+
+    /* ===== QUALITY ===== */
+    #qualidade { background: var(--white); }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--blue-heading);
+      color: rgba(255,255,255,0.85);
+      padding: 60px 0 0;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      padding-bottom: 48px;
+    }
+
+    .footer-col h4 {
+      font-family: var(--font-main);
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+
+    .footer-col ul { list-style: none; }
+
+    .footer-col ul li { margin-bottom: 8px; }
+
+    .footer-col ul li a {
+      color: rgba(255,255,255,0.75);
+      font-size: 14px;
+      transition: color 0.15s;
+    }
+
+    .footer-col ul li a:hover {
+      color: var(--white);
+      text-decoration: none;
+    }
+
+    .footer-col p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 6px;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding: 20px 0;
+      text-align: center;
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+    }
+
+    .footer-bottom a {
+      color: rgba(255,255,255,0.7);
+      margin: 0 8px;
+    }
+
+    /* ===== SIDEBAR DRAWER ===== */
+    #sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.50);
+      z-index: 990;
+      backdrop-filter: blur(2px);
+    }
+
+    #sidebar-overlay.open { display: block; }
+
+    #sidebar {
+      position: fixed;
+      top: 0;
+      right: -480px;
+      width: 100%;
+      max-width: 460px;
+      height: 100%;
+      background: var(--white);
+      z-index: 1000;
+      overflow-y: auto;
+      box-shadow: -6px 0 40px rgba(0,0,0,0.18);
+      transition: right 0.32s cubic-bezier(0.4,0,0.2,1);
+      padding: 40px 32px 40px;
+    }
+
+    #sidebar.open { right: 0; }
+
+    #sidebar-close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      color: #888;
+      line-height: 1;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    #sidebar-close:hover { color: #333; background: #f0f0f0; }
+
+    #sidebar h2 {
+      font-family: var(--font-main);
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--blue-heading);
+      margin-bottom: 8px;
+      margin-top: 8px;
+      line-height: 1.25;
+    }
+
+    #sidebar .sidebar-intro {
+      font-size: 14px;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-group label {
+      display: block;
+      font-family: var(--font-main);
+      font-size: 13px;
+      font-weight: 700;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: var(--font-body);
+      color: var(--text-main);
+      background: var(--white);
+      transition: border-color 0.15s;
+      outline: none;
+    }
+
+    .form-group select:focus,
+    .form-group input:focus {
+      border-color: var(--blue-primary);
+      box-shadow: 0 0 0 3px rgba(66,93,252,0.12);
+    }
+
+    .form-group select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+
+    .form-submit {
+      width: 100%;
+      background: var(--blue-submit);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      padding: 16px;
+      font-family: var(--font-main);
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.18s, transform 0.12s;
+      letter-spacing: 0.5px;
+    }
+
+    .form-submit:hover:not(:disabled) {
+      background: #4A58FF;
+      transform: translateY(-1px);
+    }
+
+    .form-submit:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    .form-note {
+      font-size: 12px;
+      color: #999;
+      text-align: center;
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    .form-highlight {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #EEF0FF;
+      border: 1px solid #C5CCFF;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--blue-heading);
+      line-height: 1.4;
+    }
+    .form-highlight-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .qtd-feedback {
+      font-size: 12px;
+      margin-top: 4px;
+      min-height: 18px;
+      transition: all 0.2s;
+    }
+    .qtd-feedback.ok { color: #16a34a; }
+    .qtd-feedback.warn { color: #dc2626; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      :root { --section-pad: 48px 0; }
+
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-content h1 { font-size: 32px; }
+      .hero-content p { font-size: 16px; }
+      .section-title { font-size: 26px; }
+      .section-sub { font-size: 16px; }
+
+      .two-col { grid-template-columns: 1fr; gap: 32px; }
+      .two-col.reverse { direction: ltr; }
+
+      .cards-grid { grid-template-columns: 1fr 1fr; }
+      .benefits-grid { grid-template-columns: 1fr 1fr; }
+      .plans-grid { grid-template-columns: 1fr; }
+      .counters-grid { grid-template-columns: 1fr; gap: 24px; }
+      .testimonials-grid { grid-template-columns: 1fr 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+
+      .feature-text h2 { font-size: 24px; }
+
+      #mid-cta h2 { font-size: 24px; }
+    }
+
+    @media (max-width: 580px) {
+      .cards-grid { grid-template-columns: 1fr; }
+      .benefits-grid { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .nav-logo img { width: 160px; }
+      .nav-right { gap: 12px; }
+      .btn-primary { padding: 10px 14px; font-size: 13px; }
+      .counter-number { font-size: 40px; }
+      #sidebar { max-width: 100%; padding: 32px 20px; }
+    }
+
+    /* ===== UTILITY ===== */
+    .mt-0 { margin-top: 0; }
+    .mt-8 { margin-top: 8px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mt-32 { margin-top: 32px; }
+    .mb-0 { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+
+<!-- GTM noscript -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQNBWXFK" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<!-- ===== SIDEBAR OVERLAY ===== -->
+<div id="sidebar-overlay" role="dialog" aria-modal="true" aria-label="Formulário de demonstração" onclick="closeSidebar()"></div>
+
+<!-- ===== SIDEBAR DRAWER ===== -->
+<aside id="sidebar">
+  <button id="sidebar-close" aria-label="Fechar" onclick="closeSidebar()">&times;</button>
+  <h2>Inicie aqui a gestão da sua equipe!</h2>
+  <p class="sidebar-intro"><strong>Funcionalidades completas, usuários ilimitados, app iOS/Android, relatórios, suporte e integração fácil.</strong></p>
+
+  <form id="sidebar-form" onsubmit="event.preventDefault(); handleInsideForm(this);" novalidate>
+    <div class="form-group">
+      <label for="f-qtd">Quantas pessoas na sua equipe externa?</label>
+      <input type="number" id="f-qtd" name="qtdPessoas" placeholder="Ex: 12" min="1" max="9999" required oninput="validateQtd(this)">
+      <div id="qtd-feedback" class="qtd-feedback"></div>
+    </div>
+    <div class="form-group">
+      <label for="f-nome">Seu nome</label>
+      <input type="text" id="f-nome" name="nome" placeholder="Seu nome" required>
+    </div>
+    <div class="form-group">
+      <label for="f-empresa">Sua empresa</label>
+      <input type="text" id="f-empresa" name="empresa" placeholder="Sua empresa" required>
+    </div>
+    <div class="form-group">
+      <label for="f-telefone">Número do WhatsApp</label>
+      <input type="tel" id="f-telefone" name="telefone" placeholder="(XX) XXXXX-XXXX" minlength="14" required oninput="phoneMask(this)">
+    </div>
+    <div class="form-group">
+      <label for="f-email">Seu E-mail</label>
+      <input type="email" id="f-email" name="email" placeholder="Seu E-mail" required>
+    </div>
+    <div class="form-highlight">
+      <span class="form-highlight-icon">&#9432;</span>
+      <span><strong>Mínimo de 4 usuários.</strong> Exclusivo para equipes externas.</span>
+    </div>
+    <button type="submit" class="form-submit">SOLICITAR AGORA</button>
+  </form>
+
+  <div id="sidebar-small-team-msg" style="display:none; padding: 20px; text-align: center;">
+    <h3 style="color:#273896; margin-bottom:16px; font-family: 'Nunito Sans', sans-serif;">Nosso plano atende equipes a partir de 4 pessoas</h3>
+    <p style="color:#666; margin-bottom:24px; line-height:1.6;">Para equipes menores, entre em contato com nosso time de atendimento. Vamos encontrar a melhor solução para você!</p>
+    <a href="https://wa.me/5511971325108?text=Ol%C3%A1!%20Tenho%20uma%20equipe%20menor%20que%204%20pessoas%20e%20gostaria%20de%20saber%20mais%20sobre%20o%20Contele%20Teams."
+       style="display:inline-block; background:#25D366; color:#fff; padding:14px 28px; border-radius:8px; text-decoration:none; font-weight:700; font-size:16px; font-family:'Nunito Sans',sans-serif;">
+      Falar com Atendimento via WhatsApp
+    </a>
+    <p style="color:#999; margin-top:16px; font-size:14px;">Ou ligue: (11) 97132-5108</p>
+    <button onclick="document.getElementById('sidebar-form').style.display='block'; document.getElementById('sidebar-small-team-msg').style.display='none';"
+            style="margin-top:16px; background:none; border:none; color:#425DFC; cursor:pointer; font-size:14px; text-decoration:underline;">
+      Voltar ao formulário
+    </button>
+  </div>
+</aside>
+
+<!-- ===== NAVBAR ===== -->
+<header id="navbar">
+  <nav class="nav-inner" aria-label="Navegação principal">
+    <a href="https://contelege.com.br/" class="nav-logo" aria-label="Contele Teams - Início">
+      <img src="img/contele-teams.svg" alt="Contele Teams" width="215" height="40">
+    </a>
+    <div class="nav-right">
+      <a href="https://app.contelege.com.br/" class="nav-login" target="_blank" rel="noopener">Login</a>
+      <button class="btn btn-primary" onclick="openSidebar()" aria-haspopup="dialog">Solicitar Demonstração</button>
+    </div>
+  </nav>
+</header>
+
+<!-- ===== HERO ===== -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <h1>Gestão e Controle de Equipes Externas</h1>
+        <p>Aumente a produtividade da sua equipe de vendas, promotores e técnicos com uma solução usada por mais de 1.400 empresas em 7 países.</p>
+        <button class="btn btn-hero" onclick="openSidebar()">Solicitar Demonstração Gratuita</button>
+        <p class="hero-subtext">Mínimo de 4 Usuários. Exclusivo para Equipes Externas</p>
+      </div>
+      <div class="hero-video">
+        <div class="yt-facade" onclick="loadYT(this, '-sUJTiDmtwU')" aria-label="Assistir vídeo sobre o Contele Teams" role="button" tabindex="0" onkeydown="if(event.key==='Enter')loadYT(this,'-sUJTiDmtwU')">
+          <img src="img/capa-video-lp-teams.webp" alt="Assista ao vídeo sobre o Contele Teams" width="640" height="360">
+          <div class="yt-play" aria-hidden="true">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CLIENT LOGOS ===== -->
+<section id="logos">
+  <div class="container text-center">
+    <h2 class="section-title">As melhores equipes do Brasil utilizam o Contele Teams</h2>
+    <div class="logo-strip">
+      <img src="img/dimed.webp" alt="Dimed" width="120" height="44" loading="lazy">
+      <img src="img/Estapar.webp" alt="Estapar" width="120" height="44" loading="lazy">
+      <img src="img/getnet.webp" alt="Getnet" width="120" height="44" loading="lazy">
+      <img src="img/Leo.webp" alt="Leo" width="120" height="44" loading="lazy">
+      <img src="img/coral.webp" alt="Coral" width="120" height="44" loading="lazy">
+      <img src="img/daikin.webp" alt="Daikin" width="120" height="44" loading="lazy">
+      <img src="img/boticario.webp" alt="O Boticário" width="120" height="44" loading="lazy">
+      <img src="img/a-geradora-by-loxan.webp" alt="A Geradora by Loxan" width="120" height="44" loading="lazy">
+      <img src="img/azul-viagens.webp" alt="Azul Viagens" width="120" height="44" loading="lazy">
+      <img src="img/rudnick.webp" alt="Rudnick" width="120" height="44" loading="lazy">
+      <img src="img/sanity.webp" alt="Sanity" width="120" height="44" loading="lazy">
+      <img src="img/Unimed.webp" alt="Unimed" width="120" height="44" loading="lazy">
+      <img src="img/Origo-Energia.webp" alt="Origo Energia" width="120" height="44" loading="lazy">
+      <img src="img/SkyCompany.webp" alt="Sky Company" width="120" height="44" loading="lazy">
+      <img src="img/samsung.webp" alt="Samsung" width="120" height="44" loading="lazy">
+    </div>
+    <p class="logos-bottom">Mais de 1.400 empresas fazem parte desse quadro de sucesso!</p>
+  </div>
+</section>
+
+<!-- ===== DASHBOARD / KPI ===== -->
+<section id="dashboard">
+  <div class="container">
+    <div class="two-col">
+      <div class="feature-text">
+        <h2 class="section-title">Gestão por Indicadores e Controle na Palma da Mão</h2>
+        <p>Com o Dashboard de Produtividade, tenha todos os principais indicadores da sua equipe externa em um único lugar.</p>
+        <ul class="checklist">
+          <li>Visitas realizadas</li>
+          <li>Visitas incompletas</li>
+          <li>Visitas atrasadas</li>
+          <li>Tempo médio no cliente</li>
+          <li>Segmentos de clientes mais visitados</li>
+          <li>E muito mais</li>
+        </ul>
+        <button class="btn btn-primary" onclick="openSidebar()">Solicitar demonstração</button>
+      </div>
+      <div>
+        <img src="img/dash.webp" alt="Dashboard de Produtividade de Equipes Externas" width="600" height="450" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RESOURCE CARDS ===== -->
+<section id="recursos">
+  <div class="container">
+    <h2 class="section-title text-center">Os principais recursos do Contele Gestor de Equipes para você</h2>
+    <div class="cards-grid">
+      <div class="card">
+        <h3>Controle de Visitas</h3>
+        <p>Tenha o controle das visitas por meio do check-in e check-out, com confirmação do local via GPS. Tudo online e em tempo real.</p>
+        <a class="saiba-mais" href="#visitas">Saiba mais &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>Roteirização das Visitas</h3>
+        <p>Com um clique, organize as visitas pela melhor ordem e rota, economizando tempo e combustível.</p>
+        <a class="saiba-mais" href="#roteirizacao">Saiba mais &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>Reembolso de KM</h3>
+        <p>O reembolso por km é calculado automaticamente com o check-in e check-out das visitas.</p>
+        <a class="saiba-mais" href="#reembolso">Saiba mais &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>Ordem de Serviço Digital</h3>
+        <p>Tudo que foi feito na visita se torna uma ordem de serviço digital, com fotos e assinatura do cliente.</p>
+        <a class="saiba-mais" href="#os">Saiba mais &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>Checklist Digital</h3>
+        <p>Digitalize sua operação: Monte formulários personalizados para as visitas.</p>
+        <a class="saiba-mais" href="#checklist">Saiba mais &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>Contele Desk</h3>
+        <p>Deixe seu cliente fazer a abertura de chamados, controle por prioridade e delegue para sua equipe.</p>
+        <a class="saiba-mais" href="#desk">Saiba mais &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>Monitoramento</h3>
+        <p>Faça o controle e monitoramento da sua equipe externa através do mapa e relatórios em tempo real.</p>
+        <a class="saiba-mais" href="#monitoramento">Saiba mais &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>Produtos e Estoque</h3>
+        <p>Gerencie o estoque da empresa, distribua os seus produtos para sua equipe externa.</p>
+        <a class="saiba-mais" href="#produtos">Saiba mais &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>Consultoria e Integracoes</h3>
+        <p>Nosso time especializado em automação e IA integra o Contele Teams com +3000 ferramentas.</p>
+        <a class="saiba-mais" href="#automatiza">Saiba mais &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURE: CONTROLE DE VISITAS ===== -->
+<section class="feature-section" id="visitas" style="background: var(--bg-light);">
+  <div class="container">
+    <div class="two-col">
+      <div class="feature-text">
+        <h2>Controle de Visitas</h2>
+        <p>A gestão de equipes externas pode ser otimizada com o uso de Check-in e Check-out via GPS, garantindo o controle preciso das visitas aos clientes. Através do app os colaboradores registram informações da visita de forma ágil e digital, permitindo incluir fotos e assinaturas, eliminando o uso de papéis e aumentando a eficiência no trabalho em campo.</p>
+        <p>Além disso, o gestor tem acesso em tempo real à localização da equipe e pode monitorar facilmente as atividades através do Relatório de Visitas. Por meio do Relatório de Locais Não Visitados também identifica clientes inativos, permitindo a roteirização de novas visitas e a exploração de oportunidades, economizando tempo e recursos.</p>
+      </div>
+      <div class="carousel-wrap">
+        <div class="carousel" id="car-visitas" onscroll="updateDots('car-visitas','dots-visitas')">
+          <img src="img/1-768x768.webp" alt="Controle de Visitas - tela 1" width="600" height="600" loading="lazy">
+          <img src="img/2-768x768.webp" alt="Controle de Visitas - tela 2" width="600" height="600" loading="lazy">
+          <img src="img/3-768x768.webp" alt="Controle de Visitas - tela 3" width="600" height="600" loading="lazy">
+          <img src="img/4-1-768x768.webp" alt="Controle de Visitas - tela 4" width="600" height="600" loading="lazy">
+        </div>
+        <div class="carousel-dots" id="dots-visitas">
+          <span class="dot active" onclick="scrollCarousel('car-visitas',0)"></span>
+          <span class="dot" onclick="scrollCarousel('car-visitas',1)"></span>
+          <span class="dot" onclick="scrollCarousel('car-visitas',2)"></span>
+          <span class="dot" onclick="scrollCarousel('car-visitas',3)"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURE: ROTEIRIZACAO ===== -->
+<section class="feature-section" id="roteirizacao">
+  <div class="container">
+    <div class="two-col reverse">
+      <div class="carousel-wrap">
+        <div class="carousel" id="car-rota" onscroll="updateDots('car-rota','dots-rota')">
+          <img src="img/1-1-768x768.webp" alt="Roteirização - tela 1" width="600" height="600" loading="lazy">
+          <img src="img/2-1-768x768.webp" alt="Roteirização - tela 2" width="600" height="600" loading="lazy">
+          <img src="img/3-1-768x768.webp" alt="Roteirização - tela 3" width="600" height="600" loading="lazy">
+        </div>
+        <div class="carousel-dots" id="dots-rota">
+          <span class="dot active" onclick="scrollCarousel('car-rota',0)"></span>
+          <span class="dot" onclick="scrollCarousel('car-rota',1)"></span>
+          <span class="dot" onclick="scrollCarousel('car-rota',2)"></span>
+        </div>
+      </div>
+      <div class="feature-text">
+        <h2>Roteirização das Visitas a Clientes</h2>
+        <p>A roteirização eficiente das visitas é fundamental para aumentar a produtividade da sua equipe externa. Com o Contele Teams, você define as melhores rotas entre clientes, enviando essas rotas diretamente para o aplicativo do seu Usuário. Isso permite que sua equipe execute as visitas de forma estratégica, resultando em até 30% mais visitas por dia.</p>
+        <p>No aplicativo, o Usuário recebe uma agenda roteirizada, podendo visualizar a rota no Google Maps, Uber ou Waze, o que reduz o tempo no trânsito e aumenta a produtividade. Além disso, a Prospecção em Massa permite agendar várias visitas de uma vez, considerando a proximidade dos clientes, otimizando tempo e recursos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURE: REEMBOLSO ===== -->
+<section class="feature-section" id="reembolso" style="background: var(--bg-light);">
+  <div class="container">
+    <div class="two-col">
+      <div class="feature-text">
+        <h2>Reembolso de KM Rodado e Avulso</h2>
+        <p>O reembolso por KM rodado é calculado automaticamente com base no check-in e check-out das visitas, utilizando a precisão do Google Maps. Essa metodologia garante que o reembolso seja pago apenas por visitas confirmadas via GPS, ajudando nossos clientes a reduzir gastos em até 40%.</p>
+        <p>Além disso, o aplicativo permite que a equipe externa registre reembolsos avulsos com fotos e descrições, todos sujeitos à validação do gestor. O relatório consolidado de reembolsos pode ser revisado e encaminhado ao financeiro, facilitando o controle e pagamento das despesas.</p>
+      </div>
+      <div class="carousel-wrap">
+        <div class="carousel" id="car-reem" onscroll="updateDots('car-reem','dots-reem')">
+          <img src="img/1-2-768x768.webp" alt="Reembolso - tela 1" width="600" height="600" loading="lazy">
+          <img src="img/2-2-768x768.webp" alt="Reembolso - tela 2" width="600" height="600" loading="lazy">
+          <img src="img/3-2-768x768.webp" alt="Reembolso - tela 3" width="600" height="600" loading="lazy">
+        </div>
+        <div class="carousel-dots" id="dots-reem">
+          <span class="dot active" onclick="scrollCarousel('car-reem',0)"></span>
+          <span class="dot" onclick="scrollCarousel('car-reem',1)"></span>
+          <span class="dot" onclick="scrollCarousel('car-reem',2)"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURE: ORDEM DE SERVICO ===== -->
+<section class="feature-section" id="os">
+  <div class="container">
+    <div class="two-col reverse">
+      <div class="carousel-wrap">
+        <div class="carousel" id="car-os" onscroll="updateDots('car-os','dots-os')">
+          <img src="img/1-3-768x768.webp" alt="Ordem de Serviço - tela 1" width="600" height="600" loading="lazy">
+          <img src="img/2-3-768x768.webp" alt="Ordem de Serviço - tela 2" width="600" height="600" loading="lazy">
+          <img src="img/3-4-768x768.webp" alt="Ordem de Serviço - tela 3" width="600" height="600" loading="lazy">
+        </div>
+        <div class="carousel-dots" id="dots-os">
+          <span class="dot active" onclick="scrollCarousel('car-os',0)"></span>
+          <span class="dot" onclick="scrollCarousel('car-os',1)"></span>
+          <span class="dot" onclick="scrollCarousel('car-os',2)"></span>
+        </div>
+      </div>
+      <div class="feature-text">
+        <h2>Ordem de Serviço Digital</h2>
+        <p>A Ordem de Serviço Digital oferece todos os detalhes da visita para você e seu cliente, incluindo logo personalizado, horários de check-in e check-out, fotos, comentários, checklists, assinatura digital e envio automático por e-mail.</p>
+        <p>Após a visita, a OS pode ser enviada pelo funcionário via e-mail ou WhatsApp, ou você pode enviá-la pelo computador, verificando e editando as informações conforme necessário. Além disso, você pode configurar preferências, como envio automático e exibição de formulários e comentários, adaptando a OS às suas necessidades.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURE: CHECKLIST ===== -->
+<section class="feature-section" id="checklist" style="background: var(--bg-light);">
+  <div class="container">
+    <div class="two-col">
+      <div class="feature-text">
+        <h2>Checklist Digital</h2>
+        <p>Monte checklists sob medida para suas visitas, com mais de 30 tipos de questões, desde verificações até avaliações do cliente. Inclua perguntas obrigatórias para garantir a coleta de informações estratégicas e evitar esquecimentos, tornando as visitas mais ágeis e objetivas, com uma redução de até 20% na duração.</p>
+        <p>O Contele Teams permite a criação de campos condicionais para tornar o preenchimento mais eficiente, direcionando o colaborador automaticamente para as seções relevantes. Além disso, você pode analisar as respostas completas ou individualmente, com opções de formatação específicas para diversas situações, como CEP, CPF, quantidade, links, e-mails e texto.</p>
+      </div>
+      <div class="carousel-wrap">
+        <div class="carousel" id="car-check" onscroll="updateDots('car-check','dots-check')">
+          <img src="img/1-5-768x768.webp" alt="Checklist - tela 1" width="600" height="600" loading="lazy">
+          <img src="img/2-4-768x768.webp" alt="Checklist - tela 2" width="600" height="600" loading="lazy">
+          <img src="img/3-5-768x768.webp" alt="Checklist - tela 3" width="600" height="600" loading="lazy">
+          <img src="img/4-2-768x768.webp" alt="Checklist - tela 4" width="600" height="600" loading="lazy">
+          <img src="img/5-768x768.webp" alt="Checklist - tela 5" width="600" height="600" loading="lazy">
+        </div>
+        <div class="carousel-dots" id="dots-check">
+          <span class="dot active" onclick="scrollCarousel('car-check',0)"></span>
+          <span class="dot" onclick="scrollCarousel('car-check',1)"></span>
+          <span class="dot" onclick="scrollCarousel('car-check',2)"></span>
+          <span class="dot" onclick="scrollCarousel('car-check',3)"></span>
+          <span class="dot" onclick="scrollCarousel('car-check',4)"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURE: CONTELE DESK ===== -->
+<section class="feature-section" id="desk">
+  <div class="container">
+    <div class="two-col reverse">
+      <div class="carousel-wrap">
+        <div class="carousel" id="car-desk" onscroll="updateDots('car-desk','dots-desk')">
+          <img src="img/1-6-768x768.webp" alt="Contele Desk - tela 1" width="600" height="600" loading="lazy">
+          <img src="img/2-5-768x768.webp" alt="Contele Desk - tela 2" width="600" height="600" loading="lazy">
+          <img src="img/3-8-768x768.webp" alt="Contele Desk - tela 3" width="600" height="600" loading="lazy">
+          <img src="img/4-3-768x768.webp" alt="Contele Desk - tela 4" width="600" height="600" loading="lazy">
+          <img src="img/5-1-768x768.webp" alt="Contele Desk - tela 5" width="600" height="600" loading="lazy">
+        </div>
+        <div class="carousel-dots" id="dots-desk">
+          <span class="dot active" onclick="scrollCarousel('car-desk',0)"></span>
+          <span class="dot" onclick="scrollCarousel('car-desk',1)"></span>
+          <span class="dot" onclick="scrollCarousel('car-desk',2)"></span>
+          <span class="dot" onclick="scrollCarousel('car-desk',3)"></span>
+          <span class="dot" onclick="scrollCarousel('car-desk',4)"></span>
+        </div>
+      </div>
+      <div class="feature-text">
+        <h2>Contele Desk: Abertura de Chamados e Helpdesk</h2>
+        <p>O Contele Desk centraliza todos os chamados da sua empresa em um único sistema online, permitindo a abertura e atribuição de atendimentos para a equipe técnica de forma rápida e sem papéis. Os clientes podem abrir chamados facilmente por e-mail ou por um site customizado, acessível via celular.</p>
+        <p>Com o Contele Desk, é possível classificar as prioridades dos chamados, delegar atendimentos ao funcionário mais próximo e acompanhar o andamento do serviço em tempo real. O sistema também oferece um dashboard completo para avaliar a produtividade, monitorando o tempo de atendimento, controle de prazos e status dos chamados, proporcionando uma visão clara e organizada do desempenho da sua equipe.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURE: MONITORAMENTO ===== -->
+<section class="feature-section" id="monitoramento" style="background: var(--bg-light);">
+  <div class="container">
+    <div class="two-col">
+      <div class="feature-text">
+        <h2>Monitoramento da Equipe Externa</h2>
+        <p>Com o Mapa da Equipe, o gestor pode visualizar e monitorar toda a equipe externa em tempo real, obtendo a localização atual de cada colaborador de forma simples e intuitiva.</p>
+        <p>Para uma análise mais detalhada, o Relatório de Monitoramento oferece informações essenciais sobre a rotina dos funcionários, incluindo login e logout no aplicativo, uso de localização fictícia, nível da bateria, e utilização em mais de um aparelho, permitindo um acompanhamento preciso e completo.</p>
+      </div>
+      <div class="carousel-wrap">
+        <div class="carousel" id="car-mon" onscroll="updateDots('car-mon','dots-mon')">
+          <img src="img/1-9-768x768.webp" alt="Monitoramento - tela 1" width="600" height="600" loading="lazy">
+          <img src="img/2-8-768x768.webp" alt="Monitoramento - tela 2" width="600" height="600" loading="lazy">
+        </div>
+        <div class="carousel-dots" id="dots-mon">
+          <span class="dot active" onclick="scrollCarousel('car-mon',0)"></span>
+          <span class="dot" onclick="scrollCarousel('car-mon',1)"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURE: PRODUTOS E ESTOQUE ===== -->
+<section class="feature-section" id="produtos">
+  <div class="container">
+    <div class="two-col reverse">
+      <div class="carousel-wrap">
+        <div class="carousel" id="car-prod" onscroll="updateDots('car-prod','dots-prod')">
+          <img src="img/1-10-768x768.webp" alt="Produtos e Estoque - tela 1" width="600" height="600" loading="lazy">
+          <img src="img/2-9-768x768.webp" alt="Produtos e Estoque - tela 2" width="600" height="600" loading="lazy">
+          <img src="img/3-9-768x768.webp" alt="Produtos e Estoque - tela 3" width="600" height="600" loading="lazy">
+        </div>
+        <div class="carousel-dots" id="dots-prod">
+          <span class="dot active" onclick="scrollCarousel('car-prod',0)"></span>
+          <span class="dot" onclick="scrollCarousel('car-prod',1)"></span>
+          <span class="dot" onclick="scrollCarousel('car-prod',2)"></span>
+        </div>
+      </div>
+      <div class="feature-text">
+        <h2>Produtos e Estoque das Visitas</h2>
+        <p>Cadastre todos os seus produtos no sistema, incluindo quantidade em estoque, valor de venda, data de validade, e muito mais. Cada produto recebe um código de identificação, tornando-o totalmente rastreável.</p>
+        <p>Durante as visitas, sua equipe pode registrar a entrega, retirada e troca de materiais, garantindo controle preciso do estoque e facilitando reposições. O Relatório de Produtos detalha todas as informações, como movimentação de materiais, responsáveis pelas transferências, e valores unitários e totais, permitindo um acompanhamento completo e eficiente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== DASHBOARD LOOKER / AUTOMATIZA ===== -->
+<section id="automatiza" style="background: var(--bg-light); padding: var(--section-pad);">
+  <div class="container">
+    <div class="two-col">
+      <div class="feature-text">
+        <h2 class="section-title">Dashboard personalizado para chamar de seu!</h2>
+        <p>Estamos 100% integrados ao Looker Studio, a ferramenta de BI do Google! Conecte os dados do Contele Teams ao Looker, e crie dashboards de acordo com a necessidade da sua operação. Economize horas e aumente em até 22% sua lucratividade com decisões baseadas em dados.</p>
+      </div>
+      <div>
+        <img src="img/Dashboard-de-Equipes-Externas.webp" alt="Dashboard de Equipes Externas integrado ao Looker Studio" width="600" height="400" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== INTEGRATIONS ===== -->
+<section style="background: var(--white); padding: var(--section-pad);">
+  <div class="container">
+    <div class="two-col reverse">
+      <div>
+        <img src="img/imagem-teams.webp" alt="Integracoes Contele Teams com mais de 3000 aplicativos" width="600" height="400" loading="lazy">
+      </div>
+      <div class="feature-text">
+        <h2 class="section-title">Transforme sua Operação com Integracoes Poderosas</h2>
+        <p>Faça a integração do Contele Teams com ERPs, CRMs e mais de 3.000 aplicações utilizando o Zapier, API Rest e Webhook. Com nossa integração via Zapier, API Rest e Webhook, você pode enviar e receber informações sobre locais, formulários e visitas para mais de 3.000 aplicações.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONSULTORIA ===== -->
+<section style="background: var(--bg-light); padding: var(--section-pad);">
+  <div class="container">
+    <div class="two-col">
+      <div class="feature-text">
+        <h2 class="section-title">Não tem desenvolvedor, tempo ou conhecimento?</h2>
+        <p>Nosso time especializado em integracoes e automacoes oferece consultoria, implementação e manutenção para garantir alta performance do Contele. Estamos aqui para revolucionar sua operação e aumentar a percepção de valor para seus clientes.</p>
+      </div>
+      <div>
+        <img src="img/equipe-projetos.webp" alt="Equipe de projetos e consultoria Contele" width="600" height="400" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MID-PAGE CTA ===== -->
+<section id="mid-cta">
+  <div class="container">
+    <h2>Solicite uma demonstração agora e veja como o Contele Teams pode transformar seu negócio!</h2>
+    <button class="btn-cta-white" onclick="openSidebar()">Solicitar Demonstração Gratuita</button>
+    <p class="sub-cta">Mínimo de 4 Usuários. Exclusivo para Equipes Externas.</p>
+  </div>
+</section>
+
+<!-- ===== BENEFITS ===== -->
+<section id="beneficios">
+  <div class="container">
+    <h2 class="section-title text-center">Os benefícios que você ganha com o Contele Teams</h2>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <h3>Reducao de Gastos com Reembolso</h3>
+        <p>Calcule um valor de reembolso por KM rodado justo tanto para você quanto para o colaborador, e reduza custos.</p>
+      </div>
+      <div class="benefit-card">
+        <h3>Mais visitas por dia</h3>
+        <p>Check-in e Check-out, agenda planejada, melhor rota definida e visitas objetivas com checklist.</p>
+      </div>
+      <div class="benefit-card">
+        <h3>Visitas mais eficientes</h3>
+        <p>Crie quantos formulários personalizados quiser, colete dados das visitas, e aumente a eficiência.</p>
+      </div>
+      <div class="benefit-card">
+        <h3>Decisoes guiadas por Indicadores</h3>
+        <p>Saiba quem visitou mais, quem atrasou mais, quem perdeu visitas, qual o tempo médio em visitas.</p>
+      </div>
+      <div class="benefit-card">
+        <h3>Digitalizacao de toda a operacao</h3>
+        <p>Recolha assinaturas digitais das visitas, e faça o monitoramento da sua equipe externa.</p>
+      </div>
+      <div class="benefit-card">
+        <h3>Controle dos chamados</h3>
+        <p>Seus clientes abrem os chamados, você prioriza e oferece o acompanhamento do deslocamento.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== COUNTERS ===== -->
+<section id="counters">
+  <div class="container">
+    <div class="counters-grid">
+      <div class="counter-item">
+        <span class="counter-number" data-target="20" data-prefix="+" data-suffix=" anos">+20 anos</span>
+        <span class="counter-label">De mercado</span>
+      </div>
+      <div class="counter-item">
+        <span class="counter-number" data-target="1400" data-prefix="+" data-suffix=" clientes">+1.400 clientes</span>
+        <span class="counter-label">Em mais de 7 países</span>
+      </div>
+      <div class="counter-item">
+        <span class="counter-number" data-target="12000" data-prefix="+" data-suffix=" dispositivos">+12.000 dispositivos</span>
+        <span class="counter-label">Com monitoramento online</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PLANS ===== -->
+<section id="planos">
+  <div class="container">
+    <div class="text-center">
+      <h2 class="section-title">Planos e Precos</h2>
+      <p class="section-sub">Turbine sua equipe externa sem burocracia!</p>
+    </div>
+    <div class="plans-grid">
+      <div class="plan-card">
+        <h3>De 4 a 40 usuários</h3>
+        <img src="img/preco-4-40-usuarios-contele-teams.svg" alt="Plano 4 a 40 usuários Contele Teams" loading="lazy">
+        <div style="margin-top: 24px;">
+          <button class="btn btn-primary" onclick="openSidebar()" style="width: 100%; padding: 14px;">Solicitar Demonstração</button>
+        </div>
+      </div>
+      <div class="plan-card">
+        <h3>A partir de 41 usuários</h3>
+        <img src="img/preco-mais-de-41-usuarios-contele-teams.svg" alt="Plano 41+ usuários Contele Teams" loading="lazy">
+        <div style="margin-top: 24px;">
+          <button class="btn btn-primary" onclick="openSidebar()" style="width: 100%; padding: 14px;">Solicitar Demonstração</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PLAN FEATURES ACCORDION ===== -->
+<section id="recursos-planos">
+  <div class="container">
+    <h2 class="section-title text-center" style="margin-bottom: 40px;">Recursos incluídos em ambos os planos:</h2>
+    <div class="accordion">
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
+          Aplicativos para Gestão Completa
+          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="accordion-body">
+          <p>App Gestor Contele (iOS e Android), Aplicativo para Usuários</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
+          Servicos e Suporte de Excelencia
+          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="accordion-body">
+          <p>Implantação (R$ 750, gratuita com compromisso de 30 dias), Central de Ajuda, Treinamento com Certificação</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
+          Capacitacao e Treinamento
+          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="accordion-body">
+          <p>Vídeos e treinamentos gravados</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
+          Funcionalidades Sem Limites
+          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="accordion-body">
+          <p>Uso sem Restrições, Rotas Ilimitadas, Armazenamento Ilimitado, Histórico Vitalício</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
+          Integracoes e Expansoes
+          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="accordion-body">
+          <p>+3000 Softwares, APIs Abertas</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
+          Seguranca e Atualizacoes
+          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="accordion-body">
+          <p>Privacidade, Atualizações Gratuitas</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
+          Mapas e Roteirizacao
+          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="accordion-body">
+          <p>Google Maps oficial</p>
+        </div>
+      </div>
+
+    </div>
+    <p class="accordion-footer">
+      Privacidade e confidencialidade dos seus dados garantidos no <a href="https://contelege.com.br/termos-uso/">termo de uso</a>.
+    </p>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section id="depoimentos">
+  <div class="container">
+    <h2 class="section-title text-center">Depoimentos de quem turbinou a gestão de equipes externas</h2>
+    <div class="testimonials-grid">
+
+      <div class="yt-thumb" onclick="loadYT(this,'Qpwoxd8BH8s')" aria-label="Depoimento CMA Elevadores" role="button" tabindex="0" onkeydown="if(event.key==='Enter')loadYT(this,'Qpwoxd8BH8s')">
+        <img src="img/cma-elevadores.webp" alt="CMA Elevadores - Caso de Sucesso Contele Teams" loading="lazy" width="480" height="270">
+        <div class="yt-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="yt-thumb" onclick="loadYT(this,'N5YUbhFJcxE')" aria-label="Depoimento Daikin" role="button" tabindex="0" onkeydown="if(event.key==='Enter')loadYT(this,'N5YUbhFJcxE')">
+        <img src="img/daikin-case-de-sucesso.webp" alt="Daikin - Caso de Sucesso Contele Teams" loading="lazy" width="480" height="270">
+        <div class="yt-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="yt-thumb" onclick="loadYT(this,'Hnl6hRTk7D0')" aria-label="Depoimento Doctoralia" role="button" tabindex="0" onkeydown="if(event.key==='Enter')loadYT(this,'Hnl6hRTk7D0')">
+        <img src="img/doctoralia.webp" alt="Doctoralia - Caso de Sucesso Contele Teams" loading="lazy" width="480" height="270">
+        <div class="yt-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="yt-thumb" onclick="loadYT(this,'PvlGPlgLuto')" aria-label="Depoimento CP Francisco Xavier" role="button" tabindex="0" onkeydown="if(event.key==='Enter')loadYT(this,'PvlGPlgLuto')">
+        <img src="img/cp-francisco-xavier.webp" alt="CP Francisco Xavier - Caso de Sucesso Contele Teams" loading="lazy" width="480" height="270">
+        <div class="yt-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="yt-thumb" onclick="loadYT(this,'_WcCSAHHcig')" aria-label="Depoimento Orteb" role="button" tabindex="0" onkeydown="if(event.key==='Enter')loadYT(this,'_WcCSAHHcig')">
+        <img src="img/thumb-case-de-sucesso-orteb-v2.webp" alt="Orteb - Caso de Sucesso Contele Teams" loading="lazy" width="480" height="270">
+        <div class="yt-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="yt-thumb" onclick="loadYT(this,'cHY_jjqTUig')" aria-label="Depoimento YPF" role="button" tabindex="0" onkeydown="if(event.key==='Enter')loadYT(this,'cHY_jjqTUig')">
+        <img src="img/ypf.webp" alt="YPF - Caso de Sucesso Contele Teams" loading="lazy" width="480" height="270">
+        <div class="yt-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="yt-thumb" onclick="loadYT(this,'9wqLEwvHyfI')" aria-label="Depoimento Melhoramentos" role="button" tabindex="0" onkeydown="if(event.key==='Enter')loadYT(this,'9wqLEwvHyfI')">
+        <img src="img/melhoramentos-higiene.webp" alt="Melhoramentos Higiene - Caso de Sucesso Contele Teams" loading="lazy" width="480" height="270">
+        <div class="yt-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="yt-thumb" onclick="loadYT(this,'fP6TgekfB0E')" aria-label="Depoimento Windows School" role="button" tabindex="0" onkeydown="if(event.key==='Enter')loadYT(this,'fP6TgekfB0E')">
+        <img src="img/windows-school.webp" alt="Windows School - Caso de Sucesso Contele Teams" loading="lazy" width="480" height="270">
+        <div class="yt-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="yt-thumb" onclick="loadYT(this,'VQYiBWyoU3w')" aria-label="Depoimento Incence" role="button" tabindex="0" onkeydown="if(event.key==='Enter')loadYT(this,'VQYiBWyoU3w')">
+        <img src="img/incence.webp" alt="Incence - Caso de Sucesso Contele Teams" loading="lazy" width="480" height="270">
+        <div class="yt-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+    </div>
+
+    <div class="testimonials-cta">
+      <h3>Garanta uma gestão mais eficiente com o Contele Teams. Peca sua demonstração agora!</h3>
+      <button class="btn btn-hero" onclick="openSidebar()">Solicitar Demonstração Gratuita</button>
+      <p style="color: var(--text-muted); font-size: 14px; margin-top: 12px; font-style: italic;">Mínimo de 4 Usuários. Exclusivo para Equipes Externas.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== QUALITY ===== -->
+<section id="qualidade">
+  <div class="container text-center">
+    <h2 class="section-title">Por que o Contele Gestor de Equipes é um sistema de qualidade?</h2>
+    <p class="section-sub">Para ser um sistema de alta confiabilidade, precisão e disponibilidade, nós temos uma equipe própria de desenvolvimento e usamos os melhores serviços de tecnologia do mundo.</p>
+    <img src="img/Parceiros.webp" alt="Parceiros tecnológicos do Contele" width="960" height="300" loading="lazy" style="margin: 32px auto 0; border-radius: var(--radius);">
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>Contele Teams</h4>
+        <ul>
+          <li><a href="https://app.contelege.com.br/" target="_blank" rel="noopener">Login/APP</a></li>
+          <li><a href="#recursos">Recursos</a></li>
+          <li><a href="#beneficios">Benefícios</a></li>
+          <li><a href="#planos">Planos</a></li>
+          <li><a href="https://indique.contele.io/">Indique e Ganhe</a></li>
+          <li><a href="https://exclusivo.contelege.com.br/politica-privacidade/">Política de Privacidade</a></li>
+          <li><a href="https://blog.contelege.com.br/termo-de-uso-software-de-gestao-de-equipe-externa/">Termo de uso</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Conteúdos grátis</h4>
+        <ul>
+          <li><a href="https://blog.contelege.com.br/">Blog</a></li>
+          <li><a href="https://blog.contelege.com.br/canal-leonardo-gazolli/">YouTube</a></li>
+          <li><a href="https://www.instagram.com/leogazolli/">Instagram</a></li>
+          <li><a href="https://www.facebook.com/leonardogazolli">Facebook</a></li>
+          <li><a href="#depoimentos">Depoimentos</a></li>
+          <li><a href="https://t.me/equipesexternas">Telegram</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contele Solucoes Tecnológicas</h4>
+        <ul>
+          <li><a href="https://contele.com.br/">contele.com.br</a></li>
+        </ul>
+        <p style="margin-top: 12px;"><a href="mailto:contato@contelege.com.br" style="color: rgba(255,255,255,0.75);">contato@contelege.com.br</a></p>
+        <p><a href="https://wa.me/5511971325108" style="color: rgba(255,255,255,0.75);">(11) 97132-5108</a></p>
+      </div>
+      <div class="footer-col">
+        <img src="img/qualidade-contele-lp-2026.webp" alt="Qualidade Contele" width="200" height="200" loading="lazy" style="border-radius: 8px;">
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="container">
+      <a href="https://exclusivo.contelege.com.br/politica-privacidade/">Política de Privacidade</a>
+      <a href="https://contelege.com.br/termos-uso/">Termos de Uso</a>
+      <span>Contele Teams</span>
+      <span style="display: block; margin-top: 8px;">Copyright 2003-2026 Contele Solucoes Tecnológicas LTDA | Rua Euclides Da Cunha, n 11, Cj 601, Santos/SP</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== JAVASCRIPT (deferred) ===== -->
+<script defer>
+  // ===== SIDEBAR =====
+  function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebar-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeSidebar();
+  });
+
+  // ===== PHONE MASK =====
+  function phoneMask(input) {
+    let v = input.value.replace(/\D/g, '');
+    if (v.length > 11) v = v.slice(0, 11);
+    if (v.length > 6) v = v.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+    else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+    else if (v.length > 0) v = v.replace(/^(\d{0,2})/, '($1');
+    input.value = v;
+  }
+
+  // ===== QTD VALIDATION (real-time) =====
+  function validateQtd(input) {
+    const fb = document.getElementById('qtd-feedback');
+    const val = parseInt(input.value, 10);
+    if (!input.value || isNaN(val) || val < 1) {
+      fb.textContent = '';
+      fb.className = 'qtd-feedback';
+      return;
+    }
+    if (val < 4) {
+      fb.textContent = 'Nosso plano atende equipes a partir de 4 pessoas.';
+      fb.className = 'qtd-feedback warn';
+    } else {
+      fb.textContent = 'Perfeito! Solicite sua demonstração.';
+      fb.className = 'qtd-feedback ok';
+    }
+  }
+
+  // ===== FORM SUBMISSION =====
+  function handleInsideForm(form) {
+    const qtdRaw = form.querySelector('[name="qtdPessoas"]').value;
+    const qtd = parseInt(qtdRaw, 10);
+    const nome = form.querySelector('[name="nome"]').value.trim();
+    const empresa = form.querySelector('[name="empresa"]').value.trim();
+    const telefone = form.querySelector('[name="telefone"]').value.trim();
+    const email = form.querySelector('[name="email"]').value.trim();
+
+    if (!qtdRaw || isNaN(qtd) || qtd < 1) { alert('Por favor, informe a quantidade de pessoas.'); return; }
+    if (!nome) { alert('Por favor, informe seu nome.'); return; }
+    if (!empresa) { alert('Por favor, informe o nome da sua empresa.'); return; }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      alert('Por favor, insira um e-mail válido.');
+      return;
+    }
+
+    const phoneDigits = telefone.replace(/\D/g, '');
+    if (phoneDigits.length < 10) {
+      alert('Por favor, insira um telefone válido.');
+      return;
+    }
+
+    // CRITICAL: < 4 people = ZERO submit, show message
+    if (qtd < 4) {
+      document.getElementById('sidebar-form').style.display = 'none';
+      document.getElementById('sidebar-small-team-msg').style.display = 'block';
+      return;
+    }
+
+    const submitBtn = form.querySelector('[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
+
+    function getGclid() {
+      const match = document.cookie.match(/_gcl_aw=([^;]+)/);
+      if (match) {
+        const parts = match[1].split('.');
+        return parts.length >= 3 ? parts.slice(2).join('.') : match[1];
+      }
+      const urlGclid = new URLSearchParams(window.location.search).get('gclid');
+      return urlGclid || '';
+    }
+
+    function getGA4ClientId() {
+      const match = document.cookie.match(/_ga=([^;]+)/);
+      return match ? match[1] : '';
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const utmCampaign = params.get('utm_campaign') || '';
+    const utmSource = params.get('utm_source') || '';
+    const utmMedium = params.get('utm_medium') || '';
+    const utmTerm = params.get('utm_term') || '';
+    const utmContent = params.get('utm_content') || '';
+
+    const gclid = getGclid();
+    const ga4ClientId = getGA4ClientId();
+
+    const licenseCount = qtd;
+
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'formSubmission',
+      formName: 'Lead Form',
+      formData: { email, nome, empresa, telefone, quantidade: qtd.toString() }
+    });
+
+    const now = new Date();
+    const dataHora = now.toLocaleDateString('pt-BR') + '-' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+    fetch('https://ge-prd-web-api.contele.com.br/api/v1/spreadsheet/1cM0RpSRWarWNqSYDfjqTkPnrWI1BSP8jicm77n3KiTY', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        spreadsheetData: {
+          'Data/Hora': dataHora,
+          'Nome': nome,
+          'Email': email,
+          'Telefone': telefone,
+          'Empresa': empresa,
+          'Campanha': utmCampaign,
+          'Tamanho da Equipe': qtd.toString(),
+          'Landing Page': window.location.href,
+          'GCLID': gclid,
+          'GA4 Client ID': ga4ClientId,
+          'utm_source': utmSource,
+          'utm_medium': utmMedium,
+          'utm_term': utmTerm,
+          'utm_content': utmContent
+        }
+      })
+    });
+
+    fetch('https://ge-prd-web-api.contele.com.br/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        company_name: empresa,
+        phone: telefone,
+        name: nome,
+        email: email,
+        password: 'gestorturbinado',
+        plan: 'trial',
+        license_count: licenseCount,
+        period: 0,
+        language: 'pt',
+        primeiroTeste: ' ',
+        faixadelicencas: licenseCount,
+        campaign: 'landing_page'
+      })
+    });
+
+    const utmString = window.location.search;
+    setTimeout(function() {
+      window.location.href = 'https://conteleteams.com.br/obrigado' + utmString;
+    }, 1000);
+  }
+
+  // ===== YOUTUBE FACADE =====
+  function loadYT(el, videoId) {
+    const iframe = document.createElement('iframe');
+    iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+    iframe.allowFullscreen = true;
+    iframe.style.cssText = 'width:100%;height:100%;border:0;';
+    el.innerHTML = '';
+    el.appendChild(iframe);
+    el.style.cursor = 'default';
+  }
+
+  // ===== CAROUSEL =====
+  function scrollCarousel(carId, index) {
+    const car = document.getElementById(carId);
+    if (!car) return;
+    const img = car.querySelector('img');
+    if (!img) return;
+    const w = img.offsetWidth + 16; // gap 16px
+    car.scrollTo({ left: w * index, behavior: 'smooth' });
+  }
+
+  function updateDots(carId, dotsId) {
+    const car = document.getElementById(carId);
+    const dotsEl = document.getElementById(dotsId);
+    if (!car || !dotsEl) return;
+    const img = car.querySelector('img');
+    if (!img) return;
+    const w = img.offsetWidth + 16;
+    const index = Math.round(car.scrollLeft / w);
+    const dots = dotsEl.querySelectorAll('.dot');
+    dots.forEach(function(d, i) {
+      d.classList.toggle('active', i === index);
+    });
+  }
+
+  // ===== ACCORDION =====
+  function toggleAccordion(btn) {
+    const body = btn.nextElementSibling;
+    const isOpen = btn.classList.contains('open');
+    // Close all
+    document.querySelectorAll('.accordion-trigger.open').forEach(function(b) {
+      b.classList.remove('open');
+      b.setAttribute('aria-expanded', 'false');
+      b.nextElementSibling.classList.remove('open');
+    });
+    if (!isOpen) {
+      btn.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+      body.classList.add('open');
+    }
+  }
+
+  // ===== COUNTERS =====
+  function animateCounter(el) {
+    const target = parseInt(el.getAttribute('data-target'), 10);
+    const prefix = el.getAttribute('data-prefix') || '';
+    const suffix = el.getAttribute('data-suffix') || '';
+    const duration = 1800;
+    const start = performance.now();
+
+    function format(n) {
+      if (n >= 1000) return n.toLocaleString('pt-BR');
+      return n.toString();
+    }
+
+    function step(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(eased * target);
+      el.textContent = prefix + format(current) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  const counterObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        animateCounter(entry.target);
+        counterObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('.counter-number[data-target]').forEach(function(el) {
+    counterObserver.observe(el);
+  });
+
+</script>
+
+</body>
+</html>
