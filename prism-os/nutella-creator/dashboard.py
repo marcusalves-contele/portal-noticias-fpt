@@ -252,8 +252,27 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         super().end_headers()
 
     def _check_auth(self):
-        """Auth disabled — internal tool, security by obscurity (URL not public)."""
-        return True
+        """Check Google OAuth session cookie."""
+        from auth import is_authenticated, oauth_configured
+        if not oauth_configured():
+            return True  # No OAuth configured = allow all (local dev)
+        user = is_authenticated(self)
+        if user:
+            return True
+        # Not authenticated
+        parsed = urlparse(self.path)
+        path = parsed.path
+        # Allow auth routes, static assets, favicon
+        if path.startswith("/auth/") or path == "/login" or path == "/favicon.svg" or path == "/favicon.ico":
+            return True
+        # API calls get 401
+        if path.startswith("/api/"):
+            self._json({"error": "unauthorized"}, 401)
+            return False
+        # Everything else: redirect to login
+        self.send_response(302)
+        self.send_header("Location", "/login")
+        self.end_headers()
         return False
 
     def do_GET(self):
@@ -262,6 +281,76 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
 
         parsed = urlparse(self.path)
         path = parsed.path
+
+        # Auth routes
+        if path == "/login":
+            login_file = STATIC_DIR / "login.html"
+            if login_file.exists():
+                self._serve_file(login_file)
+            else:
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html")
+                self.end_headers()
+                self.wfile.write(b"<h1>Login</h1><a href='/auth/login'>Login with Google</a>")
+            return
+        elif path == "/auth/login":
+            from auth import get_login_url, oauth_configured
+            if not oauth_configured():
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(b"OAuth not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.")
+                return
+            # Build redirect URI
+            host = self.headers.get("Host", "localhost:8765")
+            scheme = "https" if os.environ.get("RAILWAY_ENVIRONMENT") else "http"
+            redirect_uri = f"{scheme}://{host}/auth/callback"
+            url = get_login_url(redirect_uri)
+            self.send_response(302)
+            self.send_header("Location", url)
+            self.end_headers()
+            return
+        elif path == "/auth/callback":
+            from auth import exchange_code, is_email_allowed, create_session_cookie, COOKIE_NAME, COOKIE_MAX_AGE
+            qs = parse_qs(parsed.query)
+            code = qs.get("code", [None])[0]
+            if not code:
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b"Missing code parameter")
+                return
+            host = self.headers.get("Host", "localhost:8765")
+            scheme = "https" if os.environ.get("RAILWAY_ENVIRONMENT") else "http"
+            redirect_uri = f"{scheme}://{host}/auth/callback"
+            user = exchange_code(code, redirect_uri)
+            if not user:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(b"OAuth exchange failed")
+                return
+            email = user.get("email", "")
+            if not is_email_allowed(email):
+                self.send_response(403)
+                self.send_header("Content-Type", "text/html")
+                self.end_headers()
+                self.wfile.write(b"<h2>Acesso restrito ao dominio contele.com.br</h2><a href='/login'>Tentar novamente</a>")
+                return
+            cookie = create_session_cookie(email, user.get("name", ""))
+            is_prod = bool(os.environ.get("RAILWAY_ENVIRONMENT"))
+            cookie_attrs = f"{COOKIE_NAME}={cookie}; Path=/; Max-Age={COOKIE_MAX_AGE}; HttpOnly; SameSite=Lax"
+            if is_prod:
+                cookie_attrs += "; Secure"
+            self.send_response(302)
+            self.send_header("Set-Cookie", cookie_attrs)
+            self.send_header("Location", "/")
+            self.end_headers()
+            return
+        elif path == "/auth/logout":
+            from auth import COOKIE_NAME
+            self.send_response(302)
+            self.send_header("Set-Cookie", f"{COOKIE_NAME}=; Path=/; Max-Age=0")
+            self.send_header("Location", "/login")
+            self.end_headers()
+            return
 
         # API routes
         if path == "/api/version":
