@@ -262,8 +262,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         # Not authenticated
         parsed = urlparse(self.path)
         path = parsed.path
-        # Allow auth routes, static assets, favicon
-        if path.startswith("/auth/") or path == "/login" or path == "/favicon.svg" or path == "/favicon.ico":
+        # Allow auth routes, static assets, favicon, feedback
+        if path.startswith("/auth/") or path == "/login" or path == "/favicon.svg" or path == "/favicon.ico" or path == "/api/feedback":
             return True
         # API calls get 401
         if path.startswith("/api/"):
