@@ -5,7 +5,7 @@
     "watchPatterns": ["prism-os/**"]
   },
   "deploy": {
-    "startCommand": "cd nutella-creator && python3 boot.py && python3 dashboard.py",
+    "startCommand": "apt-get update -qq && apt-get install -y -qq libxcb1 libgl1-mesa-glx libglib2.0-0 libxext6 libsm6 > /dev/null 2>&1; cd nutella-creator && python3 boot.py && python3 dashboard.py",
     "healthcheckPath": "/",
     "restartPolicyType": "ON_FAILURE"
   }
