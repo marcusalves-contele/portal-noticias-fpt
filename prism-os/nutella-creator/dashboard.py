@@ -627,7 +627,12 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
 
         def _run():
             try:
+                import sys
+                print(f"[build-custom] Starting: {video_id} {clip_entrada}-{clip_saida}", flush=True)
+                _emit(job_id, "progress", {"step": "init", "message": f"Preparando corte {clip_entrada} - {clip_saida}..."})
                 from build import run_custom_build
+                print(f"[build-custom] Module loaded, calling run_custom_build", flush=True)
+                _emit(job_id, "progress", {"step": "download", "message": "Iniciando download do video..."})
                 run_custom_build(
                     video_id=video_id,
                     clip_entrada=clip_entrada,
@@ -641,6 +646,7 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     "message": f"Corte manual pronto: {clip_entrada} - {clip_saida}",
                 })
             except Exception as e:
+                print(f"[build-custom] ERROR: {e}", flush=True)
                 _emit(job_id, "error", {"message": str(e)})
 
         threading.Thread(target=_run, daemon=True).start()
