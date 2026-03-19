@@ -27,8 +27,13 @@ import tempfile
 import subprocess
 from pathlib import Path
 
-import cv2
-import mediapipe as mp
+try:
+    import cv2
+    import mediapipe as mp
+    HAS_FACE_DETECTION = True
+except ImportError as _e:
+    print(f"  AVISO: face detection indisponivel ({_e}), usando letterbox para Shorts")
+    HAS_FACE_DETECTION = False
 
 # -------------------------------------------------------------------
 # Paths
@@ -230,6 +235,9 @@ def detect_layout(video_path: Path, start_sec: float, end_sec: float) -> dict:
     """
     fallback = {"type": "no_face", "cx": W // 2, "cy": H // 2, "fw": 120, "fh": 120,
                 "best_frame_sec": start_sec}
+    if not HAS_FACE_DETECTION:
+        print("  Layout: mediapipe indisponivel, usando letterbox")
+        return fallback
     try:
         face_det = mp.solutions.face_detection.FaceDetection(
             model_selection=1, min_detection_confidence=0.4
