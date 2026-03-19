@@ -29,14 +29,17 @@ URL = f"{API_BASE}/{MODEL}:generateContent"
 
 
 def load_api_key() -> str:
+    # Prefer env var (Railway production)
+    key = os.environ.get("GEMINI_NANO_BANANA_KEY")
+    if key:
+        return key
     env_path = PROJECT_DIR / ".env"
-    if not env_path.exists():
-        raise FileNotFoundError(f".env not found at {env_path}")
-    with open(env_path) as f:
-        for line in f:
-            if line.startswith("GEMINI_NANO_BANANA_KEY"):
-                return line.split("=", 1)[1].strip().strip('"')
-    raise ValueError("GEMINI_NANO_BANANA_KEY not found in .env")
+    if env_path.exists():
+        with open(env_path) as f:
+            for line in f:
+                if line.startswith("GEMINI_NANO_BANANA_KEY"):
+                    return line.split("=", 1)[1].strip().strip('"')
+    raise ValueError("GEMINI_NANO_BANANA_KEY not found (set env var or .env file)")
 
 
 def img_to_b64(path: Path) -> tuple[str, str]:

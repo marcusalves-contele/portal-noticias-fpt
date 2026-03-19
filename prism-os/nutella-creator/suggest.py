@@ -82,10 +82,62 @@ def time_to_seconds(t: str) -> int:
     return int(parts[0]) * 60 + int(parts[1])
 
 
+def _get_transcript_ytdlp(video_id: str) -> list[dict]:
+    """Fallback: extrai legendas via yt-dlp (funciona em IPs de cloud)."""
+    import subprocess, tempfile, re as _re
+    cookies_file = Path(__file__).parent / "cookies.txt"
+    cookies_arg = ["--cookies", str(cookies_file)] if cookies_file.exists() else []
+
+    with tempfile.TemporaryDirectory(prefix="transcript_") as tmp:
+        tmp_path = Path(tmp)
+        cmd = [
+            "yt-dlp",
+            "--write-auto-sub", "--sub-lang", "pt,pt-BR,en",
+            "--sub-format", "json3",
+            "--skip-download",
+            *cookies_arg,
+            "-o", str(tmp_path / "sub"),
+            f"https://youtube.com/watch?v={video_id}",
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+
+        # Find the downloaded subtitle file
+        sub_files = list(tmp_path.glob("*.json3"))
+        if not sub_files:
+            raise RuntimeError(
+                f"yt-dlp nao conseguiu extrair legendas para {video_id}. "
+                f"Verifique se o video tem legendas disponiveis."
+            )
+
+        with open(sub_files[0], encoding="utf-8") as f:
+            data = json.load(f)
+
+        segments = []
+        for event in data.get("events", []):
+            start_ms = event.get("tStartMs", 0)
+            dur_ms = event.get("dDurationMs", 0)
+            segs = event.get("segs", [])
+            text = "".join(s.get("utf8", "") for s in segs).strip()
+            if text and text != "\n":
+                segments.append({
+                    "start": start_ms / 1000.0,
+                    "duration": dur_ms / 1000.0,
+                    "text": text,
+                })
+        if not segments:
+            raise RuntimeError(f"Legendas vazias para {video_id}")
+        return segments
+
+
 def get_transcript_with_timestamps(video_id: str) -> list[dict]:
-    api = YouTubeTranscriptApi()
-    result = api.fetch(video_id, languages=["pt", "pt-BR", "en"])
-    return [{"start": s.start, "duration": s.duration, "text": s.text} for s in result]
+    # Tenta youtube-transcript-api primeiro (mais rapido)
+    try:
+        api = YouTubeTranscriptApi()
+        result = api.fetch(video_id, languages=["pt", "pt-BR", "en"])
+        return [{"start": s.start, "duration": s.duration, "text": s.text} for s in result]
+    except Exception as e:
+        print(f"  youtube-transcript-api falhou ({e}), tentando yt-dlp...")
+        return _get_transcript_ytdlp(video_id)
 
 
 def build_transcript_text(segments: list[dict], chunk_size: int = 90) -> str:

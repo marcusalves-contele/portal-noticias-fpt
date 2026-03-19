@@ -645,9 +645,19 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     "video_id": video_id,
                     "message": f"Corte manual pronto: {clip_entrada} - {clip_saida}",
                 })
+            except RuntimeError as e:
+                msg = str(e)
+                print(f"[build-custom] ERROR: {msg}", flush=True)
+                _emit(job_id, "error", {"message": msg})
             except Exception as e:
-                print(f"[build-custom] ERROR: {e}", flush=True)
-                _emit(job_id, "error", {"message": str(e)})
+                msg = str(e)
+                print(f"[build-custom] ERROR: {msg}", flush=True)
+                # Mensagens mais claras para erros comuns
+                if "timeout" in msg.lower():
+                    msg = "Download travou (timeout). Tente novamente em alguns minutos."
+                elif "403" in msg or "forbidden" in msg.lower():
+                    msg = "YouTube bloqueou o acesso. Tente novamente em 5 minutos."
+                _emit(job_id, "error", {"message": msg})
 
         threading.Thread(target=_run, daemon=True).start()
 

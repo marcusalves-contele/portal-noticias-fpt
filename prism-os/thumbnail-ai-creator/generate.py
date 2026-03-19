@@ -96,13 +96,18 @@ def get_host_refs(channel='fleet'):
     return []
 
 def load_api_key():
-    """Carrega API key do .env"""
+    """Carrega API key (env var ou .env file)"""
+    import os
+    key = os.environ.get("GEMINI_NANO_BANANA_KEY")
+    if key:
+        return key
     env_file = ENV_PATH if ENV_PATH.exists() else Path.home() / ".env"
-    with open(env_file) as f:
-        for line in f:
-            if line.startswith('GEMINI_NANO_BANANA_KEY'):
-                return line.split('=', 1)[1].strip().strip('"')
-    raise ValueError("GEMINI_NANO_BANANA_KEY não encontrada no .env")
+    if env_file.exists():
+        with open(env_file) as f:
+            for line in f:
+                if line.startswith('GEMINI_NANO_BANANA_KEY'):
+                    return line.split('=', 1)[1].strip().strip('"')
+    raise ValueError("GEMINI_NANO_BANANA_KEY nao encontrada (set env var ou .env file)")
 
 def load_image_base64(image_path):
     """Carrega imagem e converte para base64"""
