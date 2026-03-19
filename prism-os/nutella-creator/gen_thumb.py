@@ -69,14 +69,17 @@ TIMEOUT = 180
 
 
 def load_api_key() -> str:
-    if not ENV_PATH.exists():
-        print(f"ERRO: .env não encontrado em {ENV_PATH}")
-        sys.exit(1)
-    with open(ENV_PATH) as f:
-        for line in f:
-            if line.startswith("GEMINI_NANO_BANANA_KEY"):
-                return line.split("=", 1)[1].strip().strip('"')
-    print("ERRO: GEMINI_NANO_BANANA_KEY não encontrado no .env")
+    import os
+    # Prefer env var (Railway)
+    key = os.environ.get("GEMINI_NANO_BANANA_KEY")
+    if key:
+        return key
+    if ENV_PATH.exists():
+        with open(ENV_PATH) as f:
+            for line in f:
+                if line.startswith("GEMINI_NANO_BANANA_KEY"):
+                    return line.split("=", 1)[1].strip().strip('"')
+    print("ERRO: GEMINI_NANO_BANANA_KEY não encontrada")
     sys.exit(1)
 
 

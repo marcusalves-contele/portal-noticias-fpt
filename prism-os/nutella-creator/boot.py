@@ -3,7 +3,7 @@
 Decodes base64-encoded pickle tokens from env vars to /tmp/ files.
 Run before dashboard.py in production.
 """
-import os, base64, sys
+import os, base64, sys, shutil
 from pathlib import Path
 
 TOKENS = {
@@ -45,7 +45,6 @@ def bootstrap():
                 pass  # Already linked
             elif local_dir.is_dir():
                 # Move any existing files to volume first
-                import shutil
                 for item in local_dir.iterdir():
                     dest = vol_dir / item.name
                     if not dest.exists():

@@ -42,6 +42,32 @@ _jobs: dict[str, dict] = {}
 _jobs_lock = threading.Lock()
 
 
+def _cleanup_old_jobs():
+    """Remove completed/errored jobs older than 5 minutes."""
+    while True:
+        time.sleep(60)
+        cutoff = time.time() - 300
+        with _jobs_lock:
+            to_remove = [jid for jid, j in _jobs.items()
+                        if j["status"] in ("complete", "error") and j["created"] < cutoff]
+            for jid in to_remove:
+                del _jobs[jid]
+
+threading.Thread(target=_cleanup_old_jobs, daemon=True).start()
+
+# Per-directory locks for state.json atomicity
+_state_locks: dict[str, threading.Lock] = {}
+_state_locks_lock = threading.Lock()
+
+
+def _get_state_lock(cuts_dir: Path) -> threading.Lock:
+    key = str(cuts_dir)
+    with _state_locks_lock:
+        if key not in _state_locks:
+            _state_locks[key] = threading.Lock()
+        return _state_locks[key]
+
+
 # -------------------------------------------------------------------
 # Pipeline functions (import from existing scripts)
 # -------------------------------------------------------------------
@@ -216,6 +242,16 @@ def save_state(cuts_dir: Path, state: dict):
         json.dump(state, f, ensure_ascii=False, indent=2)
 
 
+def update_state(cuts_dir: Path, updates: dict) -> dict:
+    """Atomically read-modify-write state.json."""
+    lock = _get_state_lock(cuts_dir)
+    with lock:
+        state = load_state(cuts_dir)
+        state.update(updates)
+        save_state(cuts_dir, state)
+        return state
+
+
 def load_metas(cuts_dir: Path) -> list[dict]:
     metas = []
     for f in sorted(cuts_dir.glob("*_meta.json")):
@@ -353,7 +389,9 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             return
 
         # API routes
-        if path == "/api/version":
+        if path == "/api/health":
+            self._json({"ok": True})
+        elif path == "/api/version":
             self._json({"version": VERSION, "changelog": "https://github.com/contele/growth/releases"})
         elif path == "/api/videos":
             self._handle_list_videos()
@@ -398,8 +436,9 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         elif path.startswith("/output/"):
             # Serve files from output directory
             rel_path = path[len("/output/"):]
-            file_path = OUTPUT_DIR / rel_path
-            if file_path.exists() and file_path.is_file():
+            file_path = (OUTPUT_DIR / rel_path).resolve()
+            # Safety: ensure path stays inside OUTPUT_DIR
+            if str(file_path).startswith(str(OUTPUT_DIR.resolve())) and file_path.exists() and file_path.is_file():
                 self._serve_file(file_path)
             else:
                 self._json({"error": "not found"}, 404)
@@ -674,12 +713,14 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         if not cuts_dir.exists():
             cuts_dir.mkdir(parents=True, exist_ok=True)
 
-        state = load_state(cuts_dir)
-        if status == "pending":
-            state.pop(str(rank), None)
-        else:
-            state[str(rank)] = status
-        save_state(cuts_dir, state)
+        lock = _get_state_lock(cuts_dir)
+        with lock:
+            state = load_state(cuts_dir)
+            if status == "pending":
+                state.pop(str(rank), None)
+            else:
+                state[str(rank)] = status
+            save_state(cuts_dir, state)
 
         self._json({"ok": True, "state": state})
 
@@ -760,8 +801,6 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             short_times = times["shorts"]
             privacy = "private"
 
-        state = load_state(cuts_dir)
-
         results = []
         errors = []
         for i, meta in enumerate(selected):
@@ -797,17 +836,21 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             except Exception as e:
                 errors.append(f"#{rank} short: {e}")
 
-            # Persiste estado "uploaded" no state.json
+            # Persiste estado "uploaded" no state.json (atomic)
             if clip_result:
-                state[str(rank)] = "uploaded"
-                uploads = state.setdefault("_uploads", {})
-                uploads[str(rank)] = {
+                upload_info = {
                     "clip_url":      clip_result.get("url", ""),
                     "clip_schedule": clip_result.get("publish_at", ""),
                     "short_url":     short_result.get("url", "") if short_result else "",
                     "short_schedule": short_result.get("publish_at", "") if short_result else "",
                 }
-                save_state(cuts_dir, state)
+                lock = _get_state_lock(cuts_dir)
+                with lock:
+                    state = load_state(cuts_dir)
+                    state[str(rank)] = "uploaded"
+                    uploads = state.setdefault("_uploads", {})
+                    uploads[str(rank)] = upload_info
+                    save_state(cuts_dir, state)
 
         self._json({"uploaded": results, "errors": errors})
 

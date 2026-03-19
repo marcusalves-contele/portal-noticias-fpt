@@ -18,7 +18,12 @@ import requests as req
 # Config
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
-SECRET_KEY = os.environ.get("SECRET_KEY", "prism-os-dev-key")
+_env_secret = os.environ.get("SECRET_KEY")
+if not _env_secret:
+    import secrets as _secrets
+    _env_secret = _secrets.token_urlsafe(32)
+    print("WARNING: SECRET_KEY not set, using random key (sessions reset on restart)")
+SECRET_KEY = _env_secret
 DEV_NO_AUTH = os.environ.get("DEV_NO_AUTH", "") == "1"
 EMAILS_EXCECAO = ["mantoniofassa@gmail.com"]
 COOKIE_NAME = "prism_session"
