@@ -313,6 +313,33 @@
     .ft-bot { border-top: 1px solid var(--border); padding-top: 20px; display: flex; justify-content: space-between; }
     .ft-bot p, .ft-bot a { font-size: 12px; color: var(--text-muted); text-decoration: none; }
 
+    /* EXIT INTENT MODAL */
+    .exit-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7); z-index: 200;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    .exit-overlay.active { display: flex; }
+    .exit-modal {
+      background: var(--deep); border: 1px solid var(--border);
+      border-radius: 16px; padding: 48px; max-width: 480px; width: 90%;
+      text-align: center; position: relative;
+      box-shadow: 0 32px 64px rgba(0,0,0,0.5);
+    }
+    .exit-modal::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--blue), var(--purple));
+    }
+    .exit-close {
+      position: absolute; top: 16px; right: 20px; background: none; border: none;
+      color: var(--text-muted); font-size: 24px; cursor: pointer; transition: color .2s;
+    }
+    .exit-close:hover { color: var(--white); }
+    .exit-modal h3 { font-family: var(--heading); font-size: 28px; color: var(--white); margin-bottom: 12px; }
+    .exit-modal p { font-size: 16px; color: var(--text-dim); margin-bottom: 28px; }
+    .exit-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
     /* WHATSAPP FAB */
     .wpp-fab {
       position: fixed; bottom: 24px; right: 24px; z-index: 99;
@@ -481,7 +508,7 @@
             <li>Motorista</li>
             <li>Multas</li>
           </ul>
-          <p>Controle total da frota. Sem fidelidade, sem multa, Risco Zero 30 dias. Se não resolver, você sai. Transportadoras, locadoras e frotas corporativas.</p>
+          <p>Toda empresa de frotas vende rastreador. A Contele vende resultado. Combustível, manutenção, comportamento do motorista, câmera veicular. Sem fidelidade, Risco Zero 30 dias.</p>
           <a href="https://contelerastreador.com.br/" target="_blank" rel="noopener" class="prod-link">Conhecer o Fleet &rarr;</a>
         </div>
       </div>
@@ -953,10 +980,45 @@
   </div>
 </footer>
 
+<!-- EXIT INTENT MODAL -->
+<div class="exit-overlay" id="exitModal">
+  <div class="exit-modal">
+    <button class="exit-close" id="exitClose">&times;</button>
+    <h3>Antes de sair...</h3>
+    <p>Conheça as duas soluções da Contele para quem opera em campo.</p>
+    <div class="exit-btns">
+      <a href="https://contelerastreador.com.br/" target="_blank" rel="noopener" class="btn btn-purple">Contele Fleet &rarr;</a>
+      <a href="https://conteleteams.com.br/" target="_blank" rel="noopener" class="btn btn-b">Contele Teams &rarr;</a>
+    </div>
+  </div>
+</div>
+
 <!-- WHATSAPP FAB -->
 <a href="https://api.whatsapp.com/send/?phone=5511971325108&text=Oi%2C%20vim%20pelo%20site%20contele.io%20e%20queria%20saber%20mais" class="wpp-fab" aria-label="Fale conosco pelo WhatsApp" target="_blank" rel="noopener"><svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>
 
 <script>
+// ─── Exit Intent ───
+(function() {
+  const modal = document.getElementById('exitModal');
+  const close = document.getElementById('exitClose');
+  if (!modal || !close) return;
+
+  function show() {
+    if (sessionStorage.getItem('exitShown')) return;
+    modal.classList.add('active');
+    sessionStorage.setItem('exitShown', '1');
+  }
+
+  document.addEventListener('mouseout', function(e) {
+    if (!e.relatedTarget && e.clientY < 10) show();
+  });
+
+  close.addEventListener('click', function() { modal.classList.remove('active'); });
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) modal.classList.remove('active');
+  });
+})();
+
 // ─── Fade-in on scroll ───
 const obs = new IntersectionObserver((entries) => {
   entries.forEach(e => {
