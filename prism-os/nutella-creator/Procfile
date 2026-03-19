@@ -1,1 +1,1 @@
-web: python3 boot.py && python3 dashboard.py
+web: python3 auth_proxy.py
