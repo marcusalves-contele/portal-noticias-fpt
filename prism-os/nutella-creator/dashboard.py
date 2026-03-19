@@ -470,6 +470,11 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_feedback(body)
         elif path == "/api/studio/chat":
             self._handle_studio_chat(body)
+        elif path.startswith("/api/studio/session/") and path.endswith("/delete"):
+            session_id = path.split("/api/studio/session/")[1].removesuffix("/delete")
+            from studio_chat import delete_session
+            deleted = delete_session(session_id)
+            self._json({"ok": True, "deleted": deleted})
         else:
             self._json({"error": "not found"}, 404)
 

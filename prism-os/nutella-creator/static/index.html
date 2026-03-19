@@ -1786,6 +1786,7 @@
       cursor: pointer;
       transition: all 0.15s;
       margin-bottom: 2px;
+      position: relative;
     }
     .studio-session-item:hover { background: var(--surface-3); }
     .studio-session-item.active { background: var(--purple-subtle); border: 1px solid rgba(139,35,229,0.2); }
@@ -1795,6 +1796,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      padding-right: 20px;
     }
     .studio-session-item .ss-meta {
       font-size: 11px;
@@ -1802,6 +1804,27 @@
       margin-top: 2px;
       font-family: var(--font-mono);
     }
+    .studio-session-delete {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      opacity: 0;
+      transition: opacity 0.15s, color 0.15s, background 0.15s;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .studio-session-item:hover .studio-session-delete { opacity: 1; }
+    .studio-session-delete:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
 
     .studio-back {
       padding: 12px 16px;
@@ -1957,6 +1980,19 @@
       font-family: var(--font-mono);
       padding: 8px 0;
     }
+    .studio-model-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      background: var(--surface-3);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      margin-left: 4px;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
     .studio-msg-progress .spinner-dot {
       width: 6px;
       height: 6px;
@@ -2019,6 +2055,124 @@
     .studio-send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
     .studio-send-btn svg { width: 18px; height: 18px; }
 
+    /* Issue #31: Upload button */
+    .studio-upload-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .studio-upload-btn:hover {
+      border-color: var(--purple);
+      color: var(--purple);
+      background: var(--purple-subtle);
+    }
+    .studio-upload-btn svg { width: 18px; height: 18px; }
+
+    /* Issue #31: Image preview above input */
+    .studio-preview {
+      display: none;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0 0;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .studio-preview.visible { display: flex; }
+    .studio-preview-thumb {
+      position: relative;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .studio-preview-thumb img {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      display: block;
+    }
+    .studio-preview-remove {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+    .studio-preview-remove:hover { background: #ef4444; }
+    .studio-preview-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* Issue #31: Drag-and-drop visual feedback */
+    .studio-drag-active {
+      border: 2px dashed var(--purple) !important;
+      background: var(--purple-subtle) !important;
+      border-radius: 0;
+    }
+
+    /* Studio empty chips */
+    .studio-empty-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      max-width: 480px;
+      margin-top: 4px;
+    }
+    .studio-empty-chip {
+      padding: 7px 13px;
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-family: var(--font-mono);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: left;
+      line-height: 1.4;
+    }
+    .studio-empty-chip:hover {
+      border-color: var(--purple);
+      color: var(--purple);
+      background: var(--purple-subtle);
+    }
+
+    /* Studio image download link */
+    .studio-msg-download {
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .studio-msg-download:hover { color: var(--purple); }
+
     /* Studio lightbox */
     .studio-lightbox {
       position: fixed;
@@ -2037,6 +2191,69 @@
       border-radius: 8px;
       box-shadow: 0 0 60px rgba(139,35,229,0.2);
     }
+    .studio-lightbox-download {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(139,35,229,0.85);
+      color: white;
+      font-size: 13px;
+      font-family: var(--font-mono);
+      border-radius: 24px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      backdrop-filter: blur(4px);
+      z-index: 10001;
+    }
+    .studio-lightbox-download:hover { background: rgba(139,35,229,1); }
+
+    /* Issue #32: Markdown in assistant bubbles */
+    .studio-msg-bubble code {
+      font-family: var(--font-mono);
+      background: var(--surface-3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12.5px;
+    }
+    .studio-msg-bubble strong { font-weight: 600; }
+    .studio-msg-bubble ul {
+      padding-left: 20px;
+      margin: 8px 0;
+    }
+    .studio-msg-bubble li { margin: 4px 0; }
+
+    /* Issue #38: Copy button on assistant messages */
+    .studio-msg-body { position: relative; }
+    .studio-msg-actions {
+      position: absolute;
+      top: -4px;
+      right: 0;
+      opacity: 0;
+      transition: opacity 0.15s;
+      display: flex;
+      gap: 4px;
+    }
+    .studio-msg:hover .studio-msg-actions { opacity: 1; }
+    .studio-msg-copy-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.15s;
+    }
+    .studio-msg-copy-btn:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-subtle); }
+    .studio-msg-copy-btn svg { width: 13px; height: 13px; }
 
     @media (max-width: 768px) {
       .studio-sidebar { display: none; }
@@ -2760,15 +2977,31 @@
           <div class="studio-empty" id="studioEmpty">
             <div class="studio-empty-icon">&#9671;</div>
             <div class="studio-empty-title">Studio</div>
-            <div class="studio-empty-hint">
-              Descreva a thumbnail que voce quer.<br>
-              Ex: "Thumb do Julio surpreso com texto COMO REDUZIR 40% DO COMBUSTIVEL"<br>
-              Voce pode pedir edicoes na imagem gerada.
-            </div>
+            <div class="studio-empty-hint">Descreva a thumbnail que voce quer.<br>Voce pode pedir edicoes na imagem gerada.</div>
+            <div class="studio-empty-chips" id="studioEmptyChips"></div>
           </div>
         </div>
         <div class="studio-input-area">
+          <!-- Issue #31: Image preview strip -->
+          <div class="studio-preview" id="studioPreview">
+            <div class="studio-preview-thumb">
+              <img id="studioPreviewImg" src="" alt="preview">
+              <button class="studio-preview-remove" onclick="studioRemoveImage()" title="Remover imagem">&times;</button>
+            </div>
+            <span class="studio-preview-label" id="studioPreviewLabel"></span>
+          </div>
+          <!-- Issue #31: Hidden file input -->
+          <input type="file" id="studioFileInput" accept="image/jpeg,image/png,image/webp"
+            style="display:none" onchange="studioHandleFile(this.files[0])">
           <div class="studio-input-wrap">
+            <!-- Issue #31: Upload button before textarea -->
+            <button class="studio-upload-btn" onclick="document.getElementById('studioFileInput').click()" title="Anexar imagem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </button>
             <textarea class="studio-textarea" id="studioInput"
               placeholder="Descreva a thumbnail..."
               rows="1"
@@ -2787,8 +3020,12 @@
   </div>
 
   <!-- Studio Lightbox -->
-  <div class="studio-lightbox" id="studioLightbox" onclick="studioCloseLightbox()">
+  <div class="studio-lightbox" id="studioLightbox" onclick="studioCloseLightbox(event)">
     <img id="studioLightboxImg" src="">
+    <a id="studioLightboxDownload" class="studio-lightbox-download" download onclick="event.stopPropagation()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download
+    </a>
   </div>
 
   <!-- Overlay -->
@@ -5275,26 +5512,70 @@
     let studioSessionId = null;
     let studioSending = false;
     let studioProgressEl = null;
+    // Issue #31: attached image state
+    let studioAttachedImage = null; // base64 string WITHOUT data:... prefix
+
+    function studioTimeAgo(ts) {
+      if (!ts) return '';
+      const now = Math.floor(Date.now() / 1000);
+      const diff = now - ts;
+      if (diff < 60) return 'agora';
+      if (diff < 3600) return 'ha ' + Math.floor(diff / 60) + 'min';
+      if (diff < 86400) return 'ha ' + Math.floor(diff / 3600) + 'h';
+      const d = new Date(ts * 1000);
+      const today = new Date();
+      const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+      if (d.toDateString() === yesterday.toDateString()) return 'ontem';
+      const months = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+      return d.getDate() + '/' + months[d.getMonth()];
+    }
+
+    const STUDIO_EXAMPLES = [
+      'Thumb do Julio surpreso com texto COMO REDUZIR 40% DO COMBUSTIVEL',
+      'Thumb do Leonardo sorrindo, fundo azul, texto GESTAO DE EQUIPES',
+      'Muda o fundo pra mais escuro e o texto pra vermelho',
+      'Quais expressoes o Julio tem disponivel?'
+    ];
+
+    function studioEmptyHtml() {
+      const chips = STUDIO_EXAMPLES.map((ex, i) =>
+        `<button class="studio-empty-chip" onclick="studioFillExample(${i})">${_esc(ex)}</button>`
+      ).join('');
+      return `
+        <div class="studio-empty" id="studioEmpty">
+          <div class="studio-empty-icon">&#9671;</div>
+          <div class="studio-empty-title">Studio</div>
+          <div class="studio-empty-hint">Descreva a thumbnail que voce quer.<br>Voce pode pedir edicoes na imagem gerada.</div>
+          <div class="studio-empty-chips">${chips}</div>
+        </div>`;
+    }
+
+    function studioFillExample(idx) {
+      const input = document.getElementById('studioInput');
+      input.value = STUDIO_EXAMPLES[idx];
+      studioAutoResize(input);
+      input.focus();
+    }
 
     function studioInit() {
       studioLoadSessions();
       if (!studioSessionId) studioNewChat();
       document.getElementById('studioInput').focus();
+      // Populate chips on initial empty state
+      const chipsEl = document.getElementById('studioEmptyChips');
+      if (chipsEl) {
+        chipsEl.innerHTML = STUDIO_EXAMPLES.map((ex, i) =>
+          `<button class="studio-empty-chip" onclick="studioFillExample(${i})">${_esc(ex)}</button>`
+        ).join('');
+      }
+      // Issue #31: Setup drag-and-drop
+      studioInitDragDrop();
     }
 
     function studioNewChat() {
       studioSessionId = crypto.randomUUID().slice(0, 8);
       const msgs = document.getElementById('studioMessages');
-      msgs.innerHTML = `
-        <div class="studio-empty" id="studioEmpty">
-          <div class="studio-empty-icon">&#9671;</div>
-          <div class="studio-empty-title">Studio</div>
-          <div class="studio-empty-hint">
-            Descreva a thumbnail que voce quer.<br>
-            Ex: "Thumb do Julio surpreso com texto COMO REDUZIR 40% DO COMBUSTIVEL"<br>
-            Voce pode pedir edicoes na imagem gerada.
-          </div>
-        </div>`;
+      msgs.innerHTML = studioEmptyHtml();
       document.querySelectorAll('.studio-session-item').forEach(el => el.classList.remove('active'));
       document.getElementById('studioInput').focus();
     }
@@ -5311,9 +5592,11 @@
         container.innerHTML = data.sessions.map(s => {
           const active = s.session_id === studioSessionId ? ' active' : '';
           const imgs = s.has_images ? ' · &#128247;' : '';
+          const ts = s.last_ts ? ' · ' + studioTimeAgo(s.last_ts) : '';
           return `<div class="studio-session-item${active}" onclick="studioLoadSession('${s.session_id}')">
             <div class="ss-title">${_esc(s.title)}</div>
-            <div class="ss-meta">${s.message_count} msgs${imgs}</div>
+            <div class="ss-meta">${s.message_count} msgs${imgs}${ts}</div>
+            <button class="studio-session-delete" onclick="studioDeleteSession('${s.session_id}', event)" title="Deletar conversa">&times;</button>
           </div>`;
         }).join('');
       } catch(e) {
@@ -5352,13 +5635,35 @@
       const avatarText = role === 'user' ? 'M' : 'P';
       let imgHtml = '';
       if (imageUrl) {
-        imgHtml = `<div class="studio-msg-image" onclick="studioOpenLightbox('${imageUrl}')"><img src="${imageUrl}" loading="lazy"></div>`;
+        const filename = imageUrl.split('/').pop().replace(/^studio_/, '');
+        imgHtml = `
+          <div class="studio-msg-image" onclick="studioOpenLightbox('${imageUrl}')"><img src="${imageUrl}" loading="lazy"></div>
+          <a class="studio-msg-download" href="${imageUrl}" download="${filename}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            ${filename}
+          </a>`;
       }
+
+      // Issue #32: render markdown for assistant, escape for user
+      const bubbleContent = role === 'assistant' ? _renderMd(text) : _esc(text);
+      // Issue #38: store raw text as data attribute for copy
+      const rawAttr = role === 'assistant' ? ` data-raw="${_esc(text)}"` : '';
+      // Issue #38: copy button for assistant messages
+      const actionsHtml = role === 'assistant' ? `
+        <div class="studio-msg-actions">
+          <button class="studio-msg-copy-btn" onclick="studioCopyText(this)" title="Copiar texto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </button>
+        </div>` : '';
 
       div.innerHTML = `
         <div class="studio-msg-avatar">${avatarText}</div>
         <div class="studio-msg-body">
-          <div class="studio-msg-bubble">${_esc(text)}</div>
+          ${actionsHtml}
+          <div class="studio-msg-bubble"${rawAttr}>${bubbleContent}</div>
           ${imgHtml}
         </div>`;
       msgs.appendChild(div);
@@ -5386,9 +5691,15 @@
       studioScrollBottom();
     }
 
-    function studioUpdateProgress(text) {
+    function studioUpdateProgress(text, model) {
       const el = document.getElementById('studioProgressText');
-      if (el) el.textContent = text;
+      if (el) {
+        if (model) {
+          el.innerHTML = _esc(text) + `<span class="studio-model-badge">${_esc(model)}</span>`;
+        } else {
+          el.textContent = text;
+        }
+      }
       studioScrollBottom();
     }
 
@@ -5416,6 +5727,68 @@
       el.style.height = Math.min(el.scrollHeight, 160) + 'px';
     }
 
+    // Issue #31: Handle file selection (from input or drag-and-drop)
+    function studioHandleFile(file) {
+      if (!file) return;
+      if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
+        toast('Formato nao suportado. Use JPG, PNG ou WEBP.', 'error');
+        return;
+      }
+      const MAX_BYTES = 10 * 1024 * 1024; // 10MB
+      if (file.size > MAX_BYTES) {
+        toast('Imagem muito grande. Max 10MB.', 'error');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const dataUrl = e.target.result; // "data:image/...;base64,XXXX"
+        studioAttachedImage = dataUrl.split(',')[1]; // strip prefix
+        // Show preview
+        document.getElementById('studioPreviewImg').src = dataUrl;
+        document.getElementById('studioPreviewLabel').textContent = file.name + ' (' + (file.size / 1024).toFixed(0) + ' KB)';
+        document.getElementById('studioPreview').classList.add('visible');
+      };
+      reader.readAsDataURL(file);
+      // Reset input so same file can be re-selected
+      document.getElementById('studioFileInput').value = '';
+    }
+
+    function studioRemoveImage() {
+      studioAttachedImage = null;
+      document.getElementById('studioPreview').classList.remove('visible');
+      document.getElementById('studioPreviewImg').src = '';
+      document.getElementById('studioPreviewLabel').textContent = '';
+    }
+
+    // Issue #31: Drag-and-drop setup — called from studioInit
+    function studioInitDragDrop() {
+      const dropZone = document.getElementById('studioMessages');
+      if (!dropZone) return;
+
+      dropZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        dropZone.classList.add('studio-drag-active');
+      });
+
+      dropZone.addEventListener('dragleave', function(e) {
+        // Only remove if leaving the element itself (not entering a child)
+        if (!dropZone.contains(e.relatedTarget)) {
+          dropZone.classList.remove('studio-drag-active');
+        }
+      });
+
+      dropZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        dropZone.classList.remove('studio-drag-active');
+        const file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+          studioHandleFile(file);
+        } else if (file) {
+          toast('Apenas imagens sao aceitas.', 'error');
+        }
+      });
+    }
+
     async function studioSend() {
       if (studioSending) return;
       const input = document.getElementById('studioInput');
@@ -5427,16 +5800,33 @@
       input.value = '';
       input.style.height = 'auto';
 
-      // Add user message
-      studioAppendMsg('user', message, null);
+      // Issue #31: capture and clear image before sending
+      const attachedImage = studioAttachedImage;
+      if (attachedImage) studioRemoveImage();
+
+      // Add user message — show inline preview if image was attached
+      const userMsgEl = studioAppendMsg('user', message, null);
+      if (attachedImage && userMsgEl) {
+        const bubble = userMsgEl.querySelector('.studio-msg-bubble');
+        if (bubble) {
+          const previewEl = document.createElement('div');
+          previewEl.style.cssText = 'margin-top:8px;';
+          previewEl.innerHTML = '<img src="data:image/jpeg;base64,' + attachedImage + '" style="max-width:180px;max-height:120px;border-radius:8px;object-fit:cover;border:1px solid var(--border);" alt="imagem anexada">';
+          bubble.after(previewEl);
+        }
+      }
       studioScrollBottom();
       studioShowProgress('Enviando...');
+
+      // Build POST body — include image_b64 if present
+      const body = { message, session_id: studioSessionId };
+      if (attachedImage) body.image_b64 = attachedImage;
 
       try {
         const resp = await fetch('/api/studio/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message, session_id: studioSessionId })
+          body: JSON.stringify(body)
         });
         const data = await resp.json();
 
@@ -5452,7 +5842,7 @@
 
         es.addEventListener('progress', e => {
           const d = JSON.parse(e.data);
-          studioUpdateProgress(d.msg || d.message || 'Processando...');
+          studioUpdateProgress(d.msg || d.message || 'Processando...', d.model || null);
         });
 
         es.addEventListener('complete', e => {
@@ -5497,10 +5887,14 @@
 
     function studioOpenLightbox(src) {
       document.getElementById('studioLightboxImg').src = src;
+      const dl = document.getElementById('studioLightboxDownload');
+      dl.href = src;
+      dl.download = src.split('/').pop().replace(/^studio_/, '');
       document.getElementById('studioLightbox').classList.add('active');
     }
 
-    function studioCloseLightbox() {
+    function studioCloseLightbox(e) {
+      if (e && e.target !== document.getElementById('studioLightbox') && e.target !== document.getElementById('studioLightboxImg')) return;
       document.getElementById('studioLightbox').classList.remove('active');
     }
 
@@ -5511,8 +5905,73 @@
       return d.innerHTML;
     }
 
+    // Issue #32: Mini markdown renderer (no CDN)
+    function _renderMd(str) {
+      if (!str) return '';
+      // Sanitize first
+      let s = _esc(str);
+      // Bold: **text** or __text__
+      s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      s = s.replace(/__(.+?)__/g, '<strong>$1</strong>');
+      // Italic: *text* or _text_ (single, not double)
+      s = s.replace(/\*([^*\n]+?)\*/g, '<em>$1</em>');
+      s = s.replace(/_([^_\n]+?)_/g, '<em>$1</em>');
+      // Inline code: `code`
+      s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+      // List items: lines starting with - or *
+      // Split into lines, process lists, rejoin
+      const lines = s.split('\n');
+      const out = [];
+      let inList = false;
+      for (const line of lines) {
+        const listMatch = line.match(/^[-*]\s+(.+)$/);
+        if (listMatch) {
+          if (!inList) { out.push('<ul>'); inList = true; }
+          out.push('<li>' + listMatch[1] + '</li>');
+        } else {
+          if (inList) { out.push('</ul>'); inList = false; }
+          out.push(line);
+        }
+      }
+      if (inList) out.push('</ul>');
+      // Join with <br> for non-list lines, but ul blocks already have block display
+      return out.join('<br>').replace(/<\/ul><br>/g, '</ul>').replace(/<br><ul>/g, '<ul>');
+    }
+
+    // Issue #34: Delete session
+    async function studioDeleteSession(sessionId, event) {
+      event.stopPropagation();
+      if (!confirm('Deletar essa conversa?')) return;
+      try {
+        await fetch('/api/studio/session/' + sessionId + '/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        // If deleting active session, open a new chat
+        if (studioSessionId === sessionId) {
+          studioNewChat();
+        }
+        studioLoadSessions();
+      } catch(e) {
+        toast('Erro ao deletar sessao', 'error');
+      }
+    }
+
+    // Issue #38: Copy text of assistant message
+    async function studioCopyText(btn) {
+      const bubble = btn.closest('.studio-msg-body').querySelector('.studio-msg-bubble');
+      const raw = bubble ? bubble.dataset.raw : '';
+      if (!raw) return;
+      try {
+        await navigator.clipboard.writeText(raw);
+        toast('Copiado');
+      } catch(e) {
+        toast('Erro ao copiar', 'error');
+      }
+    }
+
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') studioCloseLightbox();
+      if (e.key === 'Escape') document.getElementById('studioLightbox').classList.remove('active');
     });
 
     // ===== INIT =====

@@ -272,6 +272,14 @@ def get_session(session_id: str) -> list[dict]:
     return _sessions[session_id]
 
 
+def delete_session(session_id: str) -> bool:
+    """Delete a session from memory. Returns True if it existed."""
+    if session_id in _sessions:
+        del _sessions[session_id]
+        return True
+    return False
+
+
 def list_sessions() -> list[dict]:
     """List all sessions with summary info."""
     result = []
@@ -298,9 +306,12 @@ def run_pipeline(message: str, image_b64: str | None, session_id: str,
     Returns: {"text": str, "image_url": str | None, "error": str | None}
     """
 
-    def emit(step, msg):
+    def emit(step, msg, model=None):
         if progress_cb:
-            progress_cb({"step": step, "msg": msg})
+            payload = {"step": step, "msg": msg}
+            if model:
+                payload["model"] = model
+            progress_cb(payload)
 
     history = get_session(session_id)
     user_entry = {"role": "user", "text": message, "image_path": None, "ts": time.time()}
@@ -318,11 +329,11 @@ def run_pipeline(message: str, image_b64: str | None, session_id: str,
     history.append(user_entry)
 
     # Step 1: Parse intent
-    emit("intent", "Interpretando pedido...")
+    emit("intent", "Interpretando pedido...", "Gemini Flash")
     intent = parse_intent(message, history, api_key)
     action = intent.get("action", "question")
     summary = intent.get("summary", "")
-    emit("intent", f"Entendi: {summary}")
+    emit("intent", f"Entendi: {summary}", "Gemini Flash")
 
     # Handle questions
     if action == "question":
@@ -366,12 +377,12 @@ def run_pipeline(message: str, image_b64: str | None, session_id: str,
             f"CHANGES REQUESTED: {feedback}\n"
             f"Keep everything else the same. Only apply the requested changes."
         )
-        emit("generate", "Editando imagem...")
+        emit("generate", "Editando imagem...", "Nano Banana 2")
         result_path = _edit_image(api_key, base_image_path, edit_prompt, refs[:2], output_name)
     else:
         emit("prompt", "Montando prompt...")
         prompt = _build_prompt(intent)
-        emit("generate", "Gerando thumbnail...")
+        emit("generate", "Gerando thumbnail...", "Gemini Pro")
         result_path = _generate_image(api_key, prompt, refs, output_name)
 
     if result_path:
