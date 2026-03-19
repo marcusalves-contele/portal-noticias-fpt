@@ -31,5 +31,42 @@ def bootstrap():
     if gemini_key:
         print("GEMINI_NANO_BANANA_KEY found in env")
 
+    # Persistent volume: symlink output/ and downloads/ to volume mount
+    # Volume mounted at /app/nutella-creator/data by Railway
+    volume_path = Path("/app/nutella-creator/data")
+    project_dir = Path(__file__).parent
+    if volume_path.exists() and os.environ.get("RAILWAY_ENVIRONMENT"):
+        for dirname in ["output", "downloads"]:
+            vol_dir = volume_path / dirname
+            local_dir = project_dir / dirname
+            vol_dir.mkdir(parents=True, exist_ok=True)
+            # Remove existing dir/symlink and create symlink to volume
+            if local_dir.is_symlink():
+                pass  # Already linked
+            elif local_dir.is_dir():
+                # Move any existing files to volume first
+                import shutil
+                for item in local_dir.iterdir():
+                    dest = vol_dir / item.name
+                    if not dest.exists():
+                        shutil.move(str(item), str(dest))
+                local_dir.rmdir()
+                local_dir.symlink_to(vol_dir)
+                print(f"Linked {dirname}/ -> {vol_dir} (moved existing files)")
+            else:
+                local_dir.symlink_to(vol_dir)
+                print(f"Linked {dirname}/ -> {vol_dir}")
+        # Also persist operational_memory.json
+        mem_vol = volume_path / "operational_memory.json"
+        mem_local = project_dir / "operational_memory.json"
+        if mem_vol.exists() and not mem_local.exists():
+            mem_local.symlink_to(mem_vol)
+            print(f"Linked operational_memory.json -> {mem_vol}")
+        elif mem_local.exists() and not mem_local.is_symlink():
+            shutil.copy2(str(mem_local), str(mem_vol))
+            mem_local.unlink()
+            mem_local.symlink_to(mem_vol)
+            print(f"Migrated operational_memory.json -> {mem_vol}")
+
 if __name__ == "__main__":
     bootstrap()
