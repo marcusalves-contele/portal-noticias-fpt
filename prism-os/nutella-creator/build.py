@@ -175,6 +175,8 @@ def download_video(video_id: str) -> Path:
         "yt-dlp",
         "-f", "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4][height<=1080]/best",
         "--merge-output-format", "mp4",
+        "--socket-timeout", "30",
+        "--retries", "2",
         *cookies_arg,
         "-o", out_tmpl,
         url,
@@ -187,7 +189,14 @@ def download_video(video_id: str) -> Path:
     print(f"  Baixando {video_id} via yt-dlp...")
 
     for attempt in range(max_retries):
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        except subprocess.TimeoutExpired:
+            last_error = "Download travou (timeout 120s). YouTube pode estar bloqueando o IP. Configure cookies.txt para autenticar."
+            print(f"  Tentativa {attempt + 1}: timeout")
+            if attempt < max_retries - 1:
+                time.sleep(delays[attempt])
+            continue
 
         if result.returncode == 0:
             downloaded = list(DOWNLOADS_DIR.glob(f"{video_id}.*"))
