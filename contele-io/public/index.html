@@ -28,9 +28,9 @@
       --cyan: #29BDFF;
       --purple: #8B23E5;
       --purple-deep: #4E0091;
-      --void: #0c0c14;
-      --deep: #12121e;
-      --surface: #1a1a2e;
+      --void: #20252E;
+      --deep: #1a1e28;
+      --surface: #242a36;
       --border: rgba(74, 88, 255, 0.10);
       --border-h: rgba(74, 88, 255, 0.25);
       --text: #d8d8e8;
@@ -55,7 +55,7 @@
     /* HEADER */
     header {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(12,12,20,0.92);
+      background: rgba(32,37,46,0.95);
       backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
       border-bottom: 1px solid var(--border);
     }
@@ -101,7 +101,15 @@
       font-family: var(--brand); font-size: 12px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--blue-light); margin-bottom: 16px;
       animation: slideInLeft 0.8s ease both;
     }
-    .hero h1 { animation: fadeUp 0.9s ease 0.2s both; }
+    .hero h1 { animation: fadeUp 0.9s ease 0.2s both; font-family: var(--brand); font-weight: 900; }
+    .hero-slogan { font-family: var(--brand); font-size: 14px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.5px; margin-top: -12px; margin-bottom: 20px; animation: fadeUp 0.9s ease 0.3s both; }
+
+    /* PADRONAGEM ESPIRAL (brand manual p.15) */
+    .hero-pattern {
+      position: absolute; top: 50%; right: -5%; transform: translateY(-50%);
+      width: 500px; height: 500px; pointer-events: none; z-index: 0; opacity: 0.04;
+    }
+    .hero-pattern svg { width: 100%; height: 100%; }
     .hero-p { animation: fadeUp 0.9s ease 0.4s both; }
     .hero-leaders { animation: fadeUp 0.9s ease 0.6s both; }
     .hero-btns { animation: fadeUp 0.9s ease 0.7s both; }
@@ -126,7 +134,7 @@
     /* STRIP */
     .strip { padding: 56px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
     .strip-g { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; text-align: center; }
-    .strip-n { font-family: var(--heading); font-size: 42px; color: var(--white); line-height: 1; }
+    .strip-n { font-family: var(--brand); font-size: 42px; font-weight: 900; color: var(--white); line-height: 1; }
     .strip-n span { color: var(--blue-light); }
     .strip-l { font-size: 13px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
     .strip-5 { grid-template-columns: repeat(5, 1fr); }
@@ -367,11 +375,25 @@
 
 <!-- HERO -->
 <section class="hero">
+  <div class="hero-pattern">
+    <svg viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="250" cy="250" r="60" stroke="#29BDFF" stroke-width="1.5"/>
+      <circle cx="250" cy="250" r="100" stroke="#4A58FF" stroke-width="1.2"/>
+      <circle cx="250" cy="250" r="140" stroke="#29BDFF" stroke-width="1"/>
+      <circle cx="250" cy="250" r="180" stroke="#4A58FF" stroke-width="0.8"/>
+      <circle cx="250" cy="250" r="220" stroke="#29BDFF" stroke-width="0.6"/>
+      <path d="M250 30 Q350 150 250 250 Q150 350 250 470" stroke="#4A58FF" stroke-width="1" fill="none"/>
+      <path d="M30 250 Q150 150 250 250 Q350 350 470 250" stroke="#29BDFF" stroke-width="1" fill="none"/>
+      <path d="M100 100 Q250 200 400 100" stroke="#4A58FF" stroke-width="0.8" fill="none"/>
+      <path d="M100 400 Q250 300 400 400" stroke="#29BDFF" stroke-width="0.8" fill="none"/>
+    </svg>
+  </div>
   <div class="w">
     <div class="hero-g">
       <div>
         <div class="hero-tag">Desde 2003</div>
         <h1>Frotas que custam menos.<br>Equipes que entregam <em>mais.</em></h1>
+        <p class="hero-slogan">Conectando caminhos, otimizando jornadas.</p>
         <p class="hero-p">Software para quem gerencia frota ou equipe em campo. Equipe própria de engenharia, integração e IA. 50 pessoas, 1.500+ empresas, 7 países.</p>
         <div class="hero-leaders">
           <img src="/img/julio.png" alt="Julio César">
@@ -813,24 +835,6 @@
     <div class="s-tag">Time</div>
     <h2 class="s-title">50 pessoas. IA onde faz sentido. Humano onde importa.</h2>
     <p class="s-sub">Time enxuto que resolve. Automação no repetitivo, gente de verdade no que exige contexto e empatia.</p>
-    <div class="team-g">
-      <div class="tm">
-        <img src="/img/fernanda-uniforme.png" alt="Fernanda">
-        <div class="tm-info"><strong>Fernanda</strong><small>Produto</small></div>
-      </div>
-      <div class="tm">
-        <img src="/img/chris-uniforme.png" alt="Christopher">
-        <div class="tm-info"><strong>Christopher</strong><small>Marketing</small></div>
-      </div>
-      <div class="tm">
-        <img src="/img/nathaly-uniforme.png" alt="Nathaly">
-        <div class="tm-info"><strong>Nathaly</strong><small>Onboarding</small></div>
-      </div>
-      <div class="tm">
-        <img src="/img/luana-uniforme.png" alt="Luana">
-        <div class="tm-info"><strong>Luana</strong><small>Customer Success</small></div>
-      </div>
-    </div>
     <div class="event-banner">
       <img src="/img/evento-1.png" alt="Equipe Contele reunida em evento presencial">
     </div>
@@ -882,7 +886,8 @@
     <div class="ft-g">
       <div class="ft-brand">
         <img src="/logo-contele-branco.png" alt="Contele">
-        <p>Gestão de frotas e equipes externas com metodologia, IA e atendimento humano. Santos/SP, desde 2003.</p>
+        <p style="font-style:italic;color:var(--text-dim);margin-bottom:8px;">Conectando caminhos, otimizando jornadas.</p>
+        <p>Gestão de frotas e equipes externas. Santos/SP, desde 2003.</p>
       </div>
       <div class="ft-col">
         <h4>Produtos</h4>
