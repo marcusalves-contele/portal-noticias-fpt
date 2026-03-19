@@ -4997,5 +4997,15 @@ document.getElementById('feedbackOverlay').addEventListener('click', function(e)
 });
 </script>
 
+<!-- Version Footer -->
+<div id="versionFooter" style="position:fixed;bottom:8px;left:16px;font-size:11px;color:var(--text-muted);font-family:'IBM Plex Mono',monospace;z-index:100;">
+  <span id="versionText">PRISM OS</span> · <a href="https://github.com/contele/growth/releases" target="_blank" style="color:var(--text-muted);text-decoration:none;">Changelog</a>
+</div>
+<script>
+fetch('/api/version').then(r=>r.json()).then(d=>{
+  document.getElementById('versionText').textContent='PRISM OS v'+d.version;
+}).catch(()=>{});
+</script>
+
 </body>
 </html>

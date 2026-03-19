@@ -35,6 +35,7 @@ from datetime import datetime
 PROJECT_DIR = Path(__file__).parent
 OUTPUT_DIR  = PROJECT_DIR / "output"
 STATIC_DIR  = PROJECT_DIR / "static"
+VERSION     = (PROJECT_DIR / "VERSION").read_text().strip() if (PROJECT_DIR / "VERSION").exists() else "dev"
 
 # Progress queues per job
 _jobs: dict[str, dict] = {}
@@ -263,7 +264,9 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         path = parsed.path
 
         # API routes
-        if path == "/api/videos":
+        if path == "/api/version":
+            self._json({"version": VERSION, "changelog": "https://github.com/contele/growth/releases"})
+        elif path == "/api/videos":
             self._handle_list_videos()
         elif path == "/api/video-title":
             self._handle_video_title(parsed.query)
