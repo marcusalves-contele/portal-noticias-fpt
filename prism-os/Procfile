@@ -1,1 +1,1 @@
-web: cd nutella-creator && python3 boot.py && python3 dashboard.py
+web: cd nutella-creator && python3 auth_proxy.py
