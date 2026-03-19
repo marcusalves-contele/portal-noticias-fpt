@@ -110,7 +110,46 @@ Linhas com "Tarefa no Asana" preenchido = pendentes.
 | Thumbnails nutella (face-lock) | `gemini-3.1-flash-image-preview` (Nano Banana 2) |
 | Análise / briefing | `gemini-3-flash-preview` |
 
-**API Key**: `GEMINI_NANO_BANANA_KEY` (`.env` em cada submodule)
+**API Key**: `GEMINI_NANO_BANANA_KEY` (env var no Railway, `.env` local)
+
+---
+
+## Deploy Railway
+
+**Servico**: `prism-os` no projeto `growth` | **Auto-deploy**: push para `master`
+
+### Armadilhas conhecidas (19/mar/2026)
+
+1. **youtube-transcript-api bloqueado**: YouTube bloqueia IPs de cloud (Railway/AWS/GCP).
+   `suggest.py` tem fallback automatico via yt-dlp (`--write-auto-sub`).
+   Se ambos falharem, configurar `cookies.txt` no container.
+
+2. **libxcb.so.1 / OpenCV / mediapipe**: container precisa de libs X11.
+   `nixpacks.toml` tem `nixPkgs` (xorg.libxcb, libGL, glib) + `aptPkgs`.
+   Se mediapipe nao carregar, `build.py` usa letterbox (sem face detection).
+   NUNCA remover o fallback graceful do import cv2/mediapipe.
+
+3. **.env nao existe em producao**: Railway injeta env vars, nao tem `.env` file.
+   Todo `load_api_key()` DEVE preferir `os.environ.get()` antes de ler `.env`.
+   Validar qualquer novo script que leia `.env` diretamente.
+
+4. **Dados se perdem no redeploy**: output/, downloads/, state.json resetam.
+   Issue #54 aberta para montar Railway Volume.
+   Ate resolver: dados sao efemeros, time precisa re-processar apos deploy.
+
+5. **Docker layer cache**: nixpacks cacheia layers agressivamente.
+   Mudar apenas `aptPkgs` pode nao invalidar o cache.
+   Para forcar rebuild: alterar `nixPkgs` (muda o hash da layer nix).
+
+### Env vars obrigatorias (Railway)
+
+| Var | Uso |
+|-----|-----|
+| `GEMINI_NANO_BANANA_KEY` | API Gemini (thumbs, analise) |
+| `YOUTUBE_TOKEN_B64` | OAuth YouTube (base64 pickle) |
+| `SHEETS_TOKEN_B64` | Google Sheets (base64 pickle) |
+| `GITHUB_TOKEN` | Criar issues via feedback |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Login OAuth dashboard |
 
 ---
 
