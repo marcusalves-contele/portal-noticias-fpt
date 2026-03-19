@@ -83,30 +83,30 @@ def time_to_seconds(t: str) -> int:
 
 
 def _get_transcript_ytdlp(video_id: str) -> list[dict]:
-    """Fallback: extrai legendas via yt-dlp (funciona em IPs de cloud)."""
-    import subprocess, tempfile, re as _re
+    """Fallback 1: extrai legendas via yt-dlp."""
+    import subprocess, tempfile
     cookies_file = Path(__file__).parent / "cookies.txt"
     cookies_arg = ["--cookies", str(cookies_file)] if cookies_file.exists() else []
 
     with tempfile.TemporaryDirectory(prefix="transcript_") as tmp:
         tmp_path = Path(tmp)
+        # Tenta auto-sub E sub manual
         cmd = [
             "yt-dlp",
-            "--write-auto-sub", "--sub-lang", "pt,pt-BR,en",
+            "--write-auto-sub", "--write-sub",
+            "--sub-lang", "pt,pt-BR,en",
             "--sub-format", "json3",
             "--skip-download",
             *cookies_arg,
             "-o", str(tmp_path / "sub"),
             f"https://youtube.com/watch?v={video_id}",
         ]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        subprocess.run(cmd, capture_output=True, text=True, timeout=60)
 
-        # Find the downloaded subtitle file
         sub_files = list(tmp_path.glob("*.json3"))
         if not sub_files:
             raise RuntimeError(
-                f"yt-dlp nao conseguiu extrair legendas para {video_id}. "
-                f"Verifique se o video tem legendas disponiveis."
+                f"yt-dlp nao conseguiu extrair legendas para {video_id}."
             )
 
         with open(sub_files[0], encoding="utf-8") as f:
@@ -129,15 +129,98 @@ def _get_transcript_ytdlp(video_id: str) -> list[dict]:
         return segments
 
 
+def _get_transcript_youtube_api(video_id: str) -> list[dict]:
+    """Fallback 2: YouTube Data API captions (autenticado, ignora IP block)."""
+    try:
+        from upload import load_credentials, get_youtube
+    except Exception:
+        raise RuntimeError("YouTube OAuth nao configurado")
+
+    creds = load_credentials()
+    youtube = get_youtube(creds)
+
+    # Lista captions disponiveis
+    captions = youtube.captions().list(part="snippet", videoId=video_id).execute()
+    items = captions.get("items", [])
+    if not items:
+        raise RuntimeError(f"Video {video_id} nao tem legendas na API")
+
+    # Prefere pt > pt-BR > en > qualquer
+    preferred = None
+    for lang in ["pt", "pt-BR", "en"]:
+        for item in items:
+            if item["snippet"]["language"] == lang:
+                preferred = item
+                break
+        if preferred:
+            break
+    if not preferred:
+        preferred = items[0]
+
+    # Download da caption (SRT format)
+    caption_id = preferred["id"]
+    srt_data = youtube.captions().download(id=caption_id, tfmt="srt").execute()
+    if isinstance(srt_data, bytes):
+        srt_data = srt_data.decode("utf-8")
+
+    # Parse SRT
+    segments = []
+    blocks = srt_data.strip().split("\n\n")
+    for block in blocks:
+        lines = block.strip().split("\n")
+        if len(lines) >= 3:
+            time_line = lines[1]
+            text = " ".join(lines[2:]).strip()
+            # Parse "00:01:23,456 --> 00:01:25,789"
+            parts = time_line.split(" --> ")
+            if len(parts) == 2:
+                def _srt_to_sec(t):
+                    h, m, rest = t.split(":")
+                    s, ms = rest.split(",")
+                    return int(h) * 3600 + int(m) * 60 + int(s) + int(ms) / 1000
+                start = _srt_to_sec(parts[0].strip())
+                end = _srt_to_sec(parts[1].strip())
+                if text:
+                    segments.append({
+                        "start": start,
+                        "duration": end - start,
+                        "text": text,
+                    })
+    if not segments:
+        raise RuntimeError(f"Caption vazia para {video_id}")
+    return segments
+
+
 def get_transcript_with_timestamps(video_id: str) -> list[dict]:
-    # Tenta youtube-transcript-api primeiro (mais rapido)
+    # Tier 1: youtube-transcript-api (rapido, sem auth)
     try:
         api = YouTubeTranscriptApi()
         result = api.fetch(video_id, languages=["pt", "pt-BR", "en"])
+        print(f"  Transcricao via youtube-transcript-api OK")
         return [{"start": s.start, "duration": s.duration, "text": s.text} for s in result]
-    except Exception as e:
-        print(f"  youtube-transcript-api falhou ({e}), tentando yt-dlp...")
-        return _get_transcript_ytdlp(video_id)
+    except Exception as e1:
+        print(f"  Tier 1 falhou (transcript-api), tentando yt-dlp...")
+
+    # Tier 2: yt-dlp subtitles
+    try:
+        result = _get_transcript_ytdlp(video_id)
+        print(f"  Transcricao via yt-dlp OK ({len(result)} segmentos)")
+        return result
+    except Exception as e2:
+        print(f"  Tier 2 falhou (yt-dlp), tentando YouTube Data API...")
+
+    # Tier 3: YouTube Data API captions (autenticado)
+    try:
+        result = _get_transcript_youtube_api(video_id)
+        print(f"  Transcricao via YouTube API OK ({len(result)} segmentos)")
+        return result
+    except Exception as e3:
+        raise RuntimeError(
+            f"Nenhum metodo conseguiu extrair legendas para {video_id}. "
+            f"Tier1: transcript-api bloqueado. "
+            f"Tier2: yt-dlp sem legendas. "
+            f"Tier3: {e3}"
+        )
 
 
 def build_transcript_text(segments: list[dict], chunk_size: int = 90) -> str:
