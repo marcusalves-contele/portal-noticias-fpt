@@ -269,6 +269,8 @@
     .case-card.teams .case-badge { color: var(--blue-light); }
     .case-quote { font-family: var(--heading); font-size: 18px; color: var(--white); line-height: 1.45; margin-bottom: 20px; font-style: italic; }
     .case-quote::before { content: '\201C'; font-size: 40px; color: var(--blue-light); line-height: 0; vertical-align: -12px; margin-right: 2px; }
+    .case-author { font-size: 13px; color: var(--text-dim); margin-bottom: 14px; line-height: 1.4; }
+    .case-author strong { color: var(--white); font-weight: 700; }
     .case-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
     .case-result { background: rgba(74,88,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
     .case-result-v { font-family: var(--brand); font-size: 20px; font-weight: 800; color: var(--white); }
@@ -362,7 +364,7 @@
 
 <header>
   <div class="h-bar">
-    <a href="/" class="logo"><img src="/logo-contele-branco.png" alt="Contele"></a>
+    <a href="/" class="logo"><img src="/img/contele-logo-2linhas-white.svg" alt="Contele"></a>
     <nav>
       <a href="#produtos">Produtos</a>
       <a href="#metodologia">Metodologia</a>
@@ -376,17 +378,7 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-pattern">
-    <svg viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="250" cy="250" r="60" stroke="#29BDFF" stroke-width="1.5"/>
-      <circle cx="250" cy="250" r="100" stroke="#4A58FF" stroke-width="1.2"/>
-      <circle cx="250" cy="250" r="140" stroke="#29BDFF" stroke-width="1"/>
-      <circle cx="250" cy="250" r="180" stroke="#4A58FF" stroke-width="0.8"/>
-      <circle cx="250" cy="250" r="220" stroke="#29BDFF" stroke-width="0.6"/>
-      <path d="M250 30 Q350 150 250 250 Q150 350 250 470" stroke="#4A58FF" stroke-width="1" fill="none"/>
-      <path d="M30 250 Q150 150 250 250 Q350 350 470 250" stroke="#29BDFF" stroke-width="1" fill="none"/>
-      <path d="M100 100 Q250 200 400 100" stroke="#4A58FF" stroke-width="0.8" fill="none"/>
-      <path d="M100 400 Q250 300 400 400" stroke="#29BDFF" stroke-width="0.8" fill="none"/>
-    </svg>
+    <img src="/img/contele-digital-white.svg" alt="" style="width:100%;height:100%;opacity:0.04;">
   </div>
   <div class="w">
     <div class="hero-g">
@@ -452,8 +444,8 @@
         <div class="prod-header">
           <img src="/img/leonardo.png" class="prod-leader" alt="Leonardo Gazolli">
           <div class="prod-header-text">
-            <div class="prod-tag">Equipes externas</div>
-            <h3>Contele Teams</h3>
+            <img src="/img/contele-teams-white.svg" alt="Contele Teams" style="height:28px;margin-bottom:6px;">
+            <div class="prod-tag">Gestão de equipes externas</div>
           </div>
         </div>
         <div class="prod-body">
@@ -475,8 +467,8 @@
         <div class="prod-header">
           <img src="/img/julio.png" class="prod-leader" alt="Julio César">
           <div class="prod-header-text">
+            <img src="/img/contele-fleet-white.svg" alt="Contele Fleet" style="height:28px;margin-bottom:6px;">
             <div class="prod-tag">Gestão de frotas</div>
-            <h3>Contele Fleet</h3>
           </div>
         </div>
         <div class="prod-body">
@@ -606,6 +598,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 53 veículos</div>
         <div class="case-quote">O cara bateu e disse que foi nosso carro. Eu respondi: nosso carro tem câmera, vamos puxar as filmagens. O cara desistiu na hora.</div>
+        <div class="case-author"><strong>Celso Junior</strong>, Diretor</div>
         <div class="case-meta">Varejo · 6 filiais</div>
         <div class="case-result"><div class="case-result-v">Fraude evitada</div><div class="case-result-l">Câmera como prova jurídica</div></div>
       </div>
@@ -613,6 +606,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 215 licenças</div>
         <div class="case-quote">Se eu já era fã de vocês, agora nem se fala! Vocês nos mostraram o valor de uma verdadeira parceria.</div>
+        <div class="case-author"><strong>Marisa</strong>, Gestora de Operações</div>
         <div class="case-meta">Serviços · Cliente desde 2024</div>
         <div class="case-result"><div class="case-result-v">3.848 locais</div><div class="case-result-l">Recadastrados em 1 dia</div></div>
       </div>
@@ -620,6 +614,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 23 veículos</div>
         <div class="case-quote">Muito superior à Cobli. O motorista mais tiozinho consegue usar. O checklist com foto é outra pegada. Não tem comparação.</div>
+        <div class="case-author"><strong>Daniel</strong>, Gestor de Frota</div>
         <div class="case-meta">Eventos</div>
         <div class="case-result"><div class="case-result-v">Superior</div><div class="case-result-l">vs Cobli, Omnilink e Autotrac</div></div>
       </div>
@@ -627,6 +622,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 41 licenças</div>
         <div class="case-quote">Superou as expectativas. Atende 90 a 95% do que a gente demanda. Em 7 anos na companhia, era a principal dor que faltava resolver.</div>
+        <div class="case-author"><strong>Arthur</strong>, Gestor de Equipe</div>
         <div class="case-meta">Serviços Financeiros</div>
         <div class="case-result"><div class="case-result-v">95%</div><div class="case-result-l">Demandas atendidas</div></div>
       </div>
@@ -634,6 +630,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 215 veículos</div>
         <div class="case-quote">Identificação de motoristas caiu de 5 horas para instantâneo. Tudo na mão, sem precisar ficar olhando quem é.</div>
+        <div class="case-author"><strong>Ana Paula</strong>, Gestora de Frota</div>
         <div class="case-meta">Agronegócio · 210 OBD + 5 câmeras</div>
         <div class="case-result"><div class="case-result-v">5h → instantâneo</div><div class="case-result-l">Identificação de motoristas</div></div>
       </div>
@@ -641,6 +638,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 43 veículos</div>
         <div class="case-quote">Não me preocupo com o caminhão, patrimônio a gente recupera. Mas a vida do ser humano que dirige, não tem dinheiro que pague. O sistema nos dá suporte pra cuidar disso.</div>
+        <div class="case-author"><strong>Roberto</strong>, Diretor de Logística</div>
         <div class="case-meta">Distribuição</div>
         <div class="case-result"><div class="case-result-v">Segurança</div><div class="case-result-l">Videomonitoramento com IA</div></div>
       </div>
@@ -648,6 +646,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 25 licenças</div>
         <div class="case-quote">Essas informações não são pra cobrar resultado. É porque a gente pode ir atrás de mais oportunidade. Estou muito feliz, é uma evolução.</div>
+        <div class="case-author"><strong>Luciana Corbetta</strong>, Gestora Comercial</div>
         <div class="case-meta">Capitalização/Seguros</div>
         <div class="case-result"><div class="case-result-v">Estratégico</div><div class="case-result-l">Uso para oportunidades, não fiscalização</div></div>
       </div>
@@ -655,6 +654,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 140 veículos</div>
         <div class="case-quote">O retorno de vocês fechou com chave de ouro. É difícil contratar uma empresa com tamanha responsabilidade e ter o feedback que vocês têm.</div>
+        <div class="case-author"><strong>Angélica</strong>, Gestora de Frota</div>
         <div class="case-meta">Construção Civil</div>
         <div class="case-result"><div class="case-result-v">140 veículos</div><div class="case-result-l">Confiança total da diretoria</div></div>
       </div>
@@ -662,6 +662,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 20 veículos</div>
         <div class="case-quote">Tivemos um carro roubado e graças à Contele conseguimos recuperar o veículo e acionar a polícia. Ainda bem que temos vocês!</div>
+        <div class="case-author">Gestor de Frota</div>
         <div class="case-meta">Saúde/Emergências</div>
         <div class="case-result"><div class="case-result-v">Veículo recuperado</div><div class="case-result-l">Rastreamento em tempo real</div></div>
       </div>
@@ -669,6 +670,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 316 licenças</div>
         <div class="case-quote">A gente tinha certeza que mais pessoas viriam. Sucesso para vocês.</div>
+        <div class="case-author">Gestor de Trade Marketing</div>
         <div class="case-meta">Trade Marketing · 6 contas</div>
         <div class="case-result"><div class="case-result-v">316 licenças</div><div class="case-result-l">Expansão contínua</div></div>
       </div>
@@ -676,6 +678,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 4 veículos</div>
         <div class="case-quote">Tenho primo com empresa de rastreador e não faço com ele. O negócio está dando certo, não se mexe. Não vou nem experimentar.</div>
+        <div class="case-author">Proprietário de Autoescola</div>
         <div class="case-meta">Autoescola · 5 anos de cliente</div>
         <div class="case-result"><div class="case-result-v">5 anos</div><div class="case-result-l">Fidelidade, recusa concorrente familiar</div></div>
       </div>
@@ -683,6 +686,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 25 licenças</div>
         <div class="case-quote">A IA de vocês é incrível. Eu indiquei como benchmark. Queremos desenvolver IA aqui e alguém pode procurar vocês pra bater um papo.</div>
+        <div class="case-author">Gestor de Equipe</div>
         <div class="case-meta">Tecnologia/Fidelidade</div>
         <div class="case-result"><div class="case-result-v">Benchmark</div><div class="case-result-l">IA indicada como referência de mercado</div></div>
       </div>
@@ -690,6 +694,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 16 veículos</div>
         <div class="case-quote">Um alerta de uso fora do horário foi disparado e flagrei um desvio de rota real em tempo hábil. Superior ao que eu tinha na Localiza.</div>
+        <div class="case-author">Gestor de Frota</div>
         <div class="case-meta">Energia</div>
         <div class="case-result"><div class="case-result-v">Fraude flagrada</div><div class="case-result-l">ROI instantâneo, superior a Localiza</div></div>
       </div>
@@ -697,6 +702,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 4 licenças</div>
         <div class="case-quote">Perguntei se queriam voltar para a planilha. Disseram que não querem mais voltar a como era antes de jeito nenhum.</div>
+        <div class="case-author"><strong>Erica</strong>, Gestora de Operações</div>
         <div class="case-meta">Lazer/Turismo</div>
         <div class="case-result"><div class="case-result-v">Irreversível</div><div class="case-result-l">Adoção total, fim do papel</div></div>
       </div>
@@ -704,6 +710,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 8 veículos</div>
         <div class="case-quote">Passamos a operar com uma das plataformas mais completas do mercado. Já comunicamos nossos clientes sobre essa parceria.</div>
+        <div class="case-author">Gestor de Frota</div>
         <div class="case-meta">Transporte Alimentar</div>
         <div class="case-result"><div class="case-result-v">Diferencial</div><div class="case-result-l">Comunicado aos clientes finais</div></div>
       </div>
@@ -711,6 +718,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 7 → 42 veículos</div>
         <div class="case-quote">Vamos iniciar a compra de mais 30 rastreadores.</div>
+        <div class="case-author">Gestor de Frota</div>
         <div class="case-meta">Automotivo</div>
         <div class="case-result"><div class="case-result-v">+500%</div><div class="case-result-l">Expansão após reverter cancelamento</div></div>
       </div>
@@ -718,6 +726,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 146 licenças</div>
         <div class="case-quote">Adoro o layout da plataforma. Vocês sempre estão dispostos a ajudar em todas as situações. Tem bastante treinamento pro time de campo.</div>
+        <div class="case-author">Gestor de Equipe</div>
         <div class="case-meta">Contact Center · Cresceu de 30 para 146</div>
         <div class="case-result"><div class="case-result-v">30 → 146</div><div class="case-result-l">Crescimento orgânico interno</div></div>
       </div>
@@ -725,6 +734,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 37 veículos</div>
         <div class="case-quote">Recebi muitas propostas de concorrentes. Mas a localização em tempo real e o controle de custo foram os pontos-chave. Fez sentido.</div>
+        <div class="case-author"><strong>Rui Ferraz</strong>, Gestor de Frota</div>
         <div class="case-meta">Cerâmica/Transporte</div>
         <div class="case-result"><div class="case-result-v">Escolha</div><div class="case-result-l">Sobre múltiplos concorrentes</div></div>
       </div>
@@ -732,6 +742,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 6 licenças</div>
         <div class="case-quote">Facilitou bastante, melhorou em 100% para os promotores. A contagem de KMs está perfeita. Faz o check-in, check-out e já vai.</div>
+        <div class="case-author">Coordenador de Promotores</div>
         <div class="case-meta">Trade/Promotores</div>
         <div class="case-result"><div class="case-result-v">+100%</div><div class="case-result-l">Melhoria na rotina dos promotores</div></div>
       </div>
@@ -739,6 +750,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 241 veículos</div>
         <div class="case-quote">Não queremos esse veículo na operação sem monitoramento.</div>
+        <div class="case-author">Gestor de Frota</div>
         <div class="case-meta">Infraestrutura · Cliente desde 2018</div>
         <div class="case-result"><div class="case-result-v">7 anos</div><div class="case-result-l">Cliente contínuo</div></div>
       </div>
@@ -746,6 +758,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 5 veículos</div>
         <div class="case-quote">Meu pai era contra a tecnologia. Mas ao ver o sistema funcionando, já gostou. Os motoristas se ligaram que estão sendo monitorados e já estão fazendo mais média.</div>
+        <div class="case-author"><strong>Cesar</strong>, Gestor de Frota</div>
         <div class="case-meta">Construção</div>
         <div class="case-result"><div class="case-result-v">Cultura</div><div class="case-result-l">Quebra de resistência interna</div></div>
       </div>
@@ -753,6 +766,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 5 licenças</div>
         <div class="case-quote">Não vou dar 10 pra você não se achar muito, mas um 9.8 eu acredito. Indicaria sim.</div>
+        <div class="case-author">Gestor de Equipe</div>
         <div class="case-meta">Equipamentos</div>
         <div class="case-result"><div class="case-result-v">Nota 9.8</div><div class="case-result-l">Indicação espontânea</div></div>
       </div>
@@ -760,6 +774,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 4 licenças</div>
         <div class="case-quote">Me facilitou a questão de comunicação com o cliente. Na ordem de serviço digital, está atendendo muito bem.</div>
+        <div class="case-author"><strong>Enzo</strong>, Gestor de Operações</div>
         <div class="case-meta">Manutenção de Elevadores</div>
         <div class="case-result"><div class="case-result-v">Digital</div><div class="case-result-l">OS em papel eliminada</div></div>
       </div>
@@ -767,6 +782,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 46 veículos</div>
         <div class="case-quote">Fiz uma pesquisa bem minuciosa antes de fechar. Estou muito satisfeito. O sistema entrega mais do que eu consigo usar.</div>
+        <div class="case-author">Gestor de Frota</div>
         <div class="case-meta">Logística</div>
         <div class="case-result"><div class="case-result-v">Escolha consciente</div><div class="case-result-l">Pesquisa comparativa</div></div>
       </div>
@@ -774,6 +790,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 6 licenças</div>
         <div class="case-quote">Ficou bonito, visualmente está muito bom. Estou apaixonada! Agora eu vou ter informações rápidas.</div>
+        <div class="case-author"><strong>Helen</strong>, Gestora de Operações</div>
         <div class="case-meta">Indústria Química</div>
         <div class="case-result"><div class="case-result-v">Dashboard</div><div class="case-result-l">Reação emocional ao personalizado</div></div>
       </div>
@@ -781,6 +798,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 6 veículos</div>
         <div class="case-quote">O aplicativo para motoristas é muito intuitivo. O Ezequias conseguiu usar antes mesmo de um treinamento formal.</div>
+        <div class="case-author">Gestor de Frota</div>
         <div class="case-meta">Transportes</div>
         <div class="case-result"><div class="case-result-v">87,5%</div><div class="case-result-l">Aproveitamento imediato</div></div>
       </div>
@@ -788,6 +806,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 10 licenças</div>
         <div class="case-quote">Só consigo cobrar do meu cliente se as OS estiverem certas. O sistema atende muito bem na praticidade que a nossa atividade exige.</div>
+        <div class="case-author">Gestor de Equipe</div>
         <div class="case-meta">Construção/Locação</div>
         <div class="case-result"><div class="case-result-v">Faturamento</div><div class="case-result-l">OS como base de cobrança</div></div>
       </div>
@@ -795,6 +814,7 @@
       <div class="case-card teams">
         <div class="case-badge">Teams · 4 licenças</div>
         <div class="case-quote">Tudo era manual e conseguimos colocar grande parte no aplicativo. Economia de tempo em situações que demoraria muito.</div>
+        <div class="case-author">Coordenador de Campo</div>
         <div class="case-meta">Operação de Campo</div>
         <div class="case-result"><div class="case-result-v">100% → digital</div><div class="case-result-l">Migração total do manual</div></div>
       </div>
@@ -802,6 +822,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 33 veículos</div>
         <div class="case-quote">Pelo mapa consigo acompanhar tranquilo. A cerca eletrônica para monitorar as fazendas ficou perfeito. Resolveu o problema.</div>
+        <div class="case-author"><strong>Fernando</strong>, Gestor de Frota</div>
         <div class="case-meta">Agronegócio</div>
         <div class="case-result"><div class="case-result-v">Cercas</div><div class="case-result-l">Monitoramento de fazendas</div></div>
       </div>
@@ -809,6 +830,7 @@
       <div class="case-card fleet">
         <div class="case-badge">Fleet · 8 veículos</div>
         <div class="case-quote">Na empresa anterior, migrei da concorrência para a Contele. O atendimento e o suporte são muito dinâmicos. A exploração de dados é precisa e em tempo real.</div>
+        <div class="case-author"><strong>Rainor</strong>, Gestor de Frota</div>
         <div class="case-meta">Sinalização Viária</div>
         <div class="case-result"><div class="case-result-v">Reconquista</div><div class="case-result-l">Gestor trouxe Contele da empresa anterior</div></div>
       </div>
@@ -885,7 +907,7 @@
   <div class="w">
     <div class="ft-g">
       <div class="ft-brand">
-        <img src="/logo-contele-branco.png" alt="Contele">
+        <img src="/img/contele-logo-2linhas-white.svg" alt="Contele">
         <p style="font-style:italic;color:var(--text-dim);margin-bottom:8px;">Conectando caminhos, otimizando jornadas.</p>
         <p>Gestão de frotas e equipes externas. Santos/SP, desde 2003.</p>
       </div>
