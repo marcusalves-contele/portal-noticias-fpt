@@ -57,6 +57,29 @@ def _call_flash(prompt: str, api_key: str, system_prompt: str = None, max_tokens
         return json.dumps(data.get("error", {}))
 
 
+_MODE_SYSTEM_PROMPTS = {
+    "research": (
+        "Voce e um analista de conteudo YouTube especialista em gestao de frotas. "
+        "Analise dados, tendencias, videos, audiencia. "
+        "Use os docs de referencia para embasar analises. Responda em portugues."
+    ),
+    "script": (
+        "Voce e um roteirista e copywriter para o canal Frota Para Todos. "
+        "Crie roteiros, titulos, descricoes, copies seguindo o tom Sage Pragmatico. "
+        "Use as personas para direcionar a linguagem. Responda em portugues."
+    ),
+    "strategy": (
+        "Voce e um estrategista de conteudo para Frota Para Todos. "
+        "Planeje calendario, analise performance, sugira melhorias baseado nos dados dos docs. "
+        "Responda em portugues."
+    ),
+    "question": (
+        "Voce e o assistente PRISM Studio, especialista no sistema de producao de conteudo FPT. "
+        "Responda duvidas sobre a marca, sistema, pipeline, configuracoes. Responda em portugues."
+    ),
+}
+
+
 def parse_intent(message: str, history: list, api_key: str, mode_hint: str = None) -> dict:
     """Parse user message into structured intent via Gemini Flash."""
 
@@ -93,7 +116,8 @@ Return ONLY valid JSON with these fields:
   "background_desc": "background description" or null,
   "live_number": "323" or null,
   "edit_feedback": "what to change" or null,
-  "summary": "1-line Portuguese summary of what was understood"
+  "summary": "1-line Portuguese summary of what was understood",
+  "mode": "thumbnail" | "research" | "script" | "strategy" | "question"
 }}
 
 Rules:
@@ -106,14 +130,23 @@ Rules:
 - edit_feedback captures what to change from the previous generation
 - summary should be in Portuguese, concise
 
-Available modes (detect from user message):
-- "thumbnail": generate or edit YouTube thumbnails
-- "research": analyze content, videos, trends, audience
-- "script": write scripts, titles, descriptions, copies
-- "strategy": plan content calendar, analyze performance
-- "question": general questions about the system or brand
+Mode detection rules:
+- "thumbnail": user wants to generate or edit a YouTube thumbnail image
+- "research": user asks about video performance, analytics, trends, audience, what works, comparisons
+- "script": user wants to write/create a script, title, description, copy, CTA, or any text content
+- "strategy": user asks about content calendar, publishing schedule, best times, content planning, performance strategy
+- "question": general questions about the PRISM system, brand rules, pipeline, configurations, how things work
 
-Return additional field: "mode": "thumbnail" | "research" | "script" | "strategy" | "question"
+Examples:
+- "gera thumb do Julio" -> mode: thumbnail, action: generate
+- "quais videos tiveram mais views esse mes?" -> mode: research, action: question
+- "escreve um roteiro pra live sobre multas" -> mode: script, action: question
+- "qual o melhor dia pra publicar nutella?" -> mode: strategy, action: question
+- "como funciona o face-lock?" -> mode: question, action: question
+- "muda o fundo pra mais escuro" -> mode: thumbnail, action: edit
+- "analisa os tipos de nutella que mais performam" -> mode: research, action: question
+- "escreve um titulo SEO pra live sobre rastreador" -> mode: script, action: question
+- "quando devo postar pra ter mais alcance?" -> mode: strategy, action: question
 """
 
     result = _call_flash(prompt, api_key)  # sem system_prompt aqui, manter rapido
@@ -163,29 +196,47 @@ def _build_prompt(intent: dict) -> str:
 
     host_desc = {
         "fleet": (
-            f"{host_name}: 40-year-old man, salt-and-pepper short stubble beard, "
-            "short brown hair, hazel eyes, NO glasses. Smooth youthful skin. "
-            "Wearing black polo shirt."
+            f"{host_name}: 40-year-old Brazilian man. Salt-and-pepper SHORT stubble beard "
+            "(NOT full beard, NOT clean-shaven — only short salt-and-pepper stubble). "
+            "Short brown hair, hazel eyes. NO glasses ever. Smooth youthful skin. "
+            "ALWAYS wearing solid black polo shirt (NO patterns, NO logos, NO stripes). "
+            "Archetype: Sage Pragmatico — wise mentor who learned in the field, not academia."
         ),
         "teams": (
-            f"{host_name}: Professional young man, confident appearance. "
-            "Dark/neutral business casual clothing."
+            f"{host_name}: Young professional Brazilian man, confident appearance. "
+            "Dark/neutral business casual clothing. Clean-shaven or very light stubble. "
+            "Expression: professional, approachable, knowledgeable."
         ),
     }.get(channel, "")
 
     brand_context = """BRAND SPECS (FOLLOW EXACTLY):
 - Primary purple: #8B23E5 | Deep purple: #4E0091 | Light purple: #6C12B9
-- Typography: Montserrat (on thumbnails)
+- NEVER use #7C3AED, #6D28D9 or any other Tailwind purple — ONLY #8B23E5 family
+- Typography: Montserrat ONLY (no Comic Sans, no decorative fonts)
 - Tone: Sage Pragmatico - mentor acessivel, mao na massa, sem jargao
-- Background: ALWAYS dark/cinematic. NEVER white backgrounds.
-- Host clothing: polo LISA (solid color, no patterns)
-- Lighting: warm orange accent, cinematic contrast
+- Lighting: warm orange cinematic accent from the side
+
+ABSOLUTE RULES (NEVER VIOLATE):
+- NEVER white or light backgrounds. ALWAYS dark/cinematic.
+- NEVER full beard on Julio. ONLY short salt-and-pepper stubble.
+- NEVER glasses on Julio.
+- NEVER patterned, striped or logo clothing. Solid colors ONLY.
+- NEVER paraphrase or alter the requested text. Reproduce EXACTLY as written.
+
+COMPOSITION:
+- Host on the RIGHT side, waist up, facing slightly left toward camera
+- Text block on the LEFT, large white bold with black drop shadow (line 1)
+- Secondary text in red/orange bold (line 2, if any)
+- Live number badge (if any): top-left corner, red rounded pill
+- Guest (if any): LEFT side, slightly smaller than host
+- Aspect ratio: ALWAYS 16:9
+- Cinematic warm orange accent lighting from the side
 """
 
     prompt = f"{brand_context}\n\nYouTube thumbnail, 16:9 aspect ratio.\n\n"
-    prompt += f"REFERENCE IMAGES: Face references for {host_name}.\n\n"
+    prompt += f"REFERENCE IMAGES: Face references for {host_name}. Match this person exactly.\n\n"
     prompt += f"{host_desc}\nExpression: {expression}\n\n"
-    prompt += f"SCENE: {host_name} on the right, waist up. {background}.\n\n"
+    prompt += f"SCENE: {host_name} on the RIGHT side, waist up. {background}.\n\n"
 
     if guest:
         prompt += f"GUEST ({guest}): Add on the LEFT side, slightly smaller. Label 'Convidado {guest}'.\n\n"
@@ -322,10 +373,11 @@ def list_sessions() -> list[dict]:
 
 
 def run_pipeline(message: str, image_b64: str | None, session_id: str,
-                 api_key: str, progress_cb=None) -> dict:
+                 api_key: str, progress_cb=None, mode_hint: str = None) -> dict:
     """
     Main pipeline: message -> intent -> refs -> generate/edit -> result.
-    Returns: {"text": str, "image_url": str | None, "error": str | None}
+    Returns: {"text": str, "image_url": str | None, "error": str | None, "mode": str}
+    mode_hint: if provided by the frontend, overrides the detected mode.
     """
 
     def emit(step, msg, model=None):
@@ -354,24 +406,33 @@ def run_pipeline(message: str, image_b64: str | None, session_id: str,
     emit("intent", "Interpretando pedido...", "Gemini Flash")
     intent = parse_intent(message, history, api_key)
     action = intent.get("action", "question")
-    mode = intent.get("mode", "question")
+    # mode_hint from frontend overrides detected mode
+    mode = mode_hint or intent.get("mode", "question")
     summary = intent.get("summary", "")
     emit("intent", f"Entendi: {summary}", "Gemini Flash")
     emit("mode", f"Modo: {mode}")
 
-    # Handle questions, research, script, strategy — inject full knowledge
-    if action == "question" or action not in ("generate", "edit"):
+    # Handle questions, research, script, strategy — inject full knowledge + mode-specific prompt
+    if action in ("question", "research", "script", "strategy") or action not in ("generate", "edit"):
         from knowledge_base import get_system_prompt
         knowledge_flags = {}  # futuro: receber do frontend
-        system = get_system_prompt(mode, knowledge_flags)
+        knowledge_system = get_system_prompt(mode, knowledge_flags)
+
+        # Use mode-specific system prompt, fall back to knowledge_base system if available
+        mode_system = _MODE_SYSTEM_PROMPTS.get(mode, _MODE_SYSTEM_PROMPTS["question"])
+        # Combine: mode persona first, then knowledge docs if available
+        if knowledge_system:
+            system = f"{mode_system}\n\n{knowledge_system}"
+        else:
+            system = mode_system
 
         answer = _call_flash(
             f"Responda em portugues de forma clara e objetiva: {message}",
             api_key,
-            system_prompt=system if system else None,
+            system_prompt=system,
             max_tokens=2048,
         )
-        result = {"text": answer, "image_url": None}
+        result = {"text": answer, "image_url": None, "mode": mode}
         history.append({"role": "assistant", "text": answer, "image_path": None, "ts": time.time()})
         return result
 
@@ -419,8 +480,8 @@ def run_pipeline(message: str, image_b64: str | None, session_id: str,
         image_url = f"/output/{result_path.name}"
         text = f"Pronto! {summary}"
         history.append({"role": "assistant", "text": text, "image_path": str(result_path), "ts": time.time()})
-        return {"text": text, "image_url": image_url}
+        return {"text": text, "image_url": image_url, "mode": mode}
     else:
         text = "Erro na geracao. Tente novamente com instrucoes diferentes."
         history.append({"role": "assistant", "text": text, "image_path": None, "ts": time.time()})
-        return {"text": text, "image_url": None, "error": "generation_failed"}
+        return {"text": text, "image_url": None, "error": "generation_failed", "mode": mode}

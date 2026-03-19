@@ -1,12 +1,75 @@
 """
 knowledge_base.py — Knowledge layer for PRISM OS Studio.
 Loads domain docs from knowledge/ dir and builds system prompts per mode.
+Includes Operational Memory (Layer 2): learned patterns from user feedback.
 """
 
 import os
+import json
+from datetime import datetime
 from pathlib import Path
 
 KNOWLEDGE_DIR = Path(__file__).parent / "knowledge"
+
+# --- Operational Memory (Layer 2) ---
+
+MEMORY_FILE = Path(__file__).parent / "operational_memory.json"
+MAX_MEMORIES = 20
+
+
+def _load_memories() -> list:
+    if MEMORY_FILE.exists():
+        try:
+            return json.loads(MEMORY_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            return []
+    return []
+
+
+def _save_memories(memories: list):
+    MEMORY_FILE.write_text(
+        json.dumps(memories[-MAX_MEMORIES:], ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
+def add_memory(memory_type: str, content: str, metadata: dict = None):
+    """Add operational memory entry. Types: approval, rejection, feedback, pattern."""
+    memories = _load_memories()
+    memories.append({
+        "type": memory_type,
+        "content": content,
+        "metadata": metadata or {},
+        "ts": datetime.now().isoformat(),
+    })
+    _save_memories(memories)
+
+
+def get_memories_context() -> str:
+    """Get operational memories formatted for system prompt injection."""
+    memories = _load_memories()
+    if not memories:
+        return ""
+
+    lines = ["## OPERATIONAL MEMORY (learned from past sessions)\n"]
+    for m in memories:
+        prefix = {
+            "approval": "GOOD",
+            "rejection": "AVOID",
+            "feedback": "NOTE",
+            "pattern": "PATTERN",
+        }.get(m["type"], "NOTE")
+        lines.append(f"- [{prefix}] {m['content']}")
+
+    return "\n".join(lines)
+
+
+def list_memories() -> list:
+    return _load_memories()
+
+
+def clear_memories():
+    _save_memories([])
 
 # Registry: each doc with metadata
 KNOWLEDGE_REGISTRY = [
@@ -197,6 +260,11 @@ def get_system_prompt(mode: str = "question", flags: dict | None = None) -> str:
 
     if not sections:
         return ""
+
+    # Append operational memories after docs
+    memories_ctx = get_memories_context()
+    if memories_ctx:
+        sections.append(memories_ctx)
 
     header = (
         f"You are PRISM Studio, the AI content production assistant for Frota Para Todos (FPT) "

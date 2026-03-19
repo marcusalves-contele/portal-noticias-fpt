@@ -8,3 +8,4 @@ downloads/
 *.webp
 badge_preview.html
 .DS_Store
+operational_memory.json

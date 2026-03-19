@@ -411,6 +411,9 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 "docs": list_knowledge(),
                 "summary": get_tokens_summary(mode),
             })
+        elif path == "/api/studio/memories":
+            from knowledge_base import list_memories
+            self._json({"memories": list_memories()})
         else:
             # Serve static files (frontend)
             if path == "/" or path == "":
@@ -489,6 +492,14 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             enabled = body.get("enabled", True)
             set_flag(doc_id, enabled)
             self._json({"ok": True, "doc_id": doc_id, "enabled": enabled})
+        elif path == "/api/studio/feedback":
+            from knowledge_base import add_memory
+            feedback_type = body.get("type", "feedback")  # approval, rejection, feedback
+            content = body.get("content", "")
+            metadata = body.get("metadata", {})
+            if content:
+                add_memory(feedback_type, content, metadata)
+            self._json({"ok": True})
         else:
             self._json({"error": "not found"}, 404)
 
@@ -1454,6 +1465,7 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
         message = body.get("message", "").strip()
         image_b64 = body.get("image_b64")
         session_id = body.get("session_id", str(uuid.uuid4())[:8])
+        mode_hint = body.get("mode") or None  # optional frontend override
 
         if not message:
             self._json({"error": "message required"}, 400)
@@ -1471,7 +1483,7 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
                 def progress_cb(data):
                     _emit(job_id, "progress", data)
 
-                result = run_pipeline(message, image_b64, session_id, api_key, progress_cb)
+                result = run_pipeline(message, image_b64, session_id, api_key, progress_cb, mode_hint=mode_hint)
                 _emit(job_id, "complete", result)
             except Exception as e:
                 _emit(job_id, "error", {"message": str(e)})
