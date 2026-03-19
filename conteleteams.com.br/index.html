@@ -1777,9 +1777,17 @@
       return;
     }
 
+    // Anti-spam: block re-submit within 60s
+    const lastSubmit = parseInt(localStorage.getItem('lastSubmit') || '0', 10);
+    if (Date.now() - lastSubmit < 60000) {
+      alert('Formulário já enviado. Aguarde um momento.');
+      return;
+    }
+
     const submitBtn = form.querySelector('[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Enviando...';
+    localStorage.setItem('lastSubmit', Date.now().toString());
 
     function getGclid() {
       const match = document.cookie.match(/_gcl_aw=([^;]+)/);
@@ -1787,13 +1795,19 @@
         const parts = match[1].split('.');
         return parts.length >= 3 ? parts.slice(2).join('.') : match[1];
       }
-      const urlGclid = new URLSearchParams(window.location.search).get('gclid');
-      return urlGclid || '';
+      return new URLSearchParams(window.location.search).get('gclid') || '';
     }
 
     function getGA4ClientId() {
       const match = document.cookie.match(/_ga=([^;]+)/);
       return match ? match[1] : '';
+    }
+
+    // Format phone: strip non-digits, add 55 if <= 11 digits
+    function formatPhone(tel) {
+      var digits = tel.replace(/\D/g, '');
+      if (digits.length <= 11) digits = '55' + digits;
+      return digits;
     }
 
     const params = new URLSearchParams(window.location.search);
@@ -1805,9 +1819,9 @@
 
     const gclid = getGclid();
     const ga4ClientId = getGA4ClientId();
+    const telefoneFormatado = formatPhone(telefone);
 
-    const licenseCount = qtd;
-
+    // GTM dataLayer push (ONLY for >= 4 people)
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
       event: 'formSubmission',
@@ -1815,32 +1829,29 @@
       formData: { email, nome, empresa, telefone, quantidade: qtd.toString() }
     });
 
-    const now = new Date();
-    const dataHora = now.toLocaleDateString('pt-BR') + '-' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-    fetch('https://ge-prd-web-api.contele.com.br/api/v1/spreadsheet/1cM0RpSRWarWNqSYDfjqTkPnrWI1BSP8jicm77n3KiTY', {
+    // PRIMARY: POST to n8n webhook (handles everything: Pipedrive, spreadsheet, SDR, notifications)
+    fetch('https://primary-production-2349.up.railway.app/webhook/gera-leads-teams-lp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        spreadsheetData: {
-          'Data/Hora': dataHora,
-          'Nome': nome,
-          'Email': email,
-          'Telefone': telefone,
-          'Empresa': empresa,
-          'Campanha': utmCampaign,
-          'Tamanho da Equipe': qtd.toString(),
-          'Landing Page': window.location.href,
-          'GCLID': gclid,
-          'GA4 Client ID': ga4ClientId,
-          'utm_source': utmSource,
-          'utm_medium': utmMedium,
-          'utm_term': utmTerm,
-          'utm_content': utmContent
-        }
+        nome: nome,
+        email: email,
+        telefone: telefoneFormatado,
+        empresa: empresa,
+        tamanho_equipe: qtd,
+        campanha: utmCampaign,
+        landing_page: window.location.href,
+        gclid: gclid,
+        ga4_client_id: ga4ClientId,
+        utm_source: utmSource,
+        utm_medium: utmMedium,
+        utm_term: utmTerm,
+        utm_content: utmContent,
+        source: 'landing-page-v2'
       })
     });
 
+    // SECONDARY: Create trial account (keep for immediate user feedback)
     fetch('https://ge-prd-web-api.contele.com.br/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1851,19 +1862,20 @@
         email: email,
         password: 'gestorturbinado',
         plan: 'trial',
-        license_count: licenseCount,
+        license_count: qtd,
         period: 0,
         language: 'pt',
         primeiroTeste: ' ',
-        faixadelicencas: licenseCount,
+        faixadelicencas: qtd,
         campaign: 'landing_page'
       })
     });
 
-    const utmString = window.location.search;
+    // Redirect to /obrigado after 1.5s (give n8n time to receive)
+    var utmString = window.location.search;
     setTimeout(function() {
       window.location.href = 'https://conteleteams.com.br/obrigado' + utmString;
-    }, 1000);
+    }, 1500);
   }
 
   // ===== YOUTUBE FACADE =====
