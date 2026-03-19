@@ -117,6 +117,8 @@
     .btn { display: inline-flex; align-items: center; gap: 6px; padding: 14px 26px; border-radius: 8px; font-family: var(--body); font-size: 15px; font-weight: 700; text-decoration: none; transition: all .2s; border: none; cursor: pointer; }
     .btn-b { background: var(--blue); color: #fff; }
     .btn-b:hover { background: var(--blue-mid); }
+    .btn-purple { background: var(--purple); color: #fff; }
+    .btn-purple:hover { background: #9b33f5; }
     .btn-g { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.12); }
     .btn-g:hover { border-color: var(--blue-light); color: var(--white); }
     .hero-img { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 24px 48px rgba(0,0,0,0.35); }
@@ -250,7 +252,6 @@
     }
     .case-card:hover {
       border-color: var(--border-h);
-      box-shadow: 0 8px 32px rgba(74,88,255,0.08);
     }
     .case-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
     .case-card.fleet::before { background: linear-gradient(90deg, var(--purple), var(--purple-deep)); }
@@ -379,9 +380,9 @@
           <span class="hero-leaders-text">Liderado por quem vive a operação</span>
         </div>
         <div class="hero-btns">
-          <a href="https://api.whatsapp.com/send/?phone=5511971325108&text=Oi%2C%20vim%20pelo%20site%20contele.io%20e%20queria%20saber%20mais" class="btn btn-b">Falar com especialista &rarr;</a>
-          <a href="https://contelerastreador.com.br/" target="_blank" rel="noopener" class="btn btn-g">Contele Fleet</a>
-          <a href="https://conteleteams.com.br/" target="_blank" rel="noopener" class="btn btn-g">Contele Teams</a>
+          <a href="https://contelerastreador.com.br/" target="_blank" rel="noopener" class="btn btn-purple">Contele Fleet &rarr;</a>
+          <a href="https://conteleteams.com.br/" target="_blank" rel="noopener" class="btn btn-b">Contele Teams &rarr;</a>
+          <a href="https://api.whatsapp.com/send/?phone=5511971325108&text=Oi%2C%20vim%20pelo%20site%20contele.io%20e%20queria%20saber%20mais" class="btn btn-g">Falar com especialista</a>
         </div>
         <div class="risco-zero">&#x2713; Sem fidelidade &middot; Risco Zero 30 dias &middot; Sem multa</div>
       </div>
@@ -421,8 +422,8 @@
 <section class="s" id="produtos">
   <div class="w">
     <div class="s-tag">Produtos</div>
-    <h2 class="s-title">Gestão de frota não é gestão de equipe</h2>
-    <p class="s-sub">São problemas diferentes. Por isso são dois produtos, cada um construído pra dor específica do gestor.</p>
+    <h2 class="s-title">Duas soluções para quem opera em campo</h2>
+    <p class="s-sub">Frotas e equipes externas. Dois produtos especializados, um pra cada operação.</p>
     <div class="prod-g">
       <div class="prod teams">
         <img src="/img/teams-hero.png" loading="lazy" class="prod-hero" alt="Profissionais diversos em campo usando Contele Teams">
@@ -498,7 +499,7 @@
             <span>15 sistemas rodando: atendimento, análise, detecção de fraude, conteúdo automatizado. Resultado real, não PowerPoint.</span>
           </div>
           <div class="mc">
-            <strong>Sem lock-in</strong>
+            <strong>Sem amarração</strong>
             <span>Fleet sem fidelidade. Teams sem multa. Risco Zero 30 dias. A confiança vem do resultado, não do contrato.</span>
           </div>
           <div class="mc">
@@ -516,7 +517,7 @@
   <div class="w">
     <div class="s-tag">Quem lidera</div>
     <h2 class="s-title">Experiência real em gestão de frotas e equipes</h2>
-    <p class="s-sub">A Contele é liderada por quem vive o problema. O conteúdo vem de especialistas reais com décadas de experiência, não de texto gerado por IA.</p>
+    <p class="s-sub">A Contele é liderada por quem vive o problema. Especialistas reais com décadas de experiência em gestão de frotas e equipes externas.</p>
     <div class="leaders-g">
       <div class="leader">
         <img src="/img/julio.png" loading="lazy" class="leader-photo" alt="Julio César">
@@ -799,7 +800,9 @@
 <!-- CTA INTERMEDIÁRIO -->
 <div class="cta-mid">
   <div class="w">
-    <a href="https://api.whatsapp.com/send/?phone=5511971325108&text=Oi%2C%20vim%20pelo%20site%20contele.io%20e%20queria%20saber%20mais" class="btn btn-b" style="font-size:17px;padding:16px 32px;">Falar com especialista &rarr;</a>
+    <a href="https://contelerastreador.com.br/" target="_blank" rel="noopener" class="btn btn-purple" style="font-size:16px;padding:14px 28px;">Contele Fleet &rarr;</a>
+    <a href="https://conteleteams.com.br/" target="_blank" rel="noopener" class="btn btn-b" style="font-size:16px;padding:14px 28px;">Contele Teams &rarr;</a>
+    <a href="https://api.whatsapp.com/send/?phone=5511971325108&text=Oi%2C%20vim%20pelo%20site%20contele.io%20e%20queria%20saber%20mais" class="btn btn-g" style="font-size:16px;padding:14px 28px;">Falar com especialista</a>
     <p>Sem fidelidade. Risco Zero 30 dias. Sem multa.</p>
   </div>
 </div>
