@@ -2,7 +2,8 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "echo 'Static site, no build needed'"
+    "buildCommand": "echo 'Static site, no build needed'",
+    "watchPatterns": ["conteleteams.com.br/**"]
   },
   "deploy": {
     "startCommand": "npx serve -s . -l $PORT --no-clipboard",
