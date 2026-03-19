@@ -28,7 +28,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 PROJECT_DIR   = Path(__file__).parent
 OUTPUT_DIR    = PROJECT_DIR / "output"
 THUMB_PROJECT = PROJECT_DIR.parent / "thumbnail-ai-creator"
-REFS_DIR      = THUMB_PROJECT / "referencias"
+# Fallback: refs inside nutella-creator if thumbnail-ai-creator doesn't exist (Railway)
+REFS_DIR      = THUMB_PROJECT / "referencias" if THUMB_PROJECT.exists() else PROJECT_DIR / "referencias"
 GUESTS_DIR    = REFS_DIR / "convidados"
 STATE_FILE    = OUTPUT_DIR / "thumb_live_state.json"
 
@@ -105,13 +106,16 @@ def load_sheets_creds():
 
 
 def load_api_key() -> str:
-    """Carrega GEMINI_NANO_BANANA_KEY do .env local ou do thumbnail-ai-creator."""
+    """Carrega GEMINI_NANO_BANANA_KEY: env var (Railway) > .env local > thumbnail-ai-creator/.env."""
+    key = os.environ.get("GEMINI_NANO_BANANA_KEY")
+    if key:
+        return key
     local_env   = PROJECT_DIR / ".env"
     parent_env  = THUMB_PROJECT / ".env"
     env_path    = local_env if local_env.exists() else parent_env
 
     if not env_path.exists():
-        raise FileNotFoundError(f".env não encontrado em {env_path}")
+        raise FileNotFoundError(f"GEMINI_NANO_BANANA_KEY nao encontrada em env var nem em {env_path}")
 
     with open(env_path) as f:
         for line in f:

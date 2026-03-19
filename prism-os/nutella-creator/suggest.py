@@ -16,6 +16,7 @@ Uso:
   python3 suggest.py https://youtube.com/watch?v=XXXX --json
 """
 
+import os
 import sys
 import re
 import json
@@ -38,10 +39,15 @@ GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
 
 def load_api_key() -> str:
-    with open(ENV_PATH) as f:
-        for line in f:
-            if line.startswith("GEMINI_NANO_BANANA_KEY"):
-                return line.split("=", 1)[1].strip().strip('"')
+    # Prefer env var (Railway)
+    key = os.environ.get("GEMINI_NANO_BANANA_KEY")
+    if key:
+        return key
+    if ENV_PATH.exists():
+        with open(ENV_PATH) as f:
+            for line in f:
+                if line.startswith("GEMINI_NANO_BANANA_KEY"):
+                    return line.split("=", 1)[1].strip().strip('"')
     raise ValueError("GEMINI_NANO_BANANA_KEY não encontrada")
 
 

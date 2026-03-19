@@ -16,7 +16,8 @@ from datetime import datetime
 
 PROJECT_DIR = Path(__file__).parent
 OUTPUT_DIR = PROJECT_DIR / "output"
-REFS_DIR = PROJECT_DIR.parent / "thumbnail-ai-creator" / "referencias"
+_THUMB_REFS = PROJECT_DIR.parent / "thumbnail-ai-creator" / "referencias"
+REFS_DIR = _THUMB_REFS if _THUMB_REFS.exists() else PROJECT_DIR / "referencias"
 
 MODEL_FLASH = "gemini-3-flash-preview"
 MODEL_IMAGE_PRO = "gemini-3-pro-image-preview"
