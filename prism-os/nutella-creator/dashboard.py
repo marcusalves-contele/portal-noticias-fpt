@@ -403,6 +403,14 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 self._serve_file(file_path)
             else:
                 self._json({"error": "not found"}, 404)
+        elif path == "/api/studio/knowledge":
+            from knowledge_base import list_knowledge, get_tokens_summary
+            parsed_qs = parse_qs(parsed.query)
+            mode = parsed_qs.get("mode", ["question"])[0]
+            self._json({
+                "docs": list_knowledge(),
+                "summary": get_tokens_summary(mode),
+            })
         else:
             # Serve static files (frontend)
             if path == "/" or path == "":
@@ -475,6 +483,12 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             from studio_chat import delete_session
             deleted = delete_session(session_id)
             self._json({"ok": True, "deleted": deleted})
+        elif path == "/api/studio/knowledge/toggle":
+            from knowledge_base import set_flag
+            doc_id = body.get("doc_id", "")
+            enabled = body.get("enabled", True)
+            set_flag(doc_id, enabled)
+            self._json({"ok": True, "doc_id": doc_id, "enabled": enabled})
         else:
             self._json({"error": "not found"}, 404)
 

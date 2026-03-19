@@ -36,16 +36,19 @@ def _image_url(model: str):
     return f"{API_BASE}/{model}:generateContent"
 
 
-def _call_flash(prompt: str, api_key: str) -> str:
+def _call_flash(prompt: str, api_key: str, system_prompt: str = None, max_tokens: int = 1024) -> str:
     """Call Gemini Flash for text generation."""
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 0.3, "maxOutputTokens": max_tokens},
+    }
+    if system_prompt:
+        payload["systemInstruction"] = {"parts": [{"text": system_prompt}]}
     resp = requests.post(
         _flash_url(),
         headers={"x-goog-api-key": api_key, "Content-Type": "application/json"},
-        json={
-            "contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0.3, "maxOutputTokens": 1024},
-        },
-        timeout=30,
+        json=payload,
+        timeout=60,
     )
     data = resp.json()
     try:
@@ -54,7 +57,7 @@ def _call_flash(prompt: str, api_key: str) -> str:
         return json.dumps(data.get("error", {}))
 
 
-def parse_intent(message: str, history: list, api_key: str) -> dict:
+def parse_intent(message: str, history: list, api_key: str, mode_hint: str = None) -> dict:
     """Parse user message into structured intent via Gemini Flash."""
 
     history_text = ""
@@ -101,9 +104,19 @@ Rules:
 - Extract any live number mentioned
 - title_text should be the text the user wants ON the thumbnail
 - edit_feedback captures what to change from the previous generation
-- summary should be in Portuguese, concise"""
+- summary should be in Portuguese, concise
 
-    result = _call_flash(prompt, api_key)
+Available modes (detect from user message):
+- "thumbnail": generate or edit YouTube thumbnails
+- "research": analyze content, videos, trends, audience
+- "script": write scripts, titles, descriptions, copies
+- "strategy": plan content calendar, analyze performance
+- "question": general questions about the system or brand
+
+Return additional field: "mode": "thumbnail" | "research" | "script" | "strategy" | "question"
+"""
+
+    result = _call_flash(prompt, api_key)  # sem system_prompt aqui, manter rapido
 
     try:
         if "```" in result:
@@ -160,7 +173,16 @@ def _build_prompt(intent: dict) -> str:
         ),
     }.get(channel, "")
 
-    prompt = f"YouTube thumbnail, 16:9 aspect ratio.\n\n"
+    brand_context = """BRAND SPECS (FOLLOW EXACTLY):
+- Primary purple: #8B23E5 | Deep purple: #4E0091 | Light purple: #6C12B9
+- Typography: Montserrat (on thumbnails)
+- Tone: Sage Pragmatico - mentor acessivel, mao na massa, sem jargao
+- Background: ALWAYS dark/cinematic. NEVER white backgrounds.
+- Host clothing: polo LISA (solid color, no patterns)
+- Lighting: warm orange accent, cinematic contrast
+"""
+
+    prompt = f"{brand_context}\n\nYouTube thumbnail, 16:9 aspect ratio.\n\n"
     prompt += f"REFERENCE IMAGES: Face references for {host_name}.\n\n"
     prompt += f"{host_desc}\nExpression: {expression}\n\n"
     prompt += f"SCENE: {host_name} on the right, waist up. {background}.\n\n"
@@ -332,14 +354,22 @@ def run_pipeline(message: str, image_b64: str | None, session_id: str,
     emit("intent", "Interpretando pedido...", "Gemini Flash")
     intent = parse_intent(message, history, api_key)
     action = intent.get("action", "question")
+    mode = intent.get("mode", "question")
     summary = intent.get("summary", "")
     emit("intent", f"Entendi: {summary}", "Gemini Flash")
+    emit("mode", f"Modo: {mode}")
 
-    # Handle questions
-    if action == "question":
+    # Handle questions, research, script, strategy — inject full knowledge
+    if action == "question" or action not in ("generate", "edit"):
+        from knowledge_base import get_system_prompt
+        knowledge_flags = {}  # futuro: receber do frontend
+        system = get_system_prompt(mode, knowledge_flags)
+
         answer = _call_flash(
-            f"You are a helpful assistant for a YouTube thumbnail creation tool. "
-            f"Answer concisely in Portuguese: {message}", api_key,
+            f"Responda em portugues de forma clara e objetiva: {message}",
+            api_key,
+            system_prompt=system if system else None,
+            max_tokens=2048,
         )
         result = {"text": answer, "image_url": None}
         history.append({"role": "assistant", "text": answer, "image_path": None, "ts": time.time()})
