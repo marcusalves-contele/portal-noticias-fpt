@@ -10,3 +10,4 @@ opencv-python-headless
 mediapipe
 youtube-transcript-api
 yt-dlp
+# PRISM OS auth_proxy trigger
