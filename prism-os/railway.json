@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "cd nutella-creator && python3 auth_proxy.py",
+    "startCommand": "python3 start.py",
     "healthcheckPath": "/",
     "restartPolicyType": "ON_FAILURE"
   }
