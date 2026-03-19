@@ -361,6 +361,22 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_video_title(parsed.query)
         elif path == "/api/thumb-queue":
             self._handle_thumb_queue()
+        elif path == "/api/studio/sessions":
+            from studio_chat import list_sessions
+            self._json({"sessions": list_sessions()})
+        elif path.startswith("/api/studio/session/"):
+            session_id = path.split("/api/studio/session/")[1]
+            from studio_chat import get_session
+            msgs = get_session(session_id)
+            # Strip image data, keep URLs
+            clean = []
+            for m in msgs:
+                entry = {"role": m["role"], "text": m.get("text", ""), "ts": m.get("ts", 0)}
+                if m.get("image_path"):
+                    p = Path(m["image_path"])
+                    entry["image_url"] = f"/output/{p.name}" if p.exists() else None
+                clean.append(entry)
+            self._json({"session_id": session_id, "messages": clean})
         elif path == "/api/thumb-guest-check":
             self._handle_thumb_guest_check(parsed.query)
         elif path.startswith("/api/metas/"):
@@ -452,6 +468,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_youtube_update_thumb(body)
         elif path == "/api/feedback":
             self._handle_feedback(body)
+        elif path == "/api/studio/chat":
+            self._handle_studio_chat(body)
         else:
             self._json({"error": "not found"}, 404)
 
@@ -1411,6 +1429,35 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
             self._json({"ok": True, "issue_url": data.get("html_url", ""), "issue_number": data.get("number")})
         except Exception as e:
             self._json({"error": str(e)}, 500)
+
+    def _handle_studio_chat(self, body: dict):
+        """POST /api/studio/chat -- conversational thumbnail generation."""
+        message = body.get("message", "").strip()
+        image_b64 = body.get("image_b64")
+        session_id = body.get("session_id", str(uuid.uuid4())[:8])
+
+        if not message:
+            self._json({"error": "message required"}, 400)
+            return
+
+        job_id = _create_job()
+        self._json({"job_id": job_id, "session_id": session_id})
+
+        def _run():
+            try:
+                from studio_chat import run_pipeline
+                from thumb_live import load_api_key
+                api_key = load_api_key()
+
+                def progress_cb(data):
+                    _emit(job_id, "progress", data)
+
+                result = run_pipeline(message, image_b64, session_id, api_key, progress_cb)
+                _emit(job_id, "complete", result)
+            except Exception as e:
+                _emit(job_id, "error", {"message": str(e)})
+
+        threading.Thread(target=_run, daemon=True).start()
 
     def _json(self, data, code=200):
         body = json.dumps(data).encode()
