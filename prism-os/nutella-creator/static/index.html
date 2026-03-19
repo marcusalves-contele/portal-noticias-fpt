@@ -2533,6 +2533,7 @@
           <button class="mode-tab" id="mode-tab-thumbs" onclick="setMode('thumbs')">&#9646; Thumbnails de Live</button>
           <button class="mode-tab" id="mode-tab-roteiro" onclick="setMode('roteiro')">&#9998; Thumb de Roteiro</button>
           <button class="mode-tab" id="mode-tab-studio" onclick="setMode('studio')">&#9671; Studio</button>
+          <button class="mode-tab" id="mode-tab-manual" onclick="setMode('manual')">&#9986; Corte Manual</button>
         </div>
 
         <div class="home-input-group">
@@ -3306,7 +3307,8 @@
       const t = document.getElementById('toast');
       t.textContent = msg;
       t.className = 'toast show ' + type;
-      setTimeout(() => t.classList.remove('show'), 3000);
+      const duration = type === 'error' ? 8000 : 3000;
+      setTimeout(() => t.classList.remove('show'), duration);
     }
 
     // ===== OVERLAY =====
@@ -3964,6 +3966,7 @@
       document.getElementById('mode-tab-thumbs').classList.toggle('active', mode === 'thumbs');
       document.getElementById('mode-tab-roteiro').classList.toggle('active', mode === 'roteiro');
       document.getElementById('mode-tab-studio').classList.toggle('active', mode === 'studio');
+      document.getElementById('mode-tab-manual').classList.toggle('active', mode === 'manual');
       if (mode === 'thumbs') {
         showScreen('thumb-live');
         tlResetToQueue();
@@ -3973,9 +3976,111 @@
       } else if (mode === 'studio') {
         showScreen('studio');
         studioInit();
+      } else if (mode === 'manual') {
+        showScreen('manual');
       } else {
         showScreen('home');
         loadHistory();
+      }
+    }
+
+    async function startManualBuild() {
+      const url       = document.getElementById('manual-url').value.trim();
+      const start     = document.getElementById('manual-start').value.trim();
+      const end       = document.getElementById('manual-end').value.trim();
+      const title     = document.getElementById('manual-title').value.trim();
+      const thumbText = document.getElementById('manual-thumb-text').value.trim();
+
+      if (!url || !start || !end) {
+        toast('Preencha URL, inicio e fim', 'error');
+        return;
+      }
+
+      const tsRegex = /^(\d{1,2}:)?\d{1,2}:\d{2}$/;
+      if (!tsRegex.test(start) || !tsRegex.test(end)) {
+        toast('Formato de timestamp invalido. Use MM:SS ou HH:MM:SS', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('manual-build-btn');
+      btn.disabled = true;
+      btn.textContent = 'Cortando...';
+
+      const progress = document.getElementById('manual-progress');
+      const steps    = document.getElementById('manual-steps');
+      progress.style.display = 'block';
+      steps.innerHTML = '<div class="progress-step active"><div class="step-indicator"><div class="spinner-ring"></div></div><div class="step-info"><div class="step-label">Iniciando...</div><div class="step-detail" id="manual-step-detail"></div></div></div>';
+
+      try {
+        const resp = await fetch('/api/build-custom', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            video_url:   url,
+            clip_entrada: start,
+            clip_saida:   end,
+            title:       title || 'Corte Manual',
+            thumb_text:  thumbText,
+          }),
+        });
+        const data = await resp.json();
+
+        if (data.error) {
+          toast(data.error, 'error');
+          btn.disabled = false;
+          btn.textContent = 'Cortar';
+          return;
+        }
+
+        const es = new EventSource('/api/progress/' + data.job_id);
+
+        es.addEventListener('progress', e => {
+          const d = JSON.parse(e.data);
+          const detail = document.getElementById('manual-step-detail');
+          if (detail) detail.textContent = d.message || d.msg || '';
+        });
+
+        es.addEventListener('complete', e => {
+          es.close();
+          const d = JSON.parse(e.data);
+          toast('Corte pronto! ' + (d.message || ''));
+          steps.innerHTML = '<div class="progress-step" style="color:var(--green)">&#10003; ' + (d.message || 'Corte concluido') + '</div>';
+          btn.disabled = false;
+          btn.textContent = 'Cortar';
+
+          if (d.video_id) {
+            currentVideoId = d.video_id;
+            setTimeout(() => {
+              fetch('/api/metas/' + d.video_id).then(r => r.json()).then(mdata => {
+                if (mdata.nutellas) {
+                  currentNutellas = mdata.nutellas;
+                  showNutellasSelect(currentNutellas);
+                }
+              });
+            }, 1000);
+          }
+        });
+
+        es.addEventListener('error', e => {
+          es.close();
+          let msg = 'Erro no corte';
+          try { msg = JSON.parse(e.data).message; } catch(x) {}
+          toast(msg, 'error');
+          btn.disabled = false;
+          btn.textContent = 'Cortar';
+        });
+
+        es.onerror = () => {
+          es.close();
+          toast('Conexao perdida', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Cortar';
+        };
+
+      } catch(e) {
+        toast('Erro: ' + e.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Cortar';
       }
     }
 
@@ -6354,6 +6459,59 @@
 
     loadHistory();
   </script>
+
+  <!-- ===== SCREEN: CORTE MANUAL ===== -->
+  <div class="screen" id="screen-manual">
+    <div class="topbar">
+      <div class="topbar-brand" onclick="goHome()">
+        <div class="topbar-icon"></div>
+        <span class="topbar-title">PRISM OS</span>
+      </div>
+      <div class="topbar-sep"></div>
+      <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">Corte Manual</span>
+    </div>
+
+    <div style="max-width:600px;margin:60px auto;padding:0 24px;">
+      <h2 style="font-family:var(--font-brand);font-size:28px;margin-bottom:8px;">Corte Manual</h2>
+      <p style="color:var(--text-secondary);font-size:14px;margin-bottom:32px;">Defina timestamps exatos para cortar um trecho da live.</p>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div>
+          <label style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);display:block;margin-bottom:6px;">URL DO VIDEO</label>
+          <input class="home-input" id="manual-url" type="text" placeholder="https://youtube.com/live/..." style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text-primary);font-family:var(--font-mono);font-size:13px;">
+        </div>
+
+        <div style="display:flex;gap:16px;">
+          <div style="flex:1;">
+            <label style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);display:block;margin-bottom:6px;">INICIO</label>
+            <input class="home-input" id="manual-start" type="text" placeholder="42:07" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text-primary);font-family:var(--font-mono);font-size:14px;">
+          </div>
+          <div style="flex:1;">
+            <label style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);display:block;margin-bottom:6px;">FIM</label>
+            <input class="home-input" id="manual-end" type="text" placeholder="58:18" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text-primary);font-family:var(--font-mono);font-size:14px;">
+          </div>
+        </div>
+
+        <div>
+          <label style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);display:block;margin-bottom:6px;">TITULO (opcional)</label>
+          <input class="home-input" id="manual-title" type="text" placeholder="Premiacao de Motoristas: Divergencia ao vivo" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text-primary);font-family:var(--font-display);font-size:14px;">
+        </div>
+
+        <div>
+          <label style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);display:block;margin-bottom:6px;">TEXTO DA THUMB (opcional)</label>
+          <input class="home-input" id="manual-thumb-text" type="text" placeholder="Divergencia ao vivo entre Julio e Shelton" style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text-primary);font-family:var(--font-display);font-size:14px;">
+        </div>
+
+        <button class="btn btn-primary" id="manual-build-btn" onclick="startManualBuild()" style="margin-top:8px;">
+          Cortar
+        </button>
+
+        <div id="manual-progress" style="display:none;margin-top:16px;">
+          <div class="progress-steps" id="manual-steps"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <!-- Feedback Widget -->
 <button class="feedback-btn" onclick="openFeedback()" title="Reportar bug ou sugestao">

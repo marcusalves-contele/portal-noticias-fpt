@@ -449,6 +449,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_auto_briefing(body)
         elif path == "/api/build":
             self._handle_build(body)
+        elif path == "/api/build-custom":
+            self._handle_build_custom(body)
         elif path == "/api/approve":
             self._handle_approve(body)
         elif path == "/api/generate-thumb":
@@ -589,6 +591,59 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         thread = threading.Thread(target=run_build, args=(video_id, ranks, job_id), daemon=True)
         thread.start()
         self._json({"job_id": job_id})
+
+    def _handle_build_custom(self, body: dict):
+        """POST /api/build-custom - corte manual por timestamp."""
+        video_url    = body.get("video_url", "").strip()
+        clip_entrada = body.get("clip_entrada", "").strip()
+        clip_saida   = body.get("clip_saida", "").strip()
+        title        = body.get("title", "Corte Manual").strip()
+        thumb_text   = body.get("thumb_text", "").strip()
+
+        # Extract video_id from URL
+        video_id = None
+        m = re.search(r'(?:v=|youtu\.be/|live/)([a-zA-Z0-9_-]{11})', video_url)
+        if m:
+            video_id = m.group(1)
+
+        if not video_id:
+            self._json({"error": "URL do YouTube invalida"}, 400)
+            return
+
+        if not clip_entrada or not clip_saida:
+            self._json({"error": "Timestamps de inicio e fim sao obrigatorios"}, 400)
+            return
+
+        # Validate timestamp format (MM:SS or HH:MM:SS)
+        def valid_ts(ts):
+            return bool(re.match(r'^(\d{1,2}:)?\d{1,2}:\d{2}$', ts))
+
+        if not valid_ts(clip_entrada) or not valid_ts(clip_saida):
+            self._json({"error": "Formato de timestamp invalido. Use MM:SS ou HH:MM:SS"}, 400)
+            return
+
+        job_id = _create_job()
+        self._json({"job_id": job_id, "video_id": video_id})
+
+        def _run():
+            try:
+                from build import run_custom_build
+                run_custom_build(
+                    video_id=video_id,
+                    clip_entrada=clip_entrada,
+                    clip_saida=clip_saida,
+                    title=title,
+                    thumb_text=thumb_text,
+                    progress_cb=lambda data: _emit(job_id, "progress", data),
+                )
+                _emit(job_id, "complete", {
+                    "video_id": video_id,
+                    "message": f"Corte manual pronto: {clip_entrada} - {clip_saida}",
+                })
+            except Exception as e:
+                _emit(job_id, "error", {"message": str(e)})
+
+        threading.Thread(target=_run, daemon=True).start()
 
     def _handle_approve(self, body):
         video_id = body.get("video_id", "")

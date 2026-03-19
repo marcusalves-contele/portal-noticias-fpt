@@ -105,9 +105,11 @@ def find_font() -> str | None:
 
 def get_live_number(video_id: str) -> str:
     """Tenta extrair número da live via yt-dlp --get-title."""
+    cookies_file = PROJECT_DIR / "cookies.txt"
+    cookies_arg = ["--cookies", str(cookies_file)] if cookies_file.exists() else []
     try:
         r = subprocess.run(
-            ["yt-dlp", "--get-title", f"https://youtube.com/watch?v={video_id}"],
+            ["yt-dlp", "--get-title", *cookies_arg, f"https://youtube.com/watch?v={video_id}"],
             capture_output=True, text=True, timeout=20
         )
         title = r.stdout.strip()
@@ -123,7 +125,39 @@ def get_live_number(video_id: str) -> str:
 # Download
 # -------------------------------------------------------------------
 
+def _parse_ytdlp_error(stderr: str) -> str:
+    """Converte stderr do yt-dlp em mensagem amigável."""
+    s = stderr.lower()
+
+    if "sign in" in s or "bot" in s or "429" in s or "too many" in s:
+        return "YouTube bloqueou o IP por excesso de requests. Tente novamente em 5 minutos ou configure cookies.txt."
+
+    if "403" in s or "forbidden" in s:
+        return "YouTube retornou 403 Forbidden. IP pode estar bloqueado. Configure cookies.txt para autenticar."
+
+    if "video unavailable" in s or "private" in s:
+        return "Video indisponivel ou privado. Verifique a URL."
+
+    if "removed" in s or "copyright" in s:
+        return "Video removido ou bloqueado por direitos autorais."
+
+    if "not a valid url" in s or "unsupported" in s:
+        return "URL invalida. Cole a URL completa do YouTube."
+
+    if "unable to download" in s:
+        return "Nao conseguiu baixar o video. Verifique se a URL esta correta e tente novamente."
+
+    # Fallback: última linha significativa
+    lines = [l.strip() for l in stderr.strip().split("\n") if l.strip() and "WARNING" not in l.upper()]
+    if lines:
+        return f"Erro yt-dlp: {lines[-1][:200]}"
+
+    return "Erro desconhecido no download. Tente novamente."
+
+
 def download_video(video_id: str) -> Path:
+    import time
+
     DOWNLOADS_DIR.mkdir(exist_ok=True)
     # Procura arquivo já baixado
     existing = list(DOWNLOADS_DIR.glob(f"{video_id}.*"))
@@ -131,20 +165,48 @@ def download_video(video_id: str) -> Path:
         print(f"  Vídeo já baixado: {existing[0].name}")
         return existing[0]
 
+    url = f"https://youtube.com/watch?v={video_id}"
     out_tmpl = str(DOWNLOADS_DIR / f"{video_id}.%(ext)s")
-    print(f"  Baixando {video_id} via yt-dlp...")
-    run([
+
+    cookies_file = PROJECT_DIR / "cookies.txt"
+    cookies_arg = ["--cookies", str(cookies_file)] if cookies_file.exists() else []
+
+    cmd = [
         "yt-dlp",
         "-f", "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4][height<=1080]/best",
         "--merge-output-format", "mp4",
+        *cookies_arg,
         "-o", out_tmpl,
-        f"https://youtube.com/watch?v={video_id}",
-    ], desc=f"download {video_id}")
+        url,
+    ]
 
-    result = list(DOWNLOADS_DIR.glob(f"{video_id}.*"))
-    if not result:
-        raise FileNotFoundError(f"Download falhou para {video_id}")
-    return result[0]
+    max_retries = 3
+    delays = [5, 15, 30]
+    last_error = ""
+
+    print(f"  Baixando {video_id} via yt-dlp...")
+
+    for attempt in range(max_retries):
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+
+        if result.returncode == 0:
+            downloaded = list(DOWNLOADS_DIR.glob(f"{video_id}.*"))
+            if downloaded:
+                return downloaded[0]
+
+        stderr = result.stderr or ""
+        last_error = _parse_ytdlp_error(stderr)
+
+        # Erros permanentes: não faz sentido tentar de novo
+        if any(x in stderr.lower() for x in ["video unavailable", "private video", "removed", "copyright"]):
+            raise RuntimeError(last_error)
+
+        if attempt < max_retries - 1:
+            print(f"  Tentativa {attempt + 1} falhou: {last_error}")
+            print(f"  Aguardando {delays[attempt]}s antes de nova tentativa...")
+            time.sleep(delays[attempt])
+
+    raise RuntimeError(last_error)
 
 
 # -------------------------------------------------------------------
@@ -579,6 +641,88 @@ def build_nutella(
         json.dump(meta, f, ensure_ascii=False, indent=2)
 
     return meta
+
+
+# -------------------------------------------------------------------
+# Custom build (corte manual por timestamp)
+# -------------------------------------------------------------------
+
+def run_custom_build(video_id: str, clip_entrada: str, clip_saida: str,
+                     title: str = "Corte Manual", thumb_text: str = "",
+                     progress_cb=None):
+    """Build a custom clip from manual timestamps."""
+    import json as _json
+    import tempfile as _tempfile
+    import shutil as _shutil
+
+    def emit(step, msg):
+        if progress_cb:
+            progress_cb({"step": step, "message": msg})
+
+    # Step 1: Download
+    emit("download", "Baixando video...")
+    source = download_video(video_id)
+    emit("download", f"Video baixado: {source.name}")
+
+    # Step 2: Setup output dirs
+    cuts_dir = OUTPUT_DIR / f"{video_id}_cuts"
+    cuts_dir.mkdir(parents=True, exist_ok=True)
+    tmp_dir = Path(_tempfile.mkdtemp(prefix="nutella_custom_"))
+
+    # Step 3: Create manual nutella entry
+    manual_nutella = {
+        "rank": 99,
+        "titulo_seo": title,
+        "titulo_ctr": title,
+        "titulo_shorts": title,
+        "texto_thumb": thumb_text or title,
+        "clip_entrada": clip_entrada,
+        "clip_saida": clip_saida,
+        "shorts_entrada": clip_entrada,
+        "shorts_saida": clip_saida,
+        "hook_second": clip_entrada,
+        "por_que_viraliza": "Corte manual solicitado pelo time",
+        "tipo": "manual",
+    }
+
+    # Step 4: Get live number
+    live_num = get_live_number(video_id)
+
+    # Step 5: Detect font
+    font = find_font()
+
+    # Step 6: Build using existing pipeline
+    emit("build", f"Cortando {clip_entrada} - {clip_saida}...")
+    shared = {}
+
+    try:
+        build_nutella(manual_nutella, source, live_num, cuts_dir, tmp_dir, shared, True, font)
+    finally:
+        _shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    emit("complete", f"Corte manual pronto: {title}")
+
+    # Step 7: Save manual entry to nutellas JSON
+    json_path = OUTPUT_DIR / f"{video_id}_nutellas.json"
+    if json_path.exists():
+        data = _json.loads(json_path.read_text(encoding="utf-8"))
+        data.setdefault("nutellas", [])
+        # Remove existing rank 99 entry (replace with new one)
+        data["nutellas"] = [n for n in data["nutellas"] if n.get("rank") != 99]
+        data["nutellas"].append(manual_nutella)
+        json_path.write_text(_json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    else:
+        # Create minimal JSON so review screen can find the cut
+        data = {
+            "video_id": video_id,
+            "video_title": title,
+            "youtube_url": f"https://youtube.com/watch?v={video_id}",
+            "generated_at": __import__("datetime").datetime.now().isoformat(),
+            "segments_total": 0,
+            "nutellas": [manual_nutella],
+        }
+        OUTPUT_DIR.mkdir(exist_ok=True)
+        json_path.write_text(_json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 # -------------------------------------------------------------------
