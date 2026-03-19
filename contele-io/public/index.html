@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contele | Rastreamento de Frota e Gestão de Equipes Externas | Sem Fidelidade</title>
+  <meta name="description" content="Rastreamento de frota e gestão de equipes externas sem fidelidade. 1.500+ empresas, 23 anos de mercado. Teste grátis 30 dias. Desde 2003, Santos/SP.">
+  <link rel="canonical" href="https://contele.io/">
+  <meta property="og:title" content="Contele: Gestão de Frotas e Equipes Externas">
+  <meta property="og:description" content="Rastreamento de frota e gestão de equipes externas sem fidelidade. 1.500+ empresas. Teste grátis 30 dias.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://contele.io/">
+  <meta property="og:image" content="https://contele.io/img/equipe.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Contele: Gestão de Frotas e Equipes Externas">
+  <meta name="twitter:description" content="Sem fidelidade. Risco Zero 30 dias. 1.500+ empresas confiam na Contele.">
+  <meta name="twitter:image" content="https://contele.io/img/equipe.png">
+  <link rel="icon" href="/img/brasao-contele.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800&family=DM+Serif+Display&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #4A58FF;
+      --blue-dark: #000976;
+      --blue-mid: #323FDD;
+      --blue-light: #7E88FF;
+      --cyan: #29BDFF;
+      --purple: #8B23E5;
+      --purple-deep: #4E0091;
+      --void: #0c0c14;
+      --deep: #12121e;
+      --surface: #1a1a2e;
+      --border: rgba(74, 88, 255, 0.10);
+      --border-h: rgba(74, 88, 255, 0.25);
+      --text: #d8d8e8;
+      --text-dim: #8e8ea8;
+      --text-muted: #7a7a98;
+      --white: #f0f0ff;
+      --heading: 'DM Serif Display', Georgia, serif;
+      --body: 'DM Sans', -apple-system, sans-serif;
+      --brand: 'Nunito Sans', -apple-system, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--body); background: var(--void); color: var(--text);
+      line-height: 1.75; font-size: 18px; -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: rgba(74,88,255,0.3); color: #fff; }
+    img { max-width: 100%; display: block; }
+    .w { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+
+    /* HEADER */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(12,12,20,0.92);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+    }
+    .h-bar { max-width: 1080px; margin: 0 auto; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { text-decoration: none; }
+    .logo img { height: 30px; }
+    nav { display: flex; gap: 28px; align-items: center; }
+    nav a { font-size: 14px; font-weight: 600; color: var(--text-dim); text-decoration: none; transition: color .2s; }
+    nav a:hover { color: var(--white); }
+    .cta-h { background: var(--blue); color: #fff !important; padding: 8px 18px; border-radius: 6px; font-weight: 700; }
+    .cta-h:hover { background: var(--blue-mid); }
+
+    /* HERO */
+    .hero { padding: 180px 0 120px; position: relative; overflow: hidden; text-align: center; }
+    .hero::before { content:''; position: absolute; top: -300px; left: 50%; transform: translateX(-50%); width: 1200px; height: 1200px; background: radial-gradient(ellipse, rgba(74,88,255,0.10) 0%, rgba(139,35,229,0.04) 40%, transparent 65%); pointer-events: none; }
+    .hero-g { max-width: 720px; margin: 0 auto; }
+    .hero-tag { font-family: var(--brand); font-size: 12px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--blue-light); margin-bottom: 16px; }
+    .hero h1 { font-family: var(--heading); font-size: clamp(42px, 5vw, 64px); color: var(--white); line-height: 1.1; margin-bottom: 24px; }
+    .hero h1 em { font-style: italic; color: var(--blue-light); }
+    .hero-p { font-size: 19px; color: var(--text-dim); margin-bottom: 36px; max-width: 560px; margin-left: auto; margin-right: auto; }
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+    .hero-leaders { display: flex; justify-content: center; margin-bottom: 32px; }
+    .hero-leaders img { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--void); object-fit: cover; margin-left: -10px; }
+    .hero-leaders img:first-child { margin-left: 0; }
+    .hero-leaders-text { font-size: 14px; color: var(--text-muted); margin-left: 12px; display: flex; align-items: center; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 14px 26px; border-radius: 8px; font-family: var(--body); font-size: 15px; font-weight: 700; text-decoration: none; transition: all .2s; border: none; cursor: pointer; }
+    .btn-b { background: var(--blue); color: #fff; }
+    .btn-b:hover { background: var(--blue-mid); }
+    .btn-g { background: transparent; color: var(--text); border: 1px solid rgba(255,255,255,0.12); }
+    .btn-g:hover { border-color: var(--blue-light); color: var(--white); }
+    .hero-img { border-radius: 14px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 24px 48px rgba(0,0,0,0.35); }
+
+    /* STRIP */
+    .strip { padding: 56px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .strip-g { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; text-align: center; }
+    .strip-n { font-family: var(--heading); font-size: 42px; color: var(--white); line-height: 1; }
+    .strip-n span { color: var(--blue-light); }
+    .strip-l { font-size: 13px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; }
+    .strip-5 { grid-template-columns: repeat(5, 1fr); }
+
+    /* SECTIONS */
+    .s { padding: 100px 0; }
+    .s + .s { border-top: 1px solid var(--border); }
+    .s-tag { font-family: var(--brand); font-size: 12px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: var(--blue-light); margin-bottom: 10px; }
+    .s-title { font-family: var(--heading); font-size: clamp(32px, 3.5vw, 44px); color: var(--white); margin-bottom: 14px; }
+    .s-sub { font-size: 18px; color: var(--text-dim); max-width: 560px; margin-bottom: 48px; }
+
+    /* PRODUCTS */
+    .prod-g { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .prod { background: var(--deep); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color .3s, transform .3s; }
+    .prod:hover { border-color: var(--border-h); transform: translateY(-3px); }
+    .prod.teams { border-top: 3px solid var(--blue); }
+    .prod.fleet { border-top: 3px solid var(--purple); }
+    .prod-hero { width: 100%; height: 220px; object-fit: cover; }
+    .prod-header { padding: 28px 28px 20px; position: relative; display: flex; gap: 16px; align-items: center; }
+    .prod.teams .prod-header { background: linear-gradient(135deg, rgba(74,88,255,0.12) 0%, rgba(41,189,255,0.06) 100%); }
+    .prod.fleet .prod-header { background: linear-gradient(135deg, rgba(139,35,229,0.12) 0%, rgba(78,0,145,0.06) 100%); }
+    .prod-leader { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.15); flex-shrink: 0; }
+    .prod-header-text { flex: 1; }
+    .prod-header h3 { font-family: var(--heading); font-size: 28px; color: var(--white); margin-bottom: 4px; }
+    .prod-features { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+    .prod-features li { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 4px; letter-spacing: 0.3px; }
+    .prod.teams .prod-features li { color: var(--blue-light); background: rgba(74,88,255,0.1); }
+    .prod.fleet .prod-features li { color: #b55fff; background: rgba(139,35,229,0.1); }
+    .prod-body { padding: 28px; }
+    .prod-tag { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+    .prod.teams .prod-tag { color: var(--blue-light); }
+    .prod.fleet .prod-tag { color: #b55fff; }
+    .prod-body h3 { font-family: var(--heading); font-size: 26px; color: var(--white); margin-bottom: 10px; }
+    .prod-body p { font-size: 16px; color: var(--text-dim); margin-bottom: 20px; }
+    .prod-link { font-size: 14px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: gap .2s; }
+    .prod.teams .prod-link { color: var(--blue-light); }
+    .prod.fleet .prod-link { color: #b55fff; }
+    .prod-link:hover { gap: 10px; color: var(--white); }
+
+    /* INTEGRATION BANNER */
+    .integ { background: var(--deep); border: 1px solid var(--border); border-radius: 14px; padding: 32px 36px; margin-top: 24px; display: flex; align-items: center; gap: 24px; }
+    .integ-icon { flex-shrink: 0; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--purple)); display: flex; align-items: center; justify-content: center; font-size: 20px; color: #fff; }
+    .integ p { font-size: 15px; color: var(--text-dim); }
+    .integ strong { color: var(--text); }
+
+    /* METHOD */
+    .method-g { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+    .method-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .mc { background: var(--deep); border: 1px solid var(--border); border-radius: 10px; padding: 22px; }
+    .mc strong { color: var(--white); font-size: 15px; display: block; margin-bottom: 4px; }
+    .mc span { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+    /* LEADERS */
+    .leaders-g { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .leader { background: var(--deep); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color .3s; }
+    .leader:hover { border-color: var(--border-h); }
+    .leader-photo { width: 100%; height: 300px; object-fit: cover; object-position: top; }
+    .leader-body { padding: 24px; }
+    .leader-name { font-family: var(--heading); font-size: 20px; color: var(--white); margin-bottom: 2px; }
+    .leader-role { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+    .leader-desc { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+
+    /* CASES CAROUSEL */
+    .cases-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 32px; gap: 24px; }
+    .cases-header-left { flex: 1; }
+    .cases-header-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+
+    .cases-counter {
+      font-family: var(--heading); font-size: 56px; color: var(--white);
+      line-height: 1; letter-spacing: -2px; position: relative;
+    }
+    .cases-counter-label {
+      font-family: var(--body); font-size: 13px; color: var(--text-muted);
+      font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;
+      margin-top: 4px;
+    }
+
+    .cases-nav { display: flex; gap: 8px; }
+    .cases-nav button {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--deep); border: 1px solid var(--border);
+      color: var(--text-dim); font-size: 22px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s ease;
+    }
+    .cases-nav button:hover {
+      background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25);
+      color: var(--white); transform: scale(1.08);
+    }
+    .cases-nav button:active { transform: scale(0.95); }
+
+    .cases-wrap { position: relative; }
+
+    .cases-track {
+      display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch; padding-bottom: 24px;
+      scrollbar-width: none; /* hide default scrollbar, we have custom progress */
+    }
+    .cases-track::-webkit-scrollbar { display: none; }
+
+    .cases-progress {
+      width: 100%; height: 2px; background: rgba(74,88,255,0.1);
+      border-radius: 1px; margin-top: 8px; overflow: hidden;
+    }
+    .cases-progress-bar {
+      height: 100%; background: linear-gradient(90deg, var(--blue), var(--purple));
+      border-radius: 1px; width: 10%; transition: width 0.15s ease;
+    }
+
+    /* hint animation — gentle nudge on first load */
+    @keyframes carouselHint {
+      0%, 100% { transform: translateX(0); }
+      30% { transform: translateX(-40px); }
+      60% { transform: translateX(0); }
+    }
+    .cases-track.hint { animation: carouselHint 1.5s ease 1.5s 1; }
+
+    .case-card {
+      background: var(--deep); border: 1px solid var(--border); border-radius: 14px;
+      padding: 32px; min-width: 340px; max-width: 380px; flex-shrink: 0;
+      scroll-snap-align: start; position: relative; overflow: hidden;
+      transition: border-color .3s, box-shadow .3s;
+    }
+    .case-card:hover {
+      border-color: var(--border-h);
+      box-shadow: 0 8px 32px rgba(74,88,255,0.08);
+    }
+    .case-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .case-card.fleet::before { background: linear-gradient(90deg, var(--purple), var(--purple-deep)); }
+    .case-card.teams::before { background: linear-gradient(90deg, var(--blue), var(--blue-dark)); }
+    .case-badge { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+    .case-card.fleet .case-badge { color: #b55fff; }
+    .case-card.teams .case-badge { color: var(--blue-light); }
+    .case-quote { font-family: var(--heading); font-size: 18px; color: var(--white); line-height: 1.45; margin-bottom: 20px; font-style: italic; }
+    .case-quote::before { content: '\201C'; font-size: 40px; color: var(--blue-light); line-height: 0; vertical-align: -12px; margin-right: 2px; }
+    .case-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+    .case-result { background: rgba(74,88,255,0.06); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
+    .case-result-v { font-family: var(--brand); font-size: 20px; font-weight: 800; color: var(--white); }
+    .case-result-l { font-size: 12px; color: var(--text-muted); }
+
+    @media (max-width: 600px) {
+      .cases-header { flex-direction: column; align-items: flex-start; }
+      .cases-counter { font-size: 40px; }
+      .case-card { min-width: 290px; max-width: 320px; padding: 24px; }
+    }
+
+    /* TEAM */
+    .team-g { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+    .tm { border-radius: 10px; overflow: hidden; border: 1px solid var(--border); transition: transform .3s; }
+    .tm:hover { transform: translateY(-3px); }
+    .tm img { width: 100%; height: 260px; object-fit: cover; object-position: top; }
+    .tm-info { padding: 14px 16px; background: var(--deep); }
+    .tm-info strong { color: var(--white); font-size: 14px; display: block; }
+    .tm-info small { font-size: 11px; color: var(--text-muted); }
+
+    /* EVENT BANNER */
+    .event-banner { margin-top: 40px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
+    .event-banner img { width: 100%; }
+
+    /* CLIENTS */
+    .cl-center { text-align: center; margin-bottom: 48px; }
+    .cl-g { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+    .cl { background: var(--deep); border: 1px solid var(--border); border-radius: 10px; padding: 20px; display: flex; align-items: center; justify-content: center; }
+    .cl img { height: 50px; object-fit: contain; filter: grayscale(1) brightness(0.65); opacity: 0.55; transition: all .3s; }
+    .cl:hover img { filter: none; opacity: 1; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 56px 0 28px; }
+    .ft-g { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+    .ft-brand img { height: 26px; margin-bottom: 14px; }
+    .ft-brand p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+    .ft-col h4 { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+    .ft-col a { display: block; font-size: 14px; color: var(--text-dim); text-decoration: none; margin-bottom: 8px; transition: color .2s; }
+    .ft-col a:hover { color: var(--white); }
+    .ft-bot { border-top: 1px solid var(--border); padding-top: 20px; display: flex; justify-content: space-between; }
+    .ft-bot p, .ft-bot a { font-size: 12px; color: var(--text-muted); text-decoration: none; }
+
+    /* WHATSAPP FAB */
+    .wpp-fab {
+      position: fixed; bottom: 24px; right: 24px; z-index: 99;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: #25D366; color: #fff; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; text-decoration: none;
+      box-shadow: 0 4px 16px rgba(37,211,102,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .wpp-fab:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(37,211,102,0.5); }
+
+    /* CTA INTERMEDIARIO */
+    .cta-mid {
+      text-align: center; padding: 48px 0;
+      border-top: 1px solid var(--border);
+    }
+    .cta-mid p { font-size: 15px; color: var(--text-muted); margin-top: 12px; }
+
+    /* RISCO ZERO BADGE */
+    .risco-zero {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(37,211,102,0.08); border: 1px solid rgba(37,211,102,0.2);
+      border-radius: 8px; padding: 10px 20px; margin-top: 20px;
+      font-size: 14px; font-weight: 700; color: #25D366;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero-g, .prod-g, .method-g, .leaders-g { grid-template-columns: 1fr; }
+      .hero { padding: 120px 0 60px; }
+      .ft-g { grid-template-columns: 1fr 1fr; }
+      .team-g { grid-template-columns: 1fr 1fr; }
+      .case-numbers { flex-wrap: wrap; gap: 20px; }
+      .integ { flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .strip-g, .strip-5, .cl-g { grid-template-columns: 1fr 1fr; }
+      .team-g, .method-cards { grid-template-columns: 1fr; }
+      nav { display: none; }
+      .ft-g { grid-template-columns: 1fr; }
+      .ft-bot { flex-direction: column; gap: 6px; text-align: center; }
+      .leaders-g { gap: 16px; }
+      .case { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="h-bar">
+    <a href="/" class="logo"><img src="/logo-contele-branco.png" alt="Contele"></a>
+    <nav>
+      <a href="#produtos">Produtos</a>
+      <a href="#metodologia">Metodologia</a>
+      <a href="#lideranca">Liderança</a>
+      <a href="#clientes">Clientes</a>
+      <a href="https://api.whatsapp.com/send/?phone=5511971325108" class="cta-h">Fale conosco</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="w">
+    <div class="hero-g">
+      <div>
+        <div class="hero-tag">Desde 2003</div>
+        <h1>Frotas que custam menos.<br>Equipes que entregam <em>mais.</em></h1>
+        <p class="hero-p">Software para quem gerencia frota ou equipe em campo. Equipe própria de engenharia, integração e IA. 50 pessoas, 1.500+ empresas, 7 países.</p>
+        <div class="hero-leaders">
+          <img src="/img/julio.png" alt="Julio César">
+          <img src="/img/leonardo.png" alt="Leonardo Gazolli">
+          <img src="/img/marco.png" alt="Marco Fassa">
+          <span class="hero-leaders-text">Liderado por quem vive a operação</span>
+        </div>
+        <div class="hero-btns">
+          <a href="https://api.whatsapp.com/send/?phone=5511971325108&text=Oi%2C%20vim%20pelo%20site%20contele.io%20e%20queria%20saber%20mais" class="btn btn-b">Falar com especialista &rarr;</a>
+          <a href="https://contelerastreador.com.br/" target="_blank" rel="noopener" class="btn btn-g">Contele Fleet</a>
+          <a href="https://conteleteams.com.br/" target="_blank" rel="noopener" class="btn btn-g">Contele Teams</a>
+        </div>
+        <div class="risco-zero">&#x2713; Sem fidelidade &middot; Risco Zero 30 dias &middot; Sem multa</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NÚMEROS -->
+<section class="strip">
+  <div class="w">
+    <div class="strip-g strip-5">
+      <div>
+        <div class="strip-n">23<span>+</span></div>
+        <div class="strip-l">Anos em campo</div>
+      </div>
+      <div>
+        <div class="strip-n">1.500<span>+</span></div>
+        <div class="strip-l">Empresas atendidas</div>
+      </div>
+      <div>
+        <div class="strip-n">50k<span>+</span></div>
+        <div class="strip-l">Usuários dos sistemas</div>
+      </div>
+      <div>
+        <div class="strip-n">20k<span>+</span></div>
+        <div class="strip-l">Veículos e pessoas na rua</div>
+      </div>
+      <div>
+        <div class="strip-n">7</div>
+        <div class="strip-l">Países</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUTOS -->
+<section class="s" id="produtos">
+  <div class="w">
+    <div class="s-tag">Produtos</div>
+    <h2 class="s-title">Gestão de frota não é gestão de equipe</h2>
+    <p class="s-sub">São problemas diferentes. Por isso são dois produtos, cada um construído pra dor específica do gestor.</p>
+    <div class="prod-g">
+      <div class="prod teams">
+        <img src="/img/teams-hero.png" loading="lazy" class="prod-hero" alt="Profissionais diversos em campo usando Contele Teams">
+        <div class="prod-header">
+          <img src="/img/leonardo.png" class="prod-leader" alt="Leonardo Gazolli">
+          <div class="prod-header-text">
+            <div class="prod-tag">Equipes externas</div>
+            <h3>Contele Teams</h3>
+          </div>
+        </div>
+        <div class="prod-body">
+          <ul class="prod-features">
+            <li>Controle de visitas</li>
+            <li>Monitoramento</li>
+            <li>Roteirização</li>
+            <li>Reembolso</li>
+            <li>Ordem de Serviço</li>
+            <li>Checklist Digital</li>
+            <li>Abertura de chamados</li>
+          </ul>
+          <p>Para gestores de equipes em campo: facilities, manutenção, vendas externas, promotores. Saber quem está onde, o que fez, quanto tempo levou.</p>
+          <a href="https://conteleteams.com.br/" target="_blank" rel="noopener" class="prod-link">Conhecer o Teams &rarr;</a>
+        </div>
+      </div>
+      <div class="prod fleet">
+        <img src="/img/fleet-hero.png" loading="lazy" class="prod-hero" alt="Frota diversa com gestores usando Contele Fleet">
+        <div class="prod-header">
+          <img src="/img/julio.png" class="prod-leader" alt="Julio César">
+          <div class="prod-header-text">
+            <div class="prod-tag">Gestão de frotas</div>
+            <h3>Contele Fleet</h3>
+          </div>
+        </div>
+        <div class="prod-body">
+          <ul class="prod-features">
+            <li>Câmera Veicular</li>
+            <li>Rastreamento</li>
+            <li>Combustível</li>
+            <li>Manutenção</li>
+            <li>Checklists</li>
+            <li>Motorista</li>
+            <li>Multas</li>
+          </ul>
+          <p>Controle total da frota. Sem fidelidade, sem multa, Risco Zero 30 dias. Se não resolver, você sai. Transportadoras, locadoras e frotas corporativas.</p>
+          <a href="https://contelerastreador.com.br/" target="_blank" rel="noopener" class="prod-link">Conhecer o Fleet &rarr;</a>
+        </div>
+      </div>
+    </div>
+    <div class="integ">
+      <div class="integ-icon">&#8644;</div>
+      <p><strong>Integração nativa entre os dois produtos.</strong> Clientes que usam Teams e Fleet se beneficiam da sincronização de Locais. Cadastrou num, aparece no outro. Sem retrabalho.</p>
+    </div>
+  </div>
+</section>
+
+<!-- METODOLOGIA -->
+<section class="s" id="metodologia">
+  <div class="w">
+    <div class="method-g">
+      <div>
+        <div class="s-tag">Mais que software</div>
+        <h2 class="s-title">Metodologia, resultado e equipe própria de integração</h2>
+        <p style="color:var(--text-dim);font-size:16px;line-height:1.8;">A Contele não entrega só um sistema e manda o cliente se virar. Temos equipe interna que conecta o software ao ERP do cliente e resolve o problema de ponta a ponta. Sem terceirizar, sem mandar procurar outra empresa pra integrar com nosso produto.</p>
+      </div>
+      <div>
+        <div class="method-cards">
+          <div class="mc">
+            <strong>Integração própria</strong>
+            <span>Equipe interna que conecta Contele ao ERP, Totvs, SAP, planilhas. O cliente não precisa contratar terceiros.</span>
+          </div>
+          <div class="mc">
+            <strong>IA em produção</strong>
+            <span>15 sistemas rodando: atendimento, análise, detecção de fraude, conteúdo automatizado. Resultado real, não PowerPoint.</span>
+          </div>
+          <div class="mc">
+            <strong>Sem lock-in</strong>
+            <span>Fleet sem fidelidade. Teams sem multa. Risco Zero 30 dias. A confiança vem do resultado, não do contrato.</span>
+          </div>
+          <div class="mc">
+            <strong>Atendimento humano</strong>
+            <span>50+ videochamadas por dia com gente que conhece o produto. IA resolve o repetitivo, humano resolve o complexo.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIDERANÇA -->
+<section class="s" id="lideranca">
+  <div class="w">
+    <div class="s-tag">Quem lidera</div>
+    <h2 class="s-title">Experiência real em gestão de frotas e equipes</h2>
+    <p class="s-sub">A Contele é liderada por quem vive o problema. O conteúdo vem de especialistas reais com décadas de experiência, não de texto gerado por IA.</p>
+    <div class="leaders-g">
+      <div class="leader">
+        <img src="/img/julio.png" loading="lazy" class="leader-photo" alt="Julio César">
+        <div class="leader-body">
+          <div class="leader-name">Julio César</div>
+          <div class="leader-role">CEO Contele Fleet</div>
+          <p class="leader-desc">Engenheiro Eletrônico, 23 anos em gestão de frotas. Criador do <strong>Frota Para Todos</strong>: maior comunidade de gestores de frota do Brasil. +33 mil inscritos, +2 mil vídeos, lives toda quarta às 8h.</p>
+          <div style="display:flex;gap:12px;margin-top:10px;">
+            <a href="https://www.linkedin.com/in/julio-cesar-fassa/" target="_blank" style="font-size:13px;font-weight:600;color:var(--text-dim);text-decoration:none;transition:color .2s;">LinkedIn</a>
+            <a href="https://www.instagram.com/juliofassa/" target="_blank" style="font-size:13px;font-weight:600;color:var(--text-dim);text-decoration:none;transition:color .2s;">Instagram</a>
+          </div>
+        </div>
+      </div>
+      <div class="leader">
+        <img src="/img/leonardo.png" loading="lazy" class="leader-photo" alt="Leonardo Gazolli">
+        <div class="leader-body">
+          <div class="leader-name">Leonardo Gazolli</div>
+          <div class="leader-role">CEO Contele Teams</div>
+          <p class="leader-desc">À frente da estratégia do Contele Teams e da operação de equipes externas. Foco em transformar gestão de campo em resultado mensurável para o cliente.</p>
+          <div style="display:flex;gap:12px;margin-top:10px;">
+            <a href="https://www.linkedin.com/in/leonardogazolli/" target="_blank" style="font-size:13px;font-weight:600;color:var(--text-dim);text-decoration:none;transition:color .2s;">LinkedIn</a>
+            <a href="https://www.instagram.com/leogazolli/" target="_blank" style="font-size:13px;font-weight:600;color:var(--text-dim);text-decoration:none;transition:color .2s;">Instagram</a>
+          </div>
+        </div>
+      </div>
+      <div class="leader">
+        <img src="/img/marco.png" loading="lazy" class="leader-photo" alt="Marco Fassa">
+        <div class="leader-body">
+          <div class="leader-name">Marco Fassa</div>
+          <div class="leader-role">CTO</div>
+          <p class="leader-desc">Engenheiro de Software, responsável pela engenharia, infraestrutura e os 15 sistemas de IA da Contele. Time enxuto, automação pesada, zero terceirização de core.</p>
+          <div style="display:flex;gap:12px;margin-top:10px;">
+            <a href="https://www.linkedin.com/in/marcoantoniofassa/" target="_blank" style="font-size:13px;font-weight:600;color:var(--text-dim);text-decoration:none;transition:color .2s;">LinkedIn</a>
+            <a href="https://www.instagram.com/marcofassa.ia/" target="_blank" style="font-size:13px;font-weight:600;color:var(--text-dim);text-decoration:none;transition:color .2s;">Instagram</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CASE -->
+<section class="s" id="case">
+  <div class="w">
+    <div class="cases-header">
+      <div class="cases-header-left">
+        <div class="s-tag">Depoimentos reais</div>
+        <h2 class="s-title">O que nossos clientes dizem</h2>
+      </div>
+      <div class="cases-header-right">
+        <div style="text-align:right;">
+          <div class="cases-counter" id="casesCount">130<span style="color:var(--blue-light);">+</span></div>
+          <div class="cases-counter-label">Depoimentos documentados</div>
+        </div>
+        <div class="cases-nav">
+          <button onclick="document.getElementById('casesTrack').scrollBy({left:-380,behavior:'smooth'})" aria-label="Anterior">&#8592;</button>
+          <button onclick="document.getElementById('casesTrack').scrollBy({left:380,behavior:'smooth'})" aria-label="Próximo">&#8594;</button>
+        </div>
+      </div>
+    </div>
+    <div class="cases-wrap">
+    <div class="cases-track hint" id="casesTrack">
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 53 veículos</div>
+        <div class="case-quote">O cara bateu e disse que foi nosso carro. Eu respondi: nosso carro tem câmera, vamos puxar as filmagens. O cara desistiu na hora.</div>
+        <div class="case-meta">Varejo · 6 filiais</div>
+        <div class="case-result"><div class="case-result-v">Fraude evitada</div><div class="case-result-l">Câmera como prova jurídica</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 215 licenças</div>
+        <div class="case-quote">Se eu já era fã de vocês, agora nem se fala! Vocês nos mostraram o valor de uma verdadeira parceria.</div>
+        <div class="case-meta">Serviços · Cliente desde 2024</div>
+        <div class="case-result"><div class="case-result-v">3.848 locais</div><div class="case-result-l">Recadastrados em 1 dia</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 23 veículos</div>
+        <div class="case-quote">Muito superior à Cobli. O motorista mais tiozinho consegue usar. O checklist com foto é outra pegada. Não tem comparação.</div>
+        <div class="case-meta">Eventos</div>
+        <div class="case-result"><div class="case-result-v">Superior</div><div class="case-result-l">vs Cobli, Omnilink e Autotrac</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 41 licenças</div>
+        <div class="case-quote">Superou as expectativas. Atende 90 a 95% do que a gente demanda. Em 7 anos na companhia, era a principal dor que faltava resolver.</div>
+        <div class="case-meta">Serviços Financeiros</div>
+        <div class="case-result"><div class="case-result-v">95%</div><div class="case-result-l">Demandas atendidas</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 215 veículos</div>
+        <div class="case-quote">Identificação de motoristas caiu de 5 horas para instantâneo. Tudo na mão, sem precisar ficar olhando quem é.</div>
+        <div class="case-meta">Agronegócio · 210 OBD + 5 câmeras</div>
+        <div class="case-result"><div class="case-result-v">5h → instantâneo</div><div class="case-result-l">Identificação de motoristas</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 43 veículos</div>
+        <div class="case-quote">Não me preocupo com o caminhão, patrimônio a gente recupera. Mas a vida do ser humano que dirige, não tem dinheiro que pague. O sistema nos dá suporte pra cuidar disso.</div>
+        <div class="case-meta">Distribuição</div>
+        <div class="case-result"><div class="case-result-v">Segurança</div><div class="case-result-l">Videomonitoramento com IA</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 25 licenças</div>
+        <div class="case-quote">Essas informações não são pra cobrar resultado. É porque a gente pode ir atrás de mais oportunidade. Estou muito feliz, é uma evolução.</div>
+        <div class="case-meta">Capitalização/Seguros</div>
+        <div class="case-result"><div class="case-result-v">Estratégico</div><div class="case-result-l">Uso para oportunidades, não fiscalização</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 140 veículos</div>
+        <div class="case-quote">O retorno de vocês fechou com chave de ouro. É difícil contratar uma empresa com tamanha responsabilidade e ter o feedback que vocês têm.</div>
+        <div class="case-meta">Construção Civil</div>
+        <div class="case-result"><div class="case-result-v">140 veículos</div><div class="case-result-l">Confiança total da diretoria</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 20 veículos</div>
+        <div class="case-quote">Tivemos um carro roubado e graças à Contele conseguimos recuperar o veículo e acionar a polícia. Ainda bem que temos vocês!</div>
+        <div class="case-meta">Saúde/Emergências</div>
+        <div class="case-result"><div class="case-result-v">Veículo recuperado</div><div class="case-result-l">Rastreamento em tempo real</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 316 licenças</div>
+        <div class="case-quote">A gente tinha certeza que mais pessoas viriam. Sucesso para vocês.</div>
+        <div class="case-meta">Trade Marketing · 6 contas</div>
+        <div class="case-result"><div class="case-result-v">316 licenças</div><div class="case-result-l">Expansão contínua</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 4 veículos</div>
+        <div class="case-quote">Tenho primo com empresa de rastreador e não faço com ele. O negócio está dando certo, não se mexe. Não vou nem experimentar.</div>
+        <div class="case-meta">Autoescola · 5 anos de cliente</div>
+        <div class="case-result"><div class="case-result-v">5 anos</div><div class="case-result-l">Fidelidade, recusa concorrente familiar</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 25 licenças</div>
+        <div class="case-quote">A IA de vocês é incrível. Eu indiquei como benchmark. Queremos desenvolver IA aqui e alguém pode procurar vocês pra bater um papo.</div>
+        <div class="case-meta">Tecnologia/Fidelidade</div>
+        <div class="case-result"><div class="case-result-v">Benchmark</div><div class="case-result-l">IA indicada como referência de mercado</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 16 veículos</div>
+        <div class="case-quote">Um alerta de uso fora do horário foi disparado e flagrei um desvio de rota real em tempo hábil. Superior ao que eu tinha na Localiza.</div>
+        <div class="case-meta">Energia</div>
+        <div class="case-result"><div class="case-result-v">Fraude flagrada</div><div class="case-result-l">ROI instantâneo, superior a Localiza</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 4 licenças</div>
+        <div class="case-quote">Perguntei se queriam voltar para a planilha. Disseram que não querem mais voltar a como era antes de jeito nenhum.</div>
+        <div class="case-meta">Lazer/Turismo</div>
+        <div class="case-result"><div class="case-result-v">Irreversível</div><div class="case-result-l">Adoção total, fim do papel</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 8 veículos</div>
+        <div class="case-quote">Passamos a operar com uma das plataformas mais completas do mercado. Já comunicamos nossos clientes sobre essa parceria.</div>
+        <div class="case-meta">Transporte Alimentar</div>
+        <div class="case-result"><div class="case-result-v">Diferencial</div><div class="case-result-l">Comunicado aos clientes finais</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 7 → 42 veículos</div>
+        <div class="case-quote">Vamos iniciar a compra de mais 30 rastreadores.</div>
+        <div class="case-meta">Automotivo</div>
+        <div class="case-result"><div class="case-result-v">+500%</div><div class="case-result-l">Expansão após reverter cancelamento</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 146 licenças</div>
+        <div class="case-quote">Adoro o layout da plataforma. Vocês sempre estão dispostos a ajudar em todas as situações. Tem bastante treinamento pro time de campo.</div>
+        <div class="case-meta">Contact Center · Cresceu de 30 para 146</div>
+        <div class="case-result"><div class="case-result-v">30 → 146</div><div class="case-result-l">Crescimento orgânico interno</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 37 veículos</div>
+        <div class="case-quote">Recebi muitas propostas de concorrentes. Mas a localização em tempo real e o controle de custo foram os pontos-chave. Fez sentido.</div>
+        <div class="case-meta">Cerâmica/Transporte</div>
+        <div class="case-result"><div class="case-result-v">Escolha</div><div class="case-result-l">Sobre múltiplos concorrentes</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 6 licenças</div>
+        <div class="case-quote">Facilitou bastante, melhorou em 100% para os promotores. A contagem de KMs está perfeita. Faz o check-in, check-out e já vai.</div>
+        <div class="case-meta">Trade/Promotores</div>
+        <div class="case-result"><div class="case-result-v">+100%</div><div class="case-result-l">Melhoria na rotina dos promotores</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 241 veículos</div>
+        <div class="case-quote">Não queremos esse veículo na operação sem monitoramento.</div>
+        <div class="case-meta">Infraestrutura · Cliente desde 2018</div>
+        <div class="case-result"><div class="case-result-v">7 anos</div><div class="case-result-l">Cliente contínuo</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 5 veículos</div>
+        <div class="case-quote">Meu pai era contra a tecnologia. Mas ao ver o sistema funcionando, já gostou. Os motoristas se ligaram que estão sendo monitorados e já estão fazendo mais média.</div>
+        <div class="case-meta">Construção</div>
+        <div class="case-result"><div class="case-result-v">Cultura</div><div class="case-result-l">Quebra de resistência interna</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 5 licenças</div>
+        <div class="case-quote">Não vou dar 10 pra você não se achar muito, mas um 9.8 eu acredito. Indicaria sim.</div>
+        <div class="case-meta">Equipamentos</div>
+        <div class="case-result"><div class="case-result-v">Nota 9.8</div><div class="case-result-l">Indicação espontânea</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 4 licenças</div>
+        <div class="case-quote">Me facilitou a questão de comunicação com o cliente. Na ordem de serviço digital, está atendendo muito bem.</div>
+        <div class="case-meta">Manutenção de Elevadores</div>
+        <div class="case-result"><div class="case-result-v">Digital</div><div class="case-result-l">OS em papel eliminada</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 46 veículos</div>
+        <div class="case-quote">Fiz uma pesquisa bem minuciosa antes de fechar. Estou muito satisfeito. O sistema entrega mais do que eu consigo usar.</div>
+        <div class="case-meta">Logística</div>
+        <div class="case-result"><div class="case-result-v">Escolha consciente</div><div class="case-result-l">Pesquisa comparativa</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 6 licenças</div>
+        <div class="case-quote">Ficou bonito, visualmente está muito bom. Estou apaixonada! Agora eu vou ter informações rápidas.</div>
+        <div class="case-meta">Indústria Química</div>
+        <div class="case-result"><div class="case-result-v">Dashboard</div><div class="case-result-l">Reação emocional ao personalizado</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 6 veículos</div>
+        <div class="case-quote">O aplicativo para motoristas é muito intuitivo. O Ezequias conseguiu usar antes mesmo de um treinamento formal.</div>
+        <div class="case-meta">Transportes</div>
+        <div class="case-result"><div class="case-result-v">87,5%</div><div class="case-result-l">Aproveitamento imediato</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 10 licenças</div>
+        <div class="case-quote">Só consigo cobrar do meu cliente se as OS estiverem certas. O sistema atende muito bem na praticidade que a nossa atividade exige.</div>
+        <div class="case-meta">Construção/Locação</div>
+        <div class="case-result"><div class="case-result-v">Faturamento</div><div class="case-result-l">OS como base de cobrança</div></div>
+      </div>
+
+      <div class="case-card teams">
+        <div class="case-badge">Teams · 4 licenças</div>
+        <div class="case-quote">Tudo era manual e conseguimos colocar grande parte no aplicativo. Economia de tempo em situações que demoraria muito.</div>
+        <div class="case-meta">Operação de Campo</div>
+        <div class="case-result"><div class="case-result-v">100% → digital</div><div class="case-result-l">Migração total do manual</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 33 veículos</div>
+        <div class="case-quote">Pelo mapa consigo acompanhar tranquilo. A cerca eletrônica para monitorar as fazendas ficou perfeito. Resolveu o problema.</div>
+        <div class="case-meta">Agronegócio</div>
+        <div class="case-result"><div class="case-result-v">Cercas</div><div class="case-result-l">Monitoramento de fazendas</div></div>
+      </div>
+
+      <div class="case-card fleet">
+        <div class="case-badge">Fleet · 8 veículos</div>
+        <div class="case-quote">Na empresa anterior, migrei da concorrência para a Contele. O atendimento e o suporte são muito dinâmicos. A exploração de dados é precisa e em tempo real.</div>
+        <div class="case-meta">Sinalização Viária</div>
+        <div class="case-result"><div class="case-result-v">Reconquista</div><div class="case-result-l">Gestor trouxe Contele da empresa anterior</div></div>
+      </div>
+
+    </div>
+    <div class="cases-progress"><div class="cases-progress-bar" id="casesProgress"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA INTERMEDIÁRIO -->
+<div class="cta-mid">
+  <div class="w">
+    <a href="https://api.whatsapp.com/send/?phone=5511971325108&text=Oi%2C%20vim%20pelo%20site%20contele.io%20e%20queria%20saber%20mais" class="btn btn-b" style="font-size:17px;padding:16px 32px;">Falar com especialista &rarr;</a>
+    <p>Sem fidelidade. Risco Zero 30 dias. Sem multa.</p>
+  </div>
+</div>
+
+<!-- EQUIPE -->
+<section class="s" id="equipe">
+  <div class="w">
+    <div class="s-tag">Time</div>
+    <h2 class="s-title">50 pessoas. IA onde faz sentido. Humano onde importa.</h2>
+    <p class="s-sub">Time enxuto que resolve. Automação no repetitivo, gente de verdade no que exige contexto e empatia.</p>
+    <div class="team-g">
+      <div class="tm">
+        <img src="/img/fernanda-uniforme.png" alt="Fernanda">
+        <div class="tm-info"><strong>Fernanda</strong><small>Produto</small></div>
+      </div>
+      <div class="tm">
+        <img src="/img/chris-uniforme.png" alt="Christopher">
+        <div class="tm-info"><strong>Christopher</strong><small>Marketing</small></div>
+      </div>
+      <div class="tm">
+        <img src="/img/nathaly-uniforme.png" alt="Nathaly">
+        <div class="tm-info"><strong>Nathaly</strong><small>Onboarding</small></div>
+      </div>
+      <div class="tm">
+        <img src="/img/luana-uniforme.png" alt="Luana">
+        <div class="tm-info"><strong>Luana</strong><small>Customer Success</small></div>
+      </div>
+    </div>
+    <div class="event-banner">
+      <img src="/img/evento-1.png" alt="Equipe Contele reunida em evento presencial">
+    </div>
+  </div>
+</section>
+
+<!-- TECNOLOGIA -->
+<section class="s" style="padding:60px 0;">
+  <div class="w">
+    <p style="text-align:center;font-size:14px;color:var(--text-muted);margin-bottom:28px;font-weight:600;text-transform:uppercase;letter-spacing:2px;">Infraestrutura e parceiros tecnológicos</p>
+    <div style="display:flex;justify-content:center;align-items:center;gap:48px;flex-wrap:wrap;opacity:0.5;">
+      <span style="font-family:var(--brand);font-size:22px;font-weight:800;color:var(--text-dim);letter-spacing:1px;">ANATEL</span>
+      <span style="font-family:var(--brand);font-size:18px;font-weight:700;color:var(--text-dim);">amazon<br><small style="font-size:11px;letter-spacing:0.5px;">web services</small></span>
+      <span style="font-family:var(--brand);font-size:20px;font-weight:700;color:var(--text-dim);">Google Maps</span>
+      <span style="font-family:var(--brand);font-size:20px;font-weight:700;color:var(--text-dim);">Google Cloud</span>
+      <span style="font-family:var(--brand);font-size:20px;font-weight:700;color:var(--text-dim);">Cloudflare</span>
+      <span style="font-family:var(--brand);font-size:20px;font-weight:700;color:var(--text-dim);">WhatsApp</span>
+      <span style="font-family:var(--brand);font-size:20px;font-weight:700;color:var(--text-dim);">Anthropic</span>
+    </div>
+  </div>
+</section>
+
+<!-- NA PRÁTICA -->
+<section class="s" id="eventos">
+  <div class="w">
+    <div class="cl-center">
+      <div class="s-tag">Na prática</div>
+      <h2 class="s-title">Empresa real, com gente real</h2>
+    </div>
+    <div class="cl-g">
+      <div class="cl"><img src="/img/cliente-1.png" alt="Equipe reunida no WCP 2024" style="height:auto;filter:none;opacity:1;"></div>
+      <div class="cl"><img src="/img/cliente-2.png" alt="Estande Contele no WCP 2024" style="height:auto;filter:none;opacity:1;"></div>
+      <div class="cl"><img src="/img/cliente-3.png" alt="Caminhão Frota Para Todos no WCP 2024" style="height:auto;filter:none;opacity:1;"></div>
+      <div class="cl"><img src="/img/cliente-4.png" alt="Evento Contele" style="height:auto;filter:none;opacity:1;"></div>
+      <div class="cl"><img src="/img/cliente-5.png" alt="Evento Contele" style="height:auto;filter:none;opacity:1;"></div>
+      <div class="cl"><img src="/img/cliente-6.png" alt="Evento Contele" style="height:auto;filter:none;opacity:1;"></div>
+      <div class="cl"><img src="/img/cliente-7.png" alt="Evento Contele" style="height:auto;filter:none;opacity:1;"></div>
+      <div class="cl"><img src="/img/evento-simulador.png" alt="Simulador de direção no estande Contele Fleet" style="height:auto;filter:none;opacity:1;" loading="lazy"></div>
+      <div class="cl"><img src="/img/evento-hardware.png" alt="Dispositivos de rastreamento e câmeras Contele no estande" style="height:auto;filter:none;opacity:1;" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="w">
+    <div class="ft-g">
+      <div class="ft-brand">
+        <img src="/logo-contele-branco.png" alt="Contele">
+        <p>Gestão de frotas e equipes externas com metodologia, IA e atendimento humano. Santos/SP, desde 2003.</p>
+      </div>
+      <div class="ft-col">
+        <h4>Produtos</h4>
+        <a href="https://conteleteams.com.br/">Contele Teams</a>
+        <a href="https://contelerastreador.com.br/">Contele Fleet</a>
+        <a href="https://frotaparatodos.com.br/">Frota Para Todos</a>
+        <a href="https://blog.contelerastreador.com.br/">Blog Fleet</a>
+        <a href="https://blog.conteleteams.com.br/">Blog Teams</a>
+      </div>
+      <div class="ft-col">
+        <h4>Empresa</h4>
+        <a href="#lideranca">Liderança</a>
+        <a href="#metodologia">Metodologia</a>
+        <a href="/privacy">Privacidade</a>
+      </div>
+      <div class="ft-col">
+        <h4>Contato</h4>
+        <a href="mailto:faleconosco@contele.com.br">faleconosco@contele.com.br</a>
+        <a href="https://api.whatsapp.com/send/?phone=5511971325108">WhatsApp: (11) 97132-5108</a>
+        <a href="https://maps.google.com/?q=R.+Euclides+da+Cunha+11+Santos+SP" target="_blank" rel="noopener">R. Euclides da Cunha, 11 · Santos/SP</a>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid var(--border);padding-top:24px;margin-bottom:24px;">
+      <h4 style="font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:12px;">Canais oficiais da Contele (proteção contra golpes)</h4>
+      <p style="font-size:15px;color:var(--text-muted);line-height:1.8;margin-bottom:12px;">
+        A Contele só se comunica pelos canais abaixo. E-mails legítimos sempre terminam em <strong style="color:var(--text);">@contele.com.br</strong>.
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:15px;color:var(--text-dim);">
+        <span>Atendimento: <a href="https://api.whatsapp.com/send/?phone=5511971325108" style="color:var(--blue-light);">(11) 97132-5108</a></span>
+        <span>Vendas Teams: <a href="https://api.whatsapp.com/send/?phone=5511963956002" style="color:var(--blue-light);">(11) 96395-6002</a></span>
+        <span>Marketing: <a href="https://api.whatsapp.com/send/?phone=5511930971669" style="color:var(--blue-light);">(11) 93097-1669</a></span>
+        <span>Marketing: <a href="https://api.whatsapp.com/send/?phone=5511998859989" style="color:var(--blue-light);">(11) 99885-9989</a></span>
+      </div>
+    </div>
+
+    <div class="ft-bot">
+      <p>&copy; 2003–2026 Contele Soluções Tecnológicas Ltda. CNPJ 07.651.877/0001-91</p>
+      <a href="/privacy">Política de Privacidade</a>
+    </div>
+  </div>
+</footer>
+
+<!-- WHATSAPP FAB -->
+<a href="https://api.whatsapp.com/send/?phone=5511971325108&text=Oi%2C%20vim%20pelo%20site%20contele.io%20e%20queria%20saber%20mais" class="wpp-fab" aria-label="Fale conosco pelo WhatsApp" target="_blank" rel="noopener">&#9742;</a>
+
+<script>
+// ─── Fade-in on scroll ───
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.s, .strip, .prod, .leader, .tm, .mc, .integ').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(28px)';
+  el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+  obs.observe(el);
+});
+
+// ─── Counter animation ───
+function animateCounter(el, target, suffix) {
+  let current = 0;
+  const step = Math.max(1, Math.floor(target / 40));
+  const timer = setInterval(() => {
+    current += step;
+    if (current >= target) { current = target; clearInterval(timer); }
+    el.innerHTML = current.toLocaleString('pt-BR') + (suffix || '');
+  }, 30);
+}
+
+const stripObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !e.target.dataset.counted) {
+      e.target.dataset.counted = '1';
+      const nums = e.target.querySelectorAll('.strip-n');
+      animateCounter(nums[0], 23, '<span>+</span>');
+      animateCounter(nums[1], 1500, '<span>+</span>');
+      animateCounter(nums[2], 50, 'k<span>+</span>');
+      animateCounter(nums[3], 20, 'k<span>+</span>');
+      animateCounter(nums[4], 7, '');
+    }
+  });
+}, { threshold: 0.3 });
+stripObs.observe(document.querySelector('.strip'));
+
+// ─── Carousel progress bar ───
+const track = document.getElementById('casesTrack');
+const bar = document.getElementById('casesProgress');
+if (track && bar) {
+  track.addEventListener('scroll', () => {
+    const pct = track.scrollLeft / (track.scrollWidth - track.clientWidth) * 100;
+    bar.style.width = Math.max(5, pct) + '%';
+  });
+}
+
+// ─── Hero floating particles (subtle motion) ───
+(function() {
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;';
+  hero.style.position = 'relative';
+  hero.insertBefore(canvas, hero.firstChild);
+  // Make hero content above canvas
+  hero.querySelectorAll('.w').forEach(w => w.style.position = 'relative');
+  hero.querySelectorAll('.w').forEach(w => w.style.zIndex = '1');
+
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [];
+
+  function resize() {
+    w = canvas.width = canvas.offsetWidth * devicePixelRatio;
+    h = canvas.height = canvas.offsetHeight * devicePixelRatio;
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+  }
+
+  function init() {
+    resize();
+    particles = [];
+    const count = Math.floor(canvas.offsetWidth / 25);
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * canvas.offsetWidth,
+        y: Math.random() * canvas.offsetHeight,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -Math.random() * 0.4 - 0.1,
+        r: Math.random() * 1.5 + 0.5,
+        o: Math.random() * 0.15 + 0.03,
+        color: Math.random() > 0.5 ? '74,88,255' : '139,35,229'
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.y < -10) { p.y = canvas.offsetHeight + 10; p.x = Math.random() * canvas.offsetWidth; }
+      if (p.x < -10) p.x = canvas.offsetWidth + 10;
+      if (p.x > canvas.offsetWidth + 10) p.x = -10;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color},${p.o})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  init();
+  draw();
+  window.addEventListener('resize', () => { resize(); init(); });
+})();
+</script>
+
+</body>
+</html>
