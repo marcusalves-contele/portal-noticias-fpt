@@ -62,6 +62,7 @@ const EVOLUTION_URL = process.env.EVOLUTION_API_URL || 'https://evolution-api-81
 const EVOLUTION_KEY = process.env.EVOLUTION_API_KEY;
 const EVOLUTION_INSTANCE = process.env.EVOLUTION_INSTANCE || 'Vendas n2';
 const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK_URL;
+const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK_URL || 'https://discord.com/api/webhooks/1484533109553758208/qHY5TOheRHN_4-kJdPISRb1KgCO_UTzxy4NmL7B4gzi_0SXkyIt0gQq6olHAz5jHYnKM';
 const SPREADSHEET_API = 'https://ge-prd-web-api.contele.com.br/api/v1/spreadsheet/1cM0RpSRWarWNqSYDfjqTkPnrWI1BSP8jicm77n3KiTY';
 const SDR_WEBHOOK = process.env.SDR_WEBHOOK_URL || 'https://marcofassa.app.n8n.cloud/webhook/inicio-sdr-teams-v2';
 const LEONARDO_PHONE = '5511999796461';
@@ -106,6 +107,19 @@ async function sendWhatsApp(number, text) {
     });
   } catch (err) {
     console.error('WhatsApp send error:', err.message);
+  }
+}
+
+async function sendDiscord(content) {
+  if (!DISCORD_WEBHOOK) return;
+  try {
+    await fetch(DISCORD_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content })
+    });
+  } catch (err) {
+    console.error('Discord error:', err.message);
   }
 }
 
@@ -331,15 +345,15 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
   if (!current || !current.id) return;
 
   const dealId = current.id;
-  const newStageId = current.stage_id;
-  const oldStageId = previous?.stage_id;
-  const pipelineId = current.pipeline_id;
+  const newStageId = parseInt(current.stage_id, 10);
+  const oldStageId = parseInt(previous?.stage_id, 10) || 0;
+  const pipelineId = parseInt(current.pipeline_id, 10);
   const status = current.status;
+
+  console.log(`[PIPE] Received: deal=${dealId} pipeline=${pipelineId} stage=${oldStageId}->${newStageId} status=${status}`);
 
   // Only process Pipeline 12 (Teams)
   if (pipelineId !== 12) return;
-
-  console.log(`[PIPE] Deal ${dealId} stage ${oldStageId} -> ${newStageId} | status: ${status}`);
 
   // Get GCLID from deal
   const gclid = current[PD_FIELDS.gclid] || '';
@@ -347,10 +361,7 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
   const dealValue = current.value || 0;
   const dealTitle = current.title || '';
 
-  if (!gclid && !ga4ClientId) {
-    console.log(`[PIPE] Deal ${dealId} has no GCLID/GA4, skipping conversion`);
-    return;
-  }
+  console.log(`[PIPE] Deal ${dealId} "${dealTitle}" | gclid=${gclid ? 'yes' : 'no'} | ga4=${ga4ClientId ? 'yes' : 'no'}`);
 
   // QUALIFIED: deal entered a qualified stage
   if (QUALIFIED_STAGES.includes(newStageId) && !QUALIFIED_STAGES.includes(oldStageId)) {
@@ -378,6 +389,7 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
 
     // Notify Slack
     await sendSlack(`:star: *Lead qualificado!*\n\n*${dealTitle}* entrou em etapa avançada\nGCLID: ${gclid ? 'sim' : 'nao'}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
+    await sendDiscord(`⭐ **Lead qualificado!**\n\n**${dealTitle}** entrou em etapa avançada\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_qualificado\nPipedrive: https://contelegv.pipedrive.com/deal/${dealId}`);
   }
 
   // WON: deal closed as won
@@ -406,6 +418,7 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
 
     // Notify Slack
     await sendSlack(`:tada: *Deal ganho!*\n\n*${dealTitle}* virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid ? 'sim (Google Ads rastreável)' : 'nao'}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
+    await sendDiscord(`🎉 **Deal ganho!**\n\n**${dealTitle}** virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_convertido (value=${dealValue})\nPipedrive: https://contelegv.pipedrive.com/deal/${dealId}`);
   }
 });
 
