@@ -3,6 +3,11 @@ const path = require('path');
 
 const app = express();
 app.use(express.json());
+
+// ===== HEALTH CHECK (before static) =====
+app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
+
+// Static files
 app.use(express.static(path.join(__dirname), { extensions: ['html'] }));
 
 // ===== CONFIG =====
@@ -247,9 +252,6 @@ app.post('/api/lead', async (req, res) => {
 
   console.log(`[LEAD] Complete: ${body.empresa} -> deal ${dealId}, vendor ${vendor.nome}`);
 });
-
-// ===== HEALTH CHECK =====
-app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
 // ===== SPA FALLBACK =====
 app.get('*', (req, res) => {
