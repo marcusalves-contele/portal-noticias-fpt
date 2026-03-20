@@ -2534,6 +2534,7 @@
           <button class="mode-tab" id="mode-tab-roteiro" onclick="setMode('roteiro')">&#9998; Thumb de Roteiro</button>
           <button class="mode-tab" id="mode-tab-studio" onclick="setMode('studio')">&#9671; Studio</button>
           <button class="mode-tab" id="mode-tab-manual" onclick="setMode('manual')">&#9986; Corte Manual</button>
+          <button class="mode-tab" id="mode-tab-blog" onclick="setMode('blog')">&#9998; Blog</button>
         </div>
 
         <div class="home-input-group">
@@ -3967,7 +3968,11 @@
       document.getElementById('mode-tab-roteiro').classList.toggle('active', mode === 'roteiro');
       document.getElementById('mode-tab-studio').classList.toggle('active', mode === 'studio');
       document.getElementById('mode-tab-manual').classList.toggle('active', mode === 'manual');
-      if (mode === 'thumbs') {
+      document.getElementById('mode-tab-blog').classList.toggle('active', mode === 'blog');
+      if (mode === 'blog') {
+        showScreen('blog');
+        blogLoadQueue();
+      } else if (mode === 'thumbs') {
         showScreen('thumb-live');
         tlResetToQueue();
       } else if (mode === 'roteiro') {
@@ -6512,6 +6517,193 @@
       </div>
     </div>
   </div>
+
+  <!-- ===== SCREEN: BLOG ===== -->
+  <div class="screen" id="screen-blog">
+    <div class="topbar">
+      <div class="topbar-brand" onclick="goHome()">
+        <div class="topbar-icon"></div>
+        <span class="topbar-title">PRISM OS</span>
+      </div>
+      <div class="topbar-sep"></div>
+      <span style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted)">YouTube to Blog</span>
+    </div>
+
+    <div style="max-width:700px;margin:60px auto;padding:0 24px;">
+      <h2 style="font-family:var(--font-brand);font-size:28px;margin-bottom:8px;">Blog Post</h2>
+      <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">Transforma video em post WordPress com imagem IA + WhatsApp.</p>
+
+      <!-- Queue from spreadsheet -->
+      <div id="blog-queue" style="margin-bottom:32px;">
+        <h3 style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-bottom:12px;">LIVES DA PLANILHA <span id="blog-queue-count" style="color:var(--purple)"></span></h3>
+        <div id="blog-queue-content">
+          <div style="color:var(--text-muted);font-size:14px;">Carregando...</div>
+        </div>
+      </div>
+
+      <!-- Manual form -->
+      <div style="border-top:1px solid var(--border);padding-top:24px;">
+        <h3 style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-bottom:12px;">OU COLE UMA URL</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <input class="home-input" id="blog-url" type="text" placeholder="https://youtube.com/watch?v=..." style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text-primary);font-family:var(--font-mono);font-size:13px;">
+          <div style="display:flex;gap:12px;align-items:center;">
+            <select id="blog-channel" style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-family:var(--font-mono);font-size:13px;flex:0 0 120px;">
+              <option value="fleet">Fleet</option>
+              <option value="teams">Teams</option>
+            </select>
+            <button class="btn btn-primary" id="blog-generate-btn" onclick="blogGenerate()" style="flex:1;">
+              Gerar Blog Post
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div id="blog-progress" style="display:none;margin-top:24px;">
+        <div class="progress-steps" id="blog-steps"></div>
+      </div>
+
+      <!-- Result -->
+      <div id="blog-result" style="display:none;margin-top:24px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:20px;">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== BLOG MODE =====
+    let blogQueueItems = [];
+
+    async function blogLoadQueue() {
+      const content = document.getElementById('blog-queue-content');
+      const counter = document.getElementById('blog-queue-count');
+      content.innerHTML = '<div style="color:var(--text-muted);font-size:14px;display:flex;align-items:center;gap:8px;"><div class="spinner-ring"></div> Buscando planilha...</div>';
+      try {
+        const resp = await fetch('/api/thumb-queue');
+        const data = await resp.json();
+        if (data.error) {
+          content.innerHTML = `<div style="color:var(--red);font-size:14px;">${data.error}</div>`;
+          return;
+        }
+        blogQueueItems = data.items || [];
+        counter.textContent = `(${blogQueueItems.length})`;
+        if (!blogQueueItems.length) {
+          content.innerHTML = '<div style="color:var(--text-muted);font-size:14px;">Nenhuma live pendente na planilha.</div>';
+          return;
+        }
+        content.innerHTML = blogQueueItems.map((item, idx) => {
+          const channel = item._channel || 'fleet';
+          const title = item['title'] || item['Título'] || 'Sem titulo';
+          const url = item['url'] || '';
+          const tema = item['tema'] || '';
+          return `
+            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface-1);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--border)'">
+              <div style="flex:1;min-width:0;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                  <span class="tl-channel-badge ${channel}" style="font-size:10px;padding:2px 6px;border-radius:4px;background:${channel === 'fleet' ? 'var(--purple-subtle)' : 'var(--blue-dim)'};color:${channel === 'fleet' ? 'var(--purple)' : 'var(--blue)'};">${channel.toUpperCase()}</span>
+                  ${tema ? `<span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">${tema}</span>` : ''}
+                </div>
+                <div style="font-size:14px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${title}</div>
+              </div>
+              <button class="btn btn-primary" style="flex-shrink:0;font-size:12px;padding:8px 16px;" onclick="event.stopPropagation();blogGenerateFromQueue(${idx})">
+                Gerar Post
+              </button>
+            </div>`;
+        }).join('');
+      } catch (e) {
+        content.innerHTML = `<div style="color:var(--red);font-size:14px;">Erro: ${e.message}</div>`;
+      }
+    }
+
+    function blogGenerateFromQueue(idx) {
+      const item = blogQueueItems[idx];
+      if (!item) return;
+      const url = item['url'] || '';
+      const channel = item._channel || 'fleet';
+      if (!url) {
+        toast('Live sem URL na planilha', 'error');
+        return;
+      }
+      document.getElementById('blog-url').value = url;
+      document.getElementById('blog-channel').value = channel;
+      blogGenerate();
+    }
+
+    async function blogGenerate() {
+      const url = document.getElementById('blog-url').value.trim();
+      const blog = document.getElementById('blog-channel').value;
+      if (!url) { toast('Cole a URL do video', 'error'); return; }
+
+      const btn = document.getElementById('blog-generate-btn');
+      btn.disabled = true;
+      btn.textContent = 'Gerando...';
+
+      const progress = document.getElementById('blog-progress');
+      const steps = document.getElementById('blog-steps');
+      const result = document.getElementById('blog-result');
+      progress.style.display = 'block';
+      result.style.display = 'none';
+      steps.innerHTML = '<div class="progress-step active"><div class="step-indicator"><div class="spinner-ring"></div></div><div class="step-info"><div class="step-label">Iniciando...</div><div class="step-detail" id="blog-step-detail"></div></div></div>';
+
+      try {
+        const resp = await fetch('/api/blog-generate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ video_url: url, blog: blog })
+        });
+        const data = await resp.json();
+        if (data.error) { toast(data.error, 'error'); btn.disabled = false; btn.textContent = 'Gerar Blog Post'; return; }
+
+        const jobId = data.job_id;
+        const sse = new EventSource(`/api/progress/${jobId}`);
+
+        sse.addEventListener('progress', (e) => {
+          const d = JSON.parse(e.data);
+          const detail = document.getElementById('blog-step-detail');
+          if (detail) detail.textContent = d.message || '';
+        });
+
+        sse.addEventListener('complete', (e) => {
+          sse.close();
+          const d = JSON.parse(e.data);
+          progress.style.display = 'none';
+          result.style.display = 'block';
+          result.innerHTML = `
+            <h3 style="font-family:var(--font-brand);font-size:20px;margin-bottom:12px;color:var(--green);">Post Publicado</h3>
+            <p style="font-size:15px;margin-bottom:8px;"><strong>Titulo:</strong> ${d.title || ''}</p>
+            <p style="margin-bottom:8px;"><a href="${d.post_url || '#'}" target="_blank" style="color:var(--purple);text-decoration:underline;">${d.post_url || ''}</a></p>
+            <p style="margin-bottom:16px;"><a href="${d.edit_url || '#'}" target="_blank" style="color:var(--text-secondary);font-size:13px;">Editar no WordPress</a></p>
+            ${d.whatsapp_text ? `<div style="margin-top:12px;padding:12px;background:var(--surface-3);border-radius:8px;border:1px solid var(--border);"><p style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:6px;">TEXTO WHATSAPP</p><p style="font-size:14px;white-space:pre-wrap;">${d.whatsapp_text}</p></div>` : ''}
+          `;
+          btn.disabled = false;
+          btn.textContent = 'Gerar Blog Post';
+          toast('Blog post publicado!', 'success');
+        });
+
+        sse.addEventListener('error', (e) => {
+          sse.close();
+          let msg = 'Erro desconhecido';
+          try { msg = JSON.parse(e.data).message; } catch(_) {}
+          progress.style.display = 'none';
+          toast(msg, 'error');
+          btn.disabled = false;
+          btn.textContent = 'Gerar Blog Post';
+        });
+
+        sse.onerror = () => {
+          sse.close();
+          progress.style.display = 'none';
+          btn.disabled = false;
+          btn.textContent = 'Gerar Blog Post';
+        };
+
+      } catch(e) {
+        toast(e.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Gerar Blog Post';
+        progress.style.display = 'none';
+      }
+    }
+  </script>
 
 <!-- Feedback Widget -->
 <button class="feedback-btn" onclick="openFeedback()" title="Reportar bug ou sugestao">
