@@ -480,6 +480,57 @@
     /* ===== INTEGRATIONS SECTION ===== */
     .big-image-section { background: var(--bg-light); padding: var(--section-pad); }
 
+    /* ===== INTEGRATION UNIFIED ===== */
+    .integration-bullets { list-style: none; margin: 24px 0; }
+    .integration-bullets li {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; font-size: 16px; color: #444;
+    }
+    .integration-bullets li::before {
+      content: '';
+      display: inline-block; width: 22px; height: 22px; min-width: 22px;
+      background: var(--blue-primary); border-radius: 50%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+      background-size: 14px; background-repeat: no-repeat; background-position: center;
+    }
+    .erp-strip {
+      display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+      margin-top: 32px; padding: 24px 0;
+      border-top: 1px solid #e5e7f0;
+    }
+    .erp-strip span {
+      display: inline-block; padding: 8px 20px;
+      background: var(--white); border: 1px solid #e5e7f0;
+      border-radius: 6px; font-family: var(--font-main);
+      font-weight: 700; font-size: 14px; color: var(--text-muted);
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .erp-strip span:hover { border-color: var(--blue-primary); color: var(--blue-heading); }
+
+    /* ===== RESOURCE CARDS GRID (plan features) ===== */
+    .resource-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 32px;
+    }
+    .resource-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px 20px;
+    }
+    .resource-card h3 {
+      font-family: var(--font-main);
+      font-size: 16px; font-weight: 800;
+      color: var(--blue-heading);
+      margin-bottom: 12px;
+    }
+    .resource-card p {
+      font-size: 14px; color: var(--text-muted);
+      line-height: 1.6; margin: 0;
+    }
+
     /* ===== MID CTA ===== */
     #mid-cta {
       background: linear-gradient(135deg, var(--blue-primary) 0%, var(--blue-heading) 100%);
@@ -979,6 +1030,7 @@
       .counters-grid { grid-template-columns: 1fr; gap: 24px; }
       .testimonials-grid { grid-template-columns: 1fr 1fr; }
       .footer-grid { grid-template-columns: 1fr 1fr; }
+      .resource-cards-grid { grid-template-columns: 1fr 1fr; }
 
       .feature-text h2 { font-size: 24px; }
 
@@ -990,6 +1042,7 @@
       .benefits-grid { grid-template-columns: 1fr; }
       .testimonials-grid { grid-template-columns: 1fr; }
       .footer-grid { grid-template-columns: 1fr; }
+      .resource-cards-grid { grid-template-columns: 1fr; }
       .nav-logo img { width: 160px; }
       .nav-right { gap: 12px; }
       .btn-primary { padding: 10px 14px; font-size: 13px; }
@@ -1050,9 +1103,9 @@
   </form>
 
   <div id="sidebar-small-team-msg" style="display:none; padding: 20px; text-align: center;">
-    <h3 style="color:#273896; margin-bottom:16px; font-family: 'Nunito Sans', sans-serif;">Nosso plano atende equipes a partir de 4 pessoas</h3>
+    <h3 style="color:#273896; margin-bottom:16px; font-family: 'Nunito Sans', sans-serif;">Nosso plano foi feito para equipes maiores</h3>
     <p style="color:#666; margin-bottom:24px; line-height:1.6;">Para equipes menores, entre em contato com nosso time de atendimento. Vamos encontrar a melhor solução para você!</p>
-    <a href="https://wa.me/5511971325108?text=Ol%C3%A1!%20Tenho%20uma%20equipe%20menor%20que%204%20pessoas%20e%20gostaria%20de%20saber%20mais%20sobre%20o%20Contele%20Teams."
+    <a href="https://wa.me/5511971325108?text=Ol%C3%A1!%20Tenho%20uma%20equipe%20pequena%20e%20gostaria%20de%20saber%20mais%20sobre%20o%20Contele%20Teams."
        style="display:inline-block; background:#25D366; color:#fff; padding:14px 28px; border-radius:8px; text-decoration:none; font-weight:700; font-size:16px; font-family:'Nunito Sans',sans-serif;">
       Falar com Atendimento via WhatsApp
     </a>
@@ -1443,33 +1496,35 @@
   </div>
 </section>
 
-<!-- ===== INTEGRATIONS ===== -->
-<section style="background: var(--white); padding: var(--section-pad);">
+<!-- ===== INTEGRATIONS + CONSULTORIA (unified) ===== -->
+<section id="integracoes" style="background: var(--white); padding: var(--section-pad);">
   <div class="container">
-    <div class="two-col reverse">
-      <div>
-        <img src="img/imagem-teams.webp" alt="Integrações Contele Teams com mais de 3000 aplicativos" width="600" height="400" loading="lazy">
-      </div>
+    <div class="text-center">
+      <h2 class="section-title">Integração sob medida para sua operação</h2>
+      <p class="section-sub">API aberta, documentação completa e um time dedicado para conectar o Contele Teams ao seu ERP, CRM ou qualquer sistema.</p>
+    </div>
+    <div class="two-col" style="margin-top: 40px;">
       <div class="feature-text">
-        <h2 class="section-title">Transforme sua Operação com Integrações Poderosas</h2>
-        <p>Faça a integração do Contele Teams com ERPs, CRMs e mais de 3.000 aplicações utilizando o Zapier, API Rest e Webhook. Com nossa integração via Zapier, API Rest e Webhook, você pode enviar e receber informações sobre locais, formulários e visitas para mais de 3.000 aplicações.</p>
-        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px;">Solicitar demonstração &gt;</button>
+        <ul class="integration-bullets">
+          <li>API Rest documentada</li>
+          <li>Webhooks em tempo real</li>
+          <li>+3.000 integrações possíveis</li>
+          <li>Time especializado em automação e IA</li>
+        </ul>
+        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px;">Fale com nosso time de integrações</button>
+      </div>
+      <div>
+        <img src="img/equipe-projetos.webp" alt="Equipe de projetos e integrações Contele" width="600" height="400" loading="lazy">
       </div>
     </div>
-  </div>
-</section>
-
-<!-- ===== CONSULTORIA ===== -->
-<section style="background: var(--bg-light); padding: var(--section-pad);">
-  <div class="container">
-    <div class="two-col">
-      <div class="feature-text">
-        <h2 class="section-title">Não tem desenvolvedor, tempo ou conhecimento?</h2>
-        <p>Nosso time especializado em integrações e automações oferece consultoria, implementação e manutenção para garantir alta performance do Contele. Estamos aqui para revolucionar sua operação e aumentar a percepção de valor para seus clientes.</p>
-      </div>
-      <div>
-        <img src="img/equipe-projetos.webp" alt="Equipe de projetos e consultoria Contele" width="600" height="400" loading="lazy">
-      </div>
+    <div class="erp-strip">
+      <span>SAP</span>
+      <span>TOTVS</span>
+      <span>Salesforce</span>
+      <span>HubSpot</span>
+      <span>Sankhya</span>
+      <span>Bling</span>
+      <span>Tiny</span>
     </div>
   </div>
 </section>
@@ -1568,82 +1623,39 @@
   </div>
 </section>
 
-<!-- ===== PLAN FEATURES ACCORDION ===== -->
+<!-- ===== PLAN FEATURES GRID ===== -->
 <section id="recursos-planos">
   <div class="container">
-    <h2 class="section-title text-center" style="margin-bottom: 40px;">Recursos incluídos em ambos os planos:</h2>
-    <div class="accordion">
-
-      <div class="accordion-item">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
-          Aplicativos para Gestão Completa
-          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div class="accordion-body">
-          <p>App Gestor Contele (iOS e Android), Aplicativo para Usuários</p>
-        </div>
+    <h2 class="section-title text-center" style="margin-bottom: 40px;">Recursos incluídos em ambos os planos</h2>
+    <div class="resource-cards-grid">
+      <div class="resource-card">
+        <h3>Aplicativos para Gestão Completa</h3>
+        <p>App Gestor Contele (iOS e Android), Aplicativo para Usuários</p>
       </div>
-
-      <div class="accordion-item">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
-          Servicos e Suporte de Excelencia
-          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div class="accordion-body">
-          <p>Implantação (R$ 750, gratuita com compromisso de 30 dias), Central de Ajuda, Treinamento com Certificação</p>
-        </div>
+      <div class="resource-card">
+        <h3>Serviços e Suporte de Excelência</h3>
+        <p>Implantação (R$ 750, gratuita com compromisso de 30 dias), Central de Ajuda, Treinamento com Certificação</p>
       </div>
-
-      <div class="accordion-item">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
-          Capacitacao e Treinamento
-          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div class="accordion-body">
-          <p>Vídeos e treinamentos gravados</p>
-        </div>
+      <div class="resource-card">
+        <h3>Capacitação e Treinamento</h3>
+        <p>Vídeos e treinamentos gravados</p>
       </div>
-
-      <div class="accordion-item">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
-          Funcionalidades Sem Limites
-          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div class="accordion-body">
-          <p>Uso sem Restrições, Rotas Ilimitadas, Armazenamento Ilimitado, Histórico Vitalício</p>
-        </div>
+      <div class="resource-card">
+        <h3>Funcionalidades Sem Limites</h3>
+        <p>Uso sem Restrições, Rotas Ilimitadas, Armazenamento Ilimitado, Histórico Vitalício</p>
       </div>
-
-      <div class="accordion-item">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
-          Integrações e Expansões
-          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div class="accordion-body">
-          <p>+3000 Softwares, APIs Abertas</p>
-        </div>
+      <div class="resource-card">
+        <h3>Integrações e Expansões</h3>
+        <p>+3.000 Softwares, APIs Abertas</p>
       </div>
-
-      <div class="accordion-item">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
-          Segurança e Atualizações
-          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div class="accordion-body">
-          <p>Privacidade, Atualizações Gratuitas</p>
-        </div>
+      <div class="resource-card">
+        <h3>Segurança e Atualizações</h3>
+        <p>Privacidade, Atualizações Gratuitas</p>
       </div>
-
-      <div class="accordion-item">
-        <button class="accordion-trigger" onclick="toggleAccordion(this)" aria-expanded="false">
-          Mapas e Roteirização
-          <svg class="accordion-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"/></svg>
-        </button>
-        <div class="accordion-body">
-          <p>Google Maps oficial</p>
-        </div>
+      <div class="resource-card">
+        <h3>Mapas e Roteirização</h3>
+        <p>Google Maps oficial</p>
       </div>
-
     </div>
     <p class="accordion-footer">
       Privacidade e confidencialidade dos seus dados garantidos no <a href="https://contelege.com.br/termos-uso/">termo de uso</a>.
@@ -1802,6 +1814,9 @@
     input.value = v;
   }
 
+  // ===== CONFIG =====
+  const MIN_TEAM_SIZE = 4;
+
   // ===== QTD VALIDATION (real-time) =====
   function validateQtd(input) {
     const fb = document.getElementById('qtd-feedback');
@@ -1811,8 +1826,8 @@
       fb.className = 'qtd-feedback';
       return;
     }
-    if (val < 4) {
-      fb.textContent = 'Nosso plano atende equipes a partir de 4 pessoas.';
+    if (val < MIN_TEAM_SIZE) {
+      fb.textContent = 'Nosso plano atende equipes a partir de ' + MIN_TEAM_SIZE + ' pessoas.';
       fb.className = 'qtd-feedback warn';
     } else {
       fb.textContent = 'Perfeito! Solicite sua demonstração.';
@@ -1844,8 +1859,29 @@
       return;
     }
 
-    // CRITICAL: < 4 people = ZERO submit, show message
-    if (qtd < 4) {
+    // CRITICAL: below minimum = POST as inadequate lead, show message, NO trial
+    if (qtd < MIN_TEAM_SIZE) {
+      // Send lead data to n8n with inadequate flag
+      var phoneDigitsSmall = telefone.replace(/\D/g, '');
+      if (phoneDigitsSmall.length <= 11) phoneDigitsSmall = '55' + phoneDigitsSmall;
+      var paramsSmall = new URLSearchParams(window.location.search);
+      fetch('https://primary-production-2349.up.railway.app/webhook/gera-leads-teams-lp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome: nome,
+          email: email,
+          telefone: phoneDigitsSmall,
+          empresa: empresa,
+          tamanho_equipe: qtd,
+          lead_inadequado: true,
+          campanha: paramsSmall.get('utm_campaign') || '',
+          landing_page: window.location.href,
+          utm_source: paramsSmall.get('utm_source') || '',
+          utm_medium: paramsSmall.get('utm_medium') || '',
+          source: 'landing-page-v2'
+        })
+      });
       document.getElementById('sidebar-form').style.display = 'none';
       document.getElementById('sidebar-small-team-msg').style.display = 'block';
       return;
@@ -1986,23 +2022,6 @@
     dots.forEach(function(d, i) {
       d.classList.toggle('active', i === index);
     });
-  }
-
-  // ===== ACCORDION =====
-  function toggleAccordion(btn) {
-    const body = btn.nextElementSibling;
-    const isOpen = btn.classList.contains('open');
-    // Close all
-    document.querySelectorAll('.accordion-trigger.open').forEach(function(b) {
-      b.classList.remove('open');
-      b.setAttribute('aria-expanded', 'false');
-      b.nextElementSibling.classList.remove('open');
-    });
-    if (!isOpen) {
-      btn.classList.add('open');
-      btn.setAttribute('aria-expanded', 'true');
-      body.classList.add('open');
-    }
   }
 
   // ===== COUNTERS =====
