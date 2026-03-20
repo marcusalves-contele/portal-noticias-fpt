@@ -338,6 +338,10 @@ const QUALIFIED_STAGES = [
 // Onboarding/active stages (won)
 const WON_STAGES = [257, 272, 278, 279, 280, 238]; // ETAPA 1-5 + BASE GE
 
+// Dedup: track which deals already fired each conversion (survives in memory, resets on deploy)
+const firedQualified = new Set();
+const firedWon = new Set();
+
 app.post('/api/pipedrive-webhook', async (req, res) => {
   res.json({ ok: true });
 
@@ -385,8 +389,9 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
 
   console.log(`[PIPE] Deal ${dealId} "${dealTitle}" | gclid=${gclid ? 'yes' : 'no'} | ga4=${ga4ClientId ? 'yes' : 'no'}`);
 
-  // QUALIFIED: deal entered a qualified stage
-  if (QUALIFIED_STAGES.includes(newStageId) && !QUALIFIED_STAGES.includes(oldStageId)) {
+  // QUALIFIED: deal entered a qualified stage (fire only once per deal)
+  if (QUALIFIED_STAGES.includes(newStageId) && !QUALIFIED_STAGES.includes(oldStageId) && !firedQualified.has(dealId)) {
+    firedQualified.add(dealId);
     console.log(`[PIPE] QUALIFIED: ${dealTitle} (deal ${dealId}) | GCLID: ${gclid}`);
 
     // Send to GA4 Measurement Protocol
@@ -414,8 +419,9 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
     await sendDiscord(`⭐ **Lead qualificado!**\n\n**${dealTitle}** entrou em etapa avançada\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_qualificado\nPipedrive: https://contelegv.pipedrive.com/deal/${dealId}`);
   }
 
-  // WON: deal closed as won
-  if (status === 'won' || WON_STAGES.includes(newStageId)) {
+  // WON: deal closed as won (fire only once per deal)
+  if ((statusChangedToWon || (WON_STAGES.includes(newStageId) && !WON_STAGES.includes(oldStageId))) && !firedWon.has(dealId)) {
+    firedWon.add(dealId);
     console.log(`[PIPE] WON: ${dealTitle} (deal ${dealId}) | value: ${dealValue} | GCLID: ${gclid}`);
 
     // Send to GA4 Measurement Protocol
