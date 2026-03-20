@@ -1865,7 +1865,7 @@
       var phoneDigitsSmall = telefone.replace(/\D/g, '');
       if (phoneDigitsSmall.length <= 11) phoneDigitsSmall = '55' + phoneDigitsSmall;
       var paramsSmall = new URLSearchParams(window.location.search);
-      fetch('https://primary-production-2349.up.railway.app/webhook/gera-leads-teams-lp', {
+      fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1939,8 +1939,8 @@
       formData: { email, nome, empresa, telefone, quantidade: qtd.toString() }
     });
 
-    // PRIMARY: POST to n8n webhook (handles everything: Pipedrive, spreadsheet, SDR, notifications)
-    fetch('https://primary-production-2349.up.railway.app/webhook/gera-leads-teams-lp', {
+    // PRIMARY: POST to our own backend (handles Pipedrive, spreadsheet, SDR, notifications)
+    fetch('/api/lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
