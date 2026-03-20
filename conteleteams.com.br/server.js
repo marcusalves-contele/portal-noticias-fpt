@@ -183,6 +183,25 @@ app.post('/api/lead', async (req, res) => {
   // Quick response to frontend (don't block)
   res.json({ ok: true });
 
+  // Filter test submissions: log to sheet but skip Pipedrive/SDR/notifications
+  const isTest = /teste|test|prova|fake/i.test(body.nome || '') ||
+                 /teste|test|fake|@contele\.com/i.test(body.email || '') ||
+                 /contele/i.test(body.empresa || '');
+  if (isTest) {
+    const sheetData = {
+      'Data': brDate(), 'Nome': body.nome || '', 'Email': body.email || '',
+      'Telefone': body.telefone || '', 'Empresa': body.empresa || '',
+      'Campanha': body.campanha || '', 'Tamanho da Equipe': String(tamanho),
+      'Landing Page': body.landing_page || '', 'status': '3-temp-can-delete-teste',
+      'GCLID': body.gclid || '', 'GA4 Client ID': body.ga4_client_id || '',
+      'utm_source': body.utm_source || '', 'utm_medium': body.utm_medium || '',
+      'utm_term': body.utm_term || '', 'utm_content': body.utm_content || ''
+    };
+    await appendSheet(sheetData);
+    console.log(`[LEAD] TEST FILTERED: ${body.nome} -> sheet only`);
+    return;
+  }
+
   // Build sheet data (common for all leads)
   const sheetData = {
     'Data': brDate(),
