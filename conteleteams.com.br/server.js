@@ -6,8 +6,31 @@ const app = express();
 app.use(compression());
 app.use(express.json());
 
-// ===== HEALTH CHECK (before static) =====
+// ===== HEALTH CHECK =====
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
+
+// ===== REDIRECTS (WordPress legacy + SEO) =====
+const REDIRECTS = {
+  '/indique-ganhe': 'https://indique.contele.io/',
+  '/indique-ganhe/': 'https://indique.contele.io/',
+  '/feed': 'https://blog.contelege.com.br/feed/',
+  '/feed/': 'https://blog.contelege.com.br/feed/',
+  '/wp-login.php': '/',
+  '/wp-admin': '/',
+  '/wp-admin/': '/',
+  '/xmlrpc.php': '/',
+  '/wp-json': '/',
+  '/wp-json/': '/',
+  '/comments/feed': '/',
+  '/comments/feed/': '/',
+  '/teste-formulario-v2': '/',
+  '/teste-formulario-v2/': '/',
+};
+app.use((req, res, next) => {
+  const target = REDIRECTS[req.path];
+  if (target) return res.redirect(301, target);
+  next();
+});
 
 // Static files with aggressive caching
 app.use(express.static(path.join(__dirname), {
