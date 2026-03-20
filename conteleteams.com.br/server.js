@@ -341,6 +341,7 @@ const WON_STAGES = [257, 272, 278, 279, 280, 238]; // ETAPA 1-5 + BASE GE
 app.post('/api/pipedrive-webhook', async (req, res) => {
   res.json({ ok: true });
 
+  try {
   // Pipedrive v2 webhook sends "data" (not "current") and custom_fields as {type, value} objects
   const current = req.body.data || req.body.current || {};
   const previous = req.body.previous || {};
@@ -430,6 +431,12 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
     // Notify Slack
     await sendSlack(`:tada: *Deal ganho!*\n\n*${dealTitle}* virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid ? 'sim (Google Ads rastreável)' : 'nao'}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
     await sendDiscord(`🎉 **Deal ganho!**\n\n**${dealTitle}** virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_convertido (value=${dealValue})\nPipedrive: https://contelegv.pipedrive.com/deal/${dealId}`);
+  }
+
+  } catch (err) {
+    console.error('[PIPE] FATAL ERROR:', err.message, err.stack);
+    await sendDiscord(`🚨 **ERRO no webhook Pipedrive!**\n\n\`\`\`${err.message}\n${err.stack?.slice(0, 300)}\`\`\`\n\nPayload keys: ${Object.keys(req.body || {}).join(', ')}\nDeal ID: ${req.body?.data?.id || req.body?.current?.id || '?'}`).catch(() => {});
+    await sendSlack(`:rotating_light: *ERRO webhook Pipedrive:* ${err.message}\nDeal: ${req.body?.data?.id || '?'}`).catch(() => {});
   }
 });
 
