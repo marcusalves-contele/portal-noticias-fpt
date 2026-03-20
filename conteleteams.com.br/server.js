@@ -194,34 +194,41 @@ app.post('/api/lead', async (req, res) => {
 
   // 4. Run remaining tasks in parallel
   const pipedriveUrl = `https://contelegv.pipedrive.com/deal/${dealId}`;
+  const waLink = `https://wa.me/${body.telefone}`;
+  const faixa = tamanho >= 21 ? 'Grande (21+)' : tamanho >= 10 ? 'Media (10-20)' : 'Pequena (4-9)';
+
   const notifText = [
-    `Novo lead!`,
+    `Novo lead Teams!`,
     ``,
-    `Empresa: ${body.empresa}`,
-    `Usuarios: ${tamanho}`,
+    `${body.empresa} | ${tamanho} usuarios | ${faixa}`,
+    `${body.nome} | ${body.telefone}`,
+    `${body.email}`,
     ``,
-    `Responsavel: ${body.nome}`,
-    `Telefone: ${body.telefone}`,
-    `Email: ${body.email}`,
-    `Campanha: ${body.campanha || 'N/A'}`,
     `Vendedor: ${vendor.nome}`,
-    `Pipedrive: ${pipedriveUrl}`
-  ].join('\n');
+    `Campanha: ${body.campanha || 'organico'}`,
+    body.utm_source ? `Origem: ${body.utm_source}/${body.utm_medium || ''}` : '',
+    body.gclid ? `GCLID: sim (Google Ads)` : 'GCLID: nao (organico)',
+    ``,
+    `Pipedrive: ${pipedriveUrl}`,
+    `WhatsApp: ${waLink}`
+  ].filter(Boolean).join('\n');
 
   const slackText = [
-    `:rocket: *Novo lead!*`,
+    `:rocket: *Novo lead Teams!*`,
     ``,
-    `*Empresa:* ${body.empresa}`,
-    `*Usuarios:* ${tamanho}`,
+    `>*${body.empresa}* | ${tamanho} usuarios | ${faixa}`,
+    `>:bust_in_silhouette: ${body.nome}`,
+    `>:phone: <${waLink}|${body.telefone}>`,
+    `>:email: ${body.email}`,
     ``,
-    `• *Email:* ${body.email}`,
-    `• *Responsavel:* ${body.nome}`,
-    `• *Telefone:* ${body.telefone}`,
-    `• *Campanha:* ${body.campanha || 'N/A'}`,
-    `• *GCLID:* ${body.gclid || 'N/A'}`,
-    `• *Vendedor:* ${vendor.nome}`,
-    `• *Pipedrive:* ${pipedriveUrl}`
-  ].join('\n');
+    `:dart: *Vendedor:* ${vendor.nome}`,
+    `:bar_chart: *Campanha:* ${body.campanha || 'organico'}`,
+    body.utm_source ? `:globe_with_meridians: *Origem:* ${body.utm_source}/${body.utm_medium || ''}` : null,
+    body.gclid ? `:white_check_mark: *GCLID:* capturado (Google Ads)` : `:large_orange_circle: *GCLID:* sem (organico)`,
+    body.utm_term ? `:mag: *Keyword:* ${body.utm_term}` : null,
+    ``,
+    `:link: <${pipedriveUrl}|Abrir no Pipedrive>`
+  ].filter(Boolean).join('\n');
 
   await Promise.allSettled([
     // Sheet
