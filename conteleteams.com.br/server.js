@@ -358,6 +358,16 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
   // Only process Pipeline 12 (Teams)
   if (pipelineId !== 12) return;
 
+  // CRITICAL: only process if stage actually changed (ignore other deal updates)
+  const prevStatus = previous?.status;
+  const stageChanged = oldStageId !== newStageId && oldStageId > 0;
+  const statusChangedToWon = status === 'won' && prevStatus !== 'won';
+
+  if (!stageChanged && !statusChangedToWon) {
+    console.log(`[PIPE] Ignoring: no stage change (${oldStageId}->${newStageId}) and no won status change`);
+    return;
+  }
+
   // Extract custom field values (Pipedrive sends {type, value} objects in custom_fields)
   function getCustomField(fieldKey) {
     // Try custom_fields object first (v2 format)
