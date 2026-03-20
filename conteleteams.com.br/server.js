@@ -341,17 +341,10 @@ const WON_STAGES = [257, 272, 278, 279, 280, 238]; // ETAPA 1-5 + BASE GE
 app.post('/api/pipedrive-webhook', async (req, res) => {
   res.json({ ok: true });
 
-  // DEBUG: log raw payload to Discord
-  const rawKeys = Object.keys(req.body || {});
-  const currentId = req.body?.current?.id || req.body?.data?.id || 'no-id';
-  const currentStage = req.body?.current?.stage_id || req.body?.data?.stage_id || 'no-stage';
-  await sendDiscord(`🔍 **Pipedrive webhook received**\nKeys: ${rawKeys.join(', ')}\nDeal ID: ${currentId}\nStage: ${currentStage}\nFull body keys: ${JSON.stringify(rawKeys).slice(0, 500)}`);
-
-  const { current, previous, event, meta } = req.body;
-  if (!current || !current.id) {
-    await sendDiscord(`⚠️ No current.id found. Body structure: ${JSON.stringify(req.body).slice(0, 800)}`);
-    return;
-  }
+  // Pipedrive v2 webhook sends "data" (not "current") and custom_fields as {type, value} objects
+  const current = req.body.data || req.body.current || {};
+  const previous = req.body.previous || {};
+  if (!current.id) return;
 
   const dealId = current.id;
   const newStageId = parseInt(current.stage_id, 10);
@@ -364,9 +357,18 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
   // Only process Pipeline 12 (Teams)
   if (pipelineId !== 12) return;
 
-  // Get GCLID from deal
-  const gclid = current[PD_FIELDS.gclid] || '';
-  const ga4ClientId = current[PD_FIELDS.ga4] || '';
+  // Extract custom field values (Pipedrive sends {type, value} objects in custom_fields)
+  function getCustomField(fieldKey) {
+    // Try custom_fields object first (v2 format)
+    const cf = current.custom_fields?.[fieldKey];
+    if (cf && typeof cf === 'object') return cf.value || '';
+    if (cf) return cf;
+    // Fallback: direct field on current (v1 format)
+    return current[fieldKey] || '';
+  }
+
+  const gclid = getCustomField(PD_FIELDS.gclid);
+  const ga4ClientId = getCustomField(PD_FIELDS.ga4);
   const dealValue = current.value || 0;
   const dealTitle = current.title || '';
 
