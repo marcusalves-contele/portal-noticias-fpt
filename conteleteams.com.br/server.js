@@ -1,14 +1,35 @@
 const express = require('express');
+const compression = require('compression');
 const path = require('path');
 
 const app = express();
+app.use(compression());
 app.use(express.json());
 
 // ===== HEALTH CHECK (before static) =====
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
-// Static files
-app.use(express.static(path.join(__dirname), { extensions: ['html'] }));
+// Static files with aggressive caching
+app.use(express.static(path.join(__dirname), {
+  extensions: ['html'],
+  maxAge: '7d',
+  setHeaders: (res, filePath) => {
+    // Images, SVGs: cache 30 days
+    if (/\.(webp|svg|png|jpg|ico)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
+    }
+    // HTML: no cache (always fresh)
+    if (/\.html$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+    }
+  }
+}));
+
+// Compress responses
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  next();
+});
 
 // ===== CONFIG =====
 const MIN_TEAM_SIZE = 4;
