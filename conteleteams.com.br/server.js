@@ -11,10 +11,25 @@ app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString
 
 // ===== REDIRECTS (WordPress legacy + SEO) =====
 const REDIRECTS = {
+  // Content pages (WordPress legacy → external)
   '/indique-ganhe': 'https://indique.contele.io/',
   '/indique-ganhe/': 'https://indique.contele.io/',
+  '/termos-uso': 'https://blog.contelege.com.br/termo-de-uso-software-de-gestao-de-equipe-externa/',
+  '/termos-uso/': 'https://blog.contelege.com.br/termo-de-uso-software-de-gestao-de-equipe-externa/',
+  '/privacidade': 'https://exclusivo.contelege.com.br/politica-privacidade/',
+  '/privacidade/': 'https://exclusivo.contelege.com.br/politica-privacidade/',
+  '/politica-privacidade': 'https://exclusivo.contelege.com.br/politica-privacidade/',
+  '/politica-privacidade/': 'https://exclusivo.contelege.com.br/politica-privacidade/',
+  '/blog': 'https://blog.contelege.com.br/?utm_source=conteleteams&utm_medium=redirect',
+  '/blog/': 'https://blog.contelege.com.br/?utm_source=conteleteams&utm_medium=redirect',
+  '/contato': '/#planos',
+  '/contato/': '/#planos',
+  '/sobre': 'https://contele.io/?utm_source=conteleteams&utm_medium=redirect',
+  '/sobre/': 'https://contele.io/?utm_source=conteleteams&utm_medium=redirect',
+  // Feed
   '/feed': 'https://blog.contelege.com.br/feed/',
   '/feed/': 'https://blog.contelege.com.br/feed/',
+  // WordPress admin (block)
   '/wp-login.php': '/',
   '/wp-admin': '/',
   '/wp-admin/': '/',
@@ -25,6 +40,7 @@ const REDIRECTS = {
   '/comments/feed/': '/',
   '/teste-formulario-v2': '/',
   '/teste-formulario-v2/': '/',
+  '/wp-sitemap.xml': '/sitemap.xml',
 };
 app.use((req, res, next) => {
   const target = REDIRECTS[req.path];
