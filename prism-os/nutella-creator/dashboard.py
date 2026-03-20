@@ -541,6 +541,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             if content:
                 add_memory(feedback_type, content, metadata)
             self._json({"ok": True})
+        elif path == "/api/blog-generate":
+            self._handle_blog_generate(body)
         else:
             self._json({"error": "not found"}, 404)
 
@@ -1573,6 +1575,45 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
             self._json({"ok": True, "issue_url": data.get("html_url", ""), "issue_number": data.get("number")})
         except Exception as e:
             self._json({"error": str(e)}, 500)
+
+    def _handle_blog_generate(self, body: dict):
+        """POST /api/blog-generate -- gera post de blog a partir de video YouTube."""
+        video_url = body.get("video_url", "").strip()
+        blog = body.get("blog", "fleet").strip().lower()
+        transcript = body.get("transcript", "").strip() or None
+
+        if not video_url:
+            self._json({"error": "video_url required"}, 400)
+            return
+
+        try:
+            from suggest import extract_video_id
+            video_id = extract_video_id(video_url)
+        except Exception:
+            self._json({"error": "URL do YouTube invalida"}, 400)
+            return
+
+        if blog not in ("fleet", "teams"):
+            self._json({"error": "blog deve ser 'fleet' ou 'teams'"}, 400)
+            return
+
+        job_id = _create_job()
+        self._json({"job_id": job_id, "video_id": video_id})
+
+        def _run():
+            try:
+                from blog import generate_blog_post
+                result = generate_blog_post(
+                    video_id=video_id,
+                    blog=blog,
+                    transcript=transcript,
+                    progress_cb=lambda data: _emit(job_id, "progress", data),
+                )
+                _emit(job_id, "complete", result)
+            except Exception as e:
+                _emit(job_id, "error", {"message": str(e)})
+
+        threading.Thread(target=_run, daemon=True).start()
 
     def _handle_studio_chat(self, body: dict):
         """POST /api/studio/chat -- conversational thumbnail generation."""
