@@ -338,9 +338,36 @@ const QUALIFIED_STAGES = [
 // Onboarding/active stages (won)
 const WON_STAGES = [257, 272, 278, 279, 280, 238]; // ETAPA 1-5 + BASE GE
 
-// Dedup: track which deals already fired each conversion (survives in memory, resets on deploy)
-const firedQualified = new Set();
-const firedWon = new Set();
+// Dedup: persist fired conversions to Railway volume (survives redeploys)
+const fs = require('fs');
+const DEDUP_DIR = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/tmp';
+const DEDUP_FILE = path.join(DEDUP_DIR, 'fired-conversions.json');
+
+function loadDedup() {
+  try {
+    const data = JSON.parse(fs.readFileSync(DEDUP_FILE, 'utf8'));
+    return {
+      qualified: new Set(data.qualified || []),
+      won: new Set(data.won || [])
+    };
+  } catch {
+    return { qualified: new Set(), won: new Set() };
+  }
+}
+
+function saveDedup() {
+  try {
+    fs.writeFileSync(DEDUP_FILE, JSON.stringify({
+      qualified: [...firedQualified],
+      won: [...firedWon]
+    }));
+  } catch (err) {
+    console.error('[DEDUP] Save error:', err.message);
+  }
+}
+
+const { qualified: firedQualified, won: firedWon } = loadDedup();
+console.log(`[DEDUP] Loaded: ${firedQualified.size} qualified, ${firedWon.size} won`);
 
 app.post('/api/pipedrive-webhook', async (req, res) => {
   res.json({ ok: true });
@@ -391,7 +418,7 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
 
   // QUALIFIED: deal entered a qualified stage (fire only once per deal)
   if (QUALIFIED_STAGES.includes(newStageId) && !QUALIFIED_STAGES.includes(oldStageId) && !firedQualified.has(dealId)) {
-    firedQualified.add(dealId);
+    firedQualified.add(dealId); saveDedup();
     console.log(`[PIPE] QUALIFIED: ${dealTitle} (deal ${dealId}) | GCLID: ${gclid}`);
 
     // Send to GA4 Measurement Protocol
@@ -421,7 +448,7 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
 
   // WON: deal closed as won (fire only once per deal)
   if ((statusChangedToWon || (WON_STAGES.includes(newStageId) && !WON_STAGES.includes(oldStageId))) && !firedWon.has(dealId)) {
-    firedWon.add(dealId);
+    firedWon.add(dealId); saveDedup();
     console.log(`[PIPE] WON: ${dealTitle} (deal ${dealId}) | value: ${dealValue} | GCLID: ${gclid}`);
 
     // Send to GA4 Measurement Protocol
