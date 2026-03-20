@@ -408,13 +408,16 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
   // Only process Pipeline 12 (Teams)
   if (pipelineId !== 12) return;
 
-  // CRITICAL: only process if stage actually changed (ignore other deal updates)
+  // CRITICAL: only process if stage actually changed OR status changed to won
+  // previous may not have stage_id or status if only other fields changed
   const prevStatus = previous?.status;
-  const stageChanged = oldStageId !== newStageId && oldStageId > 0;
-  const statusChangedToWon = status === 'won' && prevStatus !== 'won';
+  const prevStageExists = previous?.stage_id !== undefined && previous?.stage_id !== null;
+  const stageChanged = prevStageExists && oldStageId !== newStageId;
+  // Status changed to won ONLY if previous explicitly had a different status
+  const statusChangedToWon = status === 'won' && prevStatus !== undefined && prevStatus !== 'won';
 
   if (!stageChanged && !statusChangedToWon) {
-    console.log(`[PIPE] Ignoring: no stage change (${oldStageId}->${newStageId}) and no won status change`);
+    console.log(`[PIPE] Ignoring: deal=${dealId} no stage change (prev_stage=${prevStageExists ? oldStageId : 'N/A'}->${newStageId}) no won change (prev_status=${prevStatus || 'N/A'})`);
     return;
   }
 

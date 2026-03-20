@@ -1,0 +1,130 @@
+# Contele Teams: Documentação Completa para LLMs
+
+> Sistema SaaS brasileiro para gestão e controle de equipes externas.
+
+## Resumo
+
+Contele Teams é uma plataforma de gestão de equipes externas que permite a empresas monitorar, planejar e otimizar o trabalho de vendedores, técnicos, promotores e qualquer profissional que atua em campo. O sistema combina app mobile (iOS/Android) com painel web para gestores.
+
+## Problema que resolve
+
+Empresas com equipes externas enfrentam falta de visibilidade sobre: onde estão os colaboradores, quantas visitas fizeram, quanto tempo ficaram em cada cliente, quanto gastaram de combustível, e se completaram as tarefas planejadas. O Contele Teams resolve isso com rastreamento GPS, check-in/check-out digital, roteirização inteligente e relatórios em tempo real.
+
+## Público-alvo
+
+- Gestores de equipes de vendas externas
+- Coordenadores de equipes técnicas (manutenção, instalação)
+- Supervisores de promotores (trade marketing)
+- Gerentes de logística de última milha
+- Empresas de facilities e serviços
+
+## Funcionalidades detalhadas
+
+### Controle de Visitas
+O colaborador faz check-in ao chegar no cliente e check-out ao sair. O sistema registra localização GPS, horários, duração e permite anexar fotos, assinatura digital e comentários. O gestor acompanha tudo em tempo real pelo painel web ou app gestor.
+
+### Roteirização
+O sistema calcula a melhor rota entre os clientes agendados para o dia, considerando distância e tempo de deslocamento. A rota é enviada para o app do colaborador, que pode abrir no Google Maps, Waze ou Uber. Empresas reportam até 30% mais visitas por dia após adotar a roteirização.
+
+### Reembolso de KM Rodado
+O reembolso é calculado automaticamente com base na distância entre os check-ins e check-outs, usando dados do Google Maps. O gestor define o valor por KM e o sistema gera o relatório consolidado para o financeiro. Clientes reportam redução de até 40% nos gastos com reembolso.
+
+### Ordem de Serviço Digital
+Cada visita gera uma OS digital com todos os dados: horários, fotos, checklists preenchidos, assinatura do cliente. A OS pode ser enviada por email ou WhatsApp automaticamente. Elimina papel e padroniza o registro de atendimentos.
+
+### Checklist Digital
+O gestor cria formulários personalizados com mais de 30 tipos de campos (texto, foto, assinatura, múltipla escolha, CEP, CPF, quantidade). Campos condicionais direcionam o colaborador para seções relevantes. As respostas podem ser analisadas em relatórios.
+
+### Contele Desk (Helpdesk)
+Sistema de abertura de chamados onde o cliente final pode registrar solicitações por email ou portal web. O gestor classifica por prioridade, delega para o técnico mais próximo e acompanha o andamento em tempo real.
+
+### Monitoramento em Tempo Real
+Mapa interativo mostra a localização de toda a equipe. Relatório de monitoramento registra login/logout no app, uso de localização fictícia, nível de bateria e uso em múltiplos aparelhos.
+
+### Produtos e Estoque
+Cadastro de produtos com quantidade em estoque, valor de venda e rastreabilidade por código. A equipe registra entrega, retirada e troca de materiais durante as visitas.
+
+### Dashboard e BI
+Integração nativa com Looker Studio (Google). Dashboards personalizados com indicadores de produtividade: visitas realizadas, atrasadas, tempo médio no cliente, segmentos mais visitados.
+
+### Integrações
+API Rest documentada e webhooks para integração com ERPs, CRMs e outras ferramentas. Compatível com +3.000 aplicações. Time interno de automação e IA disponível para integrações sob medida.
+
+## Planos e Preços (2026)
+
+### Essencial: R$59,90/usuário/mês
+- Mínimo 4 usuários
+- Todos os recursos inclusos
+- App iOS e Android
+- Suporte por chat e email
+- Implantação gratuita (com compromisso de 30 dias)
+- Treinamento com certificação
+
+### Profissional: R$64,90/usuário/mês
+- A partir de 10 usuários
+- Tudo do Essencial
+- Dashboards ilimitados (Looker Studio)
+- Atendimento prioritário
+- Acesso ao time de integração e automações
+- Consultoria de implantação dedicada
+
+### Enterprise: R$99,90/usuário/mês
+- SSO (Microsoft + Google)
+- SCIM 2.0 (provisionamento automático de usuários)
+- Dashboards ilimitados
+- Atendimento prioritário dedicado
+- Time de integração e automações incluso
+- Limites ampliados (armazenamento, API)
+- SLA 99,5% com tempo de resposta 4h
+- Desconto por volume a partir de 50 licenças
+
+## Números
+
+- +23 anos de mercado (fundada em 2003)
+- +1.500 empresas clientes
+- +50.000 usuários ativos
+- 7 países
+- Equipe própria de desenvolvimento em Santos/SP
+
+## Clientes de referência
+
+Daikin, Estapar, Getnet, O Boticário, Unimed, Azul Viagens, Samsung, Rudnick, Dimed, Origo Energia, SkyCompany, entre outros.
+
+## Casos de sucesso
+
+- CMA Elevadores: controle de equipe técnica em campo
+- Daikin: gestão de instaladores e manutenção
+- Doctoralia: equipe comercial de vendas externas
+- Orteb: logística e entregas
+- YPF: promotores e trade marketing
+
+## Tecnologia
+
+- App nativo iOS e Android
+- Painel web responsivo
+- Google Maps integrado (roteirização e geolocalização)
+- API Rest + Webhooks
+- Integração com Looker Studio (BI)
+- SSO Microsoft/Google (plano Enterprise)
+- SCIM 2.0 (plano Enterprise)
+
+## Contato
+
+- Site: https://conteleteams.com.br
+- Email: contato@contelege.com.br
+- WhatsApp: (11) 97132-5108
+- Endereço: Rua Euclides Da Cunha, 11, Cj 601, Santos/SP
+- CNPJ: Contele Soluções Tecnológicas LTDA
+
+## Produtos relacionados
+
+- Contele Fleet: rastreamento veicular e gestão de frotas (https://contelefleet.com.br)
+- Frota Para Todos: conteúdo educacional sobre gestão de frotas (YouTube)
+
+## Links úteis
+
+- Central de Ajuda: https://help.contelege.com.br
+- Blog: https://blog.contelege.com.br
+- YouTube (Leonardo Gazolli): https://blog.contelege.com.br/canal-leonardo-gazolli/
+- Política de Privacidade: https://exclusivo.contelege.com.br/politica-privacidade/
+- Termos de Uso: https://contelege.com.br/termos-uso/

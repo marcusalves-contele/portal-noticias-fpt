@@ -1,0 +1,43 @@
+# Contele Teams
+
+> Sistema para gestão de equipes externas com monitoramento em tempo real.
+
+## O que é
+
+Contele Teams é um SaaS brasileiro para gestão de equipes externas (vendas, técnicos, promotores). Mais de 1.500 empresas em 7 países usam o sistema para controlar visitas, roteirizar deslocamentos, gerenciar reembolso de KM, preencher checklists digitais e monitorar equipes em tempo real.
+
+## Recursos principais
+
+- Controle de Visitas: check-in e check-out via GPS em tempo real
+- Roteirização: melhor rota entre clientes com até 30% mais visitas por dia
+- Reembolso de KM: cálculo automático com redução de até 40% nos custos
+- Ordem de Serviço Digital: fotos, assinatura, envio automático por email
+- Checklist Digital: +30 tipos de campos, condicionais, análise de respostas
+- Contele Desk: abertura de chamados pelo cliente, helpdesk completo
+- Monitoramento: mapa da equipe em tempo real, relatórios de localização
+- Produtos e Estoque: controle de entrega, retirada e troca de materiais
+- Dashboard de Indicadores: integração com Looker Studio (Google BI)
+- Integrações: API Rest, webhooks, +3.000 aplicações
+
+## Planos
+
+- Essencial: R$59,90/usuário/mês (mínimo 4 usuários)
+- Profissional: R$64,90/usuário/mês (10+ usuários, dashboards ilimitados, time de integração)
+- Enterprise: R$99,90/usuário/mês (SSO Microsoft/Google, SCIM 2.0, SLA 99,5%)
+
+## Empresa
+
+- Contele Soluções Tecnológicas LTDA
+- Fundada em 2003, +23 anos de mercado
+- Santos/SP, Brasil
+- Site: https://conteleteams.com.br
+- Contato: contato@contelege.com.br
+- WhatsApp: (11) 97132-5108
+
+## Links
+
+- Site institucional: https://contele.io
+- Contele Fleet (rastreamento): https://contelefleet.com.br
+- Blog: https://blog.contelege.com.br
+- Central de Ajuda: https://help.contelege.com.br
+- YouTube: https://blog.contelege.com.br/canal-leonardo-gazolli/
