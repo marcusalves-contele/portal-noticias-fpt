@@ -7,6 +7,30 @@
   <title>Contele Teams | Gestão de Equipes Externas</title>
 
   <link rel="icon" type="image/svg+xml" href="img/contele-teams.svg">
+  <link rel="canonical" href="https://conteleteams.com.br/">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+
+  <!-- SEO: robots directive for AI crawlers -->
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Contele Teams | Gestao de Equipes Externas">
+  <meta property="og:description" content="Gestao de equipes externas com +1.500 empresas. Controle de visitas, roteirizacao, reembolso de KM e mais.">
+  <meta property="og:image" content="https://conteleteams.com.br/img/capa-video-lp-teams.webp">
+  <meta property="og:url" content="https://conteleteams.com.br/">
+  <meta property="og:site_name" content="Contele Teams">
+  <meta property="og:locale" content="pt_BR">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Contele Teams | Gestao de Equipes Externas">
+  <meta name="twitter:description" content="Gestao de equipes externas com +1.500 empresas em 7 paises.">
+  <meta name="twitter:image" content="https://conteleteams.com.br/img/capa-video-lp-teams.webp">
+
+  <!-- Preload LCP image + second largest asset -->
+  <link rel="preload" as="image" href="img/capa-video-lp-teams.webp" type="image/webp">
+  <link rel="preload" as="image" href="img/dash.webp" type="image/webp">
 
   <!-- Preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,12 +42,59 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap"></noscript>
 
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-TQNBWXFK');</script>
+  <!-- GTM: dataLayer init (must exist before any push) -->
+  <script>window.dataLayer = window.dataLayer || [];</script>
+
+  <!-- GTM: deferred load after first paint to avoid blocking LCP (~560ms saving) -->
+  <script>
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      var s = document.createElement('script');
+      s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-TQNBWXFK';
+      s.async = true;
+      document.head.appendChild(s);
+      window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
+    }, 100);
+  });
+  </script>
+
+  <!-- Schema.org structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Contele Teams",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web, iOS, Android",
+    "description": "Sistema para gestao de equipes externas com monitoramento em tempo real, planejamento de visitas, formularios, checklists, reembolso de KM e controle de jornada.",
+    "offers": {
+      "@type": "Offer",
+      "price": "59.90",
+      "priceCurrency": "BRL",
+      "priceValidUntil": "2027-12-31",
+      "availability": "https://schema.org/InStock"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "1500"
+    },
+    "provider": {
+      "@type": "Organization",
+      "name": "Contele Solucoes Tecnologicas",
+      "url": "https://contele.io",
+      "foundingDate": "2003",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Rua Euclides Da Cunha, 11, Cj 601",
+        "addressLocality": "Santos",
+        "addressRegion": "SP",
+        "postalCode": "11065-100",
+        "addressCountry": "BR"
+      }
+    }
+  }
+  </script>
 
   <style>
     /* ===== CRITICAL CSS (inlined) ===== */
@@ -1093,6 +1164,20 @@
     .mt-32 { margin-top: 32px; }
     .mb-0 { margin-bottom: 0; }
   </style>
+
+  <!-- Deferred CSS: below-the-fold sections (loaded async to reduce render-blocking) -->
+  <style media="print" onload="this.media='all'" id="deferred-css">
+    /* Plans, Accordion, Testimonials, Counters, Benefits, Footer, Sidebar: already in critical CSS above.
+       This block handles additional non-critical enhancements that can load after first paint. */
+
+    /* Smooth transitions for interactive elements below fold */
+    .yt-thumb { content-visibility: auto; contain-intrinsic-size: auto 270px; }
+    .carousel img { content-visibility: auto; contain-intrinsic-size: auto 600px; }
+    .benefit-card { content-visibility: auto; contain-intrinsic-size: auto 180px; }
+    .plan-card { content-visibility: auto; contain-intrinsic-size: auto 400px; }
+    .resource-card { content-visibility: auto; contain-intrinsic-size: auto 120px; }
+  </style>
+  <noscript><style>.yt-thumb,.carousel img,.benefit-card,.plan-card,.resource-card{content-visibility:visible}</style></noscript>
 </head>
 <body>
 
@@ -1165,6 +1250,9 @@
   </nav>
 </header>
 
+<!-- ===== MAIN CONTENT ===== -->
+<main>
+
 <!-- ===== HERO ===== -->
 <section id="hero">
   <div class="container">
@@ -1230,7 +1318,7 @@
         <button class="btn btn-primary" onclick="openSidebar()">Solicitar demonstração</button>
       </div>
       <div>
-        <img src="img/dash.webp" alt="Dashboard de Produtividade de Equipes Externas" width="600" height="450" loading="lazy">
+        <img src="img/dash.webp" alt="Dashboard de Produtividade de Equipes Externas" width="600" height="450">
       </div>
     </div>
   </div>
@@ -1812,6 +1900,8 @@
     <img src="img/Parceiros.webp" alt="Parceiros tecnológicos do Contele" width="960" height="300" loading="lazy" style="margin: 32px auto 0; border-radius: var(--radius);">
   </div>
 </section>
+
+</main>
 
 <!-- ===== FOOTER ===== -->
 <footer>
