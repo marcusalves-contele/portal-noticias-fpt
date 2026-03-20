@@ -443,7 +443,7 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
 
     // Notify Slack
     await sendSlack(`:star: *Lead qualificado!*\n\n*${dealTitle}* entrou em etapa avançada\nGCLID: ${gclid ? 'sim' : 'nao'}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
-    await sendDiscord(`⭐ **Lead qualificado!**\n\n**${dealTitle}** entrou em etapa avançada\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_qualificado\nPipedrive: https://contelegv.pipedrive.com/deal/${dealId}`);
+    await sendDiscord(`⭐ **Lead qualificado!**\n\n**${dealTitle}** entrou em etapa avançada\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_qualificado\nPipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`);
   }
 
   // WON: deal closed as won (fire only once per deal)
@@ -473,7 +473,7 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
 
     // Notify Slack
     await sendSlack(`:tada: *Deal ganho!*\n\n*${dealTitle}* virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid ? 'sim (Google Ads rastreável)' : 'nao'}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
-    await sendDiscord(`🎉 **Deal ganho!**\n\n**${dealTitle}** virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_convertido (value=${dealValue})\nPipedrive: https://contelegv.pipedrive.com/deal/${dealId}`);
+    await sendDiscord(`🎉 **Deal ganho!**\n\n**${dealTitle}** virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_convertido (value=${dealValue})\nPipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`);
   }
 
   } catch (err) {
