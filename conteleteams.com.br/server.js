@@ -304,6 +304,111 @@ app.post('/api/lead', async (req, res) => {
   console.log(`[LEAD] Complete: ${body.empresa} -> deal ${dealId}, vendor ${vendor.nome}`);
 });
 
+// ===== PIPEDRIVE WEBHOOK: Deal Stage Change =====
+// Receives Pipedrive webhook when deal changes stage
+// Sends offline conversion to Google Ads (GCLID) and GA4
+
+const GOOGLE_ADS_CONVERSION_URL = 'https://www.google-analytics.com/mp/collect';
+const GA4_MEASUREMENT_ID = process.env.GA4_MEASUREMENT_ID || 'G-5VY7G6X0DJ';
+const GA4_API_SECRET = process.env.GA4_API_SECRET || '';
+
+// Pipeline 12 (Teams) stages that count as "qualified"
+const QUALIFIED_STAGES = [
+  96,   // APRES. REALIZADA
+  209,  // ACOMPANHAMENTO DE TESTE
+  245,  // AGUARDANDO APROVAÇÃO
+  95,   // FECHAMENTO SEMANA
+  156,  // COMPRA ATÉ 90d
+];
+
+// Onboarding/active stages (won)
+const WON_STAGES = [257, 272, 278, 279, 280, 238]; // ETAPA 1-5 + BASE GE
+
+app.post('/api/pipedrive-webhook', async (req, res) => {
+  res.json({ ok: true });
+
+  const { current, previous, event, meta } = req.body;
+  if (!current || !current.id) return;
+
+  const dealId = current.id;
+  const newStageId = current.stage_id;
+  const oldStageId = previous?.stage_id;
+  const pipelineId = current.pipeline_id;
+  const status = current.status;
+
+  // Only process Pipeline 12 (Teams)
+  if (pipelineId !== 12) return;
+
+  console.log(`[PIPE] Deal ${dealId} stage ${oldStageId} -> ${newStageId} | status: ${status}`);
+
+  // Get GCLID from deal
+  const gclid = current[PD_FIELDS.gclid] || '';
+  const ga4ClientId = current[PD_FIELDS.ga4] || '';
+  const dealValue = current.value || 0;
+  const dealTitle = current.title || '';
+
+  if (!gclid && !ga4ClientId) {
+    console.log(`[PIPE] Deal ${dealId} has no GCLID/GA4, skipping conversion`);
+    return;
+  }
+
+  // QUALIFIED: deal entered a qualified stage
+  if (QUALIFIED_STAGES.includes(newStageId) && !QUALIFIED_STAGES.includes(oldStageId)) {
+    console.log(`[PIPE] QUALIFIED: ${dealTitle} (deal ${dealId}) | GCLID: ${gclid}`);
+
+    // Send to GA4 Measurement Protocol
+    if (ga4ClientId && GA4_API_SECRET) {
+      try {
+        await fetch(`${GOOGLE_ADS_CONVERSION_URL}?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            client_id: ga4ClientId,
+            events: [{
+              name: 'lead_qualificado',
+              params: { value: 1, currency: 'BRL', deal_id: String(dealId) }
+            }]
+          })
+        });
+        console.log(`[PIPE] GA4 lead_qualificado sent for deal ${dealId}`);
+      } catch (err) {
+        console.error('[PIPE] GA4 error:', err.message);
+      }
+    }
+
+    // Notify Slack
+    await sendSlack(`:star: *Lead qualificado!*\n\n*${dealTitle}* entrou em etapa avançada\nGCLID: ${gclid ? 'sim' : 'nao'}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
+  }
+
+  // WON: deal closed as won
+  if (status === 'won' || WON_STAGES.includes(newStageId)) {
+    console.log(`[PIPE] WON: ${dealTitle} (deal ${dealId}) | value: ${dealValue} | GCLID: ${gclid}`);
+
+    // Send to GA4 Measurement Protocol
+    if (ga4ClientId && GA4_API_SECRET) {
+      try {
+        await fetch(`${GOOGLE_ADS_CONVERSION_URL}?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            client_id: ga4ClientId,
+            events: [{
+              name: 'lead_convertido',
+              params: { value: dealValue, currency: 'BRL', deal_id: String(dealId) }
+            }]
+          })
+        });
+        console.log(`[PIPE] GA4 lead_convertido sent for deal ${dealId}, value ${dealValue}`);
+      } catch (err) {
+        console.error('[PIPE] GA4 error:', err.message);
+      }
+    }
+
+    // Notify Slack
+    await sendSlack(`:tada: *Deal ganho!*\n\n*${dealTitle}* virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid ? 'sim (Google Ads rastreável)' : 'nao'}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
+  }
+});
+
 // ===== SPA FALLBACK =====
 app.get('*', (req, res) => {
   const filePath = path.join(__dirname, req.path, 'index.html');
