@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://conteleteams.com.br/sitemap.xml
+
+# Block admin/test paths
+Disallow: /api/
+Disallow: /health
