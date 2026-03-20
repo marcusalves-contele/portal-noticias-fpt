@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Termos de Uso | Contele Teams</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="../img/contele-teams.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap">
+
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-TQNBWXFK');</script>
+
+  <style>
+    :root {
+      --blue-primary: #425DFC;
+      --blue-submit: #323FDD;
+      --blue-heading: #273896;
+      --bg-light: #f5f5f5;
+      --white: #ffffff;
+      --text-main: #333333;
+      --text-muted: #666666;
+      --border: rgba(66, 93, 252, 0.12);
+      --border-hover: rgba(66, 93, 252, 0.3);
+      --blue-glow: rgba(66, 93, 252, 0.06);
+      --font-main: 'Nunito Sans', sans-serif;
+      --font-body: 'Roboto', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--white);
+      color: var(--text-main);
+      line-height: 1.7;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::selection {
+      background: rgba(66, 93, 252, 0.2);
+      color: var(--text-main);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px) saturate(1.4);
+      -webkit-backdrop-filter: blur(20px) saturate(1.4);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .logo img {
+      height: 32px;
+      width: auto;
+    }
+
+    .back-link {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--blue-primary);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: var(--blue-heading);
+      text-decoration: none;
+    }
+
+    .back-link svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-light);
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(66, 93, 252, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 72px 32px 56px;
+      position: relative;
+    }
+
+    .hero-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--blue-primary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-label::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--blue-primary);
+    }
+
+    .hero h1 {
+      font-family: var(--font-main);
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 800;
+      color: var(--blue-heading);
+      line-height: 1.15;
+      margin-bottom: 20px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-subtitle {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 580px;
+      line-height: 1.7;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-top: 36px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .meta-value {
+      font-size: 14px;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 32px;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 80px;
+      padding: 32px 0;
+    }
+
+    .toc-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .toc ol {
+      list-style: none;
+      padding: 0;
+    }
+
+    .toc li {
+      margin-bottom: 2px;
+    }
+
+    .toc a {
+      display: block;
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-left: 2px solid transparent;
+      border-radius: 0 4px 4px 0;
+      transition: all 0.2s ease;
+    }
+
+    .toc a:hover {
+      color: var(--blue-primary);
+      border-left-color: var(--blue-primary);
+      background: var(--blue-glow);
+      text-decoration: none;
+    }
+
+    .main {
+      padding: 48px 0 96px;
+      min-width: 0;
+    }
+
+    .intro {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 48px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .intro strong { color: var(--text-main); }
+
+    section { margin-bottom: 56px; }
+
+    h2 {
+      font-family: var(--font-main);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--blue-heading);
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    h2 .num {
+      color: var(--blue-primary);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+
+    h3 {
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin: 28px 0 12px;
+    }
+
+    p {
+      margin-bottom: 16px;
+      color: var(--text-muted);
+    }
+
+    a {
+      color: var(--blue-primary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    a:hover { color: var(--blue-heading); }
+
+    ul, ol {
+      margin-bottom: 16px;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      color: var(--text-muted);
+    }
+
+    li strong { color: var(--text-main); }
+
+    .contact-box {
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px;
+      margin-top: 56px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--blue-primary), transparent);
+    }
+
+    .contact-box h2 { margin-bottom: 28px; }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+    }
+
+    .contact-card {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .contact-card .c-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .contact-card .c-value {
+      font-size: 15px;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .contact-note {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    @media (max-width: 768px) {
+      .content { grid-template-columns: 1fr; gap: 0; }
+      .toc { position: relative; top: 0; padding: 32px 0 0; border-bottom: 1px solid var(--border); margin-bottom: 0; }
+      .toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+      .toc a { border-left: none; padding: 6px 8px; font-size: 12px; }
+      .hero-inner { padding: 48px 24px 40px; }
+      .header-inner { padding: 14px 20px; }
+      .content { padding: 0 20px; }
+      .hero-meta { gap: 20px; }
+      .contact-box { padding: 28px 20px; }
+      .contact-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .toc ol { grid-template-columns: 1fr; }
+      .hero-meta { flex-direction: column; gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQNBWXFK" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo"><img src="../img/contele-teams.svg" alt="Contele Teams"></a>
+    <a href="/" class="back-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      Voltar
+    </a>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Documento Legal</div>
+    <h1>Termos de Uso</h1>
+    <p class="hero-subtitle">Contrato de presta&ccedil;&atilde;o de servi&ccedil;os de gest&atilde;o de funcion&aacute;rios entre a Contelesis Solu&ccedil;&otilde;es Tecnol&oacute;gicas Ltda e o Contratante.</p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <span class="meta-label">Contratada</span>
+        <span class="meta-value">Contelesis Solu&ccedil;&otilde;es Tecnol&oacute;gicas Ltda</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">&Uacute;ltima atualiza&ccedil;&atilde;o</span>
+        <span class="meta-value">11 de janeiro de 2024</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">CNPJ</span>
+        <span class="meta-value">06.036.246/0001-08</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Foro</span>
+        <span class="meta-value">Capital do Estado de S&atilde;o Paulo</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <nav class="toc">
+    <div class="toc-title">&Iacute;ndice</div>
+    <ol>
+      <li><a href="#s1">Do Objeto</a></li>
+      <li><a href="#s2">Da Qualidade dos Servi&ccedil;os</a></li>
+      <li><a href="#s3">Do Prazo de Vig&ecirc;ncia</a></li>
+      <li><a href="#s4">Do Pre&ccedil;o e do Pagamento</a></li>
+      <li><a href="#s5">Da Confidencialidade</a></li>
+      <li><a href="#s6">Pessoal Autorizado</a></li>
+      <li><a href="#s7">Servi&ccedil;os e Manuten&ccedil;&atilde;o T&eacute;cnica</a></li>
+      <li><a href="#s8">Obriga&ccedil;&otilde;es da Contratada</a></li>
+      <li><a href="#s9">Obriga&ccedil;&otilde;es da Contratante</a></li>
+      <li><a href="#s10">Propriedade Intelectual e Industrial</a></li>
+      <li><a href="#s11">Disposi&ccedil;&otilde;es Gerais</a></li>
+      <li><a href="#s12">Do Foro de Elei&ccedil;&atilde;o</a></li>
+    </ol>
+  </nav>
+
+  <div class="main">
+
+    <div class="intro">
+      <p>Pelo presente instrumento particular e na melhor forma de direito, as partes abaixo:</p>
+      <p>De um lado, <strong>CONTRATADA</strong>: CONTELESIS SOLU&Ccedil;&Otilde;ES TECNOL&Oacute;GICAS LTDA, com sede na cidade de Santos, Estado de S&atilde;o Paulo, &agrave; Rua Euclides da Cunha, 11, CJ. 601/602, inscrita no CNPJ/MF sob o n&ordm;. 07.651.877/0001-91, neste ato representada na forma de seu contato social;</p>
+      <p>E de outro lado, <strong>CONTRATANTE</strong>: CONSTA NO CADASTRO ONLINE PELO WEBSITE: <a href="https://contelege.com.br">https://contelege.com.br</a> OU DESCRITO NA PROPOSTA COMERCIAL EMITIDA PELA CONTELE.</p>
+    </div>
+
+    <section id="s1">
+      <h2><span class="num">CL&Aacute;USULA PRIMEIRA</span>Do Objeto</h2>
+      <p><strong>1.0</strong> O objeto deste contrato &eacute; a presta&ccedil;&atilde;o de servi&ccedil;os de gest&atilde;o de funcion&aacute;rios, que engloba os seguintes itens, a partir da escolha da CONTRATADA:</p>
+      <ul>
+        <li><strong>1.1</strong> Rastreamento e localiza&ccedil;&atilde;o;</li>
+        <li><strong>1.2</strong> Agenda de visitas via web e celular;</li>
+        <li><strong>1.3</strong> Controle de atendimentos e chamados;</li>
+        <li><strong>1.4</strong> Emiss&atilde;o de relat&oacute;rios gerenciais.</li>
+      </ul>
+      <p><strong>1.5</strong> Os servi&ccedil;os acima elencados ser&atilde;o prestados mediante a utiliza&ccedil;&atilde;o de um sistema de propriedade da CONTRATADA, que utilizado juntamente com aparelhos celulares (smartphones); com tecnologia 3G, 4G e 5G permite a sua gest&atilde;o.</p>
+      <p><strong>1.6</strong> Os aparelhos celulares dever&atilde;o ser de modelos homologados pela CONTRATADA.</p>
+    </section>
+
+    <section id="s2">
+      <h2><span class="num">CL&Aacute;USULA SEGUNDA</span>Da Qualidade dos Servi&ccedil;os</h2>
+      <p><strong>2.1</strong> O CONTRATANTE concorda e aceita que a qualidade dos servi&ccedil;os objeto do presente instrumento depende dos servi&ccedil;os de telefonia m&oacute;vel, que s&atilde;o prestados pelas operadoras de telecomunica&ccedil;&otilde;es e a CONTRATADA n&atilde;o tem qualquer responsabilidade pela qualidade dos servi&ccedil;os por aquelas prestados, bem como interrup&ccedil;&otilde;es, quedas de sinal, etc.</p>
+      <p><strong>2.2</strong> O CONTRATANTE ser&aacute; o &uacute;nico respons&aacute;vel pela coleta, tratamento e uso dos dados obtidos atrav&eacute;s da utiliza&ccedil;&atilde;o do sistema, respondendo de forma exclusiva por eventuais danos causados aos usu&aacute;rios.</p>
+    </section>
+
+    <section id="s3">
+      <h2><span class="num">CL&Aacute;USULA TERCEIRA</span>Do Prazo de Vig&ecirc;ncia</h2>
+      <p><strong>3.1</strong> O prazo de vig&ecirc;ncia do presente contrato &eacute; INDETERMINADO, podendo ser rescindido pelo CONTRATANTE, a qualquer tempo, mediante a solicita&ccedil;&atilde;o por escrito, com 30 (trinta) dias de anteced&ecirc;ncia.</p>
+      <p><strong>3.2</strong> O contrato poder&aacute; ser extinto, tamb&eacute;m, a qualquer tempo pela CONTRATADA, em caso de inadimpl&ecirc;ncia do CONTRATANTE superior a 15 dias.</p>
+      <p><strong>3.2.1</strong> Ap&oacute;s 15 dias de inadimpl&ecirc;ncia por parte do CONTRATANTE, a CONTRATADA poder&aacute; suspender remotamente os servi&ccedil;os at&eacute; a regulariza&ccedil;&atilde;o dos valores em atraso, podendo rescindir o contrato na forma prevista na cl&aacute;usula 3.1. acima. Os servi&ccedil;os poder&atilde;o ser reativados ap&oacute;s 48 horas da confirma&ccedil;&atilde;o de pagamento dos d&eacute;bitos para o departamento financeiro da CONTRATADA, em hor&aacute;rio comercial.</p>
+      <p><strong>3.3</strong> Ap&oacute;s a rescis&atilde;o contratual, a CONTRATADA poder&aacute; apagar os dados armazenados da CONTRATANTE.</p>
+    </section>
+
+    <section id="s4">
+      <h2><span class="num">CL&Aacute;USULA QUARTA</span>Do Pre&ccedil;o e do Pagamento</h2>
+      <p><strong>4.1</strong> Pelos servi&ccedil;os aqui contratados, o CONTRATANTE pagar&aacute; &agrave; CONTRATADA os valores indicados online pelo website <a href="https://www.conteleteams.com.br">www.conteleteams.com.br</a></p>
+      <p><strong>4.2</strong> O atraso no pagamento de quaisquer das import&acirc;ncias devidas por for&ccedil;a do presente contrato, importar&aacute; na cobran&ccedil;a de multa morat&oacute;ria de 2% (dois por cento) e juros morat&oacute;rios de 1% (um por cento) ao m&ecirc;s sobre o valor contratado, calculados pro rata die.</p>
+      <p><strong>4.3</strong> O CONTRATANTE AUTORIZA neste ato a CONTRATADA a emitir t&iacute;tulos de cobran&ccedil;a via cart&atilde;o de cr&eacute;dito/d&eacute;bito ou cobrar nas faturas subsequentes, caso o CONTRATANTE tenha outros servi&ccedil;os com a CONTRATADA, para a cobran&ccedil;a dos valores decorrentes do presente contrato, podendo proceder ao apontamento desses t&iacute;tulos a protesto por falta de pagamento, independentemente de aceite, cuja falta &eacute; suprida pela presente autoriza&ccedil;&atilde;o.</p>
+      <p><strong>4.4</strong> Caso o CONTRATANTE contrate a modalidade pr&eacute;-pago n&atilde;o haver&aacute; apontamento desses t&iacute;tulos a protesto por falta de pagamento.</p>
+    </section>
+
+    <section id="s5">
+      <h2><span class="num">CL&Aacute;USULA QUINTA</span>Da Confidencialidade</h2>
+      <p><strong>5.1</strong> Os dados, as informa&ccedil;&otilde;es e os documentos de ambas as Partes, especialmente os relativos aos aspectos comerciais, econ&ocirc;mico-financeiros e tecnol&oacute;gicos, tais como: &quot;mailing lists&quot;, endere&ccedil;os de clientes, produtos, pre&ccedil;os, sistemas, t&eacute;cnicas, estrat&eacute;gias, m&eacute;todos de opera&ccedil;&atilde;o e quaisquer outros repassados de uma Parte &agrave; outra, seja por que meio for, por for&ccedil;a do Contrato, constituem informa&ccedil;&atilde;o privilegiada e, como tal, t&ecirc;m car&aacute;ter de estrita confidencialidade, podendo ser utilizados pelas Partes exclusivamente na execu&ccedil;&atilde;o do Contrato e em hip&oacute;tese nenhuma poder&atilde;o ser repassados a terceiros, sob pena de grave infra&ccedil;&atilde;o contratual e as medidas judiciais cab&iacute;veis, tomadas pela parte prejudicada.</p>
+    </section>
+
+    <section id="s6">
+      <h2><span class="num">CL&Aacute;USULA SEXTA</span>Pessoal Autorizado</h2>
+      <p><strong>6.1</strong> Somente a CONTRATANTE e as pessoas indicadas no campo &quot;Gestor&quot; e os representantes legais da CONTRATANTE, relacionadas no Termo de Ades&atilde;o, online pelo website <a href="https://www.conteleteams.com.br">www.conteleteams.com.br</a>, poder&atilde;o solicitar &agrave; CONTRATADA a ativa&ccedil;&atilde;o, desativa&ccedil;&atilde;o ou altera&ccedil;&atilde;o dos servi&ccedil;os, ficando a CONTRATADA expressamente autorizada a deixar de atender solicita&ccedil;&otilde;es feitas por terceiros n&atilde;o autorizados.</p>
+    </section>
+
+    <section id="s7">
+      <h2><span class="num">CL&Aacute;USULA S&Eacute;TIMA</span>Servi&ccedil;os e Manuten&ccedil;&atilde;o T&eacute;cnica</h2>
+      <p><strong>7.1</strong> Qualquer suporte t&eacute;cnico somente ser&aacute; realizado por pessoal autorizado pela CONTRATADA, em hor&aacute;rio comercial, online pelo website <a href="https://www.contelege.com.br">www.contelege.com.br</a>.</p>
+    </section>
+
+    <section id="s8">
+      <h2><span class="num">CL&Aacute;USULA OITAVA</span>Das Obriga&ccedil;&otilde;es da Contratada</h2>
+      <p><strong>8.1</strong> Cumprir todas as leis e posturas federais, estaduais, e municipais pertinentes e vigentes durante a execu&ccedil;&atilde;o deste contrato.</p>
+      <p><strong>8.2</strong> Responsabilizar-se pelo recolhimento de todos os tributos que incidam ou que venham a incidir sobre as atividades inerentes &agrave; execu&ccedil;&atilde;o deste contrato, de acordo com a legisla&ccedil;&atilde;o em vigor.</p>
+    </section>
+
+    <section id="s9">
+      <h2><span class="num">CL&Aacute;USULA NONA</span>Das Obriga&ccedil;&otilde;es da Contratante</h2>
+      <p><strong>9.1</strong> A CONTRATANTE obriga-se a trazer ao conhecimento da CONTRATADA e fornec&ecirc;-la todos os dados e informa&ccedil;&otilde;es t&eacute;cnicas, necess&aacute;rios &agrave; execu&ccedil;&atilde;o do estabelecido no presente instrumento, bem como solicitar por escrito eventual necessidade de exclus&atilde;o dos mesmos, acompanhado da respectiva justificativa.</p>
+      <p><strong>9.2</strong> Obriga-se ainda a CONTRATANTE a comunicar imediatamente &agrave; CONTRATADA qualquer ocorr&ecirc;ncia envolvendo a presta&ccedil;&atilde;o dos servi&ccedil;os contratados, a fim de que os mesmos sejam restabelecidos dentro do menor tempo poss&iacute;vel.</p>
+    </section>
+
+    <section id="s10">
+      <h2><span class="num">CL&Aacute;USULA D&Eacute;CIMA</span>Da Propriedade Intelectual e Industrial</h2>
+      <p><strong>10.1</strong> Os direitos de Propriedade Intelectual e Industrial, relativos ao sistema, pertencem e pertencer&atilde;o &agrave; CONTRATADA.</p>
+      <p><strong>10.2</strong> &Eacute; expressamente vedado &agrave; CONTRATANTE, por si ou por meio de terceiros, copiar, alterar, desmontar, descompilar, efetuar engenharia reversa ou tomar qualquer provid&ecirc;ncia para qualquer efeito, sob pena de rescis&atilde;o autom&aacute;tica deste contrato na data de conhecimento de tal fato pela CONTRATANTE, com aplica&ccedil;&atilde;o da multa equivalente ao valor correspondente a 1000 (mil) vezes o valor deste contrato al&eacute;m das demais repara&ccedil;&otilde;es e indeniza&ccedil;&otilde;es previstas em lei.</p>
+    </section>
+
+    <section id="s11">
+      <h2><span class="num">CL&Aacute;USULA D&Eacute;CIMA PRIMEIRA</span>Das Disposi&ccedil;&otilde;es Gerais</h2>
+      <p><strong>11.1</strong> Nenhuma das Partes poder&aacute; ceder e/ou transferir os seus direitos e obriga&ccedil;&otilde;es decorrentes deste Contrato sem a expressa anu&ecirc;ncia por escrito da outra Parte.</p>
+      <p><strong>11.2</strong> O presente instrumento n&atilde;o gera, para as Partes, quaisquer outros direitos e obriga&ccedil;&otilde;es al&eacute;m daqueles aqui expressamente previstos.</p>
+      <p><strong>11.4</strong> Na hip&oacute;tese em que quaisquer termos ou disposi&ccedil;&otilde;es do presente Contrato venham a ser declarados nulos ou n&atilde;o aplic&aacute;veis, tal nulidade ou inexequibilidade n&atilde;o afetar&aacute; o restante do contrato que permanecer&aacute; em pleno vigor e efic&aacute;cia, como se tais disposi&ccedil;&otilde;es jamais lhe houvessem sido incorporadas.</p>
+      <p><strong>11.5</strong> O presente contrato obrigar&aacute; as Partes e seus respectivos sucessores e cession&aacute;rios. N&atilde;o obstante o acima exposto, a CONTRATANTE n&atilde;o poder&aacute; ceder ou transferir o presente contrato sem o pr&eacute;vio consentimento, por escrito, da CONTRATADA.</p>
+      <p><strong>11.6</strong> A CONTRATADA &eacute; a &uacute;nica e exclusiva respons&aacute;vel pelos contratos de trabalho de seus empregados, inclusive por eventuais inadimplementos trabalhistas em que possa incorrer, n&atilde;o podendo arguir responsabilidade subsidi&aacute;ria ou solid&aacute;ria da CONTRATADA, n&atilde;o existindo v&iacute;nculo empregat&iacute;cio entre a CONTRATANTE e os empregados da CONTRATADA.</p>
+      <p><strong>11.7</strong> Caso a CONTRATANTE seja autuada, notificada ou intimada em raz&atilde;o do n&atilde;o cumprimento em &eacute;poca pr&oacute;pria de qualquer obriga&ccedil;&atilde;o atribu&iacute;vel &agrave; CONTRATADA, seja de natureza trabalhista e/ou previdenci&aacute;ria, a CONTRATADA pleitear&aacute; a exclus&atilde;o da CONTRATANTE do polo passivo da a&ccedil;&atilde;o e, em caso de condena&ccedil;&atilde;o da CONTRATANTE, fica obrigada a ressarcir o valor por ela despendido em ju&iacute;zo, autorizando-se, desde j&aacute;, a paralisa&ccedil;&atilde;o dos servi&ccedil;os e rescis&atilde;o antecipada do contrato, por iniciativa da CONTRATADA, sem a incid&ecirc;ncia de qualquer multa.</p>
+      <p><strong>11.8</strong> O presente contrato n&atilde;o ser&aacute; alterado ou modificado, a n&atilde;o ser por instrumento de aditamento contratual escrito, assinado por ambas as Partes.</p>
+      <p><strong>11.9</strong> Toda e qualquer comunica&ccedil;&atilde;o a ser dada de uma Parte &agrave; outra, no &acirc;mbito do presente contrato, sob pena de ser desconsiderada para todos os fins, dever&aacute; ser feita por escrito e enviada para:</p>
+      <p><strong>CONTRATADA:</strong> CONTELESIS SOLU&Ccedil;&Otilde;ES TECNOL&Oacute;GICAS LTDA.<br>
+      Nome: Leonardo Gazolli<br>
+      Email: <a href="mailto:contato@contelege.com.br">contato@contelege.com.br</a></p>
+      <p><strong>CONTRATANTE:</strong> Pessoa Jur&iacute;dica que aceitou os Termos de uso online pelo website, faz uso regular do sistema e paga as mensalidades regularmente.</p>
+    </section>
+
+    <section id="s12">
+      <h2><span class="num">CL&Aacute;USULA D&Eacute;CIMA SEGUNDA</span>Do Foro de Elei&ccedil;&atilde;o</h2>
+      <p>Fica eleito o Foro Central da Comarca da Capital do Estado de S&atilde;o Paulo como &uacute;nico e exclusivamente competente para dirimir quaisquer d&uacute;vidas ou quest&otilde;es oriundas deste Instrumento.</p>
+    </section>
+
+    <div class="contact-box">
+      <h2>Contato</h2>
+      <p style="margin-bottom: 24px; color: var(--text-muted);">Para d&uacute;vidas sobre estes Termos de Uso, entre em contato:</p>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <span class="c-label">Empresa</span>
+          <span class="c-value">Contele Solu&ccedil;&otilde;es Tecnol&oacute;gicas Ltda</span>
+        </div>
+        <div class="contact-card">
+          <span class="c-label">E-mail</span>
+          <span class="c-value"><a href="mailto:contato@contelege.com.br">contato@contelege.com.br</a></span>
+        </div>
+        <div class="contact-card">
+          <span class="c-label">Endere&ccedil;o</span>
+          <span class="c-value">Rua Euclides da Cunha, 11, Edif&iacute;cio Panorama Center, Conjunto 601 e 606, Gonzaga, Santos/SP, CEP: 11065-100</span>
+        </div>
+        <div class="contact-card">
+          <span class="c-label">CNPJ</span>
+          <span class="c-value">06.036.246/0001-08</span>
+        </div>
+      </div>
+      <p class="contact-note">Contele Solu&ccedil;&otilde;es Tecnol&oacute;gicas Ltda. CNPJ 06.036.246/0001-08</p>
+    </div>
+
+    <p style="margin-top: 32px; font-size: 13px; color: var(--text-muted);">&Uacute;ltima atualiza&ccedil;&atilde;o: 11/01/2024</p>
+
+  </div>
+</div>
+
+<footer>
+  <div class="header-inner">
+    <p>&copy; 2024 Contele Solu&ccedil;&otilde;es Tecnol&oacute;gicas Ltda. CNPJ 06.036.246/0001-08</p>
+    <p><a href="/">conteleteams.com.br</a> &middot; <a href="/privacidade/">Privacidade</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

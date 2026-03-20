@@ -14,8 +14,7 @@ const REDIRECTS = {
   // Content pages (WordPress legacy → external)
   '/indique-ganhe': 'https://indique.contele.io/',
   '/indique-ganhe/': 'https://indique.contele.io/',
-  '/termos-uso': 'https://blog.contelege.com.br/termo-de-uso-software-de-gestao-de-equipe-externa/',
-  '/termos-uso/': 'https://blog.contelege.com.br/termo-de-uso-software-de-gestao-de-equipe-externa/',
+  // termos-uso: served as static page (termos-uso/index.html)
   '/privacidade': 'https://exclusivo.contelege.com.br/politica-privacidade/',
   '/privacidade/': 'https://exclusivo.contelege.com.br/politica-privacidade/',
   '/politica-privacidade': 'https://exclusivo.contelege.com.br/politica-privacidade/',
