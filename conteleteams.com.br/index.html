@@ -29,34 +29,28 @@
   <meta name="twitter:image" content="https://conteleteams.com.br/img/capa-video-lp-teams.webp">
 
   <!-- Preload LCP image + second largest asset -->
-  <link rel="preload" as="image" href="img/capa-video-lp-teams.webp" type="image/webp">
+  <link rel="preload" as="image" href="img/capa-video-lp-teams.webp" type="image/webp" imagesrcset="img/capa-video-lp-teams-sm.webp 400w, img/capa-video-lp-teams.webp 640w" imagesizes="(max-width: 600px) 400px, 640px">
   <link rel="preload" as="image" href="img/dash.webp" type="image/webp">
 
   <!-- Preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://www.googletagmanager.com">
+  <link rel="dns-prefetch" href="https://www.google-analytics.com">
+  <link rel="dns-prefetch" href="https://www.googleadservices.com">
+  <link rel="dns-prefetch" href="https://bat.bing.com">
 
   <!-- Fonts: async load to avoid render-blocking -->
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap"></noscript>
 
-  <!-- GTM: dataLayer init (must exist before any push) -->
-  <script>window.dataLayer = window.dataLayer || [];</script>
-
-  <!-- GTM: deferred load after first paint to avoid blocking LCP (~560ms saving) -->
-  <script>
-  window.addEventListener('load', function() {
-    setTimeout(function() {
-      var s = document.createElement('script');
-      s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-TQNBWXFK';
-      s.async = true;
-      document.head.appendChild(s);
-      window.dataLayer.push({'gtm.start': new Date().getTime(), event: 'gtm.js'});
-    }, 100);
-  });
-  </script>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-TQNBWXFK');</script>
 
   <!-- Schema.org structured data -->
   <script type="application/ld+json">
@@ -1265,7 +1259,7 @@
       </div>
       <div class="hero-video">
         <div class="yt-facade" onclick="loadYT(this, '-sUJTiDmtwU')" aria-label="Assistir vídeo sobre o Contele Teams" role="button" tabindex="0" onkeydown="if(event.key==='Enter')loadYT(this,'-sUJTiDmtwU')">
-          <img src="img/capa-video-lp-teams.webp" alt="Assista ao vídeo sobre o Contele Teams" width="640" height="360" fetchpriority="high">
+          <img src="img/capa-video-lp-teams.webp" srcset="img/capa-video-lp-teams-sm.webp 400w, img/capa-video-lp-teams.webp 640w" sizes="(max-width: 600px) 400px, 640px" alt="Assista ao vídeo sobre o Contele Teams" width="640" height="360" fetchpriority="high">
           <div class="yt-play" aria-hidden="true">
             <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
           </div>
