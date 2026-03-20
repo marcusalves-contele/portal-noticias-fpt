@@ -1150,6 +1150,54 @@
       #sidebar { max-width: 100%; padding: 32px 20px; }
     }
 
+    /* ===== EXIT INTENT MODAL ===== */
+    .exit-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6); z-index: 950;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    }
+    .exit-overlay.active { display: flex; }
+    .exit-modal {
+      background: var(--white); border-radius: 16px; padding: 48px 36px;
+      max-width: 480px; width: 90%; text-align: center; position: relative;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.25);
+      animation: exitSlideIn 0.3s ease;
+    }
+    @keyframes exitSlideIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .exit-modal::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      border-radius: 16px 16px 0 0;
+      background: linear-gradient(90deg, var(--blue-primary), var(--blue-submit));
+    }
+    .exit-close {
+      position: absolute; top: 12px; right: 16px; background: none; border: none;
+      color: var(--text-muted); font-size: 28px; cursor: pointer; transition: color 0.2s;
+      line-height: 1; padding: 4px;
+    }
+    .exit-close:hover { color: var(--text-main); }
+    .exit-modal h3 {
+      font-family: var(--font-main); font-size: 26px; font-weight: 800;
+      color: var(--blue-heading); margin-bottom: 10px; line-height: 1.25;
+    }
+    .exit-modal p.exit-sub {
+      font-size: 15px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5;
+    }
+    .exit-btns { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+    .exit-btns .btn-primary { width: 100%; max-width: 340px; padding: 14px 24px; font-size: 16px; }
+    .exit-btns .btn-wpp {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: #25D366; color: #fff; border: none; border-radius: 8px;
+      padding: 12px 24px; font-family: var(--font-main); font-weight: 700;
+      font-size: 15px; cursor: pointer; transition: background 0.18s, transform 0.12s;
+      width: 100%; max-width: 340px; text-decoration: none; text-align: center;
+    }
+    .exit-btns .btn-wpp:hover { background: #1da851; transform: translateY(-1px); text-decoration: none; }
+    .exit-btns .btn-wpp svg { flex-shrink: 0; }
+
     /* ===== UTILITY ===== */
     .mt-0 { margin-top: 0; }
     .mt-8 { margin-top: 8px; }
@@ -1949,6 +1997,22 @@
   </div>
 </footer>
 
+<!-- ===== EXIT INTENT MODAL ===== -->
+<div class="exit-overlay" id="exitModal">
+  <div class="exit-modal">
+    <button class="exit-close" id="exitClose" aria-label="Fechar">&times;</button>
+    <h3>Conheça o Contele Teams antes de sair</h3>
+    <p class="exit-sub">Mais de 1.500 empresas já transformaram sua gestão de equipes externas</p>
+    <div class="exit-btns">
+      <button class="btn btn-primary" id="exitCta">Solicitar Demonstração Gratuita</button>
+      <a href="https://wa.me/5511971325108?text=Oi%2C%20vim%20pelo%20site%20conteleteams.com.br%20e%20queria%20saber%20mais" class="btn-wpp" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Falar pelo WhatsApp
+      </a>
+    </div>
+  </div>
+</div>
+
 <!-- ===== JAVASCRIPT (deferred) ===== -->
 <script defer>
   // ===== SIDEBAR =====
@@ -2253,6 +2317,82 @@
     wrap.appendChild(prev);
     wrap.appendChild(next);
   });
+
+  // ===== EXIT INTENT =====
+  (function() {
+    var modal = document.getElementById('exitModal');
+    var closeBtn = document.getElementById('exitClose');
+    var ctaBtn = document.getElementById('exitCta');
+    if (!modal || !closeBtn || !ctaBtn) return;
+
+    var canShow = false;
+    var shown = false;
+
+    // Delay: only activate after 15s on page
+    setTimeout(function() { canShow = true; }, 15000);
+
+    function shouldBlock() {
+      if (shown) return true;
+      if (sessionStorage.getItem('exitShown')) return true;
+      if (localStorage.getItem('lastSubmit')) return true;
+      if (!canShow) return true;
+      // Don't show if sidebar is open
+      var sidebar = document.getElementById('sidebar');
+      if (sidebar && sidebar.classList.contains('open')) return true;
+      return false;
+    }
+
+    function showExit() {
+      if (shouldBlock()) return;
+      shown = true;
+      modal.classList.add('active');
+      sessionStorage.setItem('exitShown', '1');
+    }
+
+    function hideExit() {
+      modal.classList.remove('active');
+    }
+
+    // Desktop: mouse leaves viewport from top
+    document.addEventListener('mouseout', function(e) {
+      if (!e.relatedTarget && e.clientY < 10) showExit();
+    });
+
+    // Mobile: 45s without scroll and no form interaction
+    var mobileTimer = null;
+    var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    if (isMobile) {
+      function resetMobileTimer() {
+        clearTimeout(mobileTimer);
+        mobileTimer = setTimeout(showExit, 45000);
+      }
+      // Start timer after canShow delay
+      setTimeout(function() {
+        resetMobileTimer();
+        window.addEventListener('scroll', resetMobileTimer, { passive: true });
+        window.addEventListener('touchstart', resetMobileTimer, { passive: true });
+      }, 15000);
+    }
+
+    // Dismiss: X button
+    closeBtn.addEventListener('click', hideExit);
+
+    // Dismiss: overlay click
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) hideExit();
+    });
+
+    // Dismiss: ESC key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && modal.classList.contains('active')) hideExit();
+    });
+
+    // CTA: open sidebar and close modal
+    ctaBtn.addEventListener('click', function() {
+      hideExit();
+      openSidebar();
+    });
+  })();
 
   // ===== LAZY LOAD: RD Station (only after user interaction) =====
   (function() {
