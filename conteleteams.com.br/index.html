@@ -2090,6 +2090,24 @@
     wrap.appendChild(next);
   });
 
+  // ===== LAZY LOAD: RD Station (only after user interaction) =====
+  (function() {
+    var loaded = false;
+    function loadRD() {
+      if (loaded) return;
+      loaded = true;
+      var s = document.createElement('script');
+      s.src = 'https://d335luupugsy2.cloudfront.net/js/loader-scripts/efe499b4-9f6f-4a54-9469-9216eee1d1a1-loader.js';
+      s.async = true;
+      document.body.appendChild(s);
+    }
+    ['scroll', 'click', 'touchstart', 'mousemove'].forEach(function(evt) {
+      window.addEventListener(evt, loadRD, { once: true, passive: true });
+    });
+    // Fallback: load after 5s even without interaction
+    setTimeout(loadRD, 5000);
+  })();
+
 </script>
 
 </body>
