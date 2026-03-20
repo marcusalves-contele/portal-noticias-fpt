@@ -341,8 +341,17 @@ const WON_STAGES = [257, 272, 278, 279, 280, 238]; // ETAPA 1-5 + BASE GE
 app.post('/api/pipedrive-webhook', async (req, res) => {
   res.json({ ok: true });
 
+  // DEBUG: log raw payload to Discord
+  const rawKeys = Object.keys(req.body || {});
+  const currentId = req.body?.current?.id || req.body?.data?.id || 'no-id';
+  const currentStage = req.body?.current?.stage_id || req.body?.data?.stage_id || 'no-stage';
+  await sendDiscord(`🔍 **Pipedrive webhook received**\nKeys: ${rawKeys.join(', ')}\nDeal ID: ${currentId}\nStage: ${currentStage}\nFull body keys: ${JSON.stringify(rawKeys).slice(0, 500)}`);
+
   const { current, previous, event, meta } = req.body;
-  if (!current || !current.id) return;
+  if (!current || !current.id) {
+    await sendDiscord(`⚠️ No current.id found. Body structure: ${JSON.stringify(req.body).slice(0, 800)}`);
+    return;
+  }
 
   const dealId = current.id;
   const newStageId = parseInt(current.stage_id, 10);
