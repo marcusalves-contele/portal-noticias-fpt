@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
   <title>Obrigado | Contele Teams</title>
-
-  <!-- Preconnect -->
+  <link rel="icon" type="image/svg+xml" href="../img/contele-teams.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700;800&family=Roboto:wght@400;500;700&display=swap">
@@ -25,108 +24,211 @@
       --blue-heading: #273896;
       --white: #ffffff;
       --text-main: #333333;
-      --text-muted: #666666;
+      --text-muted: #555;
+      --bg: #f5f5f5;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Roboto', sans-serif;
-      color: var(--text-main);
-      background: #f5f5f5;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .card {
-      background: var(--white);
-      border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-      max-width: 600px;
-      width: 100%;
-      padding: 48px 40px;
+    body { font-family: 'Roboto', sans-serif; color: var(--text-main); background: var(--bg); line-height: 1.6; }
+    img { max-width: 100%; height: auto; }
+    a { color: var(--blue-primary); text-decoration: none; }
+
+    .header { background: var(--white); box-shadow: 0 2px 8px rgba(0,0,0,0.06); padding: 16px 24px; text-align: center; }
+    .header img { width: 150px; }
+
+    .container { max-width: 800px; margin: 0 auto; padding: 0 24px; }
+
+    .hero-thanks {
       text-align: center;
+      padding: 48px 24px 32px;
     }
-    .logo { width: 170px; margin: 0 auto 32px; }
-    .logo img { width: 100%; }
-    h1 {
-      font-family: 'Nunito Sans', sans-serif;
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--blue-heading);
-      margin-bottom: 16px;
-      line-height: 1.3;
-    }
-    .check {
-      width: 64px;
-      height: 64px;
+    .check-circle {
+      width: 72px; height: 72px;
       background: #e8f5e9;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 24px;
-      font-size: 32px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 36px; color: #2e7d32;
     }
-    p {
-      color: var(--text-muted);
-      font-size: 16px;
-      line-height: 1.6;
+    .hero-thanks h1 {
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 28px; font-weight: 800;
+      color: var(--blue-heading);
+      margin-bottom: 12px;
+    }
+    .hero-thanks .subtitle {
+      font-size: 18px; color: var(--text-muted);
+      max-width: 560px; margin: 0 auto;
+    }
+    .phone-highlight {
+      display: inline-block;
+      background: #EEF0FF; border: 1px solid #C5CCFF;
+      border-radius: 8px; padding: 8px 16px;
+      margin-top: 16px; font-size: 15px;
+      color: var(--blue-heading); font-weight: 600;
+    }
+
+    .video-section {
+      max-width: 560px; margin: 0 auto 40px;
+      text-align: center;
+    }
+    .video-section h2 {
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 20px; font-weight: 700;
+      color: var(--blue-heading);
       margin-bottom: 16px;
     }
-    .highlight {
-      background: #EEF0FF;
-      border: 1px solid #C5CCFF;
-      border-radius: 8px;
-      padding: 16px;
-      margin: 24px 0;
-      font-size: 15px;
+    .video-wrap {
+      position: relative; padding-bottom: 56.25%;
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      cursor: pointer; background: #000;
+    }
+    .video-wrap img {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .video-wrap .play-btn {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 64px; height: 64px;
+      background: rgba(255,0,0,0.85);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .video-wrap .play-btn::after {
+      content: ''; width: 0; height: 0;
+      border-style: solid;
+      border-width: 12px 0 12px 22px;
+      border-color: transparent transparent transparent white;
+      margin-left: 4px;
+    }
+
+    .pillars {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 16px; margin: 0 auto 40px;
+      max-width: 800px; padding: 0 24px;
+    }
+    .pillar {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 24px 16px;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .pillar-icon { font-size: 32px; margin-bottom: 8px; }
+    .pillar h3 {
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 14px; font-weight: 700;
       color: var(--blue-heading);
     }
-    .highlight strong { display: block; margin-bottom: 4px; }
-    .cta-whatsapp {
-      display: inline-block;
-      background: #25D366;
-      color: var(--white);
-      padding: 14px 32px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 16px;
-      margin-top: 8px;
-      transition: background 0.2s;
+
+    .benefits {
+      max-width: 800px; margin: 0 auto 40px;
+      padding: 0 24px;
     }
-    .cta-whatsapp:hover { background: #1da851; text-decoration: none; }
-    .back-link {
-      display: block;
-      margin-top: 24px;
-      color: var(--blue-primary);
+    .benefits h2 {
+      font-family: 'Nunito Sans', sans-serif;
+      font-size: 22px; font-weight: 800;
+      color: var(--blue-heading);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .benefits-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .benefit-item {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 16px 20px;
       font-size: 14px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .benefit-check { color: #2e7d32; font-weight: 700; flex-shrink: 0; }
+
+    .footer-thanks {
+      text-align: center; padding: 32px 24px;
+      color: var(--text-muted); font-size: 13px;
+    }
+    .footer-thanks a { margin: 0 8px; }
+
+    @media (max-width: 700px) {
+      .pillars { grid-template-columns: repeat(2, 1fr); }
+      .benefits-grid { grid-template-columns: 1fr; }
+      .hero-thanks h1 { font-size: 24px; }
     }
   </style>
 </head>
 <body>
-  <!-- Google Tag Manager (noscript) -->
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TQNBWXFK" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-  <div class="card">
-    <div class="logo"><img src="../img/contele-teams.svg" alt="Contele Teams"></div>
-    <div class="check">&#10003;</div>
-    <h1>Demonstraao solicitada com sucesso!</h1>
-    <p>Recebemos seus dados e nosso time de especialistas entrara em contato com voce em breve.</p>
-
-    <div class="highlight">
-      <strong>Proximos passos:</strong>
-      Nosso consultor vai entrar em contato pelo WhatsApp para agendar uma demonstracao personalizada do Contele Teams.
-    </div>
-
-    <p>Quer adiantar a conversa?</p>
-    <a href="https://wa.me/5511971325108?text=Ol%C3%A1!%20Acabei%20de%20solicitar%20uma%20demonstra%C3%A7%C3%A3o%20do%20Contele%20Teams." class="cta-whatsapp">
-      Falar agora via WhatsApp
-    </a>
-
-    <a href="/" class="back-link">Voltar para a pagina principal</a>
+  <div class="header">
+    <a href="/"><img src="../img/contele-teams.svg" alt="Contele Teams"></a>
   </div>
+
+  <div class="hero-thanks">
+    <div class="check-circle">&#10003;</div>
+    <h1>Parabéns! Sua demonstração foi solicitada.</h1>
+    <p class="subtitle">Confira seu WhatsApp agora: nosso consultor já entrou em contato com você no número que informou.</p>
+    <div class="phone-highlight">Fique de olho no WhatsApp!</div>
+  </div>
+
+  <div class="video-section">
+    <h2>Recado de boas-vindas do Leonardo Gazolli</h2>
+    <div class="video-wrap" onclick="loadVideo(this)">
+      <img src="https://img.youtube.com/vi/a08boFTB1n4/maxresdefault.jpg" alt="Vídeo de boas-vindas" loading="lazy">
+      <div class="play-btn"></div>
+    </div>
+  </div>
+
+  <div class="pillars">
+    <div class="pillar">
+      <div class="pillar-icon">&#128200;</div>
+      <h3>Produtividade</h3>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon">&#128506;</div>
+      <h3>Planejamento e Agilidade</h3>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon">&#128241;</div>
+      <h3>Transformação Digital</h3>
+    </div>
+    <div class="pillar">
+      <div class="pillar-icon">&#127919;</div>
+      <h3>Resultados</h3>
+    </div>
+  </div>
+
+  <div class="benefits">
+    <h2>O que você vai ganhar com o Contele Teams</h2>
+    <div class="benefits-grid">
+      <div class="benefit-item"><span class="benefit-check">&#10003;</span> Até 30% mais visitas por dia com roteirização inteligente</div>
+      <div class="benefit-item"><span class="benefit-check">&#10003;</span> Redução de até 42% nos custos com reembolso de KM</div>
+      <div class="benefit-item"><span class="benefit-check">&#10003;</span> Controle de visitas com check-in e check-out via GPS</div>
+      <div class="benefit-item"><span class="benefit-check">&#10003;</span> Ordens de serviço digitais com foto e assinatura</div>
+      <div class="benefit-item"><span class="benefit-check">&#10003;</span> Checklists personalizados para cada tipo de visita</div>
+      <div class="benefit-item"><span class="benefit-check">&#10003;</span> Monitoramento da equipe em tempo real no mapa</div>
+      <div class="benefit-item"><span class="benefit-check">&#10003;</span> Dashboard de indicadores e relatórios gerenciais</div>
+      <div class="benefit-item"><span class="benefit-check">&#10003;</span> Integração com ERPs, CRMs e +3.000 ferramentas</div>
+      <div class="benefit-item"><span class="benefit-check">&#10003;</span> Abertura de chamados pelo cliente (Contele Desk)</div>
+      <div class="benefit-item"><span class="benefit-check">&#10003;</span> Implantação gratuita + treinamento com certificação</div>
+    </div>
+  </div>
+
+  <div class="footer-thanks">
+    <p>Precisa de ajuda? <a href="https://help.contelege.com.br" target="_blank" rel="noopener">Central de Ajuda</a> | <a href="mailto:contato@contelege.com.br">contato@contelege.com.br</a></p>
+    <p style="margin-top: 8px;">
+      <a href="/" style="color: var(--blue-primary);">&larr; Voltar para a página principal</a>
+    </p>
+  </div>
+
+  <script>
+  function loadVideo(el) {
+    el.innerHTML = '<iframe src="https://www.youtube.com/embed/a08boFTB1n4?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"></iframe>';
+    el.style.cursor = 'default';
+  }
+  </script>
 </body>
 </html>
