@@ -1,1 +1,1 @@
-web: bash -c "apt-get update -qq 2>/dev/null && apt-get install -y -qq libxcb1 libgl1-mesa-glx libglib2.0-0 libxext6 libsm6 2>/dev/null; cd nutella-creator && python3 boot.py && python3 dashboard.py"
+web: bash -c "apt-get update -qq 2>/dev/null && apt-get install -y -qq libxcb1 libgl1 libglib2.0-0 libxext6 libsm6 2>/dev/null; cd nutella-creator && python3 boot.py && python3 dashboard.py"
