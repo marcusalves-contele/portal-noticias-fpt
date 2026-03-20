@@ -63,9 +63,11 @@ app.use(express.static(path.join(__dirname), {
   }
 }));
 
-// Compress responses
+// Security headers (override Cloudflare defaults that break YouTube embeds)
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.removeHeader('X-Frame-Options');
   next();
 });
 
