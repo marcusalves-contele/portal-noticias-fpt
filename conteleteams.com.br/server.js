@@ -127,6 +127,62 @@ async function sendWhatsApp(number, text) {
   }
 }
 
+// ===== GOOGLE ADS OFFLINE CONVERSION UPLOAD =====
+async function getGoogleAdsToken() {
+  const resp = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: process.env.GOOGLE_ADS_CLIENT_ID,
+      client_secret: process.env.GOOGLE_ADS_CLIENT_SECRET,
+      refresh_token: process.env.GOOGLE_ADS_REFRESH_TOKEN,
+      grant_type: 'refresh_token'
+    })
+  });
+  const data = await resp.json();
+  if (!data.access_token) {
+    console.error('[GADS] Token refresh failed:', JSON.stringify(data).slice(0, 300));
+  }
+  return data.access_token;
+}
+
+async function uploadGoogleAdsConversion(gclid, conversionAction, conversionValue, conversionDateTime) {
+  const token = await getGoogleAdsToken();
+  if (!token) return { error: 'no_access_token' };
+
+  const customerId = (process.env.GOOGLE_ADS_CUSTOMER_ID || '5532904101').replace(/-/g, '');
+  const devToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN || 'HMDVGk1M3N0rotf2zXiZXQ';
+
+  const resp = await fetch(`https://googleads.googleapis.com/v19/customers/${customerId}:uploadClickConversions`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'developer-token': devToken,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      conversions: [{
+        gclid: gclid,
+        conversionAction: conversionAction,
+        conversionDateTime: conversionDateTime,
+        conversionValue: conversionValue,
+        currencyCode: 'BRL'
+      }],
+      partialFailure: true
+    })
+  });
+
+  const result = await resp.json();
+  return result;
+}
+
+function brConversionDateTime() {
+  // Format: "2026-03-20 12:00:00-03:00"
+  const now = new Date();
+  const brISO = now.toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+  return brISO.replace('T', ' ') + '-03:00';
+}
+
 async function sendDiscord(content) {
   if (!DISCORD_WEBHOOK) return;
   try {
@@ -480,9 +536,26 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
       }
     }
 
+    // Upload to Google Ads (only if GCLID is complete, >= 80 chars)
+    if (gclid && gclid.length >= 80) {
+      try {
+        const adsResult = await uploadGoogleAdsConversion(
+          gclid,
+          'customers/5532904101/conversionActions/7542373908',
+          1.0,
+          brConversionDateTime()
+        );
+        console.log(`[PIPE] Google Ads upload (qualified) deal=${dealId}: ${JSON.stringify(adsResult).slice(0, 200)}`);
+        await sendDiscord(`Google Ads upload (lead_qualificado) deal=${dealId}: ${JSON.stringify(adsResult).slice(0, 200)}`);
+      } catch (err) {
+        console.error(`[PIPE] Google Ads upload error (qualified) deal=${dealId}:`, err.message);
+        await sendDiscord(`Google Ads upload FAILED (lead_qualificado) deal=${dealId}: ${err.message}`);
+      }
+    }
+
     // Notify Slack
     await sendSlack(`:star: *Lead qualificado!*\n\n*${dealTitle}* entrou em etapa avançada\nGCLID: ${gclid ? 'sim' : 'nao'}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
-    await sendDiscord(`⭐ **Lead qualificado!**\n\n**${dealTitle}** entrou em etapa avançada\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_qualificado\nPipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`);
+    await sendDiscord(`⭐ **Lead qualificado!**\n\n**${dealTitle}** entrou em etapa avançada\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_qualificado\nGoogle Ads: ${gclid && gclid.length >= 80 ? 'uploaded' : 'skipped (no full GCLID)'}\nPipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`);
   }
 
   // WON: deal closed as won (fire only once per deal)
@@ -510,9 +583,26 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
       }
     }
 
+    // Upload to Google Ads (only if GCLID is complete, >= 80 chars)
+    if (gclid && gclid.length >= 80) {
+      try {
+        const adsResult = await uploadGoogleAdsConversion(
+          gclid,
+          'customers/5532904101/conversionActions/7542084401',
+          dealValue || 1.0,
+          brConversionDateTime()
+        );
+        console.log(`[PIPE] Google Ads upload (won) deal=${dealId}: ${JSON.stringify(adsResult).slice(0, 200)}`);
+        await sendDiscord(`Google Ads upload (lead_convertido) deal=${dealId} value=${dealValue}: ${JSON.stringify(adsResult).slice(0, 200)}`);
+      } catch (err) {
+        console.error(`[PIPE] Google Ads upload error (won) deal=${dealId}:`, err.message);
+        await sendDiscord(`Google Ads upload FAILED (lead_convertido) deal=${dealId}: ${err.message}`);
+      }
+    }
+
     // Notify Slack
     await sendSlack(`:tada: *Deal ganho!*\n\n*${dealTitle}* virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid ? 'sim (Google Ads rastreável)' : 'nao'}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
-    await sendDiscord(`🎉 **Deal ganho!**\n\n**${dealTitle}** virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_convertido (value=${dealValue})\nPipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`);
+    await sendDiscord(`🎉 **Deal ganho!**\n\n**${dealTitle}** virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_convertido (value=${dealValue})\nGoogle Ads: ${gclid && gclid.length >= 80 ? 'uploaded' : 'skipped (no full GCLID)'}\nPipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`);
   }
 
   } catch (err) {
