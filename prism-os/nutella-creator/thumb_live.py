@@ -600,6 +600,30 @@ def get_guest_refs(live_number: str) -> list[Path]:
     return matches
 
 
+def find_guest_refs_by_name(guest_names: list[str]) -> list[Path]:
+    """Busca fotos de convidados por nome (fallback quando live_number não funciona).
+
+    Procura em GUESTS_DIR por arquivos cujo nome contenha o nome do convidado.
+    Útil quando o título da live não contém 'Live N' ou o número não bate.
+    """
+    import re
+    if not GUESTS_DIR.exists() or not guest_names:
+        return []
+
+    refs = []
+    for name in guest_names:
+        name_slug = name.strip().replace(" ", "-").lower()
+        if not name_slug:
+            continue
+        for f in sorted(GUESTS_DIR.iterdir()):
+            if f.suffix.lower() not in (".jpg", ".jpeg", ".png", ".webp"):
+                continue
+            if name_slug in f.stem.lower().replace("_", "-"):
+                refs.append(f)
+                break  # primeira foto por nome
+    return refs
+
+
 def image_to_part(path: Path) -> dict:
     with open(path, "rb") as f:
         data = base64.b64encode(f.read()).decode()
@@ -1217,8 +1241,21 @@ def generate_ab(briefing: dict, live_id: str, api_key: str,
     emit("refs_host", f"{host_label}: {', '.join(ref_names[:2])}{'…' if len(ref_names)>2 else ''}",
          count=len(host_refs_default), names=ref_names[:3])
 
-    # Refs dos convidados (agora retorna TODOS)
+    # Refs dos convidados: busca por live_number, fallback por nome
     guest_refs = get_guest_refs(live_number) if live_number else []
+
+    # Fallback: busca por nome do convidado no briefing
+    if not guest_refs:
+        guest_names_from_briefing = briefing.get("guests", [])
+        if not guest_names_from_briefing and briefing.get("guest"):
+            guest_names_from_briefing = [n.strip() for n in briefing["guest"].split(",") if n.strip()]
+        if guest_names_from_briefing:
+            guest_refs = find_guest_refs_by_name(guest_names_from_briefing)
+            if guest_refs:
+                emit("refs_guest_fallback",
+                     f"Busca por nome encontrou: {[g.name for g in guest_refs]}",
+                     found=True, method="name_search")
+
     if guest_refs:
         guest_names_detected = [_parse_guest_name(g) for g in guest_refs]
         guest_label = " + ".join(guest_names_detected)
@@ -1354,6 +1391,14 @@ def regenerate_one(briefing: dict, live_id: str, angle: str,
         host_refs = get_host_refs(channel, expressao=expressao)
     guest_refs = get_guest_refs(live_number) if live_number else []
 
+    # Fallback: busca por nome do convidado
+    if not guest_refs:
+        guest_names_from_briefing = briefing.get("guests", [])
+        if not guest_names_from_briefing and briefing.get("guest"):
+            guest_names_from_briefing = [n.strip() for n in briefing["guest"].split(",") if n.strip()]
+        if guest_names_from_briefing:
+            guest_refs = find_guest_refs_by_name(guest_names_from_briefing)
+
     if not original_prompt:
         if not angle_data:
             angles_data = generate_angles(briefing, api_key)
@@ -1365,8 +1410,20 @@ def regenerate_one(briefing: dict, live_id: str, angle: str,
             live_number=live_number,
         )
 
-    print(f"  Ajustando prompt com feedback para {angle}...")
-    adjusted = adjust_prompt_with_feedback(original_prompt, feedback, api_key)
+    # Inclui feedback anterior para evitar drift de contexto
+    feedback_history = item.get("feedback_history", [])
+    angle_history = [f for f in feedback_history if f["angle"] == angle.upper()]
+    if len(angle_history) > 1:
+        # Combina feedbacks anteriores + atual para dar contexto completo
+        prev_feedbacks = [f["feedback"] for f in angle_history[:-1]]  # exclui o atual (já adicionado)
+        combined = "PREVIOUS FEEDBACK (already applied):\n"
+        combined += "\n".join(f"- {fb}" for fb in prev_feedbacks[-3:])  # últimos 3
+        combined += f"\n\nNEW FEEDBACK (apply this now):\n{feedback}"
+        print(f"  Ajustando prompt com {len(prev_feedbacks)} feedbacks anteriores + novo...")
+        adjusted = adjust_prompt_with_feedback(original_prompt, combined, api_key)
+    else:
+        print(f"  Ajustando prompt com feedback para {angle}...")
+        adjusted = adjust_prompt_with_feedback(original_prompt, feedback, api_key)
 
     refs = host_refs + guest_refs
 

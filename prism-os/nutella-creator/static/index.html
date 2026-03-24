@@ -4804,7 +4804,7 @@
       for (const side of ['a', 'b']) {
         if (tlApprovedAngles.has(side.toUpperCase())) {
           const img = document.getElementById(`tl-img-${side}`);
-          if (img && img.src) return img.src.replace(window.location.origin + '/', '');
+          if (img && img.src) return img.src.replace(window.location.origin + '/', '').split('?')[0];
         }
       }
       return '';

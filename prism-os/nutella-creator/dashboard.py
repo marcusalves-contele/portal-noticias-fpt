@@ -1352,7 +1352,7 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
     def _handle_youtube_update_thumb(self, body: dict):
         """POST /api/youtube-update-thumb — atualiza thumbnail de video no YouTube."""
         video_id   = body.get("video_id", "")
-        image_path = body.get("image_path", "")
+        image_path = body.get("image_path", "").split("?")[0]
         if not video_id or not image_path:
             self._json({"error": "video_id and image_path required"}, 400)
             return

@@ -35,6 +35,12 @@ except ImportError as _e:
     print(f"  AVISO: face detection indisponivel ({_e}), usando letterbox para Shorts")
     HAS_FACE_DETECTION = False
 
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
+
 # -------------------------------------------------------------------
 # Paths
 # -------------------------------------------------------------------
@@ -60,6 +66,88 @@ SCREEN_FIT_H = (SW * H // W // 2) * 2   # 608 (full 16:9 at 1080w, even)
 FACE_FIT_H   = SH - SCREEN_FIT_H         # 1312
 
 FREEZE_DURATION = 1.5  # segundos de freeze frame no início do Short
+
+# Badge generation cache
+_badge_cache: dict[str, Path] = {}
+
+
+def generate_badge(live_num: str, tmp_dir: Path) -> Path:
+    """
+    Gera badge-overlay dinâmico com Pillow usando o número real da live.
+    Retorna Path do PNG gerado. Cache por live_num.
+    """
+    if live_num in _badge_cache and _badge_cache[live_num].exists():
+        return _badge_cache[live_num]
+
+    out_path = tmp_dir / f"badge_live{live_num}.png"
+
+    if HAS_PIL:
+        img = Image.new("RGBA", (W, BADGE_H), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+
+        # Background: dark semi-transparent bar
+        draw.rectangle([(0, 0), (W, BADGE_H)], fill=(20, 10, 30, 210))
+
+        # Thin purple accent line at top
+        draw.rectangle([(0, 0), (W, 2)], fill=(139, 35, 229, 255))
+
+        # Load fonts
+        font_path = None
+        for fp in FONT_CANDIDATES:
+            if Path(fp).exists():
+                font_path = fp
+                break
+        # Also try Linux/Railway paths
+        if not font_path:
+            for fp in ["/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+                        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+                        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"]:
+                if Path(fp).exists():
+                    font_path = fp
+                    break
+
+        try:
+            font_small = ImageFont.truetype(font_path, 14) if font_path else ImageFont.load_default()
+            font_main = ImageFont.truetype(font_path, 28) if font_path else ImageFont.load_default()
+            font_right = ImageFont.truetype(font_path, 18) if font_path else ImageFont.load_default()
+            font_right_sm = ImageFont.truetype(font_path, 13) if font_path else ImageFont.load_default()
+        except Exception:
+            font_small = ImageFont.load_default()
+            font_main = ImageFont.load_default()
+            font_right = ImageFont.load_default()
+            font_right_sm = ImageFont.load_default()
+
+        # Left side: red dot + handle
+        x = 24
+        draw.ellipse([(x, 28), (x + 12, 40)], fill=(255, 40, 40, 255))
+        x += 20
+        draw.text((x, 18), "@JULIOCESARFROTAPARATODOS", fill=(180, 180, 180, 255), font=font_small)
+
+        # Main text: CORTE DA LIVE {N}
+        x = 24
+        y_main = 42
+        draw.text((x, y_main), "CORTE DA ", fill=(255, 255, 255, 255), font=font_main)
+        corte_w = draw.textlength("CORTE DA ", font=font_main)
+        draw.text((x + corte_w, y_main), f"LIVE {live_num}", fill=(139, 35, 229, 255), font=font_main)
+
+        # Right side: CTA
+        right_text = "Assista antes que saia do ar"
+        right_sub = "LINK NA DESCRICAO"
+        rt_w = draw.textlength(right_text, font=font_right)
+        rs_w = draw.textlength(right_sub, font=font_right_sm)
+        draw.text((W - rt_w - 30, 22), right_text, fill=(220, 220, 220, 255), font=font_right)
+        draw.text((W - rs_w - 30, 52), right_sub, fill=(160, 160, 160, 200), font=font_right_sm)
+
+        img.save(out_path)
+    else:
+        # Fallback: use static badge if Pillow unavailable
+        import shutil as _shutil
+        _shutil.copy2(BADGE, out_path)
+
+    _badge_cache[live_num] = out_path
+    print(f"  Badge gerado: CORTE DA LIVE {live_num}")
+    return out_path
+
 
 # macOS system fonts (tenta em ordem)
 FONT_CANDIDATES = [
@@ -106,6 +194,27 @@ def find_font() -> str | None:
         if Path(f).exists():
             return f
     return None
+
+
+def _ensure_cookies():
+    """Decodifica COOKIES_B64 env var em cookies.txt se não existir."""
+    cookies_file = PROJECT_DIR / "cookies.txt"
+    if cookies_file.exists():
+        return
+    cookies_b64 = os.environ.get("COOKIES_B64", "")
+    if not cookies_b64:
+        return
+    import base64
+    try:
+        data = base64.b64decode(cookies_b64)
+        cookies_file.write_bytes(data)
+        print(f"  cookies.txt criado via COOKIES_B64 ({len(data)} bytes)")
+    except Exception as e:
+        print(f"  AVISO: falha ao decodificar COOKIES_B64: {e}")
+
+
+# Decodifica cookies na importação (antes de qualquer download)
+_ensure_cookies()
 
 
 def get_live_number(video_id: str) -> str:
@@ -362,6 +471,7 @@ def compose_clip(
     target_h: int,
     layout: dict | None = None,  # resultado de detect_layout(), para 9:16
     crop_mode: bool = False,      # True = Short 9:16
+    badge_path: Path | None = None,  # badge dinâmico (se None, usa estático)
 ) -> None:
     """
     16:9 → vídeo full + badge de identidade no rodapé.
@@ -371,7 +481,8 @@ def compose_clip(
     duration = end_sec - start_sec
 
     if not crop_mode:
-        # 16:9: vídeo full + badge-overlay.png no rodapé (y = H - BADGE_H)
+        # 16:9: vídeo full + badge no rodapé (y = H - BADGE_H)
+        actual_badge = badge_path or BADGE
         badge_y = target_h - BADGE_H
         filter_complex = (
             f"[0:v]scale={target_w}:{target_h},fps={FPS}[vid];"
@@ -381,7 +492,7 @@ def compose_clip(
         run([
             "ffmpeg", "-y",
             "-ss", str(start_sec), "-t", str(duration), "-i", str(source),
-            "-i", str(BADGE),
+            "-i", str(actual_badge),
             "-filter_complex", filter_complex,
             "-map", "[vfinal]", "-map", "0:a:0",
             "-c:v", "libx264", "-preset", "fast", "-crf", "18",
@@ -398,40 +509,51 @@ def compose_clip(
             face_cy = lay["cy"]
             face_fw = lay["fw"]
             face_fh = lay["fh"]
-
-            # Split dinâmico: tela = frame inteiro a 1080w (608px)
-            # Face = espaço restante (1312px)
-            face_h_s   = FACE_FIT_H     # 1312
-            screen_h_s = SCREEN_FIT_H   # 608
-
-            # Face crop: isola o webcam (screen_share=2.5x tight, multi_face=5x)
-            src_ratio = SW / face_h_s
             is_ss = lay.get("type") == "screen_share"
-            mult = 2.5 if is_ss else 5
-            crop_w = max(int(face_fw * mult), 280)
-            crop_w = min(crop_w, W // 4 if is_ss else W)
-            crop_w = (crop_w // 2) * 2
-            crop_h = (int(crop_w / src_ratio) // 2) * 2
-            crop_h = min(crop_h, H)
-            crop_w = (int(crop_h * src_ratio) // 2) * 2
 
-            # Face no terço superior (padding acima do rosto)
-            face_top = face_cy - face_fh // 2
-            padding_above = max(int(face_fh * 0.6), 30)
-            fc_y = max(0, face_top - padding_above)
-            fc_y = min(fc_y, H - crop_h)
-            fc_x = max(0, min(face_cx - crop_w // 2, W - crop_w))
+            if is_ss:
+                # Screen share: split-screen — rosto zoom topo, tela INTEIRA embaixo
+                face_h_s   = FACE_FIT_H     # 1312
+                screen_h_s = SCREEN_FIT_H   # 608
 
-            # Screen: frame INTEIRO a 1080 wide — NUNCA corta conteúdo
-            screen_filter = f"scale={SW}:{screen_h_s},fps={FPS}"
+                src_ratio = SW / face_h_s
+                mult = 2.5
+                crop_w = max(int(face_fw * mult), 280)
+                crop_w = min(crop_w, W // 4)
+                crop_w = (crop_w // 2) * 2
+                crop_h = (int(crop_w / src_ratio) // 2) * 2
+                crop_h = min(crop_h, H)
+                crop_w = (int(crop_h * src_ratio) // 2) * 2
 
-            filter_complex = (
-                f"[0:v]crop={crop_w}:{crop_h}:{fc_x}:{fc_y},"
-                f"scale={SW}:{face_h_s},fps={FPS}[face];"
-                f"[0:v]{screen_filter}[screen];"
-                f"[face][screen]vstack,setsar=1[vfinal]"
-            )
-            desc = f"compose clip 9:16 split [{start_sec:.0f}s → {end_sec:.0f}s]"
+                face_top = face_cy - face_fh // 2
+                padding_above = max(int(face_fh * 0.6), 30)
+                fc_y = max(0, face_top - padding_above)
+                fc_y = min(fc_y, H - crop_h)
+                fc_x = max(0, min(face_cx - crop_w // 2, W - crop_w))
+
+                screen_filter = f"scale={SW}:{screen_h_s},fps={FPS}"
+
+                filter_complex = (
+                    f"[0:v]crop={crop_w}:{crop_h}:{fc_x}:{fc_y},"
+                    f"scale={SW}:{face_h_s},fps={FPS}[face];"
+                    f"[0:v]{screen_filter}[screen];"
+                    f"[face][screen]vstack,setsar=1[vfinal]"
+                )
+                desc = f"compose clip 9:16 split [{start_sec:.0f}s → {end_sec:.0f}s]"
+            else:
+                # Multi-face / conversa: crop 9:16 direto centrado no rosto
+                # Evita duplicação visual (rosto zoom + rosto no frame inteiro)
+                src_crop_w = (H * 9 // 16 // 2) * 2   # 607 → 606
+                src_crop_h = H                          # 1080
+
+                # Centraliza o crop no rosto (horizontalmente)
+                fc_x = max(0, min(face_cx - src_crop_w // 2, W - src_crop_w))
+
+                filter_complex = (
+                    f"[0:v]crop={src_crop_w}:{src_crop_h}:{fc_x}:0,"
+                    f"scale={SW}:{SH},fps={FPS},setsar=1[vfinal]"
+                )
+                desc = f"compose clip 9:16 crop [{start_sec:.0f}s → {end_sec:.0f}s]"
         else:
             # Fallback: letterbox com blur (sem rosto detectado)
             filter_complex = (
@@ -484,33 +606,44 @@ def make_freeze_frame(
         face_cy = lay["cy"]
         face_fw = lay["fw"]
         face_fh = lay["fh"]
+        is_ss = lay.get("type") == "screen_share"
 
-        face_h_s   = FACE_FIT_H
-        screen_h_s = SCREEN_FIT_H
-        src_ratio  = SW / face_h_s
+        if is_ss:
+            # Screen share: split-screen (face zoom topo + tela embaixo)
+            face_h_s   = FACE_FIT_H
+            screen_h_s = SCREEN_FIT_H
+            src_ratio  = SW / face_h_s
 
-        is_ss  = lay.get("type") == "screen_share"
-        mult   = 2.5 if is_ss else 5
-        crop_w = max(int(face_fw * mult), 280)
-        crop_w = min(crop_w, W // 4 if is_ss else W)
-        crop_w = (crop_w // 2) * 2
-        crop_h = (int(crop_w / src_ratio) // 2) * 2
-        crop_h = min(crop_h, H)
-        crop_w = (int(crop_h * src_ratio) // 2) * 2
+            mult   = 2.5
+            crop_w = max(int(face_fw * mult), 280)
+            crop_w = min(crop_w, W // 4)
+            crop_w = (crop_w // 2) * 2
+            crop_h = (int(crop_w / src_ratio) // 2) * 2
+            crop_h = min(crop_h, H)
+            crop_w = (int(crop_h * src_ratio) // 2) * 2
 
-        face_top      = face_cy - face_fh // 2
-        padding_above = max(int(face_fh * 0.6), 30)
-        fc_y = max(0, face_top - padding_above)
-        fc_y = min(fc_y, H - crop_h)
-        fc_x = max(0, min(face_cx - crop_w // 2, W - crop_w))
+            face_top      = face_cy - face_fh // 2
+            padding_above = max(int(face_fh * 0.6), 30)
+            fc_y = max(0, face_top - padding_above)
+            fc_y = min(fc_y, H - crop_h)
+            fc_x = max(0, min(face_cx - crop_w // 2, W - crop_w))
 
-        # split=2 pois o PNG só tem 1 stream mas é usado em face e screen
-        filter_complex = (
-            f"[0:v]scale={W}:{H}:force_original_aspect_ratio=disable,split=2[va][vb];"
-            f"[va]crop={crop_w}:{crop_h}:{fc_x}:{fc_y},scale={SW}:{face_h_s}[face];"
-            f"[vb]scale={SW}:{screen_h_s}[screen];"
-            f"[face][screen]vstack,setsar=1,fps={FPS}[vfinal]"
-        )
+            filter_complex = (
+                f"[0:v]scale={W}:{H}:force_original_aspect_ratio=disable,split=2[va][vb];"
+                f"[va]crop={crop_w}:{crop_h}:{fc_x}:{fc_y},scale={SW}:{face_h_s}[face];"
+                f"[vb]scale={SW}:{screen_h_s}[screen];"
+                f"[face][screen]vstack,setsar=1,fps={FPS}[vfinal]"
+            )
+        else:
+            # Multi-face: crop 9:16 direto centrado no rosto
+            src_crop_w = (H * 9 // 16 // 2) * 2
+            fc_x = max(0, min(face_cx - src_crop_w // 2, W - src_crop_w))
+
+            filter_complex = (
+                f"[0:v]scale={W}:{H}:force_original_aspect_ratio=disable,"
+                f"crop={src_crop_w}:{H}:{fc_x}:0,"
+                f"scale={SW}:{SH},setsar=1,fps={FPS}[vfinal]"
+            )
     else:
         filter_complex = (
             f"[0:v]scale={W}:{H}:force_original_aspect_ratio=disable,split=2[va][vb];"
@@ -581,7 +714,8 @@ def build_nutella(
 
     if not out_h.exists():
         clip_h = tmp_dir / f"nut_{rank}_clip_16x9.mp4"
-        compose_clip(source, start, end, clip_h, W, H)
+        badge = generate_badge(live_num, tmp_dir)
+        compose_clip(source, start, end, clip_h, W, H, badge_path=badge)
 
         if "intro_1080" not in shared:
             shared["intro_1080"] = tmp_dir / "intro_1080.mp4"
