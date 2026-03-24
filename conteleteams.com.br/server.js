@@ -197,10 +197,39 @@ async function uploadGoogleAdsConversion(gclid, conversionAction, conversionValu
 }
 
 function brConversionDateTime() {
-  // Format: "2026-03-20 12:00:00-03:00"
+  // Format required by Google Ads: "2026-03-20 12:00:00-03:00"
+  // Uses Intl.DateTimeFormat.formatToParts for reliable output across Node.js versions
   const now = new Date();
-  const brISO = now.toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' });
-  return brISO.replace('T', ' ') + '-03:00';
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false,
+    timeZoneName: 'longOffset'
+  });
+  const parts = Object.fromEntries(
+    fmt.formatToParts(now).map(p => [p.type, p.value])
+  );
+  // hour12:false can return "24" for midnight in some engines; normalize to "00"
+  const hour = parts.hour === '24' ? '00' : parts.hour;
+  // timeZoneName "longOffset" gives "GMT-03:00" or "GMT-3" depending on engine
+  const tzRaw = parts.timeZoneName || 'GMT-03:00';
+  const tzMatch = tzRaw.match(/GMT([+-]\d{1,2}(?::\d{2})?)/);
+  let offset = '-03:00'; // fallback: Brazil standard time
+  if (tzMatch) {
+    const raw = tzMatch[1]; // e.g. "-3" or "-03:00"
+    if (raw.includes(':')) {
+      // Ensure hours are zero-padded: "-3:00" -> "-03:00"
+      offset = raw.replace(/([+-])(\d)(:\d{2})/, '$1$20$3');
+      if (offset.match(/^[+-]\d{1}$/)) offset = offset.replace(/([+-])(\d)$/, '$10$2:00');
+    } else {
+      // No colon: "-3" -> "-03:00"
+      const n = parseInt(raw, 10);
+      const sign = n >= 0 ? '+' : '-';
+      offset = `${sign}${String(Math.abs(n)).padStart(2, '0')}:00`;
+    }
+  }
+  return `${parts.year}-${parts.month}-${parts.day} ${hour}:${parts.minute}:${parts.second}${offset}`;
 }
 
 async function sendDiscord(content) {
