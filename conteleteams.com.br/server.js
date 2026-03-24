@@ -583,7 +583,7 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
       try {
         const adsResult = await uploadGoogleAdsConversion(
           gclid,
-          'customers/5532904101/conversionActions/7542373908',
+          'customers/5532904101/conversionActions/7453590632',
           1.0,
           brConversionDateTime()
         );
@@ -651,7 +651,7 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
       try {
         const adsResult = await uploadGoogleAdsConversion(
           gclid,
-          'customers/5532904101/conversionActions/7542084401',
+          'customers/5532904101/conversionActions/7453627859',
           dealValue || 1.0,
           brConversionDateTime()
         );
