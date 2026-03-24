@@ -563,8 +563,15 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
 
   const gclid = getCustomField(PD_FIELDS.gclid);
   const ga4ClientId = getCustomField(PD_FIELDS.ga4);
+  const utmRaw = getCustomField(PD_FIELDS.utm);
   const dealValue = current.value || 0;
   const dealTitle = current.title || '';
+
+  // Parse UTM string from Pipedrive (format: "utm_source=google&utm_medium=cpc&...")
+  const utmParams = Object.fromEntries(new URLSearchParams(utmRaw));
+  const utmSource = utmParams.utm_source || 'direct';
+  const utmMedium = utmParams.utm_medium || 'none';
+  const utmCampaign = utmParams.utm_campaign || '';
 
   console.log(`[PIPE] Deal ${dealId} "${dealTitle}" | gclid=${gclid ? 'yes' : 'no'} | ga4=${ga4ClientId ? 'yes' : 'no'}`);
 
@@ -591,9 +598,9 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
                 value: 1,
                 currency: 'BRL',
                 deal_id: String(dealId),
-                source: 'pipedrive',
-                medium: 'webhook',
-                campaign: 'offline_qualification'
+                source: utmSource,
+                medium: utmMedium,
+                campaign: utmCampaign
               }
             }]
           })
@@ -666,9 +673,9 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
                 value: dealValue,
                 currency: 'BRL',
                 deal_id: String(dealId),
-                source: 'pipedrive',
-                medium: 'webhook',
-                campaign: 'offline_conversion'
+                source: utmSource,
+                medium: utmMedium,
+                campaign: utmCampaign
               }
             }]
           })
