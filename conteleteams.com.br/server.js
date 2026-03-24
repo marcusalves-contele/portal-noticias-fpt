@@ -148,12 +148,16 @@ async function getGoogleAdsToken() {
 
 async function uploadGoogleAdsConversion(gclid, conversionAction, conversionValue, conversionDateTime) {
   const token = await getGoogleAdsToken();
-  if (!token) return { error: 'no_access_token' };
+  if (!token) {
+    const err = { error: 'no_access_token', success: false };
+    await sendDiscord(`🚨 **Google Ads token refresh FAILED** | Conversions not uploading`);
+    return err;
+  }
 
   const customerId = (process.env.GOOGLE_ADS_CUSTOMER_ID || '5532904101').replace(/-/g, '');
   const devToken = process.env.GOOGLE_ADS_DEVELOPER_TOKEN || 'HMDVGk1M3N0rotf2zXiZXQ';
 
-  const resp = await fetch(`https://googleads.googleapis.com/v19/customers/${customerId}:uploadClickConversions`, {
+  const resp = await fetch(`https://googleads.googleapis.com/v23/customers/${customerId}:uploadClickConversions`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -173,6 +177,22 @@ async function uploadGoogleAdsConversion(gclid, conversionAction, conversionValu
   });
 
   const result = await resp.json();
+
+  // Detect partialFailureError (API returns 200 but conversion failed)
+  if (result.partialFailureError) {
+    const errMsg = result.partialFailureError.message || 'unknown';
+    const errCode = result.partialFailureError.details?.[0]?.errors?.[0]?.errorCode || {};
+    console.error(`[GADS] PARTIAL FAILURE: ${errMsg}`);
+    result.success = false;
+    result.failureReason = Object.values(errCode)[0] || errMsg;
+  } else if (result.error) {
+    console.error(`[GADS] API ERROR ${result.error.code}: ${result.error.message}`);
+    result.success = false;
+    result.failureReason = `${result.error.status || result.error.code}: ${result.error.message}`;
+  } else {
+    result.success = true;
+  }
+
   return result;
 }
 
@@ -404,7 +424,10 @@ app.post('/api/lead', async (req, res) => {
         vendedor: vendor.nome,
         info: body.info || ''
       })
-    }).catch(err => console.error('SDR webhook error:', err.message))
+    }).catch(err => {
+      console.error('SDR webhook error:', err.message);
+      sendDiscord(`🚨 **SDR webhook FAILED** deal=${dealId} ${body.empresa}: ${err.message}`).catch(() => {});
+    })
   ]);
 
   console.log(`[LEAD] Complete: ${body.empresa} -> deal ${dealId}, vendor ${vendor.nome}`);
@@ -460,6 +483,11 @@ function saveDedup() {
 
 const { qualified: firedQualified, won: firedWon } = loadDedup();
 console.log(`[DEDUP] Loaded: ${firedQualified.size} qualified, ${firedWon.size} won`);
+
+// Startup health checks
+if (!GA4_API_SECRET) console.warn('[STARTUP] WARNING: GA4_API_SECRET is empty! GA4 Measurement Protocol events will NOT be sent.');
+if (!SLACK_WEBHOOK) console.warn('[STARTUP] WARNING: SLACK_WEBHOOK_URL is empty! Slack notifications disabled.');
+if (!process.env.GOOGLE_ADS_CLIENT_ID) console.warn('[STARTUP] WARNING: GOOGLE_ADS_CLIENT_ID missing! Google Ads conversions will fail.');
 
 app.post('/api/pipedrive-webhook', async (req, res) => {
   res.json({ ok: true });
@@ -517,9 +545,13 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
     console.log(`[PIPE] QUALIFIED: ${dealTitle} (deal ${dealId}) | GCLID: ${gclid}`);
 
     // Send to GA4 Measurement Protocol
-    if (ga4ClientId && GA4_API_SECRET) {
+    let ga4Status = 'skipped';
+    if (!GA4_API_SECRET) {
+      console.warn(`[PIPE] GA4_API_SECRET is empty! GA4 events NOT being sent for deal ${dealId}`);
+      ga4Status = 'FAILED (no API secret)';
+    } else if (ga4ClientId) {
       try {
-        await fetch(`${GOOGLE_ADS_CONVERSION_URL}?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`, {
+        const ga4Resp = await fetch(`${GOOGLE_ADS_CONVERSION_URL}?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -530,13 +562,23 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
             }]
           })
         });
-        console.log(`[PIPE] GA4 lead_qualificado sent for deal ${dealId}`);
+        if (ga4Resp.status >= 200 && ga4Resp.status < 300) {
+          ga4Status = 'sent';
+          console.log(`[PIPE] GA4 lead_qualificado sent for deal ${dealId} (HTTP ${ga4Resp.status})`);
+        } else {
+          ga4Status = `FAILED (HTTP ${ga4Resp.status})`;
+          console.error(`[PIPE] GA4 lead_qualificado FAILED for deal ${dealId}: HTTP ${ga4Resp.status}`);
+        }
       } catch (err) {
+        ga4Status = `FAILED (${err.message})`;
         console.error('[PIPE] GA4 error:', err.message);
       }
+    } else {
+      ga4Status = 'skipped (no client ID)';
     }
 
     // Upload to Google Ads (only if GCLID is complete, >= 80 chars)
+    let gadsStatus = 'skipped (no full GCLID)';
     if (gclid && gclid.length >= 80) {
       try {
         const adsResult = await uploadGoogleAdsConversion(
@@ -545,17 +587,24 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
           1.0,
           brConversionDateTime()
         );
-        console.log(`[PIPE] Google Ads upload (qualified) deal=${dealId}: ${JSON.stringify(adsResult).slice(0, 200)}`);
-        await sendDiscord(`Google Ads upload (lead_qualificado) deal=${dealId}: ${JSON.stringify(adsResult).slice(0, 200)}`);
+        if (adsResult.success) {
+          gadsStatus = 'SUCCESS';
+          console.log(`[PIPE] Google Ads upload SUCCESS (qualified) deal=${dealId}`);
+        } else {
+          gadsStatus = `FAILED: ${adsResult.failureReason || 'unknown'}`;
+          console.error(`[PIPE] Google Ads upload FAILED (qualified) deal=${dealId}: ${adsResult.failureReason}`);
+          await sendDiscord(`🚨 **Google Ads upload FAILED** (lead_qualificado) deal=${dealId}\nReason: ${adsResult.failureReason}\nGCLID: ${gclid.slice(0, 30)}...`);
+        }
       } catch (err) {
+        gadsStatus = `ERROR: ${err.message}`;
         console.error(`[PIPE] Google Ads upload error (qualified) deal=${dealId}:`, err.message);
-        await sendDiscord(`Google Ads upload FAILED (lead_qualificado) deal=${dealId}: ${err.message}`);
+        await sendDiscord(`🚨 **Google Ads upload ERROR** (lead_qualificado) deal=${dealId}: ${err.message}`);
       }
     }
 
-    // Notify Slack
-    await sendSlack(`:star: *Lead qualificado!*\n\n*${dealTitle}* entrou em etapa avançada\nGCLID: ${gclid ? 'sim' : 'nao'}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
-    await sendDiscord(`⭐ **Lead qualificado!**\n\n**${dealTitle}** entrou em etapa avançada\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_qualificado\nGoogle Ads: ${gclid && gclid.length >= 80 ? 'uploaded' : 'skipped (no full GCLID)'}\nPipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`);
+    // Notify Slack + Discord with real status
+    await sendSlack(`:star: *Lead qualificado!*\n\n*${dealTitle}* entrou em etapa avançada\nGCLID: ${gclid ? 'sim' : 'nao'}\nGoogle Ads: ${gadsStatus}\nGA4: ${ga4Status}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
+    await sendDiscord(`⭐ **Lead qualificado!**\n\n**${dealTitle}** entrou em etapa avançada\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4: ${ga4Status}\nGoogle Ads: ${gadsStatus}\nPipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`);
   }
 
   // WON: deal closed as won (fire only once per deal)
@@ -564,9 +613,13 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
     console.log(`[PIPE] WON: ${dealTitle} (deal ${dealId}) | value: ${dealValue} | GCLID: ${gclid}`);
 
     // Send to GA4 Measurement Protocol
-    if (ga4ClientId && GA4_API_SECRET) {
+    let ga4WonStatus = 'skipped';
+    if (!GA4_API_SECRET) {
+      console.warn(`[PIPE] GA4_API_SECRET is empty! GA4 events NOT being sent for deal ${dealId}`);
+      ga4WonStatus = 'FAILED (no API secret)';
+    } else if (ga4ClientId) {
       try {
-        await fetch(`${GOOGLE_ADS_CONVERSION_URL}?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`, {
+        const ga4Resp = await fetch(`${GOOGLE_ADS_CONVERSION_URL}?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -577,13 +630,23 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
             }]
           })
         });
-        console.log(`[PIPE] GA4 lead_convertido sent for deal ${dealId}, value ${dealValue}`);
+        if (ga4Resp.status >= 200 && ga4Resp.status < 300) {
+          ga4WonStatus = 'sent';
+          console.log(`[PIPE] GA4 lead_convertido sent for deal ${dealId}, value ${dealValue} (HTTP ${ga4Resp.status})`);
+        } else {
+          ga4WonStatus = `FAILED (HTTP ${ga4Resp.status})`;
+          console.error(`[PIPE] GA4 lead_convertido FAILED for deal ${dealId}: HTTP ${ga4Resp.status}`);
+        }
       } catch (err) {
+        ga4WonStatus = `FAILED (${err.message})`;
         console.error('[PIPE] GA4 error:', err.message);
       }
+    } else {
+      ga4WonStatus = 'skipped (no client ID)';
     }
 
     // Upload to Google Ads (only if GCLID is complete, >= 80 chars)
+    let gadsWonStatus = 'skipped (no full GCLID)';
     if (gclid && gclid.length >= 80) {
       try {
         const adsResult = await uploadGoogleAdsConversion(
@@ -592,17 +655,24 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
           dealValue || 1.0,
           brConversionDateTime()
         );
-        console.log(`[PIPE] Google Ads upload (won) deal=${dealId}: ${JSON.stringify(adsResult).slice(0, 200)}`);
-        await sendDiscord(`Google Ads upload (lead_convertido) deal=${dealId} value=${dealValue}: ${JSON.stringify(adsResult).slice(0, 200)}`);
+        if (adsResult.success) {
+          gadsWonStatus = 'SUCCESS';
+          console.log(`[PIPE] Google Ads upload SUCCESS (won) deal=${dealId}, value ${dealValue}`);
+        } else {
+          gadsWonStatus = `FAILED: ${adsResult.failureReason || 'unknown'}`;
+          console.error(`[PIPE] Google Ads upload FAILED (won) deal=${dealId}: ${adsResult.failureReason}`);
+          await sendDiscord(`🚨 **Google Ads upload FAILED** (lead_convertido) deal=${dealId} value=${dealValue}\nReason: ${adsResult.failureReason}\nGCLID: ${gclid.slice(0, 30)}...`);
+        }
       } catch (err) {
+        gadsWonStatus = `ERROR: ${err.message}`;
         console.error(`[PIPE] Google Ads upload error (won) deal=${dealId}:`, err.message);
-        await sendDiscord(`Google Ads upload FAILED (lead_convertido) deal=${dealId}: ${err.message}`);
+        await sendDiscord(`🚨 **Google Ads upload ERROR** (lead_convertido) deal=${dealId}: ${err.message}`);
       }
     }
 
-    // Notify Slack
-    await sendSlack(`:tada: *Deal ganho!*\n\n*${dealTitle}* virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid ? 'sim (Google Ads rastreável)' : 'nao'}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
-    await sendDiscord(`🎉 **Deal ganho!**\n\n**${dealTitle}** virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4 evento enviado: lead_convertido (value=${dealValue})\nGoogle Ads: ${gclid && gclid.length >= 80 ? 'uploaded' : 'skipped (no full GCLID)'}\nPipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`);
+    // Notify Slack + Discord with real status
+    await sendSlack(`:tada: *Deal ganho!*\n\n*${dealTitle}* virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid ? 'sim' : 'nao'}\nGoogle Ads: ${gadsWonStatus}\nGA4: ${ga4WonStatus}\n<https://contelegv.pipedrive.com/deal/${dealId}|Abrir no Pipedrive>`);
+    await sendDiscord(`🎉 **Deal ganho!**\n\n**${dealTitle}** virou cliente\nValor: ${dealValue} licenças\nGCLID: ${gclid || 'N/A'}\nGA4 Client ID: ${ga4ClientId || 'N/A'}\nGA4: ${ga4WonStatus}\nGoogle Ads: ${gadsWonStatus}\nPipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`);
   }
 
   } catch (err) {
