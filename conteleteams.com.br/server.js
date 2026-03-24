@@ -587,7 +587,14 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
             client_id: ga4ClientId,
             events: [{
               name: 'lead_qualificado',
-              params: { value: 1, currency: 'BRL', deal_id: String(dealId) }
+              params: {
+                value: 1,
+                currency: 'BRL',
+                deal_id: String(dealId),
+                source: 'pipedrive',
+                medium: 'webhook',
+                campaign: 'offline_qualification'
+              }
             }]
           })
         });
@@ -655,7 +662,14 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
             client_id: ga4ClientId,
             events: [{
               name: 'lead_convertido',
-              params: { value: dealValue, currency: 'BRL', deal_id: String(dealId) }
+              params: {
+                value: dealValue,
+                currency: 'BRL',
+                deal_id: String(dealId),
+                source: 'pipedrive',
+                medium: 'webhook',
+                campaign: 'offline_conversion'
+              }
             }]
           })
         });
