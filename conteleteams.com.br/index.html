@@ -2167,12 +2167,15 @@
     localStorage.setItem('lastSubmit', Date.now().toString());
 
     function getGclid() {
+      // URL param first (always complete), cookie as fallback
+      const urlGclid = new URLSearchParams(window.location.search).get('gclid');
+      if (urlGclid) return urlGclid;
       const match = document.cookie.match(/_gcl_aw=([^;]+)/);
       if (match) {
         const parts = match[1].split('.');
         return parts.length >= 3 ? parts.slice(2).join('.') : match[1];
       }
-      return new URLSearchParams(window.location.search).get('gclid') || '';
+      return '';
     }
 
     function getGA4ClientId() {
