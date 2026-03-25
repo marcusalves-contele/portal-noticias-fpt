@@ -149,6 +149,17 @@ npm run preview  # Serve SPA com fallback
 - **Remote**: `https://github.com/contele/growth.git`
 - **Nunca commitar**: `.env.local`, `node_modules/`, `dist/`
 
+### REGRA: Sempre mergear no master antes de considerar "feito"
+
+Railway faz deploy automático a partir do `master`. Código em feature/fix branch **NÃO vai pra produção** até ser mergeado.
+
+**Depois de commitar um fix ou feature:**
+1. Mergear no `master` (`git checkout master && git merge <branch>`)
+2. Push pro remote (`git push origin master`)
+3. Confirmar que o deploy Railway triggerou (checar logs ou healthcheck)
+
+**Por que:** Em março/2026, fixes críticos do PRISM OS (rotas de API, upload de thumbs) ficaram 5 dias sem deploy porque estavam numa branch `fix/` que nunca foi mergeada. O time reportou 404 em produção enquanto o código já existia local.
+
 ## Checklist Pre-Deploy
 
 - [ ] `npm install` rodou sem erros
