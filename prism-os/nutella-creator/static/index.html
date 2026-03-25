@@ -5583,7 +5583,7 @@
       if (!rotApprovedSide) return '';
       const img = document.getElementById(`rot-img-${rotApprovedSide.toLowerCase()}`);
       if (!img || !img.src) return '';
-      return img.src.replace(window.location.origin + '/', '');
+      return img.src.replace(window.location.origin + '/', '').split('?')[0];
     }
 
     async function rotUploadDrive() {
