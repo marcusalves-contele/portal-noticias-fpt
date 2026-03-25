@@ -399,6 +399,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_video_title(parsed.query)
         elif path == "/api/thumb-queue":
             self._handle_thumb_queue()
+        elif path == "/api/thumb-history":
+            self._handle_thumb_history()
         elif path == "/api/studio/sessions":
             from studio_chat import list_sessions
             self._json({"sessions": list_sessions()})
@@ -415,6 +417,14 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                     entry["image_url"] = f"/output/{p.name}" if p.exists() else None
                 clean.append(entry)
             self._json({"session_id": session_id, "messages": clean})
+        elif path.startswith("/api/thumb-history-preview/"):
+            # GET /api/thumb-history-preview/<live_id>/<a|b> — retorna preview base64
+            parts = path.split("/api/thumb-history-preview/")[1].split("/")
+            if len(parts) == 2:
+                h_live_id, h_side = parts[0], parts[1]
+                self._handle_thumb_history_preview(h_live_id, h_side)
+            else:
+                self._json({"error": "expected /api/thumb-history-preview/<live_id>/<a|b>"}, 400)
         elif path == "/api/thumb-guest-check":
             self._handle_thumb_guest_check(parsed.query)
         elif path.startswith("/api/metas/"):
@@ -1215,6 +1225,57 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
         except Exception as e:
             self._json({"error": str(e)}, 500)
 
+    def _handle_thumb_history_preview(self, live_id: str, side: str):
+        """GET /api/thumb-history-preview/<live_id>/<a|b> — retorna imagem PNG do preview."""
+        try:
+            from thumb_live import load_history
+            history = load_history()
+            for entry in history.get("entries", []):
+                if entry.get("live_id") == live_id:
+                    key = f"preview_{side.lower()}"
+                    b64 = entry.get(key, "")
+                    if b64:
+                        data = base64.b64decode(b64)
+                        self.send_response(200)
+                        self.send_header("Content-Type", "image/png")
+                        self.send_header("Content-Length", str(len(data)))
+                        self.send_header("Cache-Control", "public, max-age=86400")
+                        self.end_headers()
+                        self.wfile.write(data)
+                        return
+            self._json({"error": "preview not found"}, 404)
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
+    def _handle_thumb_history(self):
+        """GET /api/thumb-history — lista historico de thumbs geradas."""
+        try:
+            from thumb_live import load_history
+            history = load_history()
+            # Retorna sem previews pesados (frontend pede individualmente)
+            entries = []
+            for e in history.get("entries", []):
+                entries.append({
+                    "live_id": e.get("live_id", ""),
+                    "title": e.get("title", ""),
+                    "channel": e.get("channel", ""),
+                    "generated_at": e.get("generated_at", ""),
+                    "video_url": e.get("video_url", ""),
+                    "video_id": e.get("video_id", ""),
+                    "angle_a": e.get("angle_a", {}),
+                    "angle_b": e.get("angle_b", {}),
+                    "file_a": e.get("file_a", ""),
+                    "file_b": e.get("file_b", ""),
+                    "has_preview_a": bool(e.get("preview_a")),
+                    "has_preview_b": bool(e.get("preview_b")),
+                    "approved": e.get("approved", ""),
+                    "uploaded_youtube": e.get("uploaded_youtube", False),
+                    "uploaded_drive": e.get("uploaded_drive", False),
+                })
+            self._json({"entries": entries, "count": len(entries)})
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
     def _handle_thumb_approve(self, body: dict):
         """POST /api/thumb-approve — salva aprovação."""
         live_id = body.get("live_id", "")
@@ -1385,6 +1446,19 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
             # Limpa arquivo temporário se redimensionado
             if p.name.startswith("_resized_") and p.exists():
                 p.unlink()
+
+            # Marca no historico que foi subido pro YouTube
+            try:
+                from thumb_live import load_history, _save_history
+                history = load_history()
+                for entry in history.get("entries", []):
+                    if entry.get("video_id") == video_id or video_id in entry.get("video_url", ""):
+                        entry["uploaded_youtube"] = True
+                        entry["uploaded_youtube_at"] = datetime.now().isoformat()
+                        break
+                _save_history(history)
+            except Exception:
+                pass  # Nao bloqueia o upload por erro no historico
 
             self._json({"success": True})
         except FileNotFoundError:

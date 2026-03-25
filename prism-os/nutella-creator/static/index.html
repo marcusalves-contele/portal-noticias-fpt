@@ -2535,6 +2535,7 @@
           <button class="mode-tab" id="mode-tab-studio" onclick="setMode('studio')">&#9671; Studio</button>
           <button class="mode-tab" id="mode-tab-manual" onclick="setMode('manual')">&#9986; Corte Manual</button>
           <button class="mode-tab" id="mode-tab-blog" onclick="setMode('blog')">&#9998; Blog</button>
+          <button class="mode-tab" id="mode-tab-history" onclick="setMode('history')">&#128197; Historico</button>
         </div>
 
         <div class="home-input-group">
@@ -3969,7 +3970,11 @@
       document.getElementById('mode-tab-studio').classList.toggle('active', mode === 'studio');
       document.getElementById('mode-tab-manual').classList.toggle('active', mode === 'manual');
       document.getElementById('mode-tab-blog').classList.toggle('active', mode === 'blog');
-      if (mode === 'blog') {
+      document.getElementById('mode-tab-history').classList.toggle('active', mode === 'history');
+      if (mode === 'history') {
+        showScreen('history');
+        historyLoad();
+      } else if (mode === 'blog') {
         showScreen('blog');
         blogLoadQueue();
       } else if (mode === 'thumbs') {
@@ -6704,6 +6709,111 @@
       }
     }
   </script>
+
+<!-- ==================== SCREEN: HISTORICO ==================== -->
+<div class="screen" id="screen-history">
+  <div class="tl-topbar">
+    <div class="topbar-brand" onclick="goHome()">
+      <div class="topbar-icon"></div>
+      <span class="topbar-title">PRISM OS</span>
+    </div>
+    <div class="topbar-sep"></div>
+    <span style="font-family:var(--font-mono);font-size:12px;color:var(--purple)">HISTORICO DE THUMBS</span>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost btn-sm" onclick="historyLoad()">Atualizar</button>
+    </div>
+  </div>
+
+  <div class="tl-container" id="history-content">
+    <div class="tl-empty">Carregando historico...</div>
+  </div>
+</div>
+
+<script>
+  let historyEntries = [];
+
+  async function historyLoad() {
+    const container = document.getElementById('history-content');
+    container.innerHTML = '<div class="tl-empty">Carregando...</div>';
+    try {
+      const resp = await fetch('/api/thumb-history');
+      const data = await resp.json();
+      historyEntries = data.entries || [];
+      historyRender();
+    } catch(e) {
+      container.innerHTML = `<div class="tl-empty" style="color:var(--red)">Erro: ${e.message}</div>`;
+    }
+  }
+
+  function historyRender() {
+    const container = document.getElementById('history-content');
+    if (!historyEntries.length) {
+      container.innerHTML = '<div class="tl-empty">Nenhuma thumbnail gerada ainda.</div>';
+      return;
+    }
+
+    let html = `<div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-bottom:16px">${historyEntries.length} geracao(es)</div>`;
+
+    historyEntries.forEach((e, i) => {
+      const date = e.generated_at ? new Date(e.generated_at).toLocaleString('pt-BR') : '?';
+      const ch = e.channel === 'fleet' ? 'Fleet' : 'Teams';
+      const chColor = e.channel === 'fleet' ? '#8B23E5' : '#002F6C';
+      const approved = e.approved ? `<span style="color:var(--green);font-weight:600">Aprovada: ${e.approved}</span>` : '<span style="color:var(--text-muted)">Pendente</span>';
+      const ytIcon = e.uploaded_youtube ? '<span style="color:var(--green)" title="Subido no YouTube">YT</span>' : '';
+      const driveIcon = e.uploaded_drive ? '<span style="color:var(--green)" title="Subido no Drive">Drive</span>' : '';
+
+      const previewA = e.has_preview_a
+        ? `<img src="/api/thumb-history-preview/${encodeURIComponent(e.live_id)}/a" style="width:100%;border-radius:6px;cursor:pointer" onclick="historyZoom(this.src)" loading="lazy">`
+        : '<div style="height:80px;display:grid;place-items:center;color:var(--text-muted);font-size:11px;background:var(--surface-2);border-radius:6px">Sem preview</div>';
+      const previewB = e.has_preview_b
+        ? `<img src="/api/thumb-history-preview/${encodeURIComponent(e.live_id)}/b" style="width:100%;border-radius:6px;cursor:pointer" onclick="historyZoom(this.src)" loading="lazy">`
+        : '<div style="height:80px;display:grid;place-items:center;color:var(--text-muted);font-size:11px;background:var(--surface-2);border-radius:6px">Sem preview</div>';
+
+      const angleA = e.angle_a?.titulo || e.angle_a?.texto || '';
+      const angleB = e.angle_b?.titulo || e.angle_b?.texto || '';
+
+      html += `
+        <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div>
+              <span style="background:${chColor};color:white;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${ch}</span>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-left:8px">${date}</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;font-size:11px;font-family:var(--font-mono)">
+              ${approved} ${ytIcon} ${driveIcon}
+            </div>
+          </div>
+          <div style="font-size:14px;font-weight:500;margin-bottom:10px;color:var(--text-primary)">${e.title || e.live_id}</div>
+          ${e.video_url ? `<a href="${e.video_url}" target="_blank" style="font-size:11px;color:var(--purple);font-family:var(--font-mono);word-break:break-all">${e.video_url}</a>` : ''}
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:4px">A${e.approved === 'A' ? ' &#10003;' : ''}</div>
+              ${previewA}
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${angleA}</div>
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:4px">B${e.approved === 'B' ? ' &#10003;' : ''}</div>
+              ${previewB}
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${angleB}</div>
+            </div>
+          </div>
+        </div>`;
+    });
+
+    container.innerHTML = html;
+  }
+
+  function historyZoom(src) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);display:grid;place-items:center;z-index:9999;cursor:pointer';
+    overlay.onclick = () => overlay.remove();
+    const img = document.createElement('img');
+    img.src = src;
+    img.style.cssText = 'max-width:90vw;max-height:90vh;border-radius:8px';
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+  }
+</script>
 
 <!-- Feedback Widget -->
 <button class="feedback-btn" onclick="openFeedback()" title="Reportar bug ou sugestao">

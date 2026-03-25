@@ -13,6 +13,7 @@ Módulo usado pelo dashboard.py. Funções principais:
 """
 
 import os
+import io
 import json
 import base64
 import pickle
@@ -1361,6 +1362,18 @@ def generate_ab(briefing: dict, live_id: str, api_key: str,
     state.setdefault("items", {})[live_id] = item
     save_state(state)
 
+    # Registra no historico com preview base64 (sobrevive redeploy)
+    _record_history(
+        live_id=live_id,
+        title=title,
+        channel=channel,
+        path_a=result_a,
+        path_b=result_b,
+        angle_a=angle_a,
+        angle_b=angle_b,
+        briefing=briefing,
+    )
+
     return result_a, result_b
 
 
@@ -1471,6 +1484,85 @@ def upload_to_drive_folder(file_path: Path, folder_link: str, creds) -> dict:
 # State management
 # -------------------------------------------------------------------
 
+# -------------------------------------------------------------------
+# History — persiste thumbs geradas com preview base64 (sobrevive redeploy)
+# -------------------------------------------------------------------
+
+HISTORY_FILE = OUTPUT_DIR / "thumb_history.json"
+
+def _img_to_base64_preview(path: Path, max_width: int = 320) -> str:
+    """Gera preview base64 reduzida da thumb (salva espaco no JSON)."""
+    try:
+        from PIL import Image
+        img = Image.open(path)
+        ratio = max_width / img.width
+        new_size = (max_width, int(img.height * ratio))
+        img = img.resize(new_size, Image.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="PNG", optimize=True)
+        return base64.b64encode(buf.getvalue()).decode()
+    except Exception:
+        # Fallback: base64 do arquivo original (sem resize)
+        try:
+            return base64.b64encode(path.read_bytes()).decode()
+        except Exception:
+            return ""
+
+
+def _record_history(live_id: str, title: str, channel: str,
+                    path_a: Path | None, path_b: Path | None,
+                    angle_a: dict, angle_b: dict, briefing: dict):
+    """Registra geracao no historico com previews base64."""
+    history = load_history()
+    entry = {
+        "live_id": live_id,
+        "title": title,
+        "channel": channel,
+        "generated_at": datetime.now().isoformat(),
+        "video_url": briefing.get("url", ""),
+        "video_id": briefing.get("video_id", ""),
+        "angle_a": {"titulo": angle_a.get("titulo", ""), "texto": angle_a.get("texto", "")},
+        "angle_b": {"titulo": angle_b.get("titulo", ""), "texto": angle_b.get("texto", "")},
+        "preview_a": _img_to_base64_preview(path_a) if path_a and path_a.exists() else "",
+        "preview_b": _img_to_base64_preview(path_b) if path_b and path_b.exists() else "",
+        "file_a": str(path_a.name) if path_a else "",
+        "file_b": str(path_b.name) if path_b else "",
+        "approved": "",
+        "uploaded_youtube": False,
+        "uploaded_drive": False,
+    }
+    history["entries"].insert(0, entry)
+    # Limita a 200 entradas
+    history["entries"] = history["entries"][:200]
+    _save_history(history)
+
+
+def load_history() -> dict:
+    if HISTORY_FILE.exists():
+        try:
+            with open(HISTORY_FILE, encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, IOError):
+            pass
+    return {"entries": []}
+
+
+def _save_history(data: dict):
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+def update_history_entry(live_id: str, fields: dict):
+    """Atualiza campos de uma entrada no historico pelo live_id."""
+    history = load_history()
+    for entry in history["entries"]:
+        if entry.get("live_id") == live_id:
+            entry.update(fields)
+            break
+    _save_history(history)
+
+
 def load_state() -> dict:
     if STATE_FILE.exists():
         try:
@@ -1510,6 +1602,8 @@ def approve_thumb(live_id: str, choice: str, path: str) -> dict:
     else:
         item["thumb_b"] = path
     save_state(state)
+    # Atualiza historico
+    update_history_entry(live_id, {"approved": choice.upper()})
     return item
 
 
