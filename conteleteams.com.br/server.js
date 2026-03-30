@@ -298,7 +298,7 @@ function brDate() {
 // ===== LEAD ENDPOINT =====
 app.post('/api/lead', async (req, res) => {
   const body = req.body;
-  const tamanho = parseInt(body.tamanho_equipe, 10) || 0;
+  let tamanho = parseInt(body.tamanho_equipe, 10) || 0;
 
   console.log(`[LEAD] ${body.nome} | ${body.empresa} | ${tamanho} lic | gclid=${body.gclid ? 'yes' : 'no'}`);
 
@@ -343,11 +343,20 @@ app.post('/api/lead', async (req, res) => {
   };
 
   // ===== LEAD INADEQUADO (< MIN_TEAM_SIZE) =====
-  if (body.lead_inadequado || tamanho < MIN_TEAM_SIZE) {
+  // small_team_accepted: lead had <4 lic but accepted min package (4 lic)
+  const smallTeamAccepted = body.small_team_accepted === true;
+  if (!smallTeamAccepted && (body.lead_inadequado || tamanho < MIN_TEAM_SIZE)) {
     sheetData['status'] = '4_lead_inadequado';
     await appendSheet(sheetData);
     console.log(`[LEAD] Inadequado: ${body.nome} (${tamanho} lic) -> sheet only`);
     return;
+  }
+  // If small_team_accepted, force tamanho to MIN_TEAM_SIZE and proceed to create deal
+  if (smallTeamAccepted) {
+    const originalSize = body.tamanho_equipe_original || tamanho;
+    tamanho = MIN_TEAM_SIZE;
+    sheetData['Tamanho da Equipe'] = `${MIN_TEAM_SIZE} (original: ${originalSize})`;
+    console.log(`[LEAD] Small team accepted min package: ${body.nome} (original: ${originalSize} -> ${MIN_TEAM_SIZE} lic)`);
   }
 
   // ===== LEAD QUALIFICADO =====
@@ -374,7 +383,9 @@ app.post('/api/lead', async (req, res) => {
     visible_to: 3,
     status: 'open'
   };
-  dealBody[PD_FIELDS.info] = body.info || '';
+  dealBody[PD_FIELDS.info] = smallTeamAccepted
+    ? `[PACOTE MINIMO] Lead tinha ${body.tamanho_equipe_original || '?'} lic, aceitou pacote de ${MIN_TEAM_SIZE}. ${body.info || ''}`
+    : (body.info || '');
   dealBody[PD_FIELDS.utm] = utmString;
   dealBody[PD_FIELDS.licencas] = tamanho;
   dealBody[PD_FIELDS.origem] = body.landing_page || '';
@@ -387,7 +398,7 @@ app.post('/api/lead', async (req, res) => {
   console.log(`[LEAD] Pipedrive: person=${personId} deal=${dealId} vendor=${vendor.nome}`);
 
   // 3. Update sheet data with deal info
-  sheetData['status'] = '1-success-deal-created-in-pipedrive';
+  sheetData['status'] = smallTeamAccepted ? '2-small-team-accepted-deal-created' : '1-success-deal-created-in-pipedrive';
   sheetData['Vendedor'] = vendor.nome;
   sheetData['ID Pipe'] = String(dealId || '');
 

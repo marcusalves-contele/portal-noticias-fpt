@@ -1206,6 +1206,9 @@
       .btn-primary { padding: 10px 14px; font-size: 13px; }
       .counter-number { font-size: 40px; }
       #sidebar { max-width: 100%; padding: 32px 20px; }
+      .carousel { gap: 8px; scrollbar-width: none; }
+      .carousel::-webkit-scrollbar { display: none; }
+      .carousel img { flex: 0 0 95%; }
     }
 
     /* ===== EXIT INTENT MODAL ===== */
@@ -1323,18 +1326,20 @@
   </form>
 
   <div id="sidebar-small-team-msg" style="display:none; padding: 40px 20px 20px; text-align: center;">
-    <h3 style="color:#273896; margin-bottom:16px; font-family: 'Nunito Sans', sans-serif;">O Contele Teams atende equipes a partir de 4 pessoas</h3>
-    <p style="color:#666; margin-bottom:12px; line-height:1.6;">O plano mínimo é de <strong>4 licenças por R$239,60/mês</strong> (R$59,90 por usuário). Esse valor inclui todos os recursos: app iOS/Android, roteirização, check-in GPS, checklists, relatórios e suporte completo.</p>
-    <p style="color:#666; margin-bottom:12px; line-height:1.6;">Para equipes menores, o investimento por pessoa fica alto e o sistema não entrega o valor completo que foi projetado pra operações com mais volume de visitas.</p>
-    <p style="color:#666; margin-bottom:24px; line-height:1.6; font-weight:600;">Se sua equipe vai crescer em breve, fale com a gente:</p>
-    <a href="https://wa.me/5511971325108?text=Ol%C3%A1!%20Tenho%20uma%20equipe%20com%20menos%20de%204%20pessoas%20mas%20pretendo%20crescer.%20Quero%20saber%20mais%20sobre%20o%20Contele%20Teams."
-       style="display:inline-block; background:#25D366; color:#fff; padding:14px 28px; border-radius:8px; text-decoration:none; font-weight:700; font-size:16px; font-family:'Nunito Sans',sans-serif;">
+    <h3 style="color:#273896; margin-bottom:16px; font-family: 'Nunito Sans', sans-serif;">O plano minimo do Contele Teams e de 4 licencas</h3>
+    <p style="color:#666; margin-bottom:12px; line-height:1.6;">O valor e de <strong>R$239,60/mes</strong> (4 licencas x R$59,90 por usuario). Inclui todos os recursos: app iOS/Android, roteirizacao, check-in GPS, checklists, relatorios e suporte completo.</p>
+    <p style="color:#666; margin-bottom:20px; line-height:1.6;">Voce pode iniciar com o pacote minimo e ajustar conforme sua equipe crescer.</p>
+    <button id="btn-accept-small-team"
+            style="display:inline-block; background:#273896; color:#fff; padding:14px 28px; border-radius:8px; border:none; cursor:pointer; font-weight:700; font-size:16px; font-family:'Nunito Sans',sans-serif; width:100%; margin-bottom:12px;">
+      Quero continuar com 4 licencas
+    </button>
+    <a href="https://wa.me/5511971325108?text=Ol%C3%A1!%20Tenho%20uma%20equipe%20com%20menos%20de%204%20pessoas%20e%20quero%20saber%20mais%20sobre%20o%20Contele%20Teams."
+       style="display:inline-block; background:#25D366; color:#fff; padding:14px 28px; border-radius:8px; text-decoration:none; font-weight:700; font-size:16px; font-family:'Nunito Sans',sans-serif; width:100%; box-sizing:border-box;">
       Falar com Atendimento via WhatsApp
     </a>
-    <p style="color:#999; margin-top:16px; font-size:14px;">Atendimento exclusivo por mensagem.</p>
     <button onclick="document.getElementById('sidebar-form').style.display='block'; document.getElementById('sidebar-small-team-msg').style.display='none';"
             style="margin-top:16px; background:none; border:none; color:#425DFC; cursor:pointer; font-size:14px; text-decoration:underline;">
-      Voltar ao formulário
+      Voltar ao formulario
     </button>
   </div>
 </aside>
@@ -2082,7 +2087,7 @@
   }
 
   // ===== CONFIG =====
-  const MIN_TEAM_SIZE = 3;
+  const MIN_TEAM_SIZE = 4;
 
   // ===== QTD VALIDATION (real-time) =====
   function validateQtd(input) {
@@ -2094,11 +2099,8 @@
       return;
     }
     if (val < MIN_TEAM_SIZE) {
-      fb.textContent = 'Nosso plano atende equipes a partir de 4 pessoas.';
+      fb.textContent = 'Nosso plano minimo e de 4 licencas (R$239,60/mes).';
       fb.className = 'qtd-feedback warn';
-    } else if (val === 3) {
-      fb.textContent = 'O plano mínimo é de 4 licenças. Solicite uma demonstração para saber mais.';
-      fb.className = 'qtd-feedback ok';
     } else {
       fb.textContent = 'Perfeito! Solicite sua demonstração.';
       fb.className = 'qtd-feedback ok';
@@ -2129,29 +2131,10 @@
       return;
     }
 
-    // CRITICAL: below minimum = POST as inadequate lead, show message, NO trial
+    // Below minimum: show pricing + option to continue with min package
     if (qtd < MIN_TEAM_SIZE) {
-      // Send lead data to n8n with inadequate flag
-      var phoneDigitsSmall = telefone.replace(/\D/g, '');
-      if (phoneDigitsSmall.length <= 11) phoneDigitsSmall = '55' + phoneDigitsSmall;
-      var paramsSmall = new URLSearchParams(window.location.search);
-      fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nome: nome,
-          email: email,
-          telefone: phoneDigitsSmall,
-          empresa: empresa,
-          tamanho_equipe: qtd,
-          lead_inadequado: true,
-          campanha: paramsSmall.get('utm_campaign') || '',
-          landing_page: window.location.href,
-          utm_source: paramsSmall.get('utm_source') || '',
-          utm_medium: paramsSmall.get('utm_medium') || '',
-          source: 'landing-page-v2'
-        })
-      });
+      // Store form data for re-submit if user accepts min package
+      window._smallTeamData = { nome, email, telefone, empresa, qtdOriginal: qtd };
       document.getElementById('sidebar-form').style.display = 'none';
       document.getElementById('sidebar-small-team-msg').style.display = 'block';
       return;
@@ -2260,6 +2243,78 @@
       window.location.href = 'https://conteleteams.com.br/obrigado' + utmString;
     }, 1500);
   }
+
+  // ===== SMALL TEAM: ACCEPT MIN PACKAGE =====
+  document.getElementById('btn-accept-small-team').addEventListener('click', function() {
+    var data = window._smallTeamData;
+    if (!data) return;
+
+    var btn = this;
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    var phoneDigits = data.telefone.replace(/\D/g, '');
+    if (phoneDigits.length <= 11) phoneDigits = '55' + phoneDigits;
+
+    var params = new URLSearchParams(window.location.search);
+
+    // Submit as accepted small team (4 lic min). NO dataLayer push = NO Google Ads conversion
+    fetch('/api/lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome: data.nome,
+        email: data.email,
+        telefone: phoneDigits,
+        empresa: data.empresa,
+        tamanho_equipe: 4,
+        tamanho_equipe_original: data.qtdOriginal,
+        small_team_accepted: true,
+        campanha: params.get('utm_campaign') || '',
+        landing_page: window.location.href,
+        gclid: (function() {
+          var u = params.get('gclid');
+          if (u) return u;
+          var m = document.cookie.match(/_gcl_aw=([^;]+)/);
+          return m ? m[1].split('.').slice(2).join('.') || m[1] : '';
+        })(),
+        ga4_client_id: (function() {
+          var m = document.cookie.match(/_ga=([^;]+)/);
+          return m ? m[1] : '';
+        })(),
+        utm_source: params.get('utm_source') || '',
+        utm_medium: params.get('utm_medium') || '',
+        utm_term: params.get('utm_term') || '',
+        utm_content: params.get('utm_content') || '',
+        source: 'landing-page-v2'
+      })
+    });
+
+    // Create trial with min 4 licenses
+    fetch('https://ge-prd-web-api.contele.com.br/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        company_name: data.empresa,
+        phone: data.telefone,
+        name: data.nome,
+        email: data.email,
+        password: 'gestorturbinado',
+        plan: 'trial',
+        license_count: 4,
+        period: 0,
+        language: 'pt',
+        primeiroTeste: ' ',
+        faixadelicencas: 4,
+        campaign: 'landing_page'
+      })
+    });
+
+    var utmString = window.location.search;
+    setTimeout(function() {
+      window.location.href = 'https://conteleteams.com.br/obrigado' + utmString;
+    }, 1500);
+  });
 
   // ===== YOUTUBE FACADE =====
   function loadYT(el, videoId) {
