@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contele Teams : Field Team Management & Control Platform</title>
+<meta name="description" content="Boost productivity for your sales reps, technicians, and field crews. 1,500+ companies across 7 countries trust Contele Teams.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://conteleteams.com.br/presentation-en/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600;6..12,700;6..12,800;6..12,900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #4A58FF;
+    --blue-dark: #000976;
+    --blue-medium: #323FDD;
+    --blue-light: #7E88FF;
+    --cyan: #29BDFF;
+    --dark: #20252E;
+    --white: #FFFFFF;
+    --g1: #f8f9fa; --g2: #e9ecef; --g3: #dee2e6; --g5: #6c757d; --g7: #495057;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Nunito Sans', -apple-system, sans-serif; color: var(--dark); background: var(--white); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .container { max-width: 820px; margin: 0 auto; padding: 0 24px; }
+
+  /* COVER */
+  .cover { background: linear-gradient(135deg, #000976 0%, #4A58FF 50%, #323FDD 100%); color: white; text-align: center; padding: 80px 24px 72px; position: relative; overflow: hidden; }
+  .cover::before { content: ''; position: absolute; inset: 0; background: url('img/bg-pattern.png') center/cover; opacity: 0.06; }
+  .cover > * { position: relative; z-index: 1; }
+  .cover h1 { font-size: clamp(40px, 6vw, 56px); font-weight: 900; letter-spacing: -1px; }
+  .cover .sub { font-size: clamp(20px, 3vw, 28px); font-weight: 700; color: var(--cyan); letter-spacing: 5px; text-transform: uppercase; margin-bottom: 32px; }
+  .cover .divider { width: 56px; height: 3px; background: var(--cyan); border-radius: 2px; margin: 0 auto 28px; }
+  .cover h2 { font-size: clamp(24px, 4vw, 36px); font-weight: 800; line-height: 1.15; margin-bottom: 14px; }
+  .cover .desc { font-size: 16px; opacity: 0.85; max-width: 480px; margin: 0 auto 48px; line-height: 1.5; }
+  .stats { display: flex; justify-content: center; gap: clamp(20px, 4vw, 48px); flex-wrap: wrap; }
+  .stat-n { font-size: clamp(28px, 5vw, 40px); font-weight: 900; display: block; line-height: 1; }
+  .stat-l { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.7; margin-top: 4px; display: block; }
+
+  /* SECTIONS */
+  section { padding: 56px 0; }
+  section:nth-child(even) { background: var(--g1); }
+  .section-header { margin-bottom: 28px; }
+  .section-header .label { font-size: 12px; color: var(--g5); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+  .section-header h2 { font-size: clamp(24px, 4vw, 30px); font-weight: 800; color: var(--blue-dark); line-height: 1.2; border-bottom: 3px solid var(--blue); display: inline-block; padding-bottom: 8px; }
+
+  /* ABOUT + LEO */
+  .about-flex { display: flex; gap: 28px; align-items: flex-start; margin-bottom: 20px; }
+  .about-flex .text { flex: 1; }
+  .about-flex .leo { flex-shrink: 0; text-align: center; }
+  .leo img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--blue); box-shadow: 0 4px 16px rgba(74,88,255,0.2); }
+  .leo .name { margin-top: 8px; font-size: 14px; font-weight: 800; color: var(--blue-dark); }
+  .leo .role { font-size: 11px; color: var(--g5); font-weight: 600; }
+  .quote-box { background: linear-gradient(135deg, #f0f1ff, #e8f4ff); border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; border-left: 3px solid var(--blue); }
+  .quote-box p { font-size: 14px; color: var(--dark); line-height: 1.6; font-style: italic; }
+  .quote-box .author { font-size: 12px; font-weight: 700; color: var(--blue-dark); margin-top: 6px; font-style: normal; }
+  .intro { font-size: 15px; color: var(--g7); line-height: 1.65; margin-bottom: 16px; }
+  .intro strong { color: var(--dark); }
+
+  /* SCOPE LIST */
+  .scope-title { font-size: 17px; font-weight: 800; color: var(--blue-dark); margin-bottom: 12px; }
+  .scope-list { list-style: none; margin-bottom: 24px; }
+  .scope-list li { padding: 8px 0 8px 28px; position: relative; font-size: 14px; color: var(--g7); border-bottom: 1px solid var(--g2); }
+  .scope-list li:last-child { border-bottom: none; }
+  .scope-list li::before { content: ''; position: absolute; left: 0; top: 13px; width: 16px; height: 16px; background: var(--blue); border-radius: 50%; opacity: 0.12; }
+  .scope-list li::after { content: '\2713'; position: absolute; left: 3px; top: 7px; font-size: 11px; color: var(--blue); font-weight: 800; }
+
+  .hero-img { width: 100%; max-width: 520px; margin: 0 auto; display: block; }
+
+  /* FEATURES */
+  .feature { margin-bottom: 28px; }
+  .feature h3 { font-size: 20px; font-weight: 800; color: var(--blue-dark); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+  .fi { width: 36px; height: 36px; background: linear-gradient(135deg, var(--blue), var(--blue-medium)); border-radius: 9px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; flex-shrink: 0; }
+  .feature p { font-size: 14px; color: var(--g7); line-height: 1.65; margin-bottom: 8px; }
+
+  .chip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .chip-grid.c3 { grid-template-columns: 1fr 1fr 1fr; }
+  .chip { background: var(--g1); border: 1px solid var(--g2); border-radius: 7px; padding: 8px 12px; font-size: 13px; color: var(--dark); font-weight: 600; display: flex; align-items: center; gap: 7px; }
+  .dot { width: 8px; height: 8px; background: var(--blue); border-radius: 50%; flex-shrink: 0; }
+
+  .highlight-box { background: linear-gradient(135deg, #f0f1ff, #e8f4ff); border-left: 3px solid var(--blue); border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 10px 0; }
+  .highlight-box p { font-size: 14px; color: var(--dark); margin: 0; font-weight: 600; }
+
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .badge { background: var(--white); border: 1px solid var(--g3); border-radius: 7px; padding: 6px 14px; font-size: 13px; font-weight: 700; color: var(--dark); }
+
+  /* TECH GRID */
+  .tech-grid { background: var(--white); border-radius: 12px; padding: 24px 28px; margin-top: 24px; border: 1px solid var(--g2); display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .tech-grid strong { font-size: 14px; color: var(--blue-dark); }
+  .tech-grid p { font-size: 13px; color: var(--g7); margin: 2px 0 0; }
+
+  /* DASHBOARDS */
+  .dash-img { width: 100%; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-top: 16px; }
+
+  /* ROI TABLE */
+  .roi-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  .roi-table th { background: var(--blue); color: white; padding: 12px 18px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-align: left; }
+  .roi-table th:first-child { border-radius: 8px 0 0 0; }
+  .roi-table th:last-child { border-radius: 0 8px 0 0; }
+  .roi-table td { padding: 12px 18px; font-size: 14px; border-bottom: 1px solid var(--g2); }
+  .roi-table tr:nth-child(even) td { background: var(--g1); }
+  .roi-val { font-weight: 800; color: var(--blue); font-size: 15px; }
+  .roi-note { font-size: 12px; color: var(--g5); text-align: center; margin-top: 6px; }
+
+  /* WHY GRID */
+  .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+  .why-card { background: var(--white); border-radius: 10px; padding: 18px; border: 1px solid var(--g2); }
+  .why-card h4 { font-size: 14px; font-weight: 800; color: var(--blue-dark); margin-bottom: 4px; }
+  .why-card p { font-size: 13px; color: var(--g7); line-height: 1.5; }
+
+  /* USE CASE */
+  .usecase-box { background: var(--white); border-radius: 14px; padding: 28px; border: 1px solid var(--g2); display: flex; gap: 28px; align-items: center; }
+  .usecase-box .text { flex: 1; }
+  .usecase-box .mockup img { width: 220px; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+  .notif-mock { background: var(--g1); border: 1px solid var(--g2); border-radius: 10px; padding: 16px 20px; margin-top: 12px; max-width: 380px; }
+  .notif-mock .label { font-size: 11px; color: var(--g5); font-weight: 600; margin-bottom: 6px; }
+
+  /* CLIENTS */
+  .client-logos { text-align: center; margin: 16px 0; }
+  .client-logos img { max-width: 480px; width: 100%; }
+  .client-note { text-align: center; font-size: 14px; font-weight: 700; color: var(--g7); margin-top: 4px; }
+
+  /* STEPS */
+  .steps { display: flex; gap: 0; margin: 20px 0; align-items: stretch; }
+  .step { flex: 1; text-align: center; padding: 20px 14px; background: var(--white); border-radius: 10px; margin: 0 6px; border: 1px solid var(--g2); }
+  .step:first-child { margin-left: 0; } .step:last-child { margin-right: 0; }
+  .step-num { width: 32px; height: 32px; background: var(--blue); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; margin: 0 auto 8px; }
+  .step h4 { font-size: 14px; font-weight: 800; color: var(--blue-dark); margin-bottom: 4px; }
+  .step p { font-size: 12px; color: var(--g5); line-height: 1.4; }
+  .step-arrow { display: flex; align-items: center; color: var(--blue); font-size: 24px; font-weight: 800; flex-shrink: 0; }
+
+  /* GUARANTEE */
+  .guarantee { display: flex; align-items: center; gap: 14px; background: #e8fff0; border: 1px solid #b8e8cc; border-radius: 10px; padding: 14px 18px; margin-top: 16px; }
+  .guarantee-icon { width: 38px; height: 38px; background: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 17px; flex-shrink: 0; }
+  .guarantee h4 { font-size: 14px; font-weight: 800; color: #166534; }
+  .guarantee p { font-size: 13px; color: #166534; opacity: 0.8; }
+
+  /* CTA */
+  .cta-box { background: linear-gradient(135deg, var(--blue-dark), var(--blue)); color: white; border-radius: 16px; padding: 36px 40px; text-align: center; margin-top: 20px; }
+  .cta-box h3 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+  .cta-box p { font-size: 14px; opacity: 0.85; }
+  .cta-box .hl { font-size: 17px; font-weight: 700; opacity: 1; color: var(--cyan); margin-top: 12px; }
+  .cta-box .legal { margin-top: 4px; font-size: 12px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .about-flex { flex-direction: column-reverse; align-items: center; text-align: center; }
+    .chip-grid, .chip-grid.c3, .why-grid, .tech-grid { grid-template-columns: 1fr; }
+    .usecase-box { flex-direction: column; }
+    .usecase-box .mockup img { width: 180px; }
+    .steps { flex-direction: column; gap: 10px; }
+    .step-arrow { transform: rotate(90deg); justify-content: center; }
+    .stats { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<header class="cover">
+  <h1>contele</h1>
+  <div class="sub">teams</div>
+  <div class="divider"></div>
+  <h2>Field Team Management<br>& Control Platform</h2>
+  <p class="desc">Boost productivity for your sales reps, technicians, and field crews with real-time visibility, smart routing, and data-driven insights.</p>
+  <div class="stats">
+    <div><span class="stat-n">1,500+</span><span class="stat-l">Companies</span></div>
+    <div><span class="stat-n">50,000+</span><span class="stat-l">Active Users</span></div>
+    <div><span class="stat-n">7</span><span class="stat-l">Countries</span></div>
+    <div><span class="stat-n">23+</span><span class="stat-l">Years</span></div>
+    <div><span class="stat-n">4.8<span style="font-size:60%">/5</span></span><span class="stat-l">Rating</span></div>
+  </div>
+</header>
+
+<!-- ABOUT -->
+<section>
+  <div class="container">
+    <div class="about-flex">
+      <div class="text">
+        <div class="section-header"><div class="label">About Contele Teams</div><h2>Your Field Operations, Under Control</h2></div>
+        <p class="intro"><strong>Contele Teams</strong> is a field team management platform trusted by over <strong>1,500 companies across 7 countries</strong>. Our solution provides end-to-end visibility of your external workforce: route planning, visit verification, expense management, and performance analytics.</p>
+      </div>
+      <div class="leo">
+        <img src="img/leonardo.png" alt="Leonardo Gazolli">
+        <div class="name">Leonardo Gazolli</div>
+        <div class="role">CEO, Contele Teams</div>
+      </div>
+    </div>
+    <div class="quote-box">
+      <p>"With 20+ years managing field teams, I built the Contele Teams methodology to solve real operational challenges. Over 1,000 companies have transformed their field operations with our platform. I look forward to showing you how we can do the same for your team."</p>
+      <div class="author">Leonardo Gazolli, Creator of the "Turbocharged Field Teams" Method</div>
+    </div>
+    <div class="scope-title">Solution Scope</div>
+    <ul class="scope-list">
+      <li>GPS-verified visit tracking with real-time check-in and check-out</li>
+      <li>Customizable digital forms and checklists for field data collection</li>
+      <li>Automated mileage and expense reimbursement with full transparency</li>
+      <li>Productivity dashboards integrated with Looker Studio (Google BI)</li>
+      <li>Native mobile app for iOS and Android with full offline capability</li>
+      <li>Digital service orders with photos, signatures, and auto-delivery</li>
+      <li>Dedicated onboarding and implementation consulting</li>
+    </ul>
+    <img src="img/hero-mockup.png" alt="Contele Teams Platform" class="hero-img">
+  </div>
+</section>
+
+<!-- CORE FEATURES -->
+<section>
+  <div class="container">
+    <div class="section-header"><div class="label">Core Features</div><h2>Visit Control & Real-Time Monitoring</h2></div>
+    <div class="feature">
+      <h3><div class="fi">&#10003;</div>Visit Control</h3>
+      <p>Manage field teams with GPS-verified check-in and check-out, ensuring accurate visit records. Team members digitally capture <strong>photos, signatures, and forms</strong> via the mobile app, eliminating paper and accelerating fieldwork.</p>
+      <p>Managers track locations in real time and access the <strong>Visit Report</strong> and <strong>Unvisited Locations Report</strong> to identify gaps and optimize routes.</p>
+      <div class="chip-grid"><div class="chip"><span class="dot"></span>GPS-verified check-in/out</div><div class="chip"><span class="dot"></span>Photo & signature capture</div><div class="chip"><span class="dot"></span>Real-time location map</div><div class="chip"><span class="dot"></span>Unvisited locations report</div></div>
+    </div>
+    <div class="feature">
+      <h3><div class="fi">&#9673;</div>Real-Time Team Monitoring</h3>
+      <p>With the <strong>Team Map</strong>, visualize your entire field team in real time. The <strong>Monitoring Report</strong> tracks login/logout, fictitious location detection, battery level, and multi-device usage for complete oversight.</p>
+      <div class="highlight-box"><p>Full visibility of your field team, in real time, from any device.</p></div>
+    </div>
+    <div class="feature">
+      <h3><div class="fi">&#9776;</div>Digital Checklists & Forms</h3>
+      <p>Create custom checklists with <strong>30+ question types</strong>. Conditional fields guide team members automatically. Set mandatory questions to ensure data collection and reduce visit time by up to <strong>20%</strong>.</p>
+      <div class="chip-grid c3"><div class="chip"><span class="dot"></span>30+ field types</div><div class="chip"><span class="dot"></span>Conditional logic</div><div class="chip"><span class="dot"></span>Mandatory fields</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FIELD OPERATIONS -->
+<section>
+  <div class="container">
+    <div class="section-header"><div class="label">Field Operations</div><h2>Service Orders, Reports & Integrations</h2></div>
+    <div class="feature">
+      <h3><div class="fi">&#9997;</div>Digital Service Orders</h3>
+      <p>Complete visit documentation: your <strong>custom logo</strong>, check-in/out times, photos, checklists, <strong>digital signature</strong>, and automatic delivery via email or WhatsApp. Managers review and edit from the web platform.</p>
+      <div class="chip-grid c3"><div class="chip"><span class="dot"></span>Branded with your logo</div><div class="chip"><span class="dot"></span>Digital signature</div><div class="chip"><span class="dot"></span>Auto-send email/WhatsApp</div></div>
+    </div>
+    <div class="feature">
+      <h3><div class="fi">&#9638;</div>Visit Reports</h3>
+      <p>Track productivity in real time. Detailed visit reports with <strong>customizable filters</strong>, export to Excel and PDF, and easy restoration of cancelled visits.</p>
+      <div class="highlight-box"><p>Export any report to Excel or PDF with one click. Full data ownership.</p></div>
+    </div>
+    <div class="feature">
+      <h3><div class="fi">&#8644;</div>3,000+ Integrations</h3>
+      <p>Connect Contele Teams with your tools through our <strong>open REST API</strong>, webhooks, and native integrations with major ERPs and CRMs.</p>
+      <div class="badge-row"><div class="badge">SAP</div><div class="badge">TOTVS</div><div class="badge">Salesforce</div><div class="badge">HubSpot</div><div class="badge">Sankhya</div><div class="badge">Google Cloud</div><div class="badge">Zapier</div><div class="badge">REST API</div><div class="badge">Webhooks</div></div>
+    </div>
+    <div class="feature">
+      <h3><div class="fi">&#9201;</div>Workforce Journey Control</h3>
+      <p>Track work hours, breaks, and overtime automatically. The system logs the first and last activity of each day, providing accurate journey data for payroll and compliance.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ROUTES + REIMBURSEMENT -->
+<section>
+  <div class="container">
+    <div class="section-header"><div class="label">Cost Optimization</div><h2>Route Planning & Expense Management</h2></div>
+    <div class="feature">
+      <h3><div class="fi">&#10148;</div>Smart Route Optimization</h3>
+      <p>Plan the most efficient routes automatically. The system calculates optimal paths between visit points, reducing travel time and enabling <strong>up to 30% more visits per day</strong>.</p>
+      <p>Managers set daily agendas on the web. Field members receive optimized routes on the mobile app with turn-by-turn navigation.</p>
+      <div class="chip-grid"><div class="chip"><span class="dot"></span>Automatic route calculation</div><div class="chip"><span class="dot"></span>Turn-by-turn navigation</div><div class="chip"><span class="dot"></span>Daily agenda sync</div><div class="chip"><span class="dot"></span>Up to 30% more visits/day</div></div>
+    </div>
+    <div class="feature">
+      <h3><div class="fi">$</div>Mileage & Expense Reimbursement</h3>
+      <p>The system uses the first check-in as starting point and the last as destination, automatically calculating <strong>the most efficient routes</strong> and driven kilometers for fair, transparent reimbursement.</p>
+      <p>Field members can also log additional expenses through the app:</p>
+      <div class="chip-grid c3"><div class="chip"><span class="dot"></span>Transportation</div><div class="chip"><span class="dot"></span>Parking</div><div class="chip"><span class="dot"></span>Tolls</div><div class="chip"><span class="dot"></span>Meals</div><div class="chip"><span class="dot"></span>Accommodation</div><div class="chip"><span class="dot"></span>Custom categories</div></div>
+      <div class="highlight-box" style="margin-top:14px"><p>Up to 40% reduction in reimbursement costs through GPS-verified, transparent mileage tracking.</p></div>
+    </div>
+    <div class="tech-grid">
+      <div><strong>Mobile Apps</strong><p>iOS & Android native with full offline capability. Field data syncs automatically when back online.</p></div>
+      <div><strong>Enterprise Security</strong><p>SSO (Microsoft & Google), SCIM 2.0 provisioning, audit logs, and 99.5% SLA.</p></div>
+      <div><strong>Cloud Infrastructure</strong><p>Hosted on Google Cloud. Data encrypted at rest and in transit.</p></div>
+      <div><strong>AI-Powered</strong><p>15 AI systems in production: fraud detection, automated support, predictive analytics.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARDS -->
+<section>
+  <div class="container">
+    <div class="section-header"><div class="label">Business Intelligence</div><h2>Custom Dashboards & Analytics</h2></div>
+    <div class="feature">
+      <h3><div class="fi">&#9635;</div>100% Integrated with Looker Studio</h3>
+      <p>Connect Contele Teams data to <strong>Looker Studio</strong> (Google's BI tool) and build custom dashboards tailored to your operation. From sales performance to technician efficiency, gain the insights for data-driven decisions.</p>
+      <div class="highlight-box"><p>Save hours and increase profitability by up to 22% with data-driven decisions.</p></div>
+    </div>
+    <div class="scope-title">Available Dashboard Views</div>
+    <div class="chip-grid"><div class="chip"><span class="dot"></span>Visits per day/week/month</div><div class="chip"><span class="dot"></span>Visit duration analysis</div><div class="chip"><span class="dot"></span>Visits by category</div><div class="chip"><span class="dot"></span>Top performers ranking</div><div class="chip"><span class="dot"></span>Geographic heat map</div><div class="chip"><span class="dot"></span>Service orders by type</div><div class="chip"><span class="dot"></span>Forms response summary</div><div class="chip"><span class="dot"></span>Reimbursement totals</div><div class="chip"><span class="dot"></span>Locations most visited</div><div class="chip"><span class="dot"></span>Custom KPI tracking</div></div>
+    <img src="img/dashboards.png" alt="Looker Studio Dashboards" class="dash-img">
+  </div>
+</section>
+
+<!-- ROI + WHY -->
+<section>
+  <div class="container">
+    <div class="section-header"><div class="label">Return on Investment</div><h2>Measurable Impact on Your Operation</h2></div>
+    <table class="roi-table">
+      <thead><tr><th>Feature</th><th>Estimated Savings</th><th>How</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Expense Reimbursement</strong></td><td class="roi-val">20% cost reduction</td><td>Error elimination and full transparency through GPS-verified mileage</td></tr>
+        <tr><td><strong>Visit Control</strong></td><td class="roi-val">15% productivity gain</td><td>Smart route optimization and intelligent scheduling</td></tr>
+        <tr><td><strong>Unproductive Hours</strong></td><td class="roi-val">30% time reduction</td><td>Elimination of manual processes and real-time oversight</td></tr>
+        <tr><td><strong>Route Optimization</strong></td><td class="roi-val">30% more visits/day</td><td>Automated route planning reduces travel time between stops</td></tr>
+      </tbody>
+    </table>
+    <p class="roi-note">Estimates based on aggregated client data. Actual results may vary by operation.</p>
+    <div class="scope-title" style="margin-top:28px">Why Contele Teams</div>
+    <div class="why-grid">
+      <div class="why-card"><h4>23+ Years of Expertise</h4><p>Founded in 2003. Deep domain knowledge in fleet and field team management across diverse industries.</p></div>
+      <div class="why-card"><h4>In-House Engineering</h4><p>50-person team with proprietary engineering, integration, and AI capabilities. No outsourcing.</p></div>
+      <div class="why-card"><h4>Enterprise-Ready</h4><p>SSO (Microsoft & Google), SCIM 2.0, audit logs, and 99.5% uptime SLA for corporate deployments.</p></div>
+      <div class="why-card"><h4>No Lock-in Contracts</h4><p>Prepaid model, no fidelity clauses, no cancellation penalties. 30-day risk-free guarantee.</p></div>
+      <div class="why-card"><h4>Dedicated Support</h4><p>50+ daily video calls with clients. Specialized onboarding and implementation consulting.</p></div>
+      <div class="why-card"><h4>15 AI Systems in Production</h4><p>Fraud detection, automated customer support, content generation, and predictive analytics.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASE + CLIENTS + CTA -->
+<section>
+  <div class="container">
+    <div class="section-header"><div class="label">Use Case</div><h2>Automatic "On My Way" Customer Notifications</h2></div>
+    <div class="usecase-box">
+      <div class="text">
+        <p style="font-size:14px; color:var(--g7); line-height:1.65; margin-bottom:12px;">When a technician departs for a service call, the system <strong>automatically notifies your customer</strong> with real-time arrival details. Every visit becomes a professional brand touchpoint.</p>
+        <div class="chip-grid"><div class="chip"><span class="dot"></span>Automated arrival alerts</div><div class="chip"><span class="dot"></span>Real-time ETA tracking</div><div class="chip"><span class="dot"></span>Service visit documentation</div><div class="chip"><span class="dot"></span>Customer experience boost</div></div>
+      </div>
+      <div class="mockup"><img src="img/mockup-onmyway.png" alt="On My Way Notification Mockup"></div>
+    </div>
+
+    <div class="client-logos"><img src="img/client-logos.png" alt="Trusted Clients"></div>
+    <p class="client-note">Over 1,500 companies trust Contele Teams across 7 countries.</p>
+
+    <div class="scope-title" style="margin-top:28px">Next Steps</div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><h4>Online Contracting</h4><p>100% digital, no bureaucracy</p></div>
+      <div class="step-arrow">&rarr;</div>
+      <div class="step"><div class="step-num">2</div><h4>Onboarding</h4><p>Dedicated specialist for your team</p></div>
+      <div class="step-arrow">&rarr;</div>
+      <div class="step"><div class="step-num">3</div><h4>Proof of Concept</h4><p>Validate with a pilot group</p></div>
+    </div>
+
+    <div class="guarantee">
+      <div class="guarantee-icon">&#10003;</div>
+      <div><h4>30-Day Risk-Free Guarantee</h4><p>If not satisfied, cancel at no cost and no questions asked.</p></div>
+    </div>
+
+    <div class="cta-box">
+      <h3>Ready to Get Started?</h3>
+      <p>Let's schedule a personalized demo for your team.</p>
+      <div class="hl">contele.com.br</div>
+      <p class="legal">Contele Solu&ccedil;&otilde;es Tecnol&oacute;gicas LTDA &middot; Santos, SP, Brazil &middot; Founded 2003</p>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
