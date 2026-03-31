@@ -169,7 +169,7 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
 
     body {
       font-family: var(--font-body);
@@ -177,6 +177,7 @@
       background: var(--white);
       line-height: 1.6;
       font-size: 16px;
+      overflow-x: hidden;
     }
 
     img { max-width: 100%; height: auto; display: block; }
@@ -783,6 +784,7 @@
       padding: 32px;
       text-align: center;
       transition: box-shadow 0.2s, transform 0.15s;
+      min-width: 0;
     }
 
     .plan-card:hover {
@@ -1277,7 +1279,7 @@
     .yt-thumb { content-visibility: auto; contain-intrinsic-size: auto 270px; }
     .carousel img { content-visibility: auto; contain-intrinsic-size: auto 600px; }
     .benefit-card { content-visibility: auto; contain-intrinsic-size: auto 180px; }
-    .plan-card { content-visibility: auto; contain-intrinsic-size: auto 400px; }
+    .plan-card { content-visibility: auto; contain-intrinsic-size: auto 400px; min-width: 0; }
     .resource-card { content-visibility: auto; contain-intrinsic-size: auto 120px; }
   </style>
   <noscript><style>.yt-thumb,.carousel img,.benefit-card,.plan-card,.resource-card{content-visibility:visible}</style></noscript>
