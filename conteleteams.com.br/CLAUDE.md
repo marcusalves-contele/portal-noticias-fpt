@@ -44,7 +44,8 @@ Pipedrive deal stage change → webhook POST /api/pipedrive-webhook
 | `llms.txt` | Resumo pra crawlers de IA (Gemini, ChatGPT, Perplexity) |
 | `llms-full.txt` | Documentação completa pra LLMs |
 | `railway.json` | Config Railway (Nixpacks, start command) |
-| `legacy-appscript-send-to-n8n.js` | Apps Script antigo (referência, DESATIVADO) |
+| `legacy-appscript-send-to-n8n.js` | Apps Script antigo (referencia, DESATIVADO) |
+| `legacy/` | Workflows n8n antigos (v1/v2/v3), DESATIVADOS desde 20/mar/2026. Toda logica migrou pro server.js |
 
 ## Variáveis de Ambiente (Railway)
 
@@ -175,7 +176,8 @@ Deals antigos: GCLID irrecuperável. Deals novos: GCLID completo via campo dedic
 
 - Apps Script da planilha: trigger onChange removido (20/mar/2026)
 - Workflow n8n Railway (MIfmxdihSCEjS0Jj): desativado (20/mar/2026)
-- Conversões offline via planilha (gclid-teams-qualificado): substituídas pelo GA4 + Google Ads API
+- Workflows n8n (workflow-update v1/v2/v3): movidos para `legacy/`, toda logica de lead migrou pro `server.js` (Express)
+- Conversoes offline via planilha (gclid-teams-qualificado): substituidas pelo GA4 + Google Ads API
 
 ## SEO e IA
 
