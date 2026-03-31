@@ -271,13 +271,8 @@ async function appendSheet(data) {
 }
 
 function assignVendor(tamanho) {
-  if (tamanho >= 21) return { id: ID_SHEILA, nome: 'Sheila' };
-  if (tamanho >= 10) {
-    // Round-robin por segundo
-    return (Math.floor(Date.now() / 1000) % 2 === 0)
-      ? { id: ID_SHEILA, nome: 'Sheila' }
-      : { id: ID_DANIEL, nome: 'Daniel' };
-  }
+  // Sheila em licenca maternidade (a partir de 31/03/2026)
+  // Todos os leads direcionados para Daniel
   return { id: ID_DANIEL, nome: 'Daniel' };
 }
 

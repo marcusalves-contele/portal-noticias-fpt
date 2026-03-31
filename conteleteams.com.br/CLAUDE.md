@@ -105,11 +105,10 @@ Pipedrive deal stage change → webhook POST /api/pipedrive-webhook
 
 | Faixa | Vendedor | Pipedrive user_id | WhatsApp |
 |-------|----------|-------------------|----------|
-| >= 21 licenças | Sheila | 6186902 | 5511973527309 |
-| 10-20 licenças | Round-robin Sheila/Daniel | - | - |
-| 4-9 licenças | Daniel | 13133598 | 5513997431489 |
+| >= 4 licenças | Daniel | 13133598 | 5513997431489 |
 | < 4 licenças | Nenhum (lead inadequado) | - | - |
 
+Sheila (6186902) em licenca maternidade desde 31/03/2026. Todos os leads vao para Daniel.
 Leonardo Gazolli (CEO) notificado em todos os leads: 5511999796461
 
 ## Proteções
