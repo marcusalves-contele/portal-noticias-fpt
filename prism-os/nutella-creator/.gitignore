@@ -4,9 +4,13 @@ __pycache__/
 *.pyc
 output/
 downloads/
-*.png
-*.mp4
 *.webp
 badge_preview.html
 .DS_Store
 operational_memory.json
+
+# Media files (output/temp) — mas NAO assets/
+*.mp4
+*.png
+!assets/*.mp4
+!assets/*.png

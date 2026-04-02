@@ -37,6 +37,19 @@ SECRET_KEY=qualquer-string-aleatoria
 | `GOOGLE_CLIENT_SECRET` | OAuth login no dashboard | Sim (se auth ativo) |
 | `SECRET_KEY` | Sessoes HTTP persistentes | Nao (gera random se ausente) |
 
+### Assets obrigatorios
+
+A pasta `assets/` contem arquivos de video e imagem usados na composicao dos cortes. Ja estao commitados no repo:
+
+| Arquivo | Uso |
+|---------|-----|
+| `intro-julio-cortes-nutela-v2.mp4` | Vinheta de abertura (intro) |
+| `cta-final-pronto-v2.mp4` | Call-to-action final |
+| `badge-overlay.png` | Badge 1920x90 do rodape |
+| `moldura-cortes-video.png` | Moldura dos cortes |
+
+Sem esses arquivos o `build.py` nao consegue gerar os cortes.
+
 ### Rodar
 
 ```bash
