@@ -177,6 +177,19 @@ Token YouTube OAuth (`token_youtube_write.pickle`) precisa validar scope `thumbn
 
 ---
 
+## Limpeza local
+
+Ao rodar funcoes locais (dashboard, build, download), o nutella-creator acumula videos pesados em `downloads/` e thumbnails em `output/`. Esses arquivos sao temporarios e podem passar de 6 GB facilmente.
+
+**Apos concluir o processamento local**, sugerir proativamente ao usuario:
+```bash
+rm -rf nutella-creator/downloads nutella-creator/output
+```
+
+Isso nao afeta codigo, assets ou configs. As pastas sao recriadas automaticamente no proximo uso.
+
+---
+
 ## Roadmap (próximas funções)
 
 - [ ] SEO de títulos integrado ao dashboard
