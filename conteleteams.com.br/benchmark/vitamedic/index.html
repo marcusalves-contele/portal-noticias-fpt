@@ -1,0 +1,2214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Benchmark Contele Teams : Vitamedic</title>
+<meta name="description" content="Análise comparativa entre Contele Teams, VExpenses e Foco PDV para a operação de campo da Vitamedic.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%234A58FF'/%3E%3Ctext x='16' y='22' font-family='serif' font-size='20' font-weight='900' fill='white' text-anchor='middle'%3EC%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=DM+Sans:opsz,wght@9..40,300..700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   RESET & TOKENS
+   ============================================================ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+:root {
+  /* Surface */
+  --bg-base: #0A0E1A;
+  --bg-elev: #10141F;
+  --bg-card: #141827;
+  --bg-hi:   #1A1F30;
+
+  /* Brand */
+  --blue: #4A58FF;
+  --blue-deep: #000976;
+  --cyan: #29BDFF;
+  --accent: #F5B84C;    /* warm editorial highlight */
+  --success: #4ADE80;
+  --danger: #FF5E5E;
+
+  /* Text */
+  --ink-0: #FFFFFF;
+  --ink-1: #F5F5F7;
+  --ink-2: #B8BECE;
+  --ink-3: #8B92A8;
+  --ink-4: #5A6175;
+
+  /* Borders */
+  --line-1: rgba(255,255,255,0.06);
+  --line-2: rgba(255,255,255,0.10);
+  --line-3: rgba(255,255,255,0.18);
+
+  /* Type */
+  --f-display: 'Fraunces', 'Times New Roman', serif;
+  --f-body: 'DM Sans', -apple-system, sans-serif;
+  --f-mono: 'JetBrains Mono', 'SF Mono', monospace;
+
+  /* Fluid scale (clamp) */
+  --fs-hero: clamp(3.2rem, 8vw, 8.4rem);
+  --fs-h1:   clamp(2.4rem, 5vw, 4.8rem);
+  --fs-h2:   clamp(1.8rem, 3.2vw, 2.8rem);
+  --fs-h3:   clamp(1.2rem, 1.8vw, 1.5rem);
+  --fs-lead: clamp(1.05rem, 1.4vw, 1.25rem);
+  --fs-body: 1rem;
+  --fs-small: 0.82rem;
+  --fs-tiny: 0.72rem;
+
+  /* Spacing */
+  --sp-section: clamp(5rem, 10vw, 9rem);
+  --sp-inner: clamp(2rem, 5vw, 5rem);
+
+  /* Easing */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html, body {
+  background: var(--bg-base);
+  color: var(--ink-1);
+  font-family: var(--f-body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection { background: var(--blue); color: #fff; }
+
+/* Noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ============================================================
+   LAYOUT PRIMITIVES
+   ============================================================ */
+.wrap {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 clamp(1.25rem, 4vw, 3rem);
+  position: relative;
+  z-index: 2;
+}
+
+.wrap--narrow { max-width: 860px; }
+
+/* ============================================================
+   READING PROGRESS BAR
+   ============================================================ */
+.progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+  z-index: 100;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 20px rgba(74, 88, 255, 0.5);
+}
+
+/* ============================================================
+   NAV (sticky, minimal)
+   ============================================================ */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 90;
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  background: rgba(10, 14, 26, 0.72);
+  border-bottom: 1px solid var(--line-1);
+}
+.nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+}
+.nav__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  color: var(--ink-0);
+}
+.nav__dot {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  background: var(--blue);
+  box-shadow: 0 0 12px var(--blue);
+}
+.nav__meta {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+}
+.nav__chapter {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--ink-2);
+  text-transform: uppercase;
+  display: none;
+}
+@media (min-width: 900px) {
+  .nav__chapter { display: block; }
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  min-height: 100vh;
+  padding: 140px 0 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 20% 30%, rgba(74, 88, 255, 0.22) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 70%, rgba(41, 189, 255, 0.12) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 1;
+}
+.hero__grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse at center, black 0%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 80%);
+  z-index: 1;
+}
+.hero__content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 48px;
+  padding: 8px 16px 8px 14px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.02);
+}
+.hero__eyebrow-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+  animation: pulse 2.4s var(--ease) infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+.hero__title {
+  font-family: var(--f-display);
+  font-size: var(--fs-hero);
+  font-weight: 400;
+  font-variation-settings: 'SOFT' 30, 'opsz' 144;
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+  color: var(--ink-0);
+  margin-bottom: 36px;
+  max-width: 14ch;
+}
+.hero__title em {
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'SOFT' 100, 'opsz' 144;
+  color: var(--blue);
+  background: linear-gradient(180deg, var(--blue) 0%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero__lead {
+  font-size: var(--fs-lead);
+  line-height: 1.55;
+  color: var(--ink-2);
+  max-width: 58ch;
+  margin-bottom: 64px;
+}
+
+.hero__deck {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1rem, 3vw, 2.5rem);
+  padding: 32px 0;
+  border-top: 1px solid var(--line-2);
+  border-bottom: 1px solid var(--line-2);
+}
+.deck__item { position: relative; }
+.deck__item + .deck__item::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * clamp(0.5rem, 1.5vw, 1.25rem));
+  top: 10%; bottom: 10%;
+  width: 1px;
+  background: var(--line-2);
+}
+.deck__num {
+  font-family: var(--f-display);
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 400;
+  font-variation-settings: 'SOFT' 20, 'opsz' 144;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--ink-0);
+  margin-bottom: 10px;
+}
+.deck__label {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  max-width: 18ch;
+}
+
+.hero__scroll {
+  margin-top: 80px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.hero__scroll-line {
+  width: 60px; height: 1px;
+  background: linear-gradient(90deg, var(--ink-3), transparent);
+  position: relative;
+}
+.hero__scroll-line::after {
+  content: '';
+  position: absolute;
+  right: 0; top: -3px;
+  width: 7px; height: 7px;
+  border-right: 1px solid var(--ink-3);
+  border-bottom: 1px solid var(--ink-3);
+  transform: rotate(-45deg);
+}
+
+/* ============================================================
+   SECTION BASE
+   ============================================================ */
+.section {
+  padding: var(--sp-section) 0;
+  position: relative;
+}
+.section--line { border-top: 1px solid var(--line-1); }
+
+.chapter {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  margin-bottom: 48px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line-2);
+}
+.chapter__num {
+  font-family: var(--f-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.chapter__label {
+  font-family: var(--f-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+}
+
+.section__title {
+  font-family: var(--f-display);
+  font-size: var(--fs-h1);
+  font-weight: 400;
+  font-variation-settings: 'SOFT' 30, 'opsz' 144;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--ink-0);
+  max-width: 18ch;
+  margin-bottom: 28px;
+}
+.section__title em {
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'SOFT' 100, 'opsz' 144;
+  color: var(--cyan);
+}
+
+.section__lead {
+  font-size: var(--fs-lead);
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 60ch;
+  margin-bottom: 56px;
+}
+
+/* ============================================================
+   § 01 : CONTEXTO OPERACIONAL
+   ============================================================ */
+.context-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1px;
+  background: var(--line-2);
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.context-card {
+  background: var(--bg-elev);
+  padding: 32px 28px;
+  position: relative;
+  transition: background 0.4s var(--ease);
+}
+.context-card:hover { background: var(--bg-card); }
+.context-card__tag {
+  font-family: var(--f-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+.context-card__num {
+  font-family: var(--f-display);
+  font-size: clamp(3rem, 6vw, 4.8rem);
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 25, 'opsz' 144;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--ink-0);
+  margin-bottom: 14px;
+}
+.context-card__num sup {
+  font-size: 0.35em;
+  vertical-align: super;
+  color: var(--blue);
+  margin-left: 6px;
+}
+.context-card__desc {
+  font-size: 0.92rem;
+  color: var(--ink-3);
+  line-height: 1.5;
+}
+
+.dores {
+  margin-top: 72px;
+}
+.dores__title {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 28px;
+}
+.dores__list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+.dor {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 24px;
+  align-items: start;
+  padding: 28px 0;
+  border-top: 1px solid var(--line-1);
+}
+.dor:last-child { border-bottom: 1px solid var(--line-1); }
+.dor__num {
+  font-family: var(--f-mono);
+  font-size: 0.75rem;
+  color: var(--ink-4);
+  padding-top: 6px;
+}
+.dor__title {
+  font-family: var(--f-display);
+  font-size: clamp(1.3rem, 2.2vw, 1.85rem);
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 20, 'opsz' 72;
+  line-height: 1.25;
+  color: var(--ink-0);
+  margin-bottom: 8px;
+  letter-spacing: -0.015em;
+}
+.dor__desc {
+  font-size: 0.98rem;
+  color: var(--ink-2);
+  line-height: 1.55;
+  max-width: 64ch;
+}
+
+/* ============================================================
+   § 02 : CENÁRIO DO GRUPO (quote / editorial)
+   ============================================================ */
+.scenario {
+  padding: clamp(3rem, 6vw, 5rem) clamp(2rem, 5vw, 4rem);
+  background: linear-gradient(135deg, rgba(74, 88, 255, 0.06) 0%, rgba(41, 189, 255, 0.03) 100%);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+.scenario::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: linear-gradient(180deg, var(--blue), var(--cyan));
+}
+.scenario__quote-mark {
+  font-family: var(--f-display);
+  font-size: clamp(6rem, 14vw, 11rem);
+  font-weight: 300;
+  font-variation-settings: 'SOFT' 100, 'opsz' 144;
+  line-height: 0.6;
+  color: var(--blue);
+  opacity: 0.32;
+  position: absolute;
+  top: 28px;
+  right: 40px;
+  pointer-events: none;
+  user-select: none;
+}
+.scenario__text {
+  font-family: var(--f-display);
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
+  font-weight: 400;
+  font-variation-settings: 'SOFT' 35, 'opsz' 72;
+  line-height: 1.35;
+  color: var(--ink-0);
+  letter-spacing: -0.012em;
+  max-width: 44ch;
+  position: relative;
+  z-index: 1;
+}
+.scenario__text strong {
+  font-weight: 600;
+  background: linear-gradient(180deg, var(--cyan), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.scenario__foot {
+  margin-top: 32px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.scenario__foot-line { width: 40px; height: 1px; background: var(--ink-4); }
+
+.scenario-meta {
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (min-width: 760px) {
+  .scenario-meta { grid-template-columns: repeat(4, 1fr); gap: 20px; }
+}
+.sm-card {
+  padding: 24px;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  background: var(--bg-elev);
+}
+.sm-card__label {
+  font-family: var(--f-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 12px;
+}
+.sm-card__value {
+  font-family: var(--f-display);
+  font-size: 1.45rem;
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 20;
+  color: var(--ink-0);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.sm-card__value em {
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'SOFT' 100;
+  color: var(--cyan);
+}
+
+/* ============================================================
+   § 03 : TRÊS FERRAMENTAS
+   ============================================================ */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+.tool-card {
+  padding: 36px 32px;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--bg-elev);
+  position: relative;
+  transition: transform 0.5s var(--ease), border-color 0.5s var(--ease), background 0.5s var(--ease);
+}
+.tool-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--line-3);
+  background: var(--bg-card);
+}
+.tool-card--contele {
+  border-color: rgba(74, 88, 255, 0.35);
+  background: linear-gradient(180deg, rgba(74, 88, 255, 0.08) 0%, var(--bg-elev) 100%);
+}
+.tool-card--contele::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  padding: 1px;
+  background: linear-gradient(180deg, var(--blue), transparent 70%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+.tool-card__tag {
+  font-family: var(--f-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tool-card__badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-family: var(--f-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  background: rgba(74, 88, 255, 0.15);
+  color: var(--blue);
+  border: 1px solid rgba(74, 88, 255, 0.3);
+}
+.tool-card__name {
+  font-family: var(--f-display);
+  font-size: 2.1rem;
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 20, 'opsz' 72;
+  color: var(--ink-0);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+.tool-card__category {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 26px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line-1);
+}
+.tool-card__desc {
+  font-size: 0.95rem;
+  line-height: 1.58;
+  color: var(--ink-2);
+  margin-bottom: 22px;
+}
+.tool-card__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.tool-card__list li {
+  font-size: 0.87rem;
+  color: var(--ink-3);
+  padding-left: 20px;
+  position: relative;
+}
+.tool-card__list li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0.6em;
+  width: 10px; height: 1px;
+  background: var(--ink-4);
+}
+.tool-card--contele .tool-card__list li::before {
+  background: var(--blue);
+}
+
+/* ============================================================
+   § 04 : BENCHMARK MATRIX
+   ============================================================ */
+.matrix-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--bg-elev);
+}
+.matrix {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+.matrix thead th {
+  padding: 28px 24px;
+  text-align: left;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--line-2);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.matrix thead th:first-child {
+  width: 40%;
+}
+.matrix thead th:not(:first-child) {
+  text-align: center;
+  width: 20%;
+  border-left: 1px solid var(--line-1);
+}
+.matrix__head-label {
+  font-family: var(--f-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  display: block;
+  margin-bottom: 6px;
+}
+.matrix__head-name {
+  font-family: var(--f-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-variation-settings: 'SOFT' 25;
+  color: var(--ink-1);
+  letter-spacing: -0.01em;
+}
+.matrix__head-contele .matrix__head-name {
+  color: var(--cyan);
+}
+.matrix tbody tr {
+  border-bottom: 1px solid var(--line-1);
+  transition: background 0.3s var(--ease);
+}
+.matrix tbody tr:hover { background: rgba(255,255,255,0.015); }
+.matrix tbody tr:last-child { border-bottom: none; }
+.matrix td {
+  padding: 22px 24px;
+  vertical-align: top;
+}
+.matrix td:not(:first-child) {
+  text-align: center;
+  border-left: 1px solid var(--line-1);
+}
+.criterion {
+  font-family: var(--f-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 20, 'opsz' 36;
+  color: var(--ink-0);
+  letter-spacing: -0.005em;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.criterion__note {
+  font-size: 0.78rem;
+  color: var(--ink-4);
+  font-family: var(--f-body);
+  line-height: 1.4;
+  max-width: 40ch;
+}
+.col-contele {
+  background: linear-gradient(180deg, rgba(74, 88, 255, 0.04), rgba(74, 88, 255, 0.01));
+}
+
+/* Indicator */
+.ind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  font-family: var(--f-mono);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.ind--yes {
+  background: rgba(74, 222, 128, 0.12);
+  color: var(--success);
+  border: 1px solid rgba(74, 222, 128, 0.35);
+}
+.ind--partial {
+  background: rgba(245, 184, 76, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(245, 184, 76, 0.35);
+}
+.ind--no {
+  background: rgba(255, 94, 94, 0.08);
+  color: var(--danger);
+  border: 1px solid rgba(255, 94, 94, 0.28);
+}
+.ind--contele {
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 14px rgba(74, 88, 255, 0.4);
+}
+
+.matrix__detail {
+  font-family: var(--f-mono);
+  font-size: 0.78rem;
+  color: var(--ink-2);
+  margin-top: 8px;
+  letter-spacing: 0.02em;
+  max-width: 16ch;
+  line-height: 1.45;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.matrix-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line-1);
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  letter-spacing: 0.08em;
+}
+.matrix-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.matrix-legend__ind {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+}
+.matrix-legend__ind--yes { background: var(--success); }
+.matrix-legend__ind--partial { background: var(--accent); }
+.matrix-legend__ind--no { background: var(--danger); }
+
+/* ============================================================
+   § 05 : CONSOLIDAÇÃO
+   ============================================================ */
+.consol {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  align-items: center;
+}
+@media (min-width: 960px) {
+  .consol { grid-template-columns: 1fr 1.1fr; gap: 80px; }
+}
+.consol__text h3 {
+  font-family: var(--f-display);
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  font-variation-settings: 'SOFT' 35, 'opsz' 72;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink-0);
+  margin-bottom: 24px;
+  max-width: 16ch;
+}
+.consol__text h3 em {
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'SOFT' 100;
+  color: var(--cyan);
+}
+.consol__text p {
+  color: var(--ink-2);
+  font-size: 1.02rem;
+  line-height: 1.65;
+  max-width: 50ch;
+}
+.consol__text p + p { margin-top: 18px; }
+
+.consol__diagram {
+  padding: 32px;
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  background: var(--bg-elev);
+  position: relative;
+}
+.consol__stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 0;
+}
+.consol__box {
+  flex: 1;
+  padding: 16px 10px;
+  text-align: center;
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  background: var(--bg-card);
+}
+.consol__box-name {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+}
+.consol__box-tag {
+  font-family: var(--f-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.consol__arrow {
+  text-align: center;
+  padding: 18px 0;
+  font-family: var(--f-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  position: relative;
+}
+.consol__arrow::before, .consol__arrow::after {
+  content: '';
+  display: inline-block;
+  height: 1px;
+  width: 60px;
+  background: var(--line-3);
+  vertical-align: middle;
+  margin: 0 12px;
+}
+.consol__result {
+  padding: 24px;
+  border: 1px solid rgba(74, 88, 255, 0.4);
+  border-radius: 4px;
+  background: linear-gradient(135deg, rgba(74, 88, 255, 0.12) 0%, rgba(41, 189, 255, 0.05) 100%);
+  text-align: center;
+}
+.consol__result-name {
+  font-family: var(--f-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  font-variation-settings: 'SOFT' 20;
+  color: var(--ink-0);
+  letter-spacing: -0.01em;
+}
+.consol__result-tag {
+  font-family: var(--f-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ============================================================
+   § 06 : IMPACTO
+   ============================================================ */
+.impact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1px;
+  background: var(--line-2);
+  border: 1px solid var(--line-2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.impact-card {
+  background: var(--bg-elev);
+  padding: 40px 32px;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.5s var(--ease);
+}
+.impact-card:hover { background: var(--bg-card); }
+.impact-card__corner {
+  position: absolute;
+  top: 16px; right: 20px;
+  font-family: var(--f-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+}
+.impact-card__label {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+.impact-card__value {
+  font-family: var(--f-display);
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 25, 'opsz' 144;
+  color: var(--ink-0);
+  line-height: 1;
+  letter-spacing: -0.025em;
+  margin-bottom: 18px;
+}
+.impact-card__value em {
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'SOFT' 100;
+  color: var(--cyan);
+}
+.impact-card__desc {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink-3);
+  max-width: 34ch;
+}
+
+/* ============================================================
+   § 07 : CAMINHO DE IMPLANTAÇÃO
+   ============================================================ */
+.timeline {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-top: 1px solid var(--line-2);
+}
+.t-step {
+  display: grid;
+  grid-template-columns: minmax(90px, 130px) 1fr;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  padding: 36px 0;
+  border-bottom: 1px solid var(--line-2);
+  align-items: start;
+  transition: background 0.4s var(--ease);
+}
+.t-step:hover { background: rgba(255,255,255,0.01); }
+.t-step__week {
+  font-family: var(--f-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  padding-top: 8px;
+}
+.t-step__week strong {
+  display: block;
+  font-family: var(--f-display);
+  font-size: 2rem;
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 20, 'opsz' 72;
+  color: var(--blue);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-top: 4px;
+}
+.t-step__title {
+  font-family: var(--f-display);
+  font-size: clamp(1.25rem, 2.2vw, 1.7rem);
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 20, 'opsz' 72;
+  color: var(--ink-0);
+  letter-spacing: -0.015em;
+  margin-bottom: 8px;
+  line-height: 1.25;
+}
+.t-step__desc {
+  color: var(--ink-3);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  max-width: 60ch;
+}
+
+.contract-callout {
+  margin-top: 56px;
+  padding: 32px 36px;
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  border-radius: 6px;
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.05) 0%, rgba(74, 88, 255, 0.04) 100%);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.contract-callout__icon {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--success);
+  font-family: var(--f-mono);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.contract-callout__text {
+  flex: 1;
+  min-width: 260px;
+}
+.contract-callout__title {
+  font-family: var(--f-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  font-variation-settings: 'SOFT' 20;
+  color: var(--ink-0);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+.contract-callout__desc {
+  font-size: 0.92rem;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+
+/* ============================================================
+   § 08 : OBJEÇÕES (FAQ)
+   ============================================================ */
+.faq {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-top: 1px solid var(--line-2);
+}
+.faq__item {
+  border-bottom: 1px solid var(--line-2);
+  padding: 0;
+}
+.faq__q {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 32px 0;
+  color: var(--ink-0);
+  font-family: var(--f-display);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  font-weight: 500;
+  font-variation-settings: 'SOFT' 30, 'opsz' 72;
+  letter-spacing: -0.012em;
+  line-height: 1.3;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  transition: color 0.3s var(--ease);
+}
+.faq__q:hover { color: var(--cyan); }
+.faq__q-mark {
+  font-family: var(--f-mono);
+  font-size: 0.85rem;
+  color: var(--ink-4);
+  flex-shrink: 0;
+  padding-top: 6px;
+  transition: transform 0.4s var(--ease), color 0.3s var(--ease);
+}
+.faq__item[open] .faq__q-mark {
+  transform: rotate(45deg);
+  color: var(--cyan);
+}
+.faq__a {
+  padding: 0 0 32px 0;
+  color: var(--ink-2);
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 66ch;
+}
+
+/* ============================================================
+   § 09 : CTA / FOOTER
+   ============================================================ */
+.cta {
+  text-align: center;
+  padding: clamp(4rem, 8vw, 7rem) 0;
+  border-top: 1px solid var(--line-2);
+}
+.cta__kicker {
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+}
+.cta__title {
+  font-family: var(--f-display);
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 400;
+  font-variation-settings: 'SOFT' 40, 'opsz' 144;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--ink-0);
+  margin-bottom: 28px;
+  max-width: 20ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+.cta__title em {
+  font-style: italic;
+  font-weight: 300;
+  font-variation-settings: 'SOFT' 100;
+  background: linear-gradient(180deg, var(--cyan), var(--blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cta__desc {
+  color: var(--ink-2);
+  font-size: var(--fs-lead);
+  max-width: 52ch;
+  margin: 0 auto 48px;
+  line-height: 1.6;
+}
+.cta__actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 30px;
+  font-family: var(--f-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 999px;
+  transition: all 0.4s var(--ease);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.btn--primary {
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(74, 88, 255, 0.35);
+}
+.btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(74, 88, 255, 0.5);
+}
+.btn--ghost {
+  background: transparent;
+  color: var(--ink-1);
+  border-color: var(--line-3);
+}
+.btn--ghost:hover {
+  background: rgba(255,255,255,0.04);
+  border-color: var(--ink-2);
+}
+.btn__arrow { transition: transform 0.3s var(--ease); }
+.btn:hover .btn__arrow { transform: translateX(4px); }
+
+.footer {
+  padding: 48px 0 56px;
+  border-top: 1px solid var(--line-1);
+  font-family: var(--f-mono);
+  font-size: 0.72rem;
+  color: var(--ink-4);
+  letter-spacing: 0.06em;
+}
+.footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 24px;
+}
+.footer__meta { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer__meta span {
+  padding-right: 24px;
+  border-right: 1px solid var(--line-2);
+}
+.footer__meta span:last-child { border-right: none; padding-right: 0; }
+
+/* ============================================================
+   MOTION : SCROLL REVEAL
+   ============================================================ */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.9s var(--ease), transform 0.9s var(--ease); }
+.reveal.in { opacity: 1; transform: translateY(0); }
+.reveal[data-delay="1"] { transition-delay: 0.08s; }
+.reveal[data-delay="2"] { transition-delay: 0.16s; }
+.reveal[data-delay="3"] { transition-delay: 0.24s; }
+.reveal[data-delay="4"] { transition-delay: 0.32s; }
+.reveal[data-delay="5"] { transition-delay: 0.4s; }
+
+/* Hero initial entrance */
+.hero__eyebrow, .hero__title, .hero__lead, .hero__deck, .hero__scroll {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: enter 1s var(--ease) forwards;
+}
+.hero__eyebrow { animation-delay: 0.1s; }
+.hero__title   { animation-delay: 0.22s; }
+.hero__lead    { animation-delay: 0.38s; }
+.hero__deck    { animation-delay: 0.5s; }
+.hero__scroll  { animation-delay: 0.68s; }
+@keyframes enter { to { opacity: 1; transform: translateY(0); } }
+
+/* Mobile tweaks */
+@media (max-width: 780px) {
+  .hero__deck { grid-template-columns: 1fr; gap: 28px; padding: 28px 0; }
+  .deck__item + .deck__item::before { display: none; }
+  .deck__item + .deck__item {
+    border-top: 1px solid var(--line-1);
+    padding-top: 28px;
+  }
+  .chapter { flex-wrap: wrap; gap: 10px; }
+  .t-step { grid-template-columns: 1fr; gap: 14px; padding: 28px 0; }
+}
+
+/* === Matrix : stacked cards on mobile (CSS-only transform) === */
+@media (max-width: 780px) {
+  .matrix-wrap {
+    overflow: visible;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+  }
+  .matrix {
+    display: block;
+    min-width: 0;
+  }
+  .matrix thead { display: none; }
+  .matrix tbody { display: block; }
+  .matrix tbody tr {
+    display: block;
+    background: var(--bg-elev);
+    border: 1px solid var(--line-2);
+    border-radius: 6px;
+    margin-bottom: 14px;
+    padding: 22px 22px 8px;
+  }
+  .matrix tbody tr:hover { background: var(--bg-elev); }
+  .matrix tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-left: none;
+    text-align: left;
+  }
+  .matrix tbody td:first-child {
+    display: block;
+    padding: 0 0 16px;
+    border-bottom: 1px solid var(--line-2);
+    margin-bottom: 6px;
+  }
+  .matrix tbody td:not(:first-child) {
+    border-top: 1px solid var(--line-1);
+  }
+  .matrix tbody td:nth-child(2)::before {
+    content: 'VExpenses';
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    flex: 1;
+  }
+  .matrix tbody td:nth-child(3)::before {
+    content: 'Foco PDV';
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    flex: 1;
+  }
+  .matrix tbody td:nth-child(4)::before {
+    content: 'Contele';
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    flex: 1;
+  }
+  .matrix tbody td:nth-child(4) {
+    background: linear-gradient(180deg, rgba(74, 88, 255, 0.06), rgba(74, 88, 255, 0.02));
+    margin: 4px -22px 0;
+    padding: 14px 22px;
+    border-radius: 0 0 4px 4px;
+  }
+  .matrix .col-contele {
+    background: linear-gradient(180deg, rgba(74, 88, 255, 0.06), rgba(74, 88, 255, 0.02));
+  }
+  .matrix__detail {
+    margin: 0;
+    text-align: right;
+    max-width: none;
+    flex-shrink: 0;
+    font-size: 0.7rem;
+  }
+  .matrix .ind {
+    flex-shrink: 0;
+  }
+  .matrix tbody td:not(:first-child) > .ind + .matrix__detail {
+    margin-left: 10px;
+  }
+  /* hide the duplicated detail (mobile shows only ind, not the small text) */
+  .matrix tbody td:not(:first-child) .matrix__detail { display: none; }
+  .criterion { font-size: 1.08rem; }
+  .criterion__note { font-size: 0.82rem; max-width: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<!-- ============================================================
+     NAV
+     ============================================================ -->
+<nav class="nav">
+  <div class="wrap nav__inner">
+    <div class="nav__brand">
+      <span class="nav__dot"></span>
+      <span>Contele Teams</span>
+    </div>
+    <div class="nav__chapter" id="navChapter">§ 00 / Prólogo</div>
+    <div class="nav__meta">Benchmark / Vitamedic</div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero" data-chapter="§ 00 / Prólogo">
+  <div class="hero__grid-bg"></div>
+  <div class="wrap hero__content">
+
+    <div class="hero__eyebrow">
+      <span class="hero__eyebrow-dot"></span>
+      <span>Documento interno : Grupo José Alves</span>
+    </div>
+
+    <h1 class="hero__title">
+      Consolidar a operação de campo da <em>Vitamedic</em>
+    </h1>
+
+    <p class="hero__lead">
+      Uma análise funcional e estratégica entre Contele Teams, VExpenses e Foco PDV, as três plataformas que hoje convivem na operação de 300 representantes da Vitamedic. Preparada como extensão natural da implantação já em curso na N&amp;L Logística.
+    </p>
+
+    <div class="hero__deck">
+      <div class="deck__item">
+        <div class="deck__num" data-count="300">300</div>
+        <div class="deck__label">Representantes de campo<br>em operação nacional</div>
+      </div>
+      <div class="deck__item">
+        <div class="deck__num" data-count="3">3</div>
+        <div class="deck__label">Sistemas operacionais<br>rodando em paralelo hoje</div>
+      </div>
+      <div class="deck__item">
+        <div class="deck__num" data-count="1">1</div>
+        <div class="deck__label">Plataforma recomendada<br>pela diretoria do grupo</div>
+      </div>
+    </div>
+
+    <div class="hero__scroll">
+      <span class="hero__scroll-line"></span>
+      Começar a leitura
+    </div>
+
+  </div>
+</header>
+
+<!-- ============================================================
+     § 01 : CONTEXTO OPERACIONAL
+     ============================================================ -->
+<section class="section section--line" data-chapter="§ 01 / Contexto Operacional" id="sec1">
+  <div class="wrap">
+
+    <div class="chapter reveal">
+      <span class="chapter__num">§ 01</span>
+      <span class="chapter__label">Contexto Operacional</span>
+    </div>
+
+    <h2 class="section__title reveal">A operação da <em>Vitamedic</em> em números e em dores.</h2>
+    <p class="section__lead reveal">
+      Antes do comparativo, o retrato da operação atual. O que a Vitamedic tem em campo hoje, quantas pessoas gerencia remotamente, e as cinco dores que o grupo reconheceu como prioritárias para o próximo ciclo.
+    </p>
+
+    <div class="context-grid reveal" data-delay="1">
+      <div class="context-card">
+        <div class="context-card__tag">Campo</div>
+        <div class="context-card__num">300<sup>reps</sup></div>
+        <div class="context-card__desc">Representantes e vendedores externos atuando em redes de farmácia nacionais.</div>
+      </div>
+      <div class="context-card">
+        <div class="context-card__tag">Cobertura</div>
+        <div class="context-card__num">BR</div>
+        <div class="context-card__desc">Operação distribuída em múltiplos estados, exigindo roteirização centralizada.</div>
+      </div>
+      <div class="context-card">
+        <div class="context-card__tag">Stack atual</div>
+        <div class="context-card__num">3<sup>sist</sup></div>
+        <div class="context-card__desc">ERP corporativo, VExpenses para despesas, Foco PDV para execução em ponto de venda.</div>
+      </div>
+      <div class="context-card">
+        <div class="context-card__tag">Dores mapeadas</div>
+        <div class="context-card__num">5</div>
+        <div class="context-card__desc">Frentes que a diretoria identificou como prioritárias na expansão do projeto Contele.</div>
+      </div>
+    </div>
+
+    <div class="dores reveal" data-delay="2">
+      <div class="dores__title">As cinco dores identificadas</div>
+      <ul class="dores__list">
+        <li class="dor">
+          <div class="dor__num">01</div>
+          <div>
+            <div class="dor__title">Roteirização ineficiente em nível nacional</div>
+            <div class="dor__desc">O planejamento de rotas da equipe de vendas externas precisa de otimização para garantir maior produtividade e menor custo operacional em todas as regiões atendidas.</div>
+          </div>
+        </li>
+        <li class="dor">
+          <div class="dor__num">02</div>
+          <div>
+            <div class="dor__title">Gestão de KM rodado e reembolso</div>
+            <div class="dor__desc">Ausência de uma solução única que calcule com precisão a quilometragem rodada pelo representante e automatize o lançamento de reembolsos avulsos.</div>
+          </div>
+        </li>
+        <li class="dor">
+          <div class="dor__num">03</div>
+          <div>
+            <div class="dor__title">Controle das visitas em ponto de venda</div>
+            <div class="dor__desc">A ferramenta de visita em PDV atualmente em uso atende parte do escopo, mas deixa gaps em auditoria, geolocalização e integração com o restante da jornada do representante.</div>
+          </div>
+        </li>
+        <li class="dor">
+          <div class="dor__num">04</div>
+          <div>
+            <div class="dor__title">Importação e integração da base de clientes</div>
+            <div class="dor__desc">Necessidade de importar grandes bases de leads e clientes diretamente para a roteirização, sem depender de exportações manuais entre sistemas.</div>
+          </div>
+        </li>
+        <li class="dor">
+          <div class="dor__num">05</div>
+          <div>
+            <div class="dor__title">Acompanhamento em tempo real</div>
+            <div class="dor__desc">Visibilidade ao vivo da execução das visitas e localização dos vendedores, com check-in e check-out georreferenciados e alertas para a gestão.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     § 02 : CENÁRIO DO GRUPO
+     ============================================================ -->
+<section class="section section--line" data-chapter="§ 02 / Cenário do Grupo" id="sec2">
+  <div class="wrap wrap--narrow">
+
+    <div class="chapter reveal">
+      <span class="chapter__num">§ 02</span>
+      <span class="chapter__label">Cenário do Grupo</span>
+    </div>
+
+    <h2 class="section__title reveal">A implantação já começou <em>dentro do grupo.</em></h2>
+    <p class="section__lead reveal">
+      A decisão de consolidar a operação de campo sob o Contele Teams não é um salto no escuro. É a extensão de uma implantação que já está rodando em outra empresa do mesmo Grupo José Alves.
+    </p>
+
+    <div class="scenario reveal" data-delay="1">
+      <div class="scenario__quote-mark">&ldquo;</div>
+      <div class="scenario__text">
+        A N&amp;L Logística já está <strong>em produção</strong> com o Contele Teams. Roteirização rodando, equipe ativa em campo e os dashboards analíticos em fase final de construção. A expansão para a Vitamedic foi endossada pela diretoria do Grupo José Alves como passo natural.
+      </div>
+      <div class="scenario__foot">
+        <span class="scenario__foot-line"></span>
+        Registro interno : Grupo José Alves
+      </div>
+    </div>
+
+    <div class="scenario-meta reveal" data-delay="2">
+      <div class="sm-card">
+        <div class="sm-card__label">Empresa em produção</div>
+        <div class="sm-card__value">N&amp;L <em>Logística</em></div>
+      </div>
+      <div class="sm-card">
+        <div class="sm-card__label">Status operacional</div>
+        <div class="sm-card__value">Go-live <em>concluído</em></div>
+      </div>
+      <div class="sm-card">
+        <div class="sm-card__label">Contrato da Vitamedic</div>
+        <div class="sm-card__value">Sob o <em>guarda-chuva</em> do grupo</div>
+      </div>
+      <div class="sm-card">
+        <div class="sm-card__label">Aval da diretoria</div>
+        <div class="sm-card__value"><em>Confirmado</em></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     § 03 : TRÊS FERRAMENTAS
+     ============================================================ -->
+<section class="section section--line" data-chapter="§ 03 / As Três Ferramentas" id="sec3">
+  <div class="wrap">
+
+    <div class="chapter reveal">
+      <span class="chapter__num">§ 03</span>
+      <span class="chapter__label">As Três Ferramentas</span>
+    </div>
+
+    <h2 class="section__title reveal">Três especialistas, <em>um só campo.</em></h2>
+    <p class="section__lead reveal">
+      Cada uma das três ferramentas resolve um pedaço do problema. Duas são verticais e cobrem nichos específicos da operação. Uma é horizontal e cobre o fluxo completo do representante em campo. Antes do comparativo, vale entender honestamente o que cada plataforma é.
+    </p>
+
+    <div class="tools-grid reveal" data-delay="1">
+
+      <article class="tool-card">
+        <div class="tool-card__tag">Especialista</div>
+        <h3 class="tool-card__name">VExpenses</h3>
+        <div class="tool-card__category">Despesas corporativas</div>
+        <p class="tool-card__desc">
+          Plataforma focada em reembolso, aprovação de despesas e prestação de contas. Forte em controle financeiro e auditoria fiscal.
+        </p>
+        <ul class="tool-card__list">
+          <li>Gestão de despesas e reembolso</li>
+          <li>Aprovação em fluxo hierárquico</li>
+          <li>Integração com cartões corporativos</li>
+          <li>Compliance financeiro</li>
+        </ul>
+      </article>
+
+      <article class="tool-card">
+        <div class="tool-card__tag">Especialista</div>
+        <h3 class="tool-card__name">Foco PDV</h3>
+        <div class="tool-card__category">Execução em ponto de venda</div>
+        <p class="tool-card__desc">
+          Plataforma focada em execução de trade marketing e auditoria de gôndola. Forte em pesquisas, formulários e registro de visitas em varejo.
+        </p>
+        <ul class="tool-card__list">
+          <li>Visitas em ponto de venda</li>
+          <li>Auditoria de gôndola e pesquisas</li>
+          <li>Formulários e fotos em campo</li>
+          <li>Trade marketing em varejo</li>
+        </ul>
+      </article>
+
+      <article class="tool-card tool-card--contele">
+        <div class="tool-card__tag">
+          <span class="tool-card__badge">Recomendado</span>
+          Plataforma completa
+        </div>
+        <h3 class="tool-card__name">Contele Teams</h3>
+        <div class="tool-card__category">Gestão de equipe externa</div>
+        <p class="tool-card__desc">
+          Plataforma horizontal que cobre a jornada inteira do representante em campo, do planejamento da rota até a reconciliação de despesas, num único sistema.
+        </p>
+        <ul class="tool-card__list">
+          <li>Roteirização otimizada nacional</li>
+          <li>Check-in e check-out georreferenciados</li>
+          <li>KM rodado, reembolso e despesas</li>
+          <li>Visitas, formulários e evidências</li>
+          <li>Dashboards analíticos integrados</li>
+          <li>Hierarquia de gestão completa</li>
+        </ul>
+      </article>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     § 04 : BENCHMARK MATRIX
+     ============================================================ -->
+<section class="section section--line" data-chapter="§ 04 / Benchmark Funcional" id="sec4">
+  <div class="wrap">
+
+    <div class="chapter reveal">
+      <span class="chapter__num">§ 04</span>
+      <span class="chapter__label">Benchmark Funcional</span>
+    </div>
+
+    <h2 class="section__title reveal">Onze critérios, <em>três plataformas</em>, uma leitura honesta.</h2>
+    <p class="section__lead reveal">
+      Cada critério a seguir foi ancorado em uma das dores mapeadas na operação Vitamedic. A pontuação é funcional e prática: atende, atende parcialmente, ou não atende. As notas vêm acompanhadas da justificativa técnica correspondente.
+    </p>
+
+    <div class="matrix-wrap reveal" data-delay="1">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>
+              <span class="matrix__head-label">Critério</span>
+              <span class="matrix__head-name">Funcionalidade avaliada</span>
+            </th>
+            <th>
+              <span class="matrix__head-label">Atual</span>
+              <span class="matrix__head-name">VExpenses</span>
+            </th>
+            <th>
+              <span class="matrix__head-label">Atual</span>
+              <span class="matrix__head-name">Foco PDV</span>
+            </th>
+            <th class="matrix__head-contele">
+              <span class="matrix__head-label">Proposto</span>
+              <span class="matrix__head-name">Contele</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>
+              <div class="criterion">Roteirização nacional otimizada</div>
+              <div class="criterion__note">Planejamento de rotas em escala nacional com algoritmo de otimização e replanejamento.</div>
+            </td>
+            <td><span class="ind ind--no">&times;</span><div class="matrix__detail">Fora do escopo</div></td>
+            <td><span class="ind ind--partial">~</span><div class="matrix__detail">Roteiro simples de visita</div></td>
+            <td class="col-contele"><span class="ind ind--contele">&#10003;</span><div class="matrix__detail">Motor dedicado</div></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="criterion">KM rodado automático por GPS</div>
+              <div class="criterion__note">Cálculo preciso da quilometragem rodada em campo, sem depender de odômetro manual.</div>
+            </td>
+            <td><span class="ind ind--partial">~</span><div class="matrix__detail">Lançamento manual</div></td>
+            <td><span class="ind ind--no">&times;</span><div class="matrix__detail">Fora do escopo</div></td>
+            <td class="col-contele"><span class="ind ind--contele">&#10003;</span><div class="matrix__detail">Automático via GPS</div></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="criterion">Reembolso e despesas avulsas</div>
+              <div class="criterion__note">Lançamento, aprovação e auditoria de despesas do representante em campo.</div>
+            </td>
+            <td><span class="ind ind--yes">&#10003;</span><div class="matrix__detail">Especialidade</div></td>
+            <td><span class="ind ind--no">&times;</span><div class="matrix__detail">Fora do escopo</div></td>
+            <td class="col-contele"><span class="ind ind--contele">&#10003;</span><div class="matrix__detail">Módulo nativo</div></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="criterion">Check-in e check-out georreferenciado</div>
+              <div class="criterion__note">Registro preciso da entrada e saída do representante em cada visita, com coordenadas.</div>
+            </td>
+            <td><span class="ind ind--no">&times;</span><div class="matrix__detail">Fora do escopo</div></td>
+            <td><span class="ind ind--yes">&#10003;</span><div class="matrix__detail">Visita em PDV</div></td>
+            <td class="col-contele"><span class="ind ind--contele">&#10003;</span><div class="matrix__detail">Nativo, com cerca</div></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="criterion">Gestão de visitas em ponto de venda</div>
+              <div class="criterion__note">Execução de visitas, formulários, fotos e evidências diretamente no aplicativo de campo.</div>
+            </td>
+            <td><span class="ind ind--no">&times;</span><div class="matrix__detail">Fora do escopo</div></td>
+            <td><span class="ind ind--yes">&#10003;</span><div class="matrix__detail">Especialidade</div></td>
+            <td class="col-contele"><span class="ind ind--contele">&#10003;</span><div class="matrix__detail">Cobertura completa</div></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="criterion">Importação de grandes bases de clientes</div>
+              <div class="criterion__note">Capacidade de importar e integrar bases volumosas de leads e clientes para roteirização.</div>
+            </td>
+            <td><span class="ind ind--no">&times;</span><div class="matrix__detail">Fora do escopo</div></td>
+            <td><span class="ind ind--partial">~</span><div class="matrix__detail">Carga limitada</div></td>
+            <td class="col-contele"><span class="ind ind--contele">&#10003;</span><div class="matrix__detail">API e CSV nativos</div></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="criterion">Acompanhamento em tempo real</div>
+              <div class="criterion__note">Visualização ao vivo da posição dos representantes e do status das visitas em execução.</div>
+            </td>
+            <td><span class="ind ind--no">&times;</span><div class="matrix__detail">Fora do escopo</div></td>
+            <td><span class="ind ind--partial">~</span><div class="matrix__detail">Refresh atrasado</div></td>
+            <td class="col-contele"><span class="ind ind--contele">&#10003;</span><div class="matrix__detail">Mapa ao vivo</div></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="criterion">Dashboards e BI integrados</div>
+              <div class="criterion__note">Relatórios analíticos sobre produtividade, cobertura de rota, custo e conformidade.</div>
+            </td>
+            <td><span class="ind ind--partial">~</span><div class="matrix__detail">Foco em despesa</div></td>
+            <td><span class="ind ind--partial">~</span><div class="matrix__detail">Foco em execução</div></td>
+            <td class="col-contele"><span class="ind ind--contele">&#10003;</span><div class="matrix__detail">Visão 360</div></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="criterion">Hierarquia de gestão (supervisor e coordenação)</div>
+              <div class="criterion__note">Estrutura de papéis para coordenadores, supervisores regionais e representantes de campo.</div>
+            </td>
+            <td><span class="ind ind--partial">~</span><div class="matrix__detail">Só aprovação</div></td>
+            <td><span class="ind ind--partial">~</span><div class="matrix__detail">Gestão básica</div></td>
+            <td class="col-contele"><span class="ind ind--contele">&#10003;</span><div class="matrix__detail">Níveis completos</div></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="criterion">Aplicativo mobile offline</div>
+              <div class="criterion__note">Capacidade de operar em campo mesmo sem sinal, com sincronização automática ao reconectar.</div>
+            </td>
+            <td><span class="ind ind--partial">~</span><div class="matrix__detail">Cache parcial</div></td>
+            <td><span class="ind ind--yes">&#10003;</span><div class="matrix__detail">Robusto em PDV</div></td>
+            <td class="col-contele"><span class="ind ind--contele">&#10003;</span><div class="matrix__detail">Offline completo</div></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="criterion">Trilha de auditoria e compliance</div>
+              <div class="criterion__note">Registro completo de ações, horários e evidências, para fins fiscais e de auditoria interna.</div>
+            </td>
+            <td><span class="ind ind--yes">&#10003;</span><div class="matrix__detail">Auditoria financeira</div></td>
+            <td><span class="ind ind--yes">&#10003;</span><div class="matrix__detail">Auditoria de PDV</div></td>
+            <td class="col-contele"><span class="ind ind--contele">&#10003;</span><div class="matrix__detail">Auditoria 360</div></td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <div style="padding: 0 24px;">
+        <div class="matrix-legend">
+          <div class="matrix-legend__item">
+            <span class="matrix-legend__ind matrix-legend__ind--yes"></span>
+            Atende
+          </div>
+          <div class="matrix-legend__item">
+            <span class="matrix-legend__ind matrix-legend__ind--partial"></span>
+            Atende parcial
+          </div>
+          <div class="matrix-legend__item">
+            <span class="matrix-legend__ind matrix-legend__ind--no"></span>
+            Fora do escopo
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     § 05 : CONSOLIDAÇÃO
+     ============================================================ -->
+<section class="section section--line" data-chapter="§ 05 / Consolidação" id="sec5">
+  <div class="wrap">
+
+    <div class="chapter reveal">
+      <span class="chapter__num">§ 05</span>
+      <span class="chapter__label">Consolidação</span>
+    </div>
+
+    <div class="consol">
+      <div class="consol__text reveal">
+        <h3>Três sistemas viram <em>uma plataforma só.</em></h3>
+        <p>A operação Vitamedic hoje paga pelo menos duas licenças de software que cobrem pedaços distintos da jornada do representante em campo. VExpenses resolve a frente financeira, Foco PDV resolve a execução em ponto de venda, e o ERP corporativo continua cuidando do fluxo de back office.</p>
+        <p>Nenhuma das duas ferramentas verticais foi construída para orquestrar a jornada completa: planejar a rota, registrar o deslocamento, executar a visita, capturar a despesa e consolidar o dado no dashboard. O Contele Teams é a camada horizontal que conecta essas pontas em um só fluxo, preservando a integração com o ERP corporativo existente.</p>
+      </div>
+
+      <div class="consol__diagram reveal" data-delay="1">
+        <div class="consol__stage">
+          <div class="consol__box">
+            <div class="consol__box-name">VExpenses</div>
+            <div class="consol__box-tag">Despesas</div>
+          </div>
+          <div class="consol__box">
+            <div class="consol__box-name">Foco PDV</div>
+            <div class="consol__box-tag">Visitas</div>
+          </div>
+          <div class="consol__box">
+            <div class="consol__box-name">Planilhas</div>
+            <div class="consol__box-tag">KM / Rotas</div>
+          </div>
+        </div>
+        <div class="consol__arrow">Consolida em</div>
+        <div class="consol__result">
+          <div class="consol__result-name">Contele Teams</div>
+          <div class="consol__result-tag">Plataforma única de campo</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     § 06 : IMPACTO ESTIMADO
+     ============================================================ -->
+<section class="section section--line" data-chapter="§ 06 / Impacto Estimado" id="sec6">
+  <div class="wrap">
+
+    <div class="chapter reveal">
+      <span class="chapter__num">§ 06</span>
+      <span class="chapter__label">Impacto Estimado</span>
+    </div>
+
+    <h2 class="section__title reveal">O que a consolidação <em>destrava.</em></h2>
+    <p class="section__lead reveal">
+      Estimativas conservadoras baseadas em operações comparáveis e no cenário atual da Vitamedic. Os números finais serão ajustados com base nos dados reais da N&amp;L Logística assim que o time de CS liberar a régua analítica consolidada.
+    </p>
+
+    <div class="impact-grid reveal" data-delay="1">
+
+      <div class="impact-card">
+        <div class="impact-card__corner">01</div>
+        <div class="impact-card__label">Stack</div>
+        <div class="impact-card__value">2<em>→1</em></div>
+        <div class="impact-card__desc">Duas licenças de software verticais convergem em uma única plataforma, reduzindo o custo recorrente da operação.</div>
+      </div>
+
+      <div class="impact-card">
+        <div class="impact-card__corner">02</div>
+        <div class="impact-card__label">Retrabalho</div>
+        <div class="impact-card__value">Gestão <em>centralizada</em></div>
+        <div class="impact-card__desc">Fim da reconciliação manual entre VExpenses e Foco PDV. Coordenadores deixam de cruzar planilhas para fechar o mês.</div>
+      </div>
+
+      <div class="impact-card">
+        <div class="impact-card__corner">03</div>
+        <div class="impact-card__label">Roteirização</div>
+        <div class="impact-card__value">Ganho <em>direto</em></div>
+        <div class="impact-card__desc">Roteirização otimizada substitui planejamento manual de visitas, gerando ganho mensurável em produtividade por representante.</div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     § 07 : CAMINHO DE IMPLANTAÇÃO
+     ============================================================ -->
+<section class="section section--line" data-chapter="§ 07 / Caminho de Implantação" id="sec7">
+  <div class="wrap">
+
+    <div class="chapter reveal">
+      <span class="chapter__num">§ 07</span>
+      <span class="chapter__label">Caminho de Implantação</span>
+    </div>
+
+    <h2 class="section__title reveal">Quatro semanas para <em>virar o jogo.</em></h2>
+    <p class="section__lead reveal">
+      A expansão do Contele Teams para a Vitamedic não começa do zero. A régua de implantação já foi validada internamente na N&amp;L Logística e pode ser replicada com ajustes pontuais ao perfil da operação farmacêutica.
+    </p>
+
+    <div class="timeline reveal" data-delay="1">
+
+      <div class="t-step">
+        <div class="t-step__week">Semana<strong>01</strong></div>
+        <div>
+          <div class="t-step__title">Setup e integração</div>
+          <div class="t-step__desc">Ativação do ambiente, integração inicial com o ERP corporativo, importação da base de clientes e configuração da estrutura hierárquica de coordenação e supervisão.</div>
+        </div>
+      </div>
+
+      <div class="t-step">
+        <div class="t-step__week">Semana<strong>02</strong></div>
+        <div>
+          <div class="t-step__title">Treinamento do time de gestão</div>
+          <div class="t-step__desc">Capacitação dos coordenadores e supervisores regionais no painel de acompanhamento, relatórios, regras de roteirização e fluxo de aprovação de despesas.</div>
+        </div>
+      </div>
+
+      <div class="t-step">
+        <div class="t-step__week">Semana<strong>03</strong></div>
+        <div>
+          <div class="t-step__title">Piloto com subgrupo de representantes</div>
+          <div class="t-step__desc">Rodagem controlada com um subgrupo de campo, validação da roteirização, ajustes finos no app mobile e confirmação da captura correta de KM e visitas.</div>
+        </div>
+      </div>
+
+      <div class="t-step">
+        <div class="t-step__week">Semana<strong>04</strong></div>
+        <div>
+          <div class="t-step__title">Rollout nacional</div>
+          <div class="t-step__desc">Expansão para os 300 representantes, acompanhamento diário nas primeiras duas semanas de operação e transição formal do Foco PDV e do VExpenses para a nova plataforma.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="contract-callout reveal" data-delay="2">
+      <div class="contract-callout__icon">&#10003;</div>
+      <div class="contract-callout__text">
+        <div class="contract-callout__title">Sem contrato novo</div>
+        <div class="contract-callout__desc">A Vitamedic entra automaticamente sob o guarda-chuva contratual já assinado pelo Grupo José Alves, eliminando qualquer fricção jurídica ou comercial.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     § 08 : OBJEÇÕES
+     ============================================================ -->
+<section class="section section--line" data-chapter="§ 08 / Perguntas Previstas" id="sec8">
+  <div class="wrap wrap--narrow">
+
+    <div class="chapter reveal">
+      <span class="chapter__num">§ 08</span>
+      <span class="chapter__label">Perguntas Previstas</span>
+    </div>
+
+    <h2 class="section__title reveal">As dúvidas que <em>normalmente aparecem.</em></h2>
+    <p class="section__lead reveal">
+      Os pontos que coordenadores e gestores costumam levantar quando a decisão de trocar de plataforma chega ao time de operação. As respostas estão aqui, antes de virarem objeção.
+    </p>
+
+    <div class="faq reveal" data-delay="1">
+
+      <details class="faq__item">
+        <summary class="faq__q">
+          E a curva de aprendizado da equipe de campo?
+          <span class="faq__q-mark">+</span>
+        </summary>
+        <div class="faq__a">
+          O aplicativo foi desenhado para representantes e vendedores externos, não para analistas. O time de onboarding da Contele conduz o treinamento inicial presencial ou remoto, disponibiliza materiais gravados e acompanha os primeiros ciclos de uso até o time entrar no ritmo. A N&amp;L passou por esse processo e já opera de forma autônoma.
+        </div>
+      </details>
+
+      <details class="faq__item">
+        <summary class="faq__q">
+          O que acontece com o histórico do VExpenses e do Foco PDV?
+          <span class="faq__q-mark">+</span>
+        </summary>
+        <div class="faq__a">
+          O histórico permanece acessível nos sistemas atuais durante a transição, e o time técnico da Contele prepara um plano de extração e arquivamento dos dados relevantes. O objetivo é chegar no rollout com o novo fluxo limpo, sem interromper o acesso a registros passados.
+        </div>
+      </details>
+
+      <details class="faq__item">
+        <summary class="faq__q">
+          Como fica a integração com o ERP corporativo?
+          <span class="faq__q-mark">+</span>
+        </summary>
+        <div class="faq__a">
+          O ERP corporativo continua sendo o sistema de registro do back office. O Contele Teams se integra via API para sincronizar base de clientes, despesas aprovadas, visitas concluídas e informações operacionais, funcionando como camada de campo alimentada e alimentando o ERP.
+        </div>
+      </details>
+
+      <details class="faq__item">
+        <summary class="faq__q">
+          E se o time operacional resistir à mudança?
+          <span class="faq__q-mark">+</span>
+        </summary>
+        <div class="faq__a">
+          A resistência à troca de ferramenta é natural em qualquer operação consolidada. A abordagem é pragmática: o piloto controlado na semana 3 dá visibilidade precoce do que funciona e do que precisa ser ajustado, e a equipe de coordenação participa da validação antes do rollout nacional. A experiência recente da N&amp;L mostra que a adoção estabiliza nas primeiras duas semanas após o go-live.
+        </div>
+      </details>
+
+      <details class="faq__item">
+        <summary class="faq__q">
+          A Vitamedic precisa assinar um novo contrato?
+          <span class="faq__q-mark">+</span>
+        </summary>
+        <div class="faq__a">
+          Não. O contrato do Grupo José Alves com a Contele já está assinado e prevê a extensão para as demais empresas do grupo. A Vitamedic entra sob a mesma estrutura contratual da N&amp;L Logística, sem necessidade de nova aprovação jurídica ou comercial.
+        </div>
+      </details>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     § 09 : CTA
+     ============================================================ -->
+<section class="cta" data-chapter="§ 09 / Próximos Passos" id="sec9">
+  <div class="wrap">
+    <div class="cta__kicker reveal">§ 09 / Próximos Passos</div>
+    <h2 class="cta__title reveal" data-delay="1">O próximo <em>passo</em> é técnico, não contratual.</h2>
+    <p class="cta__desc reveal" data-delay="2">
+      Com o aval da diretoria e o contrato do grupo já assinado, o que resta é cronograma. O time de Customer Success do Contele Teams está pronto para iniciar o setup e dar continuidade ao que já começou na N&amp;L Logística.
+    </p>
+    <div class="cta__actions reveal" data-delay="3">
+      <a class="btn btn--primary" href="#sec1">
+        Releia do início
+        <span class="btn__arrow">↑</span>
+      </a>
+      <a class="btn btn--ghost" href="https://conteleteams.com.br" target="_blank" rel="noopener">
+        Contele Teams
+        <span class="btn__arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer">
+  <div class="wrap footer__inner">
+    <div class="footer__meta">
+      <span>Benchmark / Vitamedic</span>
+      <span>Documento interno</span>
+      <span>Contele Teams</span>
+    </div>
+    <div class="footer__meta">
+      <span>1500 empresas</span>
+      <span>conteleteams.com.br</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script>
+// Reading progress bar
+(function () {
+  var bar = document.getElementById('progress');
+  function onScroll() {
+    var h = document.documentElement;
+    var b = document.body;
+    var st = 'scrollTop';
+    var sh = 'scrollHeight';
+    var progress = (h[st] || b[st]) / ((h[sh] || b[sh]) - h.clientHeight) * 100;
+    bar.style.width = Math.min(100, Math.max(0, progress)) + '%';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+
+// Scroll reveal
+(function () {
+  if (!('IntersectionObserver' in window)) {
+    document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -80px 0px' });
+  document.querySelectorAll('.reveal').forEach(function (el) { io.observe(el); });
+})();
+
+// Nav chapter indicator
+(function () {
+  var label = document.getElementById('navChapter');
+  var sections = document.querySelectorAll('[data-chapter]');
+  if (!label || !sections.length) return;
+  var current = '';
+  function onScroll() {
+    var pos = window.scrollY + 120;
+    var found = '';
+    sections.forEach(function (s) {
+      if (s.offsetTop <= pos) {
+        found = s.getAttribute('data-chapter') || '';
+      }
+    });
+    if (found && found !== current) {
+      current = found;
+      label.textContent = found;
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+
+// Counter animation for hero deck (only the numeric "300" and "3" and "1")
+(function () {
+  var nums = document.querySelectorAll('.deck__num[data-count]');
+  var started = false;
+  function animate() {
+    if (started) return;
+    started = true;
+    nums.forEach(function (el) {
+      var target = parseInt(el.getAttribute('data-count'), 10);
+      var duration = 1400;
+      var start = performance.now();
+      function tick(now) {
+        var t = Math.min(1, (now - start) / duration);
+        var eased = 1 - Math.pow(1 - t, 3);
+        var val = Math.round(target * eased);
+        el.textContent = val;
+        if (t < 1) requestAnimationFrame(tick);
+        else el.textContent = target;
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+  setTimeout(animate, 600);
+})();
+</script>
+
+</body>
+</html>
