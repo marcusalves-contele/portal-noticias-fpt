@@ -555,8 +555,11 @@ body::before {
 .scenario-meta {
   margin-top: 48px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (min-width: 760px) {
+  .scenario-meta { grid-template-columns: repeat(4, 1fr); gap: 20px; }
 }
 .sm-card {
   padding: 24px;
@@ -817,12 +820,12 @@ body::before {
 
 .matrix__detail {
   font-family: var(--f-mono);
-  font-size: 0.62rem;
-  color: var(--ink-4);
-  margin-top: 6px;
-  letter-spacing: 0.04em;
-  max-width: 14ch;
-  line-height: 1.4;
+  font-size: 0.78rem;
+  color: var(--ink-2);
+  margin-top: 8px;
+  letter-spacing: 0.02em;
+  max-width: 16ch;
+  line-height: 1.45;
   margin-left: auto;
   margin-right: auto;
 }
@@ -1319,7 +1322,102 @@ body::before {
   }
   .chapter { flex-wrap: wrap; gap: 10px; }
   .t-step { grid-template-columns: 1fr; gap: 14px; padding: 28px 0; }
-  .matrix td, .matrix thead th { padding: 18px 14px; }
+}
+
+/* === Matrix : stacked cards on mobile (CSS-only transform) === */
+@media (max-width: 780px) {
+  .matrix-wrap {
+    overflow: visible;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+  }
+  .matrix {
+    display: block;
+    min-width: 0;
+  }
+  .matrix thead { display: none; }
+  .matrix tbody { display: block; }
+  .matrix tbody tr {
+    display: block;
+    background: var(--bg-elev);
+    border: 1px solid var(--line-2);
+    border-radius: 6px;
+    margin-bottom: 14px;
+    padding: 22px 22px 8px;
+  }
+  .matrix tbody tr:hover { background: var(--bg-elev); }
+  .matrix tbody td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-left: none;
+    text-align: left;
+  }
+  .matrix tbody td:first-child {
+    display: block;
+    padding: 0 0 16px;
+    border-bottom: 1px solid var(--line-2);
+    margin-bottom: 6px;
+  }
+  .matrix tbody td:not(:first-child) {
+    border-top: 1px solid var(--line-1);
+  }
+  .matrix tbody td:nth-child(2)::before {
+    content: 'VExpenses';
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    flex: 1;
+  }
+  .matrix tbody td:nth-child(3)::before {
+    content: 'Foco PDV';
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    flex: 1;
+  }
+  .matrix tbody td:nth-child(4)::before {
+    content: 'Contele';
+    font-family: var(--f-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: var(--cyan);
+    text-transform: uppercase;
+    flex: 1;
+  }
+  .matrix tbody td:nth-child(4) {
+    background: linear-gradient(180deg, rgba(74, 88, 255, 0.06), rgba(74, 88, 255, 0.02));
+    margin: 4px -22px 0;
+    padding: 14px 22px;
+    border-radius: 0 0 4px 4px;
+  }
+  .matrix .col-contele {
+    background: linear-gradient(180deg, rgba(74, 88, 255, 0.06), rgba(74, 88, 255, 0.02));
+  }
+  .matrix__detail {
+    margin: 0;
+    text-align: right;
+    max-width: none;
+    flex-shrink: 0;
+    font-size: 0.7rem;
+  }
+  .matrix .ind {
+    flex-shrink: 0;
+  }
+  .matrix tbody td:not(:first-child) > .ind + .matrix__detail {
+    margin-left: 10px;
+  }
+  /* hide the duplicated detail (mobile shows only ind, not the small text) */
+  .matrix tbody td:not(:first-child) .matrix__detail { display: none; }
+  .criterion { font-size: 1.08rem; }
+  .criterion__note { font-size: 0.82rem; max-width: none; }
 }
 </style>
 </head>
