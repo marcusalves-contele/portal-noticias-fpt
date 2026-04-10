@@ -60,17 +60,18 @@ const Benefits = () => {
           {/* Texto 22 anos com ícone */}
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-blue-300 flex-shrink-0" />
-            <span className="text-xs md:text-sm text-blue-200">22 anos no mercado</span>
+            <span className="text-xs md:text-sm text-blue-200">23 anos no mercado</span>
           </div>
 
           {/* Logos dos parceiros - inline e pequenos */}
           <div className="flex items-center gap-2">
             <span className="text-xs text-blue-300/70 hidden md:inline">|</span>
-            <img
-              src="https://contele.com.br/wp-content/uploads/2024/08/parceiros-contele-rastreador.png"
-              alt="Anatel, Amazon, Google Maps, Google Cloud"
-              className="h-5 md:h-6 w-auto object-contain brightness-0 invert opacity-90"
-            />
+            <div className="flex items-center gap-3">
+              <img src="https://contele.com.br/img/parceiros/anatel.svg" alt="Anatel" className="h-4 md:h-5 w-auto brightness-0 invert opacity-80" />
+              <img src="https://contele.com.br/img/parceiros/aws.png" alt="Amazon" className="h-4 md:h-5 w-auto brightness-0 invert opacity-80" />
+              <img src="https://contele.com.br/img/parceiros/google-maps.svg" alt="Google Maps" className="h-4 md:h-5 w-auto brightness-0 invert opacity-80" />
+              <img src="https://contele.com.br/img/parceiros/google-cloud.svg" alt="Google Cloud" className="h-4 md:h-5 w-auto brightness-0 invert opacity-80" />
+            </div>
           </div>
         </div>
       </div>
