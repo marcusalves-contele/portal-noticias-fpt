@@ -169,9 +169,9 @@
 
   <div class="hero-thanks">
     <div class="check-circle">&#10003;</div>
-    <h1>Parabéns! Sua demonstração foi solicitada.</h1>
-    <p class="subtitle">Confira seu WhatsApp agora: nosso consultor já entrou em contato com você no número que informou.</p>
-    <div class="phone-highlight">Fique de olho no WhatsApp!</div>
+    <h1 id="thanks-title">Parabéns! Sua demonstração foi solicitada.</h1>
+    <p class="subtitle" id="thanks-subtitle">Confira seu WhatsApp agora: nosso consultor já entrou em contato com você no número que informou.</p>
+    <div class="phone-highlight" id="thanks-highlight">Fique de olho no WhatsApp!</div>
   </div>
 
   <div class="video-section">
@@ -229,6 +229,40 @@
     el.innerHTML = '<iframe src="https://www.youtube.com/embed/a08boFTB1n4?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"></iframe>';
     el.style.cursor = 'default';
   }
+
+  // Customize content based on CTA source
+  (function() {
+    var cta = new URLSearchParams(window.location.search).get('cta') || 'testar';
+    var el = {
+      title: document.getElementById('thanks-title'),
+      sub: document.getElementById('thanks-subtitle'),
+      hl: document.getElementById('thanks-highlight')
+    };
+    if (!el.title) return;
+
+    var copy = {
+      testar: {
+        title: 'Seu teste grátis foi ativado!',
+        sub: 'Você já pode acessar o Contele Teams. Confira seu WhatsApp: nosso consultor vai te ajudar a configurar tudo.',
+        hl: 'Acesse agora: app.contelege.com.br'
+      },
+      especialista: {
+        title: 'Recebemos seu pedido!',
+        sub: 'Nosso especialista Daniel vai entrar em contato pelo WhatsApp para agendar sua sessão personalizada.',
+        hl: 'Fique de olho no WhatsApp!'
+      },
+      contratar: {
+        title: 'Estamos preparando sua conta!',
+        sub: 'Nosso time vai entrar em contato pelo WhatsApp para finalizar sua contratação com Risco Zero.',
+        hl: '30 dias para cancelar sem custo'
+      }
+    };
+
+    var c = copy[cta] || copy.testar;
+    el.title.textContent = c.title;
+    el.sub.textContent = c.sub;
+    el.hl.textContent = c.hl;
+  })();
   </script>
 </body>
 </html>

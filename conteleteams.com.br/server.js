@@ -295,7 +295,8 @@ app.post('/api/lead', async (req, res) => {
   const body = req.body;
   let tamanho = parseInt(body.tamanho_equipe, 10) || 0;
 
-  console.log(`[LEAD] ${body.nome} | ${body.empresa} | ${tamanho} lic | gclid=${body.gclid ? 'yes' : 'no'}`);
+  const ctaSource = body.cta_source || 'testar';
+  console.log(`[LEAD] ${body.nome} | ${body.empresa} | ${tamanho} lic | cta=${ctaSource} | gclid=${body.gclid ? 'yes' : 'no'}`);
 
   // Quick response to frontend (don't block)
   res.json({ ok: true });
@@ -312,7 +313,8 @@ app.post('/api/lead', async (req, res) => {
       'Landing Page': body.landing_page || '', 'status': '3-temp-can-delete-teste',
       'GCLID': body.gclid || '', 'GA4 Client ID': body.ga4_client_id || '',
       'utm_source': body.utm_source || '', 'utm_medium': body.utm_medium || '',
-      'utm_term': body.utm_term || '', 'utm_content': body.utm_content || ''
+      'utm_term': body.utm_term || '', 'utm_content': body.utm_content || '',
+      'CTA': ctaSource
     };
     await appendSheet(sheetData);
     console.log(`[LEAD] TEST FILTERED: ${body.nome} -> sheet only`);
@@ -334,7 +336,8 @@ app.post('/api/lead', async (req, res) => {
     'utm_source': body.utm_source || '',
     'utm_medium': body.utm_medium || '',
     'utm_term': body.utm_term || '',
-    'utm_content': body.utm_content || ''
+    'utm_content': body.utm_content || '',
+    'CTA': ctaSource
   };
 
   // ===== LEAD INADEQUADO (< MIN_TEAM_SIZE) =====
@@ -378,9 +381,10 @@ app.post('/api/lead', async (req, res) => {
     visible_to: 3,
     status: 'open'
   };
+  const ctaLabel = { testar: 'Teste Grátis', especialista: 'Falar com Especialista', contratar: 'Contratar Agora' }[ctaSource] || ctaSource;
   dealBody[PD_FIELDS.info] = smallTeamAccepted
-    ? `[PACOTE MINIMO] Lead tinha ${body.tamanho_equipe_original || '?'} lic, aceitou pacote de ${MIN_TEAM_SIZE}. ${body.info || ''}`
-    : (body.info || '');
+    ? `[PACOTE MINIMO] Lead tinha ${body.tamanho_equipe_original || '?'} lic, aceitou pacote de ${MIN_TEAM_SIZE}. CTA: ${ctaLabel}. ${body.info || ''}`
+    : `CTA: ${ctaLabel}. ${body.info || ''}`;
   dealBody[PD_FIELDS.utm] = utmString;
   dealBody[PD_FIELDS.licencas] = tamanho;
   dealBody[PD_FIELDS.origem] = body.landing_page || '';
@@ -410,6 +414,7 @@ app.post('/api/lead', async (req, res) => {
     `${body.email}`,
     ``,
     `Vendedor: ${vendor.nome}`,
+    `CTA: ${ctaLabel}`,
     `Campanha: ${body.campanha || 'organico'}`,
     body.utm_source ? `Origem: ${body.utm_source}/${body.utm_medium || ''}` : '',
     body.gclid ? `GCLID: sim (Google Ads)` : 'GCLID: nao (organico)',
@@ -457,7 +462,8 @@ app.post('/api/lead', async (req, res) => {
         empresa: body.empresa,
         idUsuarioPipedrive: vendor.id,
         vendedor: vendor.nome,
-        info: body.info || ''
+        info: body.info || '',
+        cta_source: ctaSource
       })
     }).catch(err => {
       console.error('SDR webhook error:', err.message);

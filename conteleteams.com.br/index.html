@@ -674,6 +674,13 @@
       line-height: 1.3;
     }
 
+    .mid-cta-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
     #mid-cta .btn-cta-white {
       background: var(--white);
       color: var(--blue-primary);
@@ -683,13 +690,23 @@
       font-weight: 800;
       border-radius: 10px;
       cursor: pointer;
-      border: none;
+      border: 2px solid var(--white);
       transition: background 0.18s, transform 0.12s;
     }
 
     #mid-cta .btn-cta-white:hover {
       background: #f0f3ff;
       transform: translateY(-2px);
+    }
+
+    #mid-cta .btn-cta-outline {
+      background: transparent;
+      color: var(--white);
+      border: 2px solid var(--white);
+    }
+
+    #mid-cta .btn-cta-outline:hover {
+      background: rgba(255,255,255,0.15);
     }
 
     #mid-cta .sub-cta {
@@ -1299,6 +1316,7 @@
   <p class="sidebar-intro"><strong>Funcionalidades completas, app iOS/Android, relatórios, suporte e integração fácil.</strong></p>
 
   <form id="sidebar-form" onsubmit="event.preventDefault(); handleInsideForm(this);" novalidate>
+    <input type="hidden" id="f-cta-source" name="cta_source" value="testar">
     <div class="form-group">
       <label for="f-qtd">Quantas pessoas na sua equipe externa?</label>
       <input type="number" id="f-qtd" name="qtdPessoas" placeholder="Ex: 12" min="1" max="9999" required oninput="validateQtd(this)">
@@ -1354,7 +1372,7 @@
     </a>
     <div class="nav-right">
       <a href="https://app.contelege.com.br/" class="nav-login" target="_blank" rel="noopener">Login</a>
-      <button class="btn btn-primary" onclick="openSidebar()" aria-haspopup="dialog">Solicitar Demonstração</button>
+      <button class="btn btn-primary" onclick="openSidebar('testar')" aria-haspopup="dialog">Teste Grátis</button>
     </div>
   </nav>
 </header>
@@ -1369,8 +1387,8 @@
       <div class="hero-content">
         <h1>Gestão e Controle de Equipes Externas</h1>
         <p>Aumente a produtividade da sua equipe de vendas, promotores e técnicos com uma solução usada por mais de 1.500 empresas em 7 países.</p>
-        <button class="btn btn-hero" onclick="openSidebar()">Solicitar Demonstração Gratuita</button>
-        <p class="hero-subtext">Mínimo de 4 Usuários. Exclusivo para Equipes Externas</p>
+        <button class="btn btn-hero" onclick="openSidebar('testar')">Teste Grátis</button>
+        <p class="hero-subtext">7 dias grátis. Mínimo de 4 Usuários.</p>
       </div>
       <div class="hero-video">
         <div class="yt-facade" onclick="loadYT(this, '-sUJTiDmtwU')" aria-label="Assistir vídeo sobre o Contele Teams" role="button" tabindex="0" onkeydown="if(event.key==='Enter')loadYT(this,'-sUJTiDmtwU')">
@@ -1424,7 +1442,7 @@
           <li>Segmentos de clientes mais visitados</li>
           <li>E muito mais</li>
         </ul>
-        <button class="btn btn-primary" onclick="openSidebar()">Solicitar demonstração</button>
+        <button class="btn btn-primary" onclick="openSidebar('testar')">Teste Grátis</button>
       </div>
       <div>
         <img src="img/dash.webp" alt="Dashboard de Produtividade de Equipes Externas" width="600" height="450" loading="lazy">
@@ -1504,7 +1522,7 @@
         <h2>Controle de Visitas</h2>
         <p>A gestão de equipes externas pode ser otimizada com o uso de Check-in e Check-out via GPS, garantindo o controle preciso das visitas aos clientes. Através do app os colaboradores registram informações da visita de forma ágil e digital, permitindo incluir fotos e assinaturas, eliminando o uso de papéis e aumentando a eficiência no trabalho em campo.</p>
         <p>Além disso, o gestor tem acesso em tempo real à localização da equipe e pode monitorar facilmente as atividades através do Relatório de Visitas. Por meio do Relatório de Locais Não Visitados também identifica clientes inativos, permitindo a roteirização de novas visitas e a exploração de oportunidades, economizando tempo e recursos.</p>
-        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px;">Solicitar demonstração &gt;</button>
+        <button class="btn btn-primary" onclick="openSidebar('testar')" style="margin-top: 16px;">Teste Grátis &gt;</button>
       </div>
       <div class="carousel-wrap">
         <div class="carousel" id="car-visitas" onscroll="updateDots('car-visitas','dots-visitas')">
@@ -1544,7 +1562,7 @@
         <h2>Roteirização das Visitas a Clientes</h2>
         <p>A roteirização eficiente das visitas é fundamental para aumentar a produtividade da sua equipe externa. Com o Contele Teams, você define as melhores rotas entre clientes, enviando essas rotas diretamente para o aplicativo do seu Usuário. Isso permite que sua equipe execute as visitas de forma estratégica, resultando em até 30% mais visitas por dia.</p>
         <p>No aplicativo, o Usuário recebe uma agenda roteirizada, podendo visualizar a rota no Google Maps, Uber ou Waze, o que reduz o tempo no trânsito e aumenta a produtividade. Além disso, a Prospecção em Massa permite agendar várias visitas de uma vez, considerando a proximidade dos clientes, otimizando tempo e recursos.</p>
-        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px;">Solicitar demonstração &gt;</button>
+        <button class="btn btn-primary" onclick="openSidebar('testar')" style="margin-top: 16px;">Teste Grátis &gt;</button>
       </div>
     </div>
   </div>
@@ -1558,7 +1576,7 @@
         <h2>Reembolso de KM Rodado e Avulso</h2>
         <p>O reembolso por KM rodado é calculado automaticamente com base no check-in e check-out das visitas, utilizando a precisão do Google Maps. Essa metodologia garante que o reembolso seja pago apenas por visitas confirmadas via GPS, ajudando nossos clientes a reduzir gastos em até 40%.</p>
         <p>Além disso, o aplicativo permite que a equipe externa registre reembolsos avulsos com fotos e descrições, todos sujeitos à validação do gestor. O relatório consolidado de reembolsos pode ser revisado e encaminhado ao financeiro, facilitando o controle e pagamento das despesas.</p>
-        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px;">Solicitar demonstração &gt;</button>
+        <button class="btn btn-primary" onclick="openSidebar('testar')" style="margin-top: 16px;">Teste Grátis &gt;</button>
       </div>
       <div class="carousel-wrap">
         <div class="carousel" id="car-reem" onscroll="updateDots('car-reem','dots-reem')">
@@ -1596,7 +1614,7 @@
         <h2>Ordem de Serviço Digital</h2>
         <p>A Ordem de Serviço Digital oferece todos os detalhes da visita para você e seu cliente, incluindo logo personalizado, horários de check-in e check-out, fotos, comentários, checklists, assinatura digital e envio automático por e-mail.</p>
         <p>Após a visita, a OS pode ser enviada pelo funcionário via e-mail ou WhatsApp, ou você pode enviá-la pelo computador, verificando e editando as informações conforme necessário. Além disso, você pode configurar preferências, como envio automático e exibição de formulários e comentários, adaptando a OS às suas necessidades.</p>
-        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px;">Solicitar demonstração &gt;</button>
+        <button class="btn btn-primary" onclick="openSidebar('testar')" style="margin-top: 16px;">Teste Grátis &gt;</button>
       </div>
     </div>
   </div>
@@ -1610,7 +1628,7 @@
         <h2>Checklist Digital</h2>
         <p>Monte checklists sob medida para suas visitas, com mais de 30 tipos de questões, desde verificações até avaliações do cliente. Inclua perguntas obrigatórias para garantir a coleta de informações estratégicas e evitar esquecimentos, tornando as visitas mais ágeis e objetivas, com uma redução de até 20% na duração.</p>
         <p>O Contele Teams permite a criação de campos condicionais para tornar o preenchimento mais eficiente, direcionando o colaborador automaticamente para as seções relevantes. Além disso, você pode analisar as respostas completas ou individualmente, com opções de formatação específicas para diversas situações, como CEP, CPF, quantidade, links, e-mails e texto.</p>
-        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px;">Solicitar demonstração &gt;</button>
+        <button class="btn btn-primary" onclick="openSidebar('testar')" style="margin-top: 16px;">Teste Grátis &gt;</button>
       </div>
       <div class="carousel-wrap">
         <div class="carousel" id="car-check" onscroll="updateDots('car-check','dots-check')">
@@ -1656,7 +1674,7 @@
         <h2>Contele Desk: Abertura de Chamados e Helpdesk</h2>
         <p>O Contele Desk centraliza todos os chamados da sua empresa em um único sistema online, permitindo a abertura e atribuição de atendimentos para a equipe técnica de forma rápida e sem papéis. Os clientes podem abrir chamados facilmente por e-mail ou por um site customizado, acessível via celular.</p>
         <p>Com o Contele Desk, é possível classificar as prioridades dos chamados, delegar atendimentos ao funcionário mais próximo e acompanhar o andamento do serviço em tempo real. O sistema também oferece um dashboard completo para avaliar a produtividade, monitorando o tempo de atendimento, controle de prazos e status dos chamados, proporcionando uma visão clara e organizada do desempenho da sua equipe.</p>
-        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px;">Solicitar demonstração &gt;</button>
+        <button class="btn btn-primary" onclick="openSidebar('testar')" style="margin-top: 16px;">Teste Grátis &gt;</button>
       </div>
     </div>
   </div>
@@ -1670,7 +1688,7 @@
         <h2>Monitoramento da Equipe Externa</h2>
         <p>Com o Mapa da Equipe, o gestor pode visualizar e monitorar toda a equipe externa em tempo real, obtendo a localização atual de cada colaborador de forma simples e intuitiva.</p>
         <p>Para uma análise mais detalhada, o Relatório de Monitoramento oferece informações essenciais sobre a rotina dos funcionários, incluindo login e logout no aplicativo, uso de localização fictícia, nível da bateria, e utilização em mais de um aparelho, permitindo um acompanhamento preciso e completo.</p>
-        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px;">Solicitar demonstração &gt;</button>
+        <button class="btn btn-primary" onclick="openSidebar('testar')" style="margin-top: 16px;">Teste Grátis &gt;</button>
       </div>
       <div class="carousel-wrap">
         <div class="carousel" id="car-mon" onscroll="updateDots('car-mon','dots-mon')">
@@ -1706,7 +1724,7 @@
         <h2>Produtos e Estoque das Visitas</h2>
         <p>Cadastre todos os seus produtos no sistema, incluindo quantidade em estoque, valor de venda, data de validade, e muito mais. Cada produto recebe um código de identificação, tornando-o totalmente rastreável.</p>
         <p>Durante as visitas, sua equipe pode registrar a entrega, retirada e troca de materiais, garantindo controle preciso do estoque e facilitando reposições. O Relatório de Produtos detalha todas as informações, como movimentação de materiais, responsáveis pelas transferências, e valores unitários e totais, permitindo um acompanhamento completo e eficiente.</p>
-        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px;">Solicitar demonstração &gt;</button>
+        <button class="btn btn-primary" onclick="openSidebar('testar')" style="margin-top: 16px;">Teste Grátis &gt;</button>
       </div>
     </div>
   </div>
@@ -1719,7 +1737,7 @@
       <div class="feature-text">
         <h2 class="section-title">Dashboard personalizado para chamar de seu!</h2>
         <p>Estamos 100% integrados ao Looker Studio, a ferramenta de BI do Google! Conecte os dados do Contele Teams ao Looker, e crie dashboards de acordo com a necessidade da sua operação. Economize horas e aumente em até 22% sua lucratividade com decisões baseadas em dados.</p>
-        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px;">Solicitar demonstração &gt;</button>
+        <button class="btn btn-primary" onclick="openSidebar('testar')" style="margin-top: 16px;">Teste Grátis &gt;</button>
       </div>
       <div>
         <img src="img/Dashboard-de-Equipes-Externas.webp" alt="Dashboard de Equipes Externas integrado ao Looker Studio" width="600" height="400" loading="lazy">
@@ -1743,7 +1761,7 @@
           <li>+3.000 integrações possíveis</li>
           <li>Time especializado em automação e IA</li>
         </ul>
-        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px;">Fale com nosso time de integrações</button>
+        <button class="btn btn-primary" onclick="openSidebar('especialista')" style="margin-top: 16px;">Fale com nosso time de integrações</button>
       </div>
       <div>
         <img src="img/time-automacao-ia.webp" alt="Time de automação e IA Contele" width="600" height="400" loading="lazy">
@@ -1764,8 +1782,11 @@
 <!-- ===== MID-PAGE CTA ===== -->
 <section id="mid-cta">
   <div class="container">
-    <h2>Solicite uma demonstração agora e veja como o Contele Teams pode transformar seu negócio!</h2>
-    <button class="btn-cta-white" onclick="openSidebar()">Solicitar Demonstração Gratuita</button>
+    <h2>Pronto para transformar a gestão da sua equipe externa?</h2>
+    <div class="mid-cta-buttons">
+      <button class="btn-cta-white" onclick="openSidebar('especialista')">Falar com Especialista</button>
+      <button class="btn-cta-white btn-cta-outline" onclick="openSidebar('contratar')">Contratar Agora</button>
+    </div>
     <p class="sub-cta">Mínimo de 4 Usuários. Exclusivo para Equipes Externas.</p>
   </div>
 </section>
@@ -1841,14 +1862,14 @@
         <h3>De 4 a 40 usuários</h3>
         <img src="img/preco-4-40-usuarios-contele-teams.svg" alt="Plano 4 a 40 usuários Contele Teams" loading="lazy">
         <div style="margin-top: 24px;">
-          <button class="btn btn-primary" onclick="openSidebar()" style="width: 100%; padding: 14px;">Solicitar Demonstração</button>
+          <button class="btn btn-primary" onclick="openSidebar('testar')" style="width: 100%; padding: 14px;">Teste Grátis</button>
         </div>
       </div>
       <div class="plan-card">
         <h3>A partir de 41 usuários</h3>
         <img src="img/preco-mais-de-41-usuarios-contele-teams.svg" alt="Plano 41+ usuários Contele Teams" loading="lazy">
         <div style="margin-top: 24px;">
-          <button class="btn btn-primary" onclick="openSidebar()" style="width: 100%; padding: 14px;">Solicitar Demonstração</button>
+          <button class="btn btn-primary" onclick="openSidebar('testar')" style="width: 100%; padding: 14px;">Teste Grátis</button>
         </div>
       </div>
     </div>
@@ -1873,7 +1894,7 @@
         <span class="currency">R$</span><span class="value">99</span><span class="cents">,90</span>
         <span class="period">por usuário/mês</span>
         <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Desconto por volume a partir de 50 lic.</p>
-        <button class="btn btn-primary" onclick="openSidebar()" style="margin-top: 16px; padding: 10px 24px; font-size: 14px;">Falar com Vendas</button>
+        <button class="btn btn-primary" onclick="openSidebar('especialista')" style="margin-top: 16px; padding: 10px 24px; font-size: 14px;">Falar com Vendas</button>
       </div>
     </div>
   </div>
@@ -1974,7 +1995,7 @@
 
     <div class="testimonials-cta">
       <h3>Garanta uma gestão mais eficiente com o Contele Teams. Peça sua demonstração agora!</h3>
-      <button class="btn btn-hero" onclick="openSidebar()">Solicitar Demonstração Gratuita</button>
+      <button class="btn btn-hero" onclick="openSidebar('testar')">Teste Grátis</button>
       <p style="color: var(--text-muted); font-size: 14px; margin-top: 12px; font-style: italic;">Mínimo de 4 Usuários. Exclusivo para Equipes Externas.</p>
     </div>
   </div>
@@ -2062,7 +2083,37 @@
 <!-- ===== JAVASCRIPT (deferred) ===== -->
 <script defer>
   // ===== SIDEBAR =====
-  function openSidebar() {
+  // ===== CTA CONFIGS =====
+  var CTA_CONFIG = {
+    testar: {
+      title: 'Comece seu teste grátis agora',
+      intro: '<strong>7 dias de acesso completo. Sem cartão, sem compromisso.</strong>',
+      submit: 'COMEÇAR TESTE GRÁTIS'
+    },
+    especialista: {
+      title: 'Fale com nosso especialista',
+      intro: '<strong>Sessão personalizada para sua operação. O Daniel vai te ajudar a configurar tudo na prática.</strong>',
+      submit: 'AGENDAR COM ESPECIALISTA'
+    },
+    contratar: {
+      title: 'Contrate com Risco Zero',
+      intro: '<strong>30 dias para cancelar sem custo. Acesso completo, suporte dedicado, app iOS/Android.</strong>',
+      submit: 'CONTRATAR AGORA'
+    }
+  };
+
+  function openSidebar(ctaType) {
+    var type = ctaType || 'testar';
+    var cfg = CTA_CONFIG[type] || CTA_CONFIG.testar;
+
+    // Update sidebar content based on CTA
+    document.querySelector('#sidebar h2').textContent = cfg.title;
+    document.querySelector('#sidebar .sidebar-intro').innerHTML = cfg.intro;
+    document.querySelector('#sidebar .form-submit').textContent = cfg.submit;
+
+    // Store CTA source for form submission
+    document.getElementById('f-cta-source').value = type;
+
     document.getElementById('sidebar').classList.add('open');
     document.getElementById('sidebar-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -2188,14 +2239,36 @@
     const gclid = getGclid();
     const ga4ClientId = getGA4ClientId();
     const telefoneFormatado = formatPhone(telefone);
+    const ctaSource = form.querySelector('[name="cta_source"]').value || 'testar';
 
     // GTM dataLayer push (ONLY for >= 4 people)
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
       event: 'formSubmission',
       formName: 'Lead Form',
-      formData: { email, nome, empresa, telefone, quantidade: qtd.toString() }
+      formData: { email, nome, empresa, telefone, quantidade: qtd.toString(), cta_source: ctaSource }
     });
+
+    // RD Station conversion (public token, fire-and-forget)
+    fetch('https://api.rd.services/platform/conversions?api_key=aa36284ab8fe7a6454aa43ecd7a22704', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event_type: 'CONVERSION',
+        event_family: 'CDP',
+        payload: {
+          conversion_identifier: 'landing-page-teams-' + ctaSource,
+          email: email,
+          name: nome,
+          mobile_phone: telefoneFormatado,
+          company_name: empresa,
+          cf_cta_clicado: ctaSource,
+          cf_tamanho_equipe: qtd.toString(),
+          tags: ['landing-page-teams', 'cta-' + ctaSource],
+          legal_bases: [{ category: 'communications', type: 'consent', status: 'granted' }]
+        }
+      })
+    }).catch(function() {});
 
     // PRIMARY: POST to our own backend (handles Pipedrive, spreadsheet, SDR, notifications)
     fetch('/api/lead', {
@@ -2215,7 +2288,8 @@
         utm_medium: utmMedium,
         utm_term: utmTerm,
         utm_content: utmContent,
-        source: 'landing-page-v2'
+        source: 'landing-page-v2',
+        cta_source: ctaSource
       })
     });
 
@@ -2240,9 +2314,10 @@
     });
 
     // Redirect to /obrigado after 1.5s (give n8n time to receive)
-    var utmString = window.location.search;
+    var redirectParams = new URLSearchParams(window.location.search);
+    redirectParams.set('cta', ctaSource);
     setTimeout(function() {
-      window.location.href = 'https://conteleteams.com.br/obrigado' + utmString;
+      window.location.href = 'https://conteleteams.com.br/obrigado?' + redirectParams.toString();
     }, 1500);
   }
 
@@ -2492,7 +2567,7 @@
     // CTA: open sidebar and close modal
     ctaBtn.addEventListener('click', function() {
       hideExit();
-      openSidebar();
+      openSidebar('testar');
     });
   })();
 
