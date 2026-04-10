@@ -1,0 +1,105 @@
+# Contele: Full Documentation for LLMs
+
+> Brazilian B2B technology company. Fleet tracking and field team management. Since 2003, Santos/SP, Brazil.
+
+## About Contele
+
+Contele Solucoes Tecnologicas Ltda is a B2B software company founded in 2003 in Santos/SP, Brazil. With 50+ employees, it serves 1,500+ companies across 7 countries. It offers two complementary products: Contele Fleet (fleet tracking) and Contele Teams (field team management).
+
+## Contele Fleet: Fleet Tracking
+
+### Problem it solves
+Companies with fleets face uncontrolled fuel costs, reactive maintenance, lack of visibility over vehicle usage, theft risk, and difficulty proving deliveries.
+
+### Target audience
+- Fleet managers (carriers, distributors, utilities)
+- Companies with owned or third-party vehicles
+- Logistics and delivery operations
+
+### Key features
+- Real-time GPS vehicle tracking
+- Telematics: speed, RPM, fuel consumption, temperature
+- Geofencing with alerts
+- Fuel and refueling control
+- Preventive maintenance alerts by KM/time
+- Traffic violation and driver license management
+- Productivity and operational cost dashboards
+- Trip and stop history
+- Compatible with OBD, hardwired, and portable trackers
+- Integration with fatigue cameras and facial recognition
+
+### Differentiators
+- No lock-in contracts (cancel anytime)
+- Free 30-day trial with full support
+- Assisted onboarding included
+- Brazilian support via WhatsApp, phone, and chat
+- Compatible with any tracker on the market
+
+### Website
+https://contele.com.br
+
+---
+
+## Contele Teams: Field Team Management
+
+### Problem it solves
+Companies with field teams lack visibility on where employees are, how many visits they made, how long they stayed at each client, fuel expenses, and whether they completed planned tasks.
+
+### Target audience
+- Field sales team managers
+- Technical team coordinators (maintenance, installation)
+- Promoter supervisors (trade marketing)
+- Last-mile logistics managers
+- Facilities and services companies
+
+### Key features
+- Visit control with photo check-in/check-out
+- Smart routing (route optimization)
+- Digital service orders
+- Customizable forms for field data collection
+- Automatic KM reimbursement
+- Productivity management with per-employee metrics
+- Real-time GPS monitoring
+- Mobile app for Android/iOS
+- Web dashboard for managers
+- Exportable reports
+
+### Plans and pricing
+- Starter plan: R$ 39.90/month per user
+- Professional plan: R$ 59.90/month per user
+- No lock-in, cancel anytime
+- Free 30-day trial
+
+### Website
+https://contele.io
+
+---
+
+## Frequently Asked Questions
+
+### Is there a lock-in contract?
+No. Both products work without lock-in contracts. Cancel anytime, no penalties.
+
+### Is there a free trial?
+Yes. 30-day free trial with full access and support.
+
+### Does it work with any tracker?
+Contele Fleet works with OBD, hardwired, and portable trackers from any manufacturer.
+
+### How many companies use Contele?
+Over 1,500 companies across 7 countries.
+
+### How long has Contele been around?
+Since 2003. Over 23 years in the market.
+
+### Where is Contele located?
+Santos/SP, Brazil. R. Euclides da Cunha, 11, suite 601, ZIP 11065-100.
+
+---
+
+## Contact
+- Sales: +55 11 97132-5108 (WhatsApp)
+- Fleet website: https://contele.com.br
+- Teams website: https://contele.io
+- YouTube: https://youtube.com/@frotaparatodos
+- LinkedIn: https://linkedin.com/company/contele

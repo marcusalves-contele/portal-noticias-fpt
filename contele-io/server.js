@@ -84,6 +84,12 @@ app.get('/llms.txt', (req, res) => {
   res.type('text').sendFile(path.join(__dirname, 'public', file));
 });
 
+app.get('/llms-full.txt', (req, res) => {
+  const host = req.hostname || '';
+  const file = host.includes('contele.io') ? 'llms-full-en.txt' : 'llms-full.txt';
+  res.type('text').sendFile(path.join(__dirname, 'public', file));
+});
+
 // ---------------------------------------------------------------------------
 // Dynamic robots.txt (per domain)
 // ---------------------------------------------------------------------------

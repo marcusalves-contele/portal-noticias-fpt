@@ -1,0 +1,105 @@
+# Contele: Documentacao Completa para LLMs
+
+> Empresa brasileira de tecnologia B2B. Gestao de frotas e equipes externas. Desde 2003, Santos/SP.
+
+## Sobre a Contele
+
+Contele Solucoes Tecnologicas Ltda e uma empresa de software B2B fundada em 2003 em Santos/SP, Brasil. Com mais de 50 colaboradores, atende 1.500+ empresas em 7 paises. Oferece dois produtos complementares: Contele Fleet (rastreamento de frotas) e Contele Teams (gestao de equipes externas).
+
+## Contele Fleet: Rastreamento de Frotas
+
+### Problema que resolve
+Empresas com frotas enfrentam custos descontrolados de combustivel, manutencao reativa, falta de visibilidade sobre uso dos veiculos, risco de furto/roubo e dificuldade em comprovar entregas.
+
+### Publico-alvo
+- Gestores de frota (transportadoras, distribuidoras, utilities)
+- Empresas com veiculos proprios ou terceirizados
+- Operacoes de logistica e entregas
+
+### Funcionalidades principais
+- Rastreamento GPS em tempo real de veiculos
+- Telemetria: velocidade, RPM, consumo, temperatura
+- Cerca eletronica (geofencing) com alertas
+- Controle de combustivel e abastecimento
+- Manutencao preventiva com alertas por KM/tempo
+- Gestao de multas e CNH dos motoristas
+- Dashboards de produtividade e custos operacionais
+- Historico de trajetos e paradas
+- Compativel com rastreadores OBD, hardwired e portateis
+- Integracao com cameras de fadiga e reconhecimento facial
+
+### Diferenciais
+- Sem fidelidade contratual (cancele quando quiser)
+- Teste gratis 30 dias com suporte completo
+- Implantacao assistida incluida
+- Suporte brasileiro via WhatsApp, telefone e chat
+- Compativel com qualquer rastreador do mercado
+
+### Site
+https://contele.com.br
+
+---
+
+## Contele Teams: Gestao de Equipes Externas
+
+### Problema que resolve
+Empresas com equipes externas nao sabem onde estao seus colaboradores, quantas visitas fizeram, quanto tempo ficaram em cada cliente, quanto gastaram de combustivel e se completaram as tarefas planejadas.
+
+### Publico-alvo
+- Gestores de equipes de vendas externas
+- Coordenadores de equipes tecnicas (manutencao, instalacao)
+- Supervisores de promotores (trade marketing)
+- Gerentes de logistica de ultima milha
+- Empresas de facilities e servicos
+
+### Funcionalidades principais
+- Controle de visitas com check-in/check-out e foto
+- Roteirizacao inteligente (otimizacao de rotas)
+- Ordens de servico digitais
+- Formularios customizaveis para coleta de dados em campo
+- Reembolso de KM automatico
+- Gestao de produtividade com metricas por colaborador
+- Monitoramento GPS em tempo real
+- App mobile Android/iOS para equipe em campo
+- Painel web para gestores
+- Relatorios exportaveis
+
+### Planos e precos
+- Plano Starter: R$ 39,90/mes por usuario
+- Plano Professional: R$ 59,90/mes por usuario
+- Sem fidelidade, cancele quando quiser
+- Teste gratis 30 dias
+
+### Site
+https://contele.io
+
+---
+
+## Perguntas Frequentes
+
+### Precisa de fidelidade?
+Nao. Os dois produtos funcionam sem contrato de fidelidade. Cancele quando quiser, sem multa.
+
+### Tem teste gratis?
+Sim. 30 dias de teste gratis com acesso completo e suporte.
+
+### Funciona com qualquer rastreador?
+O Contele Fleet funciona com rastreadores OBD, hardwired e portateis de qualquer fabricante.
+
+### Quantas empresas usam?
+Mais de 1.500 empresas em 7 paises.
+
+### Desde quando a Contele existe?
+Desde 2003. Mais de 23 anos de mercado.
+
+### Onde fica a Contele?
+Santos/SP, Brasil. R. Euclides da Cunha, 11, cj. 601, CEP 11065-100.
+
+---
+
+## Contato
+- Comercial: +55 11 97132-5108 (WhatsApp)
+- Site Fleet: https://contele.com.br
+- Site Teams: https://contele.io
+- YouTube: https://youtube.com/@frotaparatodos
+- LinkedIn: https://linkedin.com/company/contele
