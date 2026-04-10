@@ -30,20 +30,20 @@
 
   <!-- Preload LCP image + second largest asset -->
   <link rel="preload" as="image" href="img/capa-video-lp-teams.webp" type="image/webp" imagesrcset="img/capa-video-lp-teams-sm.webp 400w, img/capa-video-lp-teams.webp 640w" imagesizes="(max-width: 600px) 400px, 640px">
-  <link rel="preload" as="image" href="img/dash.webp" type="image/webp">
+  <!-- dash.webp: removed preload (below fold, lazy loaded) -->
 
   <!-- Preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://www.googletagmanager.com">
+  <!-- DNS prefetch for third-party scripts loaded later by GTM -->
   <link rel="dns-prefetch" href="https://www.google-analytics.com">
   <link rel="dns-prefetch" href="https://www.googleadservices.com">
-  <link rel="dns-prefetch" href="https://bat.bing.com">
 
   <!-- Fonts: async load to avoid render-blocking -->
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap"></noscript>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800&family=Roboto:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800&family=Roboto:wght@400;500;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@600;700;800&family=Roboto:wght@400;500;700&display=swap"></noscript>
 
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -1016,160 +1016,7 @@
       margin: 0 8px;
     }
 
-    /* ===== SIDEBAR DRAWER ===== */
-    #sidebar-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.50);
-      z-index: 990;
-      backdrop-filter: blur(2px);
-    }
-
-    #sidebar-overlay.open { display: block; }
-
-    #sidebar {
-      position: fixed;
-      top: 0;
-      right: -480px;
-      width: 100%;
-      max-width: 460px;
-      height: 100%;
-      background: var(--white);
-      z-index: 1000;
-      overflow-y: auto;
-      box-shadow: -6px 0 40px rgba(0,0,0,0.18);
-      transition: right 0.32s cubic-bezier(0.4,0,0.2,1);
-      padding: 40px 32px 40px;
-    }
-
-    #sidebar.open { right: 0; }
-
-    #sidebar-close {
-      position: absolute;
-      top: 16px;
-      right: 20px;
-      background: none;
-      border: none;
-      font-size: 28px;
-      cursor: pointer;
-      color: #888;
-      line-height: 1;
-      padding: 4px 8px;
-      border-radius: 4px;
-      transition: color 0.15s, background 0.15s;
-    }
-
-    #sidebar-close:hover { color: #333; background: #f0f0f0; }
-
-    #sidebar h2 {
-      font-family: var(--font-main);
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--blue-heading);
-      margin-bottom: 8px;
-      margin-top: 8px;
-      line-height: 1.25;
-    }
-
-    #sidebar .sidebar-intro {
-      font-size: 14px;
-      font-weight: 600;
-      color: #444;
-      margin-bottom: 24px;
-      line-height: 1.6;
-    }
-
-    .form-group { margin-bottom: 16px; }
-
-    .form-group label {
-      display: block;
-      font-family: var(--font-main);
-      font-size: 13px;
-      font-weight: 700;
-      color: #555;
-      margin-bottom: 6px;
-    }
-
-    .form-group select,
-    .form-group input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid #ddd;
-      border-radius: 8px;
-      font-size: 15px;
-      font-family: var(--font-body);
-      color: var(--text-main);
-      background: var(--white);
-      transition: border-color 0.15s;
-      outline: none;
-    }
-
-    .form-group select:focus,
-    .form-group input:focus {
-      border-color: var(--blue-primary);
-      box-shadow: 0 0 0 3px rgba(66,93,252,0.12);
-    }
-
-    .form-group select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
-
-    .form-submit {
-      width: 100%;
-      background: var(--blue-submit);
-      color: var(--white);
-      border: none;
-      border-radius: 10px;
-      padding: 16px;
-      font-family: var(--font-main);
-      font-size: 17px;
-      font-weight: 800;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: background 0.18s, transform 0.12s;
-      letter-spacing: 0.5px;
-    }
-
-    .form-submit:hover:not(:disabled) {
-      background: #4A58FF;
-      transform: translateY(-1px);
-    }
-
-    .form-submit:disabled { opacity: 0.65; cursor: not-allowed; }
-
-    .form-note {
-      font-size: 12px;
-      color: #999;
-      text-align: center;
-      margin-top: 10px;
-      line-height: 1.5;
-    }
-
-    .form-highlight {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #EEF0FF;
-      border: 1px solid #C5CCFF;
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-top: 12px;
-      font-size: 13px;
-      color: var(--blue-heading);
-      line-height: 1.4;
-    }
-    .form-highlight-icon {
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-
-    .qtd-feedback {
-      font-size: 12px;
-      margin-top: 4px;
-      min-height: 18px;
-      transition: all 0.2s;
-    }
-    .qtd-feedback.ok { color: #16a34a; }
-    .qtd-feedback.warn { color: #dc2626; }
+    /* Sidebar + Form + Exit: moved to deferred-css block below */
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 900px) {
@@ -1213,6 +1060,85 @@
       .carousel img { flex: 0 0 95%; }
     }
 
+    /* Exit intent: moved to deferred-css block below */
+
+    /* ===== UTILITY ===== */
+    .mt-0 { margin-top: 0; }
+    .mt-8 { margin-top: 8px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mt-32 { margin-top: 32px; }
+    .mb-0 { margin-bottom: 0; }
+  </style>
+
+  <!-- Deferred CSS: below-the-fold sections (loaded async to reduce render-blocking) -->
+  <style media="print" onload="this.media='all'" id="deferred-css">
+    /* Non-critical CSS: sidebar, form, exit modal, content-visibility hints */
+
+    /* Smooth transitions for interactive elements below fold */
+    .yt-thumb { content-visibility: auto; contain-intrinsic-size: auto 270px; }
+    .carousel img { content-visibility: auto; contain-intrinsic-size: auto 600px; }
+    .benefit-card { content-visibility: auto; contain-intrinsic-size: auto 180px; }
+    .plan-card { content-visibility: auto; contain-intrinsic-size: auto 400px; min-width: 0; }
+    .resource-card { content-visibility: auto; contain-intrinsic-size: auto 120px; }
+
+    /* ===== SIDEBAR DRAWER ===== */
+    #sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.50); z-index: 990; backdrop-filter: blur(2px);
+    }
+    #sidebar-overlay.open { display: block; }
+    #sidebar {
+      position: fixed; top: 0; right: -480px; width: 100%; max-width: 460px; height: 100%;
+      background: var(--white); z-index: 1000; overflow-y: auto;
+      box-shadow: -6px 0 40px rgba(0,0,0,0.18);
+      transition: right 0.32s cubic-bezier(0.4,0,0.2,1); padding: 40px 32px 40px;
+    }
+    #sidebar.open { right: 0; }
+    #sidebar-close {
+      position: absolute; top: 16px; right: 20px; background: none; border: none;
+      font-size: 28px; cursor: pointer; color: #888; line-height: 1; padding: 4px 8px;
+      border-radius: 4px; transition: color 0.15s, background 0.15s;
+    }
+    #sidebar-close:hover { color: #333; background: #f0f0f0; }
+    #sidebar h2 {
+      font-family: var(--font-main); font-size: 24px; font-weight: 800;
+      color: var(--blue-heading); margin-bottom: 8px; margin-top: 8px; line-height: 1.25;
+    }
+    #sidebar .sidebar-intro { font-size: 14px; font-weight: 600; color: #444; margin-bottom: 24px; line-height: 1.6; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block; font-family: var(--font-main); font-size: 13px;
+      font-weight: 700; color: #555; margin-bottom: 6px;
+    }
+    .form-group select, .form-group input {
+      width: 100%; padding: 12px 14px; border: 1.5px solid #ddd; border-radius: 8px;
+      font-size: 15px; font-family: var(--font-body); color: var(--text-main);
+      background: var(--white); transition: border-color 0.15s; outline: none;
+    }
+    .form-group select:focus, .form-group input:focus {
+      border-color: var(--blue-primary); box-shadow: 0 0 0 3px rgba(66,93,252,0.12);
+    }
+    .form-group select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+    .form-submit {
+      width: 100%; background: var(--blue-submit); color: var(--white); border: none;
+      border-radius: 10px; padding: 16px; font-family: var(--font-main); font-size: 17px;
+      font-weight: 800; cursor: pointer; margin-top: 8px;
+      transition: background 0.18s, transform 0.12s; letter-spacing: 0.5px;
+    }
+    .form-submit:hover:not(:disabled) { background: #4A58FF; transform: translateY(-1px); }
+    .form-submit:disabled { opacity: 0.65; cursor: not-allowed; }
+    .form-note { font-size: 12px; color: #999; text-align: center; margin-top: 10px; line-height: 1.5; }
+    .form-highlight {
+      display: flex; align-items: center; gap: 8px; background: #EEF0FF;
+      border: 1px solid #C5CCFF; border-radius: 8px; padding: 10px 14px;
+      margin-top: 12px; font-size: 13px; color: var(--blue-heading); line-height: 1.4;
+    }
+    .form-highlight-icon { font-size: 18px; flex-shrink: 0; }
+    .qtd-feedback { font-size: 12px; margin-top: 4px; min-height: 18px; transition: all 0.2s; }
+    .qtd-feedback.ok { color: #16a34a; }
+    .qtd-feedback.warn { color: #dc2626; }
+
     /* ===== EXIT INTENT MODAL ===== */
     .exit-overlay {
       display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -1224,8 +1150,7 @@
     .exit-modal {
       background: var(--white); border-radius: 16px; padding: 48px 36px;
       max-width: 480px; width: 90%; text-align: center; position: relative;
-      box-shadow: 0 24px 64px rgba(0,0,0,0.25);
-      animation: exitSlideIn 0.3s ease;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.25); animation: exitSlideIn 0.3s ease;
     }
     @keyframes exitSlideIn {
       from { opacity: 0; transform: translateY(24px); }
@@ -1246,9 +1171,7 @@
       font-family: var(--font-main); font-size: 26px; font-weight: 800;
       color: var(--blue-heading); margin-bottom: 10px; line-height: 1.25;
     }
-    .exit-modal p.exit-sub {
-      font-size: 15px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5;
-    }
+    .exit-modal p.exit-sub { font-size: 15px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
     .exit-btns { display: flex; flex-direction: column; gap: 12px; align-items: center; }
     .exit-btns .btn-primary { width: 100%; max-width: 340px; padding: 14px 24px; font-size: 16px; }
     .exit-btns .btn-wpp {
@@ -1260,27 +1183,6 @@
     }
     .exit-btns .btn-wpp:hover { background: #1da851; transform: translateY(-1px); text-decoration: none; }
     .exit-btns .btn-wpp svg { flex-shrink: 0; }
-
-    /* ===== UTILITY ===== */
-    .mt-0 { margin-top: 0; }
-    .mt-8 { margin-top: 8px; }
-    .mt-16 { margin-top: 16px; }
-    .mt-24 { margin-top: 24px; }
-    .mt-32 { margin-top: 32px; }
-    .mb-0 { margin-bottom: 0; }
-  </style>
-
-  <!-- Deferred CSS: below-the-fold sections (loaded async to reduce render-blocking) -->
-  <style media="print" onload="this.media='all'" id="deferred-css">
-    /* Plans, Accordion, Testimonials, Counters, Benefits, Footer, Sidebar: already in critical CSS above.
-       This block handles additional non-critical enhancements that can load after first paint. */
-
-    /* Smooth transitions for interactive elements below fold */
-    .yt-thumb { content-visibility: auto; contain-intrinsic-size: auto 270px; }
-    .carousel img { content-visibility: auto; contain-intrinsic-size: auto 600px; }
-    .benefit-card { content-visibility: auto; contain-intrinsic-size: auto 180px; }
-    .plan-card { content-visibility: auto; contain-intrinsic-size: auto 400px; min-width: 0; }
-    .resource-card { content-visibility: auto; contain-intrinsic-size: auto 120px; }
   </style>
   <noscript><style>.yt-thumb,.carousel img,.benefit-card,.plan-card,.resource-card{content-visibility:visible}</style></noscript>
 </head>
@@ -1427,7 +1329,7 @@
         <button class="btn btn-primary" onclick="openSidebar()">Solicitar demonstração</button>
       </div>
       <div>
-        <img src="img/dash.webp" alt="Dashboard de Produtividade de Equipes Externas" width="600" height="450">
+        <img src="img/dash.webp" alt="Dashboard de Produtividade de Equipes Externas" width="600" height="450" loading="lazy">
       </div>
     </div>
   </div>

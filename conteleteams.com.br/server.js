@@ -4,7 +4,8 @@ const path = require('path');
 
 const app = express();
 app.use(compression());
-app.use(express.json());
+// express.json() only on API routes (not needed for static files)
+const jsonParser = express.json();
 
 // ===== HEALTH CHECK =====
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
@@ -56,9 +57,9 @@ app.use(express.static(path.join(__dirname), {
     if (/\.(webp|svg|png|jpg|ico)$/i.test(filePath)) {
       res.setHeader('Cache-Control', 'public, max-age=2592000, immutable');
     }
-    // HTML: no cache (always fresh)
+    // HTML: short cache with revalidation (improves TTFB on repeat visits)
     if (/\.html$/i.test(filePath)) {
-      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+      res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=86400');
     }
   }
 }));
@@ -291,7 +292,7 @@ function brDate() {
 }
 
 // ===== LEAD ENDPOINT =====
-app.post('/api/lead', async (req, res) => {
+app.post('/api/lead', jsonParser, async (req, res) => {
   const body = req.body;
   let tamanho = parseInt(body.tamanho_equipe, 10) || 0;
 
@@ -524,7 +525,7 @@ if (!GA4_API_SECRET) console.warn('[STARTUP] WARNING: GA4_API_SECRET is empty! G
 if (!SLACK_WEBHOOK) console.warn('[STARTUP] WARNING: SLACK_WEBHOOK_URL is empty! Slack notifications disabled.');
 if (!process.env.GOOGLE_ADS_CLIENT_ID) console.warn('[STARTUP] WARNING: GOOGLE_ADS_CLIENT_ID missing! Google Ads conversions will fail.');
 
-app.post('/api/pipedrive-webhook', async (req, res) => {
+app.post('/api/pipedrive-webhook', jsonParser, async (req, res) => {
   res.json({ ok: true });
 
   try {
