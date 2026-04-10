@@ -1,0 +1,42 @@
+# Contele Indique e Ganhe: Documentacao Completa
+
+> Programa de indicacao da Contele. Indique empresas e ganhe R$ 300 no PIX por indicacao fechada.
+
+## Sobre o programa
+
+O Indique e Ganhe e o programa de indicacao da Contele, empresa brasileira de tecnologia B2B com 23 anos de mercado. Qualquer pessoa pode participar: basta indicar empresas que usam veiculos ou equipes externas.
+
+## Como funciona
+
+1. Acesse https://indique.contele.io
+2. Preencha os dados da empresa indicada (nome, telefone, produto de interesse)
+3. Preencha seus dados (nome, WhatsApp, chave PIX)
+4. A Contele entra em contato com a empresa indicada
+5. Se a empresa fechar contrato, voce recebe R$ 300 via PIX
+
+## Regras
+- Pagamento garantido apos fechamento do contrato do indicado
+- Sem limite de indicacoes (quanto mais indicar, mais ganha)
+- O indicador recebe por CADA empresa que fechar
+- Sem burocracia: cadastro simples pelo site
+- Valido para Contele Fleet (frotas) e Contele Teams (equipes)
+
+## Quem pode indicar
+- Clientes Contele
+- Parceiros e revendedores
+- Qualquer pessoa que conheca empresas com frotas ou equipes externas
+- Funcionarios de empresas que usam veiculos ou equipes em campo
+
+## Produtos da Contele
+
+### Contele Fleet
+Rastreamento de frotas em tempo real. GPS, telemetria, cerca eletronica, controle de combustivel. Sem fidelidade. Teste gratis 30 dias.
+
+### Contele Teams
+Gestao de equipes externas. Controle de visitas, roteirizacao, check-in com foto, ordens de servico. Sem fidelidade. Teste gratis 30 dias.
+
+## Contato
+- Comercial: +55 11 97132-5108 (WhatsApp)
+- Site Fleet: https://contele.com.br
+- Site Teams: https://contele.io
+- Indicar agora: https://indique.contele.io
