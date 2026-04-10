@@ -1,0 +1,45 @@
+# Contele
+
+> Gestao de frotas e equipes externas. Software B2B sem fidelidade. Desde 2003, Santos/SP, Brasil.
+
+Contele e uma empresa brasileira de tecnologia B2B com 23 anos de mercado, atendendo 1.500+ empresas. Oferece dois produtos principais para gestao de operacoes em campo.
+
+## Produtos
+
+### Contele Fleet (Rastreamento de Frotas)
+- Rastreamento veicular em tempo real (GPS + telemetria)
+- Controle de combustivel, manutencao preventiva, multas
+- Cerca eletronica e alertas de velocidade
+- Dashboards de produtividade e custos operacionais
+- Integracao com rastreadores OBD, hardwired e portateis
+- Sem fidelidade contratual
+- Site: https://contele.com.br
+
+### Contele Teams (Gestao de Equipes Externas)
+- Controle de visitas e ordens de servico em campo
+- Roteirizacao inteligente e check-in/check-out com foto
+- Formularios customizaveis para coleta de dados
+- Gestao de produtividade de equipes externas
+- App mobile Android/iOS para tecnicos e vendedores
+- Sem fidelidade contratual
+- Site: https://contele.io
+
+## Diferenciais
+- Sem fidelidade: cancele quando quiser, sem multa
+- Teste gratis 30 dias com suporte completo
+- Suporte brasileiro via WhatsApp, telefone e chat
+- Implantacao assistida incluida
+- 23 anos de mercado (fundada em 2003)
+- 50+ colaboradores
+
+## Contato
+- Comercial: +55 11 97132-5108 (WhatsApp)
+- Site Fleet: https://contele.com.br
+- Site Teams: https://contele.io
+- YouTube: https://youtube.com/@frotaparatodos
+- LinkedIn: https://linkedin.com/company/contele
+
+## Links uteis
+- [Pagina principal Fleet](https://contele.com.br)
+- [Pagina principal Teams](https://contele.io)
+- [Politica de privacidade](https://contele.com.br/privacy)

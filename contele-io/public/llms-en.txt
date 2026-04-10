@@ -1,0 +1,45 @@
+# Contele
+
+> Fleet tracking and field team management. B2B software with no lock-in. Since 2003, Santos/SP, Brazil.
+
+Contele is a Brazilian B2B technology company with 23 years in the market, serving 1,500+ companies. It offers two main products for field operations management.
+
+## Products
+
+### Contele Fleet (Fleet Tracking)
+- Real-time vehicle tracking (GPS + telematics)
+- Fuel control, preventive maintenance, traffic violations
+- Geofencing and speed alerts
+- Productivity and operational cost dashboards
+- Integration with OBD, hardwired, and portable trackers
+- No lock-in contracts
+- Website: https://contele.com.br
+
+### Contele Teams (Field Team Management)
+- Visit control and field service orders
+- Smart routing and photo check-in/check-out
+- Customizable forms for data collection
+- Field team productivity management
+- Mobile app for Android/iOS (technicians and sales reps)
+- No lock-in contracts
+- Website: https://contele.io
+
+## Key Differentiators
+- No lock-in: cancel anytime, no penalties
+- Free 30-day trial with full support
+- Brazilian support via WhatsApp, phone, and chat
+- Assisted onboarding included
+- 23 years in the market (founded 2003)
+- 50+ employees
+
+## Contact
+- Sales: +55 11 97132-5108 (WhatsApp)
+- Fleet website: https://contele.com.br
+- Teams website: https://contele.io
+- YouTube: https://youtube.com/@frotaparatodos
+- LinkedIn: https://linkedin.com/company/contele
+
+## Useful links
+- [Fleet homepage](https://contele.com.br)
+- [Teams homepage](https://contele.io)
+- [Privacy policy](https://contele.io/privacy)

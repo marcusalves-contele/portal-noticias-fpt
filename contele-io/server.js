@@ -76,12 +76,43 @@ function sendHtmlWithSeo(req, res, filePath) {
 }
 
 // ---------------------------------------------------------------------------
+// llms.txt (per domain language)
+// ---------------------------------------------------------------------------
+app.get('/llms.txt', (req, res) => {
+  const host = req.hostname || '';
+  const file = host.includes('contele.io') ? 'llms-en.txt' : 'llms.txt';
+  res.type('text').sendFile(path.join(__dirname, 'public', file));
+});
+
+// ---------------------------------------------------------------------------
 // Dynamic robots.txt (per domain)
 // ---------------------------------------------------------------------------
 app.get('/robots.txt', (req, res) => {
   const { self } = getDomains(req);
   const content = [
     'User-agent: *',
+    'Allow: /',
+    '',
+    '# AI crawlers (explicitly allowed)',
+    'User-agent: GPTBot',
+    'Allow: /',
+    '',
+    'User-agent: ChatGPT-User',
+    'Allow: /',
+    '',
+    'User-agent: ClaudeBot',
+    'Allow: /',
+    '',
+    'User-agent: Claude-Web',
+    'Allow: /',
+    '',
+    'User-agent: PerplexityBot',
+    'Allow: /',
+    '',
+    'User-agent: Bytespider',
+    'Allow: /',
+    '',
+    'User-agent: GoogleOther',
     'Allow: /',
     '',
     `Sitemap: ${self}/sitemap.xml`
@@ -92,7 +123,7 @@ app.get('/robots.txt', (req, res) => {
 // ---------------------------------------------------------------------------
 // Dynamic sitemap.xml (per domain)
 // ---------------------------------------------------------------------------
-const PAGES = ['/', '/privacy'];
+const PAGES = ['/', '/privacy', '/en'];
 
 app.get('/sitemap.xml', (req, res) => {
   const { self, alt, selfLang, altLang } = getDomains(req);
