@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+
+# AI crawlers (explicitly allowed)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+Sitemap: https://indique.contele.io/sitemap.xml
