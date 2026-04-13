@@ -217,9 +217,8 @@ def get_transcript_with_timestamps(video_id: str) -> list[dict]:
     except Exception as e3:
         raise RuntimeError(
             f"Nenhum metodo conseguiu extrair legendas para {video_id}. "
-            f"Tier1: transcript-api bloqueado. "
-            f"Tier2: yt-dlp sem legendas. "
-            f"Tier3: {e3}"
+            f"Cole a transcricao manualmente no campo abaixo e tente novamente. "
+            f"(Tier1: transcript-api bloqueado | Tier2: yt-dlp sem legendas | Tier3: {e3})"
         )
 
 

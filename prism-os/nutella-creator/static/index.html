@@ -6551,6 +6551,13 @@
         <h3 style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-bottom:12px;">OU COLE UMA URL</h3>
         <div style="display:flex;flex-direction:column;gap:12px;">
           <input class="home-input" id="blog-url" type="text" placeholder="https://youtube.com/watch?v=..." style="width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text-primary);font-family:var(--font-mono);font-size:13px;">
+          <div id="blog-transcript-wrap" style="display:none;margin-top:4px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">TRANSCRICAO MANUAL</span>
+              <button type="button" onclick="document.getElementById('blog-transcript-wrap').style.display='none';document.getElementById('blog-transcript').value='';" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:2px 6px;">&times;</button>
+            </div>
+            <textarea id="blog-transcript" placeholder="Cole aqui a transcricao do video. Necessario quando a extracao automatica de legendas falha (ex: videos do Teams)." style="width:100%;min-height:120px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;color:var(--text-primary);font-family:var(--font-mono);font-size:13px;resize:vertical;box-sizing:border-box;"></textarea>
+          </div>
           <div style="display:flex;gap:12px;align-items:center;">
             <select id="blog-channel" style="background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text-primary);font-family:var(--font-mono);font-size:13px;flex:0 0 120px;">
               <option value="fleet">Fleet</option>
@@ -6560,6 +6567,9 @@
               Gerar Blog Post
             </button>
           </div>
+          <button type="button" id="blog-transcript-toggle" onclick="document.getElementById('blog-transcript-wrap').style.display='block';this.style.display='none';" style="background:none;border:none;color:var(--text-muted);font-family:var(--font-mono);font-size:11px;cursor:pointer;padding:4px 0;margin-top:4px;text-align:left;">
+            + Colar transcricao manualmente
+          </button>
         </div>
       </div>
 
@@ -6636,6 +6646,7 @@
     async function blogGenerate() {
       const url = document.getElementById('blog-url').value.trim();
       const blog = document.getElementById('blog-channel').value;
+      const transcript = (document.getElementById('blog-transcript')?.value || '').trim();
       if (!url) { toast('Cole a URL do video', 'error'); return; }
 
       const btn = document.getElementById('blog-generate-btn');
@@ -6650,10 +6661,12 @@
       steps.innerHTML = '<div class="progress-step active"><div class="step-indicator"><div class="spinner-ring"></div></div><div class="step-info"><div class="step-label">Iniciando...</div><div class="step-detail" id="blog-step-detail"></div></div></div>';
 
       try {
+        const payload = { video_url: url, blog: blog };
+        if (transcript) payload.transcript = transcript;
         const resp = await fetch('/api/blog-generate', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ video_url: url, blog: blog })
+          body: JSON.stringify(payload)
         });
         const data = await resp.json();
         if (data.error) { toast(data.error, 'error'); btn.disabled = false; btn.textContent = 'Gerar Blog Post'; return; }
@@ -6689,7 +6702,14 @@
           let msg = 'Erro desconhecido';
           try { msg = JSON.parse(e.data).message; } catch(_) {}
           progress.style.display = 'none';
-          toast(msg, 'error');
+          if (msg.includes('legenda') || msg.includes('transcript') || msg.includes('caption') || msg.includes('Nenhum metodo')) {
+            document.getElementById('blog-transcript-wrap').style.display = 'block';
+            const toggle = document.getElementById('blog-transcript-toggle');
+            if (toggle) toggle.style.display = 'none';
+            toast('Extracao automatica falhou. Cole a transcricao manualmente e tente de novo.', 'error');
+          } else {
+            toast(msg, 'error');
+          }
           btn.disabled = false;
           btn.textContent = 'Gerar Blog Post';
         });
