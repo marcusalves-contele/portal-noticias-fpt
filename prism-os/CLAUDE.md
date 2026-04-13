@@ -13,6 +13,7 @@ Hoje o sistema cobre Plan → Shoot → Multiply. Quando crescer o suficiente, v
 | Módulo | Path | O que faz |
 |--------|------|-----------|
 | **Nutella Creator** | `nutella-creator/` | Pipeline completo: URL → cortes 16:9 + 9:16 + thumbnail via dashboard local |
+| **Blog (YouTube to Blog)** | `nutella-creator/blog.py` | Video YouTube → post WordPress (Fleet + Teams) via dashboard |
 | **Thumbnail AI Creator** | `thumbnail-ai-creator/` | Geração standalone de thumbnails via CLI (Fleet e Teams) |
 
 ---
@@ -121,8 +122,22 @@ Linhas com "Tarefa no Asana" preenchido = pendentes.
 ### Armadilhas conhecidas (19/mar/2026)
 
 1. **youtube-transcript-api bloqueado**: YouTube bloqueia IPs de cloud (Railway/AWS/GCP).
-   `suggest.py` tem fallback automatico via yt-dlp (`--write-auto-sub`).
-   Se ambos falharem, configurar `cookies.txt` no container.
+   Resolvido com `COOKIES_B64` env var no Railway. `boot.py` decodifica para `/tmp/cookies.txt`.
+   `suggest.py` injeta cookies no Tier 1 (youtube-transcript-api) e Tier 2 (yt-dlp).
+   Cookies expiram ~6 meses. Renovar com:
+   ```bash
+   cd nutella-creator
+   yt-dlp --cookies-from-browser chrome --cookies cookies_export.txt --skip-download "https://youtube.com"
+   head -4 cookies_export.txt > cookies_min.txt
+   grep -E '^\.youtube\.com' cookies_export.txt >> cookies_min.txt
+   grep -E '\.google\.com.*(SID|SSID|HSID|NID|CONSENT|SOCS|__Secure|APISID|SAPISID|LOGIN_INFO)' cookies_export.txt >> cookies_min.txt
+   railway variables --set "COOKIES_B64=$(base64 -i cookies_min.txt)" --service prism-os
+   ```
+
+1b. **YouTube captions.download() exige Owner**: A YouTube Data API so permite
+   download de captions pelo OWNER do canal, nao por Managers/Admins.
+   Dar acesso de admin a alguem NAO resolve o 403 em captions.download().
+   Solucao: usar youtube-transcript-api com cookies (Tier 1) em vez de depender do Tier 3 (OAuth).
 
 2. **libxcb.so.1 / OpenCV / mediapipe**: container precisa de libs X11.
    `nixpacks.toml` tem `nixPkgs` (xorg.libxcb, libGL, glib) + `aptPkgs`.
@@ -146,8 +161,10 @@ Linhas com "Tarefa no Asana" preenchido = pendentes.
 | Var | Uso |
 |-----|-----|
 | `GEMINI_NANO_BANANA_KEY` | API Gemini (thumbs, analise) |
-| `YOUTUBE_TOKEN_B64` | OAuth YouTube (base64 pickle) |
+| `YOUTUBE_TOKEN_B64` | OAuth YouTube Fleet/Julio (base64 pickle) |
+| `YOUTUBE_TEAMS_TOKEN_B64` | OAuth YouTube Teams/Leo (base64 pickle, opcional) |
 | `SHEETS_TOKEN_B64` | Google Sheets (base64 pickle) |
+| `COOKIES_B64` | Cookies YouTube para bypass IP block (base64 Netscape) |
 | `GITHUB_TOKEN` | Criar issues via feedback |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Login OAuth dashboard |
 
