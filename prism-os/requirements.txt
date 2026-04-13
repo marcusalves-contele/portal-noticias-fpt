@@ -9,5 +9,5 @@ google-auth-httplib2
 opencv-python-headless
 mediapipe
 youtube-transcript-api
-yt-dlp
+yt-dlp>=2026.3.17
 # PRISM OS auth_proxy trigger

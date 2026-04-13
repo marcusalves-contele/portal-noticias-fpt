@@ -108,6 +108,7 @@ def _get_transcript_ytdlp(video_id: str) -> list[dict]:
             "--sub-lang", "pt,pt-BR,en",
             "--sub-format", "json3",
             "--skip-download",
+            "--remote-components", "ejs:github",
             *cookies_arg,
             "-o", str(tmp_path / "sub"),
             f"https://youtube.com/watch?v={video_id}",

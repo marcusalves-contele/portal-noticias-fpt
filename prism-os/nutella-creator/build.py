@@ -282,13 +282,18 @@ def download_video(video_id: str) -> Path:
     url = f"https://youtube.com/watch?v={video_id}"
     out_tmpl = str(DOWNLOADS_DIR / f"{video_id}.%(ext)s")
 
-    cookies_file = PROJECT_DIR / "cookies.txt"
-    cookies_arg = ["--cookies", str(cookies_file)] if cookies_file.exists() else []
+    # Cookies: env var (Railway) > local
+    cookies_path = os.environ.get("COOKIES_PATH")
+    if not cookies_path or not Path(cookies_path).exists():
+        local_cookies = PROJECT_DIR / "cookies.txt"
+        cookies_path = str(local_cookies) if local_cookies.exists() else None
+    cookies_arg = ["--cookies", cookies_path] if cookies_path else []
 
     cmd = [
         "yt-dlp",
         "-f", "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4][height<=1080]/best",
         "--merge-output-format", "mp4",
+        "--remote-components", "ejs:github",
         "--socket-timeout", "30",
         "--retries", "2",
         *cookies_arg,
