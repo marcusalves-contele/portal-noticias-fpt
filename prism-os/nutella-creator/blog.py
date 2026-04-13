@@ -393,7 +393,7 @@ def generate_blog_post(video_id: str, blog: str, transcript: str = None,
         emit("transcript", "Buscando transcricao...")
         from suggest import extract_video_id, get_transcript_with_timestamps, build_transcript_text
         vid = extract_video_id(video_id)
-        segments = get_transcript_with_timestamps(vid)
+        segments = get_transcript_with_timestamps(vid, channel=blog)
         transcript = " ".join(s["text"] for s in segments)
         emit("transcript", f"OK ({len(segments)} segmentos)")
 

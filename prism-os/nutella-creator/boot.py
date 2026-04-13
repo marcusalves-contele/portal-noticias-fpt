@@ -8,7 +8,12 @@ from pathlib import Path
 
 TOKENS = {
     "YOUTUBE_TOKEN_B64": "/tmp/token_youtube.pickle",
+    "YOUTUBE_TEAMS_TOKEN_B64": "/tmp/token_youtube_teams.pickle",
     "SHEETS_TOKEN_B64": "/tmp/token_sheets.pickle",
+}
+
+EXTRA_FILES = {
+    "COOKIES_B64": "/tmp/cookies.txt",
 }
 
 def bootstrap():
@@ -19,12 +24,26 @@ def bootstrap():
             Path(dest_path).write_bytes(data)
             print(f"Decoded {env_var} -> {dest_path} ({len(data)} bytes)")
             # Set env vars so other modules find them
-            if "YOUTUBE" in env_var:
+            if env_var == "YOUTUBE_TOKEN_B64":
                 os.environ["YOUTUBE_TOKEN_PATH"] = dest_path
+            elif env_var == "YOUTUBE_TEAMS_TOKEN_B64":
+                os.environ["YOUTUBE_TEAMS_TOKEN_PATH"] = dest_path
             elif "SHEETS" in env_var:
                 os.environ["SHEETS_TOKEN_PATH"] = dest_path
         else:
             print(f"No {env_var} env var, skipping (local dev mode)")
+
+    # Extra files (cookies, etc)
+    for env_var, dest_path in EXTRA_FILES.items():
+        b64 = os.environ.get(env_var)
+        if b64:
+            data = base64.b64decode(b64)
+            Path(dest_path).write_bytes(data)
+            print(f"Decoded {env_var} -> {dest_path} ({len(data)} bytes)")
+            if "COOKIES" in env_var:
+                os.environ["COOKIES_PATH"] = dest_path
+        else:
+            print(f"No {env_var} env var, skipping")
 
     # Gemini key: ensure it's available even without .env file
     gemini_key = os.environ.get("GEMINI_NANO_BANANA_KEY")

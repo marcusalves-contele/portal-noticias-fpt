@@ -82,11 +82,22 @@ def time_to_seconds(t: str) -> int:
     return int(parts[0]) * 60 + int(parts[1])
 
 
+def _find_cookies_path() -> Path | None:
+    """Busca cookies.txt: env var (Railway) > local."""
+    env_path = os.environ.get("COOKIES_PATH")
+    if env_path and Path(env_path).exists():
+        return Path(env_path)
+    local = Path(__file__).parent / "cookies.txt"
+    if local.exists():
+        return local
+    return None
+
+
 def _get_transcript_ytdlp(video_id: str) -> list[dict]:
     """Fallback 1: extrai legendas via yt-dlp."""
     import subprocess, tempfile
-    cookies_file = Path(__file__).parent / "cookies.txt"
-    cookies_arg = ["--cookies", str(cookies_file)] if cookies_file.exists() else []
+    cookies_file = _find_cookies_path()
+    cookies_arg = ["--cookies", str(cookies_file)] if cookies_file else []
 
     with tempfile.TemporaryDirectory(prefix="transcript_") as tmp:
         tmp_path = Path(tmp)
@@ -129,15 +140,46 @@ def _get_transcript_ytdlp(video_id: str) -> list[dict]:
         return segments
 
 
-def _get_transcript_youtube_api(video_id: str) -> list[dict]:
-    """Fallback 2: YouTube Data API captions (autenticado, ignora IP block)."""
-    try:
-        from upload import load_credentials, get_youtube
-    except Exception:
-        raise RuntimeError("YouTube OAuth nao configurado")
+def _load_teams_credentials():
+    """Carrega token OAuth do canal Teams (Leonardo), se disponivel."""
+    import pickle
+    from google.auth.transport.requests import Request
+    teams_path = os.environ.get("YOUTUBE_TEAMS_TOKEN_PATH")
+    if not teams_path or not Path(teams_path).exists():
+        # Fallback: local dev
+        local = Path(__file__).parent / "token_youtube_teams.pickle"
+        if local.exists():
+            teams_path = str(local)
+        else:
+            return None
+    with open(teams_path, "rb") as f:
+        creds = pickle.load(f)
+    if creds.expired and creds.refresh_token:
+        creds.refresh(Request())
+        with open(teams_path, "wb") as f:
+            pickle.dump(creds, f)
+    return creds if creds.valid else None
 
-    creds = load_credentials()
-    youtube = get_youtube(creds)
+
+def _get_transcript_youtube_api(video_id: str, channel: str = "fleet") -> list[dict]:
+    """Fallback 2: YouTube Data API captions (autenticado, ignora IP block)."""
+    from googleapiclient.discovery import build
+
+    creds = None
+    # Tenta token do canal correto primeiro
+    if channel == "teams":
+        creds = _load_teams_credentials()
+        if creds:
+            print(f"  Usando token OAuth Teams (Leonardo)")
+    if not creds:
+        try:
+            from upload import load_credentials, get_youtube
+            creds = load_credentials()
+            print(f"  Usando token OAuth Fleet (Julio)")
+        except Exception:
+            raise RuntimeError("YouTube OAuth nao configurado (nem Fleet nem Teams)")
+
+    youtube = build("youtube", "v3", credentials=creds)
 
     # Lista captions disponiveis
     captions = youtube.captions().list(part="snippet", videoId=video_id).execute()
@@ -191,15 +233,26 @@ def _get_transcript_youtube_api(video_id: str) -> list[dict]:
     return segments
 
 
-def get_transcript_with_timestamps(video_id: str) -> list[dict]:
+def get_transcript_with_timestamps(video_id: str, channel: str = "fleet") -> list[dict]:
     # Tier 1: youtube-transcript-api (rapido, sem auth)
     try:
-        api = YouTubeTranscriptApi()
-        result = api.fetch(video_id, languages=["pt", "pt-BR", "en"])
+        cookies_path = _find_cookies_path()
+        kwargs = {"languages": ["pt", "pt-BR", "en"]}
+        if cookies_path:
+            import http.cookiejar
+            cj = http.cookiejar.MozillaCookieJar(str(cookies_path))
+            cj.load(ignore_discard=True, ignore_expires=True)
+            session = requests.Session()
+            session.cookies = cj
+            api = YouTubeTranscriptApi(http_client=session)
+            print(f"  Tier 1: usando cookies de {cookies_path}")
+        else:
+            api = YouTubeTranscriptApi()
+        result = api.fetch(video_id, **kwargs)
         print(f"  Transcricao via youtube-transcript-api OK")
         return [{"start": s.start, "duration": s.duration, "text": s.text} for s in result]
     except Exception as e1:
-        print(f"  Tier 1 falhou (transcript-api), tentando yt-dlp...")
+        print(f"  Tier 1 falhou (transcript-api: {e1}), tentando yt-dlp...")
 
     # Tier 2: yt-dlp subtitles
     try:
@@ -211,7 +264,7 @@ def get_transcript_with_timestamps(video_id: str) -> list[dict]:
 
     # Tier 3: YouTube Data API captions (autenticado)
     try:
-        result = _get_transcript_youtube_api(video_id)
+        result = _get_transcript_youtube_api(video_id, channel=channel)
         print(f"  Transcricao via YouTube API OK ({len(result)} segmentos)")
         return result
     except Exception as e3:
