@@ -1692,9 +1692,14 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
     def _handle_studio_chat(self, body: dict):
         """POST /api/studio/chat -- conversational thumbnail generation."""
         message = body.get("message", "").strip()
-        image_b64 = body.get("image_b64")
         session_id = body.get("session_id", str(uuid.uuid4())[:8])
         mode_hint = body.get("mode") or None  # optional frontend override
+
+        # Issue #68: accept images_b64 (array) with fallback to image_b64 (single)
+        images_b64 = body.get("images_b64")
+        if not images_b64:
+            single = body.get("image_b64")
+            images_b64 = [single] if single else None
 
         if not message:
             self._json({"error": "message required"}, 400)
@@ -1712,7 +1717,8 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
                 def progress_cb(data):
                     _emit(job_id, "progress", data)
 
-                result = run_pipeline(message, image_b64, session_id, api_key, progress_cb, mode_hint=mode_hint)
+                result = run_pipeline(message, images_b64=images_b64, session_id=session_id,
+                                      api_key=api_key, progress_cb=progress_cb, mode_hint=mode_hint)
                 _emit(job_id, "complete", result)
             except Exception as e:
                 _emit(job_id, "error", {"message": str(e)})

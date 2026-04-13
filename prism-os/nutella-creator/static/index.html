@@ -6279,27 +6279,34 @@
       input.value = '';
       input.style.height = 'auto';
 
-      // Issue #31: capture and clear image before sending
-      const attachedImage = studioAttachedImage;
-      if (attachedImage) studioRemoveImage();
+      // Issue #68: capture and clear images before sending
+      const attachedImages = studioAttachedImages.slice();
+      if (attachedImages.length > 0) studioRemoveImage();
 
-      // Add user message — show inline preview if image was attached
+      // Add user message with inline image previews
       const userMsgEl = studioAppendMsg('user', message, null);
-      if (attachedImage && userMsgEl) {
+      if (attachedImages.length > 0 && userMsgEl) {
         const bubble = userMsgEl.querySelector('.studio-msg-bubble');
         if (bubble) {
           const previewEl = document.createElement('div');
-          previewEl.style.cssText = 'margin-top:8px;';
-          previewEl.innerHTML = '<img src="data:image/jpeg;base64,' + attachedImage + '" style="max-width:180px;max-height:120px;border-radius:8px;object-fit:cover;border:1px solid var(--border);" alt="imagem anexada">';
+          previewEl.style.cssText = 'margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;';
+          previewEl.innerHTML = attachedImages.map(img =>
+            '<img src="' + img.dataUrl + '" style="max-width:120px;max-height:90px;border-radius:8px;object-fit:cover;border:1px solid var(--border);" alt="imagem anexada">'
+          ).join('');
           bubble.after(previewEl);
         }
       }
       studioScrollBottom();
       studioShowProgress('Enviando...');
 
-      // Build POST body — include image_b64 if present, mode if not auto
+      // Build POST body: images_b64 array (retrocompat: also send image_b64 if single)
       const body = { message, session_id: studioSessionId };
-      if (attachedImage) body.image_b64 = attachedImage;
+      if (attachedImages.length === 1) {
+        body.image_b64 = attachedImages[0].b64;
+        body.images_b64 = [attachedImages[0].b64];
+      } else if (attachedImages.length > 1) {
+        body.images_b64 = attachedImages.map(img => img.b64);
+      }
       if (studioMode !== 'auto') body.mode = studioMode;
 
       try {

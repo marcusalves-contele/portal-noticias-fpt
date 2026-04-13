@@ -373,12 +373,14 @@ def list_sessions() -> list[dict]:
     return result[:20]
 
 
-def run_pipeline(message: str, image_b64: str | None, session_id: str,
-                 api_key: str, progress_cb=None, mode_hint: str = None) -> dict:
+def run_pipeline(message: str, image_b64: str | None = None, session_id: str = "",
+                 api_key: str = "", progress_cb=None, mode_hint: str = None,
+                 images_b64: list[str] | None = None) -> dict:
     """
     Main pipeline: message -> intent -> refs -> generate/edit -> result.
     Returns: {"text": str, "image_url": str | None, "error": str | None, "mode": str}
     mode_hint: if provided by the frontend, overrides the detected mode.
+    images_b64: list of base64-encoded images (issue #68). Falls back to image_b64 for retrocompat.
     """
 
     def emit(step, msg, model=None):
@@ -388,18 +390,30 @@ def run_pipeline(message: str, image_b64: str | None, session_id: str,
                 payload["model"] = model
             progress_cb(payload)
 
-    history = get_session(session_id)
-    user_entry = {"role": "user", "text": message, "image_path": None, "ts": time.time()}
+    # Issue #68: normalize to list (retrocompat with single image_b64)
+    all_images = images_b64 or []
+    if not all_images and image_b64:
+        all_images = [image_b64]
 
-    # Save uploaded image
+    history = get_session(session_id)
+    user_entry = {"role": "user", "text": message, "image_path": None, "image_paths": [], "ts": time.time()}
+
+    # Save uploaded images
     base_image_path = None
-    if image_b64:
+    uploaded_paths = []
+    for idx, img_b64 in enumerate(all_images):
         ts = datetime.now().strftime("%Y%m%d-%H%M%S")
-        img_path = OUTPUT_DIR / f"studio_upload_{session_id}_{ts}.png"
+        suffix = f"_{idx}" if idx > 0 else ""
+        img_path = OUTPUT_DIR / f"studio_upload_{session_id}_{ts}{suffix}.png"
         img_path.parent.mkdir(parents=True, exist_ok=True)
-        img_path.write_bytes(base64.b64decode(image_b64))
-        user_entry["image_path"] = str(img_path)
-        base_image_path = img_path
+        img_path.write_bytes(base64.b64decode(img_b64))
+        uploaded_paths.append(img_path)
+        if idx == 0:
+            base_image_path = img_path
+
+    if uploaded_paths:
+        user_entry["image_path"] = str(uploaded_paths[0])
+        user_entry["image_paths"] = [str(p) for p in uploaded_paths]
 
     history.append(user_entry)
 
