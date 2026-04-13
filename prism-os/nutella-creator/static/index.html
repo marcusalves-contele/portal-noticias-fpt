@@ -2076,7 +2076,7 @@
     }
     .studio-upload-btn svg { width: 18px; height: 18px; }
 
-    /* Issue #31: Image preview above input */
+    /* Issue #31 + #68: Multi-image preview strip above input */
     .studio-preview {
       display: none;
       flex-direction: row;
@@ -2085,6 +2085,7 @@
       padding: 8px 0 0;
       max-width: 720px;
       margin: 0 auto;
+      flex-wrap: wrap;
     }
     .studio-preview.visible { display: flex; }
     .studio-preview-thumb {
@@ -2119,9 +2120,27 @@
     }
     .studio-preview-remove:hover { background: #ef4444; }
     .studio-preview-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      max-width: 60px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .studio-preview-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .studio-preview-count {
       font-size: 12px;
       color: var(--text-muted);
       font-family: var(--font-mono);
+      align-self: center;
+      margin-left: 4px;
     }
 
     /* Issue #31: Drag-and-drop visual feedback */
@@ -3218,17 +3237,11 @@
               </svg>
             </button>
           </div>
-          <!-- Issue #31: Image preview strip -->
-          <div class="studio-preview" id="studioPreview">
-            <div class="studio-preview-thumb">
-              <img id="studioPreviewImg" src="" alt="preview">
-              <button class="studio-preview-remove" onclick="studioRemoveImage()" title="Remover imagem">&times;</button>
-            </div>
-            <span class="studio-preview-label" id="studioPreviewLabel"></span>
-          </div>
-          <!-- Issue #31: Hidden file input -->
-          <input type="file" id="studioFileInput" accept="image/jpeg,image/png,image/webp"
-            style="display:none" onchange="studioHandleFile(this.files[0])">
+          <!-- Issue #31 + #68: Multi-image preview strip -->
+          <div class="studio-preview" id="studioPreview"></div>
+          <!-- Issue #68: Hidden file input with multiple support -->
+          <input type="file" id="studioFileInput" accept="image/jpeg,image/png,image/webp" multiple
+            style="display:none" onchange="studioHandleFiles(this.files)">
           <div class="studio-input-wrap">
             <!-- Issue #31: Upload button before textarea -->
             <button class="studio-upload-btn" onclick="document.getElementById('studioFileInput').click()" title="Anexar imagem">
@@ -5137,6 +5150,7 @@
     // ===== ROTEIRO (THUMB DE VIDEO COM ROTEIRO) =====
     let rotChannel = 'fleet';
     let rotSource = 'planilha';
+    let rotCurrentLiveId = '';
     let rotGuestsList = [];
     let rotGuestFileData = null;
     let rotGuestFileMime = '';
@@ -5157,6 +5171,7 @@
         rotScriptText = '';
         rotSelectedItem = null;
         rotApprovedSide = '';
+        rotCurrentLiveId = '';
         document.getElementById('rot-selected-banner').style.display = 'none';
         document.getElementById('rot-approved-banner').style.display = 'none';
         document.getElementById('rot-publish-actions').style.display = 'none';
@@ -5679,9 +5694,58 @@
     }
 
     async function rotRegenerateOne(side) {
-      // TODO: implement single-side regeneration with feedback
-      const feedback = document.getElementById(`rot-feedback-${side.toLowerCase()}`).value.trim();
-      toast('Regeneracao individual em breve. Feedback: ' + (feedback || 'nenhum'), 'info');
+      const s = side.toLowerCase();
+      const feedback = document.getElementById(`rot-feedback-${s}`).value.trim();
+      if (!feedback) {
+        toast('Escreva um feedback antes de ajustar', 'error');
+        return;
+      }
+      if (!rotCurrentLiveId) {
+        toast('Gere as thumbnails primeiro', 'error');
+        return;
+      }
+
+      // Show spinner
+      const ph = document.getElementById(`rot-ph-${s}`);
+      if (ph) ph.style.display = 'none';
+      document.getElementById(`rot-spinner-${s}`).style.display = 'flex';
+      const img = document.getElementById(`rot-img-${s}`);
+      if (img) img.style.display = 'none';
+
+      try {
+        const resp = await fetch('/api/thumb-feedback', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            live_id: rotCurrentLiveId,
+            angle: side,
+            feedback: feedback,
+          })
+        });
+        const data = await resp.json();
+
+        if (data.error) {
+          toast('Erro: ' + data.error, 'error');
+          // Reset UI
+          document.getElementById(`rot-spinner-${s}`).style.display = 'none';
+          if (img) img.style.display = 'block';
+          return;
+        }
+
+        const key = `thumb_${s}`;
+        if (data[key]) {
+          if (img) { img.src = '/' + data[key] + '?t=' + Date.now(); img.style.display = 'block'; }
+          document.getElementById(`rot-spinner-${s}`).style.display = 'none';
+          const dl = document.getElementById(`rot-download-${s}`);
+          if (dl) { dl.href = '/' + data[key]; dl.style.display = ''; }
+          document.getElementById(`rot-feedback-${s}`).value = '';
+          toast(`Thumb ${side} ajustada`, 'success');
+        }
+      } catch (e) {
+        toast('Erro: ' + e.message, 'error');
+        document.getElementById(`rot-spinner-${s}`).style.display = 'none';
+        if (img) img.style.display = 'block';
+      }
     }
 
     async function rotGenerate() {
@@ -5782,10 +5846,13 @@
 
       try {
         const divergence = parseInt(document.getElementById('rot-divergence')?.value || '6');
+        const now = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        rotCurrentLiveId = `roteiro-${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
         const resp = await fetch('/api/thumb-generate', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ briefing, divergence })
+          body: JSON.stringify({ briefing, divergence, live_id: rotCurrentLiveId })
         });
         const init = await resp.json();
 
@@ -5872,8 +5939,8 @@
     let studioSessionId = null;
     let studioSending = false;
     let studioProgressEl = null;
-    // Issue #31: attached image state
-    let studioAttachedImage = null; // base64 string WITHOUT data:... prefix
+    // Issue #31 + #68: attached images state (array of {b64, name, size})
+    let studioAttachedImages = [];
     // Issue #45: mode selector
     let studioMode = 'auto';
 
@@ -6099,37 +6166,74 @@
       el.style.height = Math.min(el.scrollHeight, 160) + 'px';
     }
 
-    // Issue #31: Handle file selection (from input or drag-and-drop)
-    function studioHandleFile(file) {
-      if (!file) return;
-      if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
-        toast('Formato nao suportado. Use JPG, PNG ou WEBP.', 'error');
-        return;
+    // Issue #68: Handle multiple file selection (from input or drag-and-drop)
+    function studioHandleFiles(files) {
+      if (!files || files.length === 0) return;
+      const MAX_BYTES = 10 * 1024 * 1024; // 10MB per file
+      const MAX_IMAGES = 5;
+      for (const file of files) {
+        if (studioAttachedImages.length >= MAX_IMAGES) {
+          toast('Maximo ' + MAX_IMAGES + ' imagens por mensagem.', 'error');
+          break;
+        }
+        if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
+          toast('Formato nao suportado: ' + file.name + '. Use JPG, PNG ou WEBP.', 'error');
+          continue;
+        }
+        if (file.size > MAX_BYTES) {
+          toast('Imagem muito grande: ' + file.name + '. Max 10MB.', 'error');
+          continue;
+        }
+        const reader = new FileReader();
+        reader.onload = (function(f) {
+          return function(e) {
+            const dataUrl = e.target.result;
+            studioAttachedImages.push({
+              b64: dataUrl.split(',')[1],
+              dataUrl: dataUrl,
+              name: f.name,
+              size: f.size
+            });
+            studioRenderPreviews();
+          };
+        })(file);
+        reader.readAsDataURL(file);
       }
-      const MAX_BYTES = 10 * 1024 * 1024; // 10MB
-      if (file.size > MAX_BYTES) {
-        toast('Imagem muito grande. Max 10MB.', 'error');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const dataUrl = e.target.result; // "data:image/...;base64,XXXX"
-        studioAttachedImage = dataUrl.split(',')[1]; // strip prefix
-        // Show preview
-        document.getElementById('studioPreviewImg').src = dataUrl;
-        document.getElementById('studioPreviewLabel').textContent = file.name + ' (' + (file.size / 1024).toFixed(0) + ' KB)';
-        document.getElementById('studioPreview').classList.add('visible');
-      };
-      reader.readAsDataURL(file);
-      // Reset input so same file can be re-selected
       document.getElementById('studioFileInput').value = '';
     }
 
-    function studioRemoveImage() {
-      studioAttachedImage = null;
-      document.getElementById('studioPreview').classList.remove('visible');
-      document.getElementById('studioPreviewImg').src = '';
-      document.getElementById('studioPreviewLabel').textContent = '';
+    // Backwards compat: single file from older code paths
+    function studioHandleFile(file) {
+      if (file) studioHandleFiles([file]);
+    }
+
+    function studioRemoveImage(index) {
+      if (typeof index === 'number') {
+        studioAttachedImages.splice(index, 1);
+      } else {
+        studioAttachedImages = [];
+      }
+      studioRenderPreviews();
+    }
+
+    function studioRenderPreviews() {
+      const container = document.getElementById('studioPreview');
+      if (studioAttachedImages.length === 0) {
+        container.classList.remove('visible');
+        container.innerHTML = '';
+        return;
+      }
+      container.classList.add('visible');
+      container.innerHTML = studioAttachedImages.map((img, i) =>
+        '<div class="studio-preview-item">' +
+          '<div class="studio-preview-thumb">' +
+            '<img src="' + img.dataUrl + '" alt="preview">' +
+            '<button class="studio-preview-remove" onclick="studioRemoveImage(' + i + ')" title="Remover imagem">&times;</button>' +
+          '</div>' +
+          '<span class="studio-preview-label">' + _esc(img.name) + '</span>' +
+        '</div>'
+      ).join('') +
+      (studioAttachedImages.length > 1 ? '<span class="studio-preview-count">' + studioAttachedImages.length + ' imgs</span>' : '');
     }
 
     // Issue #31: Drag-and-drop setup — called from studioInit
@@ -6152,11 +6256,14 @@
       dropZone.addEventListener('drop', function(e) {
         e.preventDefault();
         dropZone.classList.remove('studio-drag-active');
-        const file = e.dataTransfer.files && e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) {
-          studioHandleFile(file);
-        } else if (file) {
-          toast('Apenas imagens sao aceitas.', 'error');
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+          const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+          if (imageFiles.length > 0) {
+            studioHandleFiles(imageFiles);
+          } else {
+            toast('Apenas imagens sao aceitas.', 'error');
+          }
         }
       });
     }
