@@ -80,6 +80,9 @@ const EVOLUTION_KEY = process.env.EVOLUTION_API_KEY;
 const EVOLUTION_INSTANCE = process.env.EVOLUTION_INSTANCE || 'Vendas n2';
 const SLACK_WEBHOOK = process.env.SLACK_WEBHOOK_URL;
 const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK_URL || 'https://discord.com/api/webhooks/1484533109553758208/qHY5TOheRHN_4-kJdPISRb1KgCO_UTzxy4NmL7B4gzi_0SXkyIt0gQq6olHAz5jHYnKM';
+// Canal dedicado pra falhas sensiveis (lead perdido, Pipe fail, sheet fail).
+// Nao mistura com notificacoes normais pra nao afogar o sinal critico.
+const DISCORD_LEAD_CRITICAL_WEBHOOK = process.env.DISCORD_LEAD_CRITICAL_WEBHOOK_URL || 'https://discord.com/api/webhooks/1460216471270723769/cEq-Rc-Dzgm_GYRZpGoVWNYWEMZAYQLNPcQ1cMu1upPw4rowRmc-x8ILTAQN5M8_Hip4';
 const SPREADSHEET_API = 'https://ge-prd-web-api.contele.com.br/api/v1/spreadsheet/1cM0RpSRWarWNqSYDfjqTkPnrWI1BSP8jicm77n3KiTY';
 const SDR_WEBHOOK = process.env.SDR_WEBHOOK_URL || 'https://marcofassa.app.n8n.cloud/webhook/inicio-sdr-teams-v2';
 const LEONARDO_PHONE = '5511999796461';
@@ -105,14 +108,22 @@ const PD_FIELDS = {
 
 // ===== HELPERS =====
 async function pipedrivePost(resource, body) {
-  const res = await fetch(`https://api.pipedrive.com/v1/${resource}?api_token=${PIPEDRIVE_TOKEN}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  const data = await res.json();
-  if (!data.success) console.error(`Pipedrive ${resource} error:`, data.error);
-  return data;
+  try {
+    const res = await fetch(`https://api.pipedrive.com/v1/${resource}?api_token=${PIPEDRIVE_TOKEN}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!data.success) {
+      console.error(`Pipedrive ${resource} error [${res.status}]:`, JSON.stringify(data.error).slice(0, 400));
+      return { ok: false, data, error: data.error, status: res.status };
+    }
+    return { ok: true, data };
+  } catch (err) {
+    console.error(`Pipedrive ${resource} throw:`, err.message);
+    return { ok: false, data: null, error: err.message, status: 0 };
+  }
 }
 
 async function sendWhatsApp(number, text) {
@@ -245,6 +256,21 @@ async function sendDiscord(content) {
   }
 }
 
+// Canal critico: falhas no fluxo de captura de lead (Pipe, sheet, SDR).
+// Qualquer evento que signifique "lead perdido ou em risco de perder" vem aqui.
+async function sendDiscordCritical(content) {
+  if (!DISCORD_LEAD_CRITICAL_WEBHOOK) return;
+  try {
+    await fetch(DISCORD_LEAD_CRITICAL_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content })
+    });
+  } catch (err) {
+    console.error('Discord critical error:', err.message);
+  }
+}
+
 async function sendSlack(text) {
   if (!SLACK_WEBHOOK) return;
   try {
@@ -260,13 +286,33 @@ async function sendSlack(text) {
 
 async function appendSheet(data) {
   try {
-    await fetch(SPREADSHEET_API, {
+    const res = await fetch(SPREADSHEET_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ spreadsheetData: data })
     });
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      console.error(`Sheets error [${res.status}]:`, body.slice(0, 300));
+      // Alert critico: lead pode estar no Pipe mas sumiu do relatorio
+      sendDiscordCritical(
+        `🚨 **appendSheet FAILED** [${res.status}]\n` +
+        `Lead: ${data.Nome || '?'} | ${data.Empresa || '?'} | ${data.Telefone || '?'}\n` +
+        `Status: ${data.status || '?'} | ID Pipe: ${data['ID Pipe'] || 'sem'}\n` +
+        `Body: ${body.slice(0, 200)}`
+      ).catch(() => {});
+      return false;
+    }
+    return true;
   } catch (err) {
-    console.error('Sheets error:', err.message);
+    console.error('Sheets throw:', err.message);
+    sendDiscordCritical(
+      `🚨 **appendSheet THROW**\n` +
+      `Lead: ${data.Nome || '?'} | ${data.Empresa || '?'} | ${data.Telefone || '?'}\n` +
+      `Status: ${data.status || '?'} | ID Pipe: ${data['ID Pipe'] || 'sem'}\n` +
+      `Erro: ${err.message}`
+    ).catch(() => {});
+    return false;
   }
 }
 
@@ -300,6 +346,24 @@ app.post('/api/lead', async (req, res) => {
 
   // Quick response to frontend (don't block)
   res.json({ ok: true });
+
+  // Wrapper global: qualquer throw nao-tratado dispara alerta critico pra
+  // nao perder lead silenciosamente. Frontend ja recebeu 200, entao processar
+  // em background com guard.
+  try {
+  await processLead(body, tamanho, ctaSource);
+  } catch (err) {
+    console.error('[LEAD] Handler crashed:', err);
+    await sendDiscordCritical(
+      `🚨 **LEAD HANDLER CRASHED** (possivel lead perdido)\n` +
+      `Lead: ${body?.nome || '?'} | ${body?.empresa || '?'} | ${body?.telefone || '?'} | ${body?.email || '?'}\n` +
+      `Licencas: ${tamanho} | CTA: ${ctaSource}\n` +
+      `Erro: ${err.message}\n\`\`\`${(err.stack || '').slice(0, 400)}\`\`\``
+    ).catch(() => {});
+  }
+});
+
+async function processLead(body, tamanho, ctaSource) {
 
   // Filter test submissions: log to sheet but skip Pipedrive/SDR/notifications
   const isTest = /teste|test|prova|fake/i.test(body.nome || '') ||
@@ -367,7 +431,24 @@ app.post('/api/lead', async (req, res) => {
     email: [body.email],
     phone: [body.telefone]
   });
-  const personId = personRes.data?.id;
+  const personId = personRes.ok ? personRes.data?.data?.id : null;
+
+  if (!personRes.ok || !personId) {
+    // Person nao foi criada: lead morre aqui. Nao adianta tentar Deal sem
+    // person_id. Marca sheet como fail e alerta critico.
+    sheetData['status'] = '5_pipedrive_person_failed';
+    sheetData['Vendedor'] = '';
+    sheetData['ID Pipe'] = '';
+    await appendSheet(sheetData);
+    await sendDiscordCritical(
+      `🚨 **Pipedrive PERSON FAILED** (lead nao virou deal)\n` +
+      `Lead: ${body.nome} | ${body.empresa} | ${body.telefone} | ${body.email}\n` +
+      `Licencas: ${tamanho} | CTA: ${ctaSource}\n` +
+      `Status: ${personRes.status} | Erro: ${JSON.stringify(personRes.error).slice(0, 200)}`
+    ).catch(() => {});
+    console.error(`[LEAD] ABORT: person creation failed for ${body.empresa}`);
+    return;
+  }
 
   // 2. Create Deal in Pipedrive (with GCLID, GA4, UTMs)
   const dealBody = {
@@ -392,14 +473,32 @@ app.post('/api/lead', async (req, res) => {
   dealBody[PD_FIELDS.ga4] = body.ga4_client_id || '';
 
   const dealRes = await pipedrivePost('deals', dealBody);
-  const dealId = dealRes.data?.id;
+  const dealId = dealRes.ok ? dealRes.data?.data?.id : null;
+
+  if (!dealRes.ok || !dealId) {
+    // Deal nao foi criado: lead fica orfao (pessoa existe, deal nao). Marca
+    // sheet + alerta + NAO dispara notifs pra evitar URL quebrada.
+    sheetData['status'] = '5_pipedrive_deal_failed';
+    sheetData['Vendedor'] = vendor.nome;
+    sheetData['ID Pipe'] = '';
+    await appendSheet(sheetData);
+    await sendDiscordCritical(
+      `🚨 **Pipedrive DEAL FAILED** (person criada mas deal nao, lead orfao)\n` +
+      `Lead: ${body.nome} | ${body.empresa} | ${body.telefone} | ${body.email}\n` +
+      `Licencas: ${tamanho} | CTA: ${ctaSource}\n` +
+      `Person ID: ${personId}\n` +
+      `Status: ${dealRes.status} | Erro: ${JSON.stringify(dealRes.error).slice(0, 200)}`
+    ).catch(() => {});
+    console.error(`[LEAD] ABORT: deal creation failed for ${body.empresa} (person=${personId})`);
+    return;
+  }
 
   console.log(`[LEAD] Pipedrive: person=${personId} deal=${dealId} vendor=${vendor.nome}`);
 
   // 3. Update sheet data with deal info
   sheetData['status'] = smallTeamAccepted ? '2-small-team-accepted-deal-created' : '1-success-deal-created-in-pipedrive';
   sheetData['Vendedor'] = vendor.nome;
-  sheetData['ID Pipe'] = String(dealId || '');
+  sheetData['ID Pipe'] = String(dealId);
 
   // 4. Run remaining tasks in parallel
   const pipedriveUrl = `https://contelegv.pipedrive.com/deal/${dealId}`;
@@ -465,14 +564,32 @@ app.post('/api/lead', async (req, res) => {
         info: body.info || '',
         cta_source: ctaSource
       })
+    }).then(async (sdrRes) => {
+      // SDR webhook (n8n -> contele-os sales-lead): trigger do Leo IA.
+      // Se falhar, lead existe no Pipe mas Leo nao dispara first-contact.
+      if (!sdrRes.ok) {
+        const txt = await sdrRes.text().catch(() => '');
+        console.error(`SDR webhook non-OK [${sdrRes.status}]:`, txt.slice(0, 200));
+        sendDiscordCritical(
+          `🚨 **SDR webhook NON-OK** [${sdrRes.status}] (Leo IA pode nao ter disparado)\n` +
+          `Lead: ${body.nome} | ${body.empresa} | ${body.telefone}\n` +
+          `Deal: ${dealId} | Licencas: ${tamanho}\n` +
+          `Body: ${txt.slice(0, 200)}`
+        ).catch(() => {});
+      }
     }).catch(err => {
       console.error('SDR webhook error:', err.message);
-      sendDiscord(`🚨 **SDR webhook FAILED** deal=${dealId} ${body.empresa}: ${err.message}`).catch(() => {});
+      sendDiscordCritical(
+        `🚨 **SDR webhook THROW** (Leo IA nao disparou)\n` +
+        `Lead: ${body.nome} | ${body.empresa} | ${body.telefone}\n` +
+        `Deal: ${dealId} | Licencas: ${tamanho}\n` +
+        `Erro: ${err.message}`
+      ).catch(() => {});
     })
   ]);
 
   console.log(`[LEAD] Complete: ${body.empresa} -> deal ${dealId}, vendor ${vendor.nome}`);
-});
+}
 
 // ===== PIPEDRIVE WEBHOOK: Deal Stage Change =====
 // Receives Pipedrive webhook when deal changes stage
