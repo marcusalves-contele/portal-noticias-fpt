@@ -716,40 +716,31 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
       ga4Status = 'FAILED (no API secret)';
     } else if (ga4ClientId) {
       try {
-        // Params GA4 oficiais: `campaign_source`, `campaign_medium`, `campaign_name`.
-        // `source`/`medium`/`campaign` (nomes que usavamos) nao sao reconhecidos e
-        // resultavam em sessionSource=(not set) em 100% dos eventos.
-        // Enviamos tambem evento `campaign_details` pra atribuir traffic source
-        // session-level (requer session_id pra stitching completo - fase 2).
-        // `engagement_time_msec: 1` evita que GA4 trate como "nao engajado".
+        // Params GA4 oficiais pra traffic source: `campaign_source`, `campaign_medium`,
+        // `campaign_name`. `source`/`medium`/`campaign` (nomes que usavamos antes)
+        // nao sao reconhecidos e resultavam em sessionSource=(not set) em 100%.
+        // `engagement_time_msec: 1` evita que GA4 trate evento como "nao engajado".
+        // Nota: `campaign_details` (evento auxiliar) e reservado pra Firebase/Apps
+        // e e descartado em web property - nao usamos.
+        // Session-scoped attribution (sessionSource preenchido em reports padrao)
+        // requer `session_id` - fase 2, exige captura client-side.
         const ga4Resp = await fetch(`${GOOGLE_ADS_CONVERSION_URL}?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             client_id: ga4ClientId,
-            events: [
-              {
-                name: 'campaign_details',
-                params: {
-                  campaign_source: utmSource,
-                  campaign_medium: utmMedium,
-                  campaign_name: utmCampaign,
-                  engagement_time_msec: 1
-                }
-              },
-              {
-                name: 'lead_qualificado',
-                params: {
-                  value: 1,
-                  currency: 'BRL',
-                  deal_id: String(dealId),
-                  campaign_source: utmSource,
-                  campaign_medium: utmMedium,
-                  campaign_name: utmCampaign,
-                  engagement_time_msec: 1
-                }
+            events: [{
+              name: 'lead_qualificado',
+              params: {
+                value: 1,
+                currency: 'BRL',
+                deal_id: String(dealId),
+                campaign_source: utmSource,
+                campaign_medium: utmMedium,
+                campaign_name: utmCampaign,
+                engagement_time_msec: 1
               }
-            ]
+            }]
           })
         });
         if (ga4Resp.status >= 200 && ga4Resp.status < 300) {
@@ -809,36 +800,25 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
       ga4WonStatus = 'FAILED (no API secret)';
     } else if (ga4ClientId) {
       try {
-        // Mesma correcao do lead_qualificado: params oficiais GA4 + campaign_details
+        // Mesma correcao do lead_qualificado: params oficiais GA4.
         // Ver comentario em ~linha 720 pra contexto completo.
         const ga4Resp = await fetch(`${GOOGLE_ADS_CONVERSION_URL}?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             client_id: ga4ClientId,
-            events: [
-              {
-                name: 'campaign_details',
-                params: {
-                  campaign_source: utmSource,
-                  campaign_medium: utmMedium,
-                  campaign_name: utmCampaign,
-                  engagement_time_msec: 1
-                }
-              },
-              {
-                name: 'lead_convertido',
-                params: {
-                  value: dealValue,
-                  currency: 'BRL',
-                  deal_id: String(dealId),
-                  campaign_source: utmSource,
-                  campaign_medium: utmMedium,
-                  campaign_name: utmCampaign,
-                  engagement_time_msec: 1
-                }
+            events: [{
+              name: 'lead_convertido',
+              params: {
+                value: dealValue,
+                currency: 'BRL',
+                deal_id: String(dealId),
+                campaign_source: utmSource,
+                campaign_medium: utmMedium,
+                campaign_name: utmCampaign,
+                engagement_time_msec: 1
               }
-            ]
+            }]
           })
         });
         if (ga4Resp.status >= 200 && ga4Resp.status < 300) {
