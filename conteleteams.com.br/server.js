@@ -1,6 +1,39 @@
 const express = require('express');
 const compression = require('compression');
 const path = require('path');
+const crypto = require('crypto');
+
+// ===== Enhanced Conversions helpers (growth#76) =====
+function normalizeEmail(email) {
+  if (!email || typeof email !== 'string') return '';
+  return email.trim().toLowerCase();
+}
+
+function normalizePhoneBR(phone) {
+  if (!phone || typeof phone !== 'string') return '';
+  let digits = phone.replace(/\D/g, '');
+  if (!digits) return '';
+  if (digits.length === 12 || digits.length === 13) {
+    if (digits.startsWith('55')) return '+' + digits;
+  }
+  if (digits.length === 10 || digits.length === 11) return '+55' + digits;
+  return '+' + digits;
+}
+
+function sha256Hex(value) {
+  if (!value) return null;
+  return crypto.createHash('sha256').update(value).digest('hex');
+}
+
+function hashEmail(email) {
+  const norm = normalizeEmail(email);
+  return norm ? sha256Hex(norm) : null;
+}
+
+function hashPhoneBR(phone) {
+  const norm = normalizePhoneBR(phone);
+  return norm ? sha256Hex(norm) : null;
+}
 
 const app = express();
 app.use(compression());
@@ -525,7 +558,10 @@ async function processLead(body, tamanho, ctaSource) {
         utm_campaign: body.campanha || '',
         utm_term: body.utm_term || '',
         utm_content: body.utm_content || '',
-        landing_page: body.landing_page || ''
+        landing_page: body.landing_page || '',
+        hashed_email: hashEmail(body.email),
+        hashed_phone: hashPhoneBR(body.telefone),
+        raw_gclid: body.gclid || null
       })
     }).then(async (r) => {
       if (!r.ok) {
@@ -754,6 +790,8 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
   let utmSource = utmParamsFromPipe.utm_source || 'direct';
   let utmMedium = utmParamsFromPipe.utm_medium || 'none';
   let utmCampaign = utmParamsFromPipe.utm_campaign || '';
+  let hashedEmail = null;
+  let hashedPhone = null;
 
   if (CONTELE_OS_WEBHOOK_SECRET) {
     try {
@@ -772,7 +810,9 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
             if (j.utm_data.utm_medium) utmMedium = j.utm_data.utm_medium;
             if (j.utm_data.utm_campaign) utmCampaign = j.utm_data.utm_campaign;
           }
-          console.log(`[PIPE] Tracking do Contele OS: deal=${dealId} sid=${ga4SessionId ? 'yes' : 'no'} cid=${ga4ClientId ? 'yes' : 'no'}`);
+          hashedEmail = j.hashed_email || (j.email ? hashEmail(j.email) : null);
+          hashedPhone = j.hashed_phone || (j.phone ? hashPhoneBR(j.phone) : null);
+          console.log(`[PIPE] Tracking do Contele OS: deal=${dealId} sid=${ga4SessionId ? 'yes' : 'no'} cid=${ga4ClientId ? 'yes' : 'no'} ec=${hashedEmail ? 'yes' : 'no'}`);
         } else {
           console.log(`[PIPE] Contele OS lookup: deal=${dealId} not_found, usando fallback Pipedrive`);
         }
@@ -811,6 +851,12 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             client_id: ga4ClientId,
+            ...(hashedEmail || hashedPhone ? {
+              user_data: {
+                ...(hashedEmail ? { sha256_email_address: hashedEmail } : {}),
+                ...(hashedPhone ? { sha256_phone_number: hashedPhone } : {})
+              }
+            } : {}),
             events: [{
               name: 'lead_qualificado',
               params: {
@@ -890,6 +936,12 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             client_id: ga4ClientId,
+            ...(hashedEmail || hashedPhone ? {
+              user_data: {
+                ...(hashedEmail ? { sha256_email_address: hashedEmail } : {}),
+                ...(hashedPhone ? { sha256_phone_number: hashedPhone } : {})
+              }
+            } : {}),
             events: [{
               name: 'lead_convertido',
               params: {

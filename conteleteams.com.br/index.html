@@ -2139,6 +2139,58 @@
     input.value = v;
   }
 
+  // ===== TRACKING HELPERS (growth#76 Enhanced Conversions) =====
+  // First-party cookies de click IDs (Google Ads) com vida 180d. Usadas
+  // pra persistir gclid/gbraid/wbraid entre sessoes quando o cookie _gcl_aw
+  // e outros third-party sao bloqueados (Consent Mode v2, iOS, ITP).
+  function setFirstPartyClickId(name, value) {
+    const maxAge = 60 * 60 * 24 * 180;
+    document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; Secure; SameSite=Lax`;
+  }
+  function getFirstPartyClickId(name) {
+    const m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]+)'));
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+  function getGclid() {
+    const params = new URLSearchParams(window.location.search);
+    const urlGclid = params.get('gclid');
+    if (urlGclid) {
+      setFirstPartyClickId('_contele_gclid', urlGclid);
+      return urlGclid;
+    }
+    const cookieGclid = getFirstPartyClickId('_contele_gclid');
+    if (cookieGclid) return cookieGclid;
+    const match = document.cookie.match(/_gcl_aw=([^;]+)/);
+    if (match) {
+      const parts = match[1].split('.');
+      return parts.length >= 3 ? parts.slice(2).join('.') : match[1];
+    }
+    return '';
+  }
+  function getGbraid() {
+    const params = new URLSearchParams(window.location.search);
+    const urlVal = params.get('gbraid');
+    if (urlVal) { setFirstPartyClickId('_contele_gbraid', urlVal); return urlVal; }
+    return getFirstPartyClickId('_contele_gbraid') || '';
+  }
+  function getWbraid() {
+    const params = new URLSearchParams(window.location.search);
+    const urlVal = params.get('wbraid');
+    if (urlVal) { setFirstPartyClickId('_contele_wbraid', urlVal); return urlVal; }
+    return getFirstPartyClickId('_contele_wbraid') || '';
+  }
+  function getGA4ClientId() {
+    const match = document.cookie.match(/_ga=([^;]+)/);
+    return match ? match[1] : '';
+  }
+  // GA4 session_id cookie: _ga_<MEASUREMENT_ID_HASH> format:
+  //   GS1.1.{session_id}.{session_count}.{engagement}.{timestamp}.0
+  // Ver issue growth#77 (session-scoped attribution).
+  function getGA4SessionId() {
+    const m = document.cookie.match(/_ga_P9C84XP07E=GS1\.1\.(\d+)\./);
+    return m ? m[1] : '';
+  }
+
   // ===== CONFIG =====
   const MIN_TEAM_SIZE = 4;
 
@@ -2205,31 +2257,6 @@
     submitBtn.textContent = 'Enviando...';
     localStorage.setItem('lastSubmit', Date.now().toString());
 
-    function getGclid() {
-      // URL param first (always complete), cookie as fallback
-      const urlGclid = new URLSearchParams(window.location.search).get('gclid');
-      if (urlGclid) return urlGclid;
-      const match = document.cookie.match(/_gcl_aw=([^;]+)/);
-      if (match) {
-        const parts = match[1].split('.');
-        return parts.length >= 3 ? parts.slice(2).join('.') : match[1];
-      }
-      return '';
-    }
-
-    function getGA4ClientId() {
-      const match = document.cookie.match(/_ga=([^;]+)/);
-      return match ? match[1] : '';
-    }
-
-    // GA4 session_id cookie: _ga_<MEASUREMENT_ID_HASH> format:
-    //   GS1.1.{session_id}.{session_count}.{engagement}.{timestamp}.0
-    // Ver issue growth#77 (session-scoped attribution).
-    function getGA4SessionId() {
-      const m = document.cookie.match(/_ga_P9C84XP07E=GS1\.1\.(\d+)\./);
-      return m ? m[1] : '';
-    }
-
     // Format phone: strip non-digits, add 55 if <= 11 digits
     function formatPhone(tel) {
       var digits = tel.replace(/\D/g, '');
@@ -2245,6 +2272,8 @@
     const utmContent = params.get('utm_content') || '';
 
     const gclid = getGclid();
+    const gbraid = getGbraid();
+    const wbraid = getWbraid();
     const ga4ClientId = getGA4ClientId();
     const ga4SessionId = getGA4SessionId();
     const telefoneFormatado = formatPhone(telefone);
@@ -2292,6 +2321,8 @@
         campanha: utmCampaign,
         landing_page: window.location.href,
         gclid: gclid,
+        gbraid: gbraid,
+        wbraid: wbraid,
         ga4_client_id: ga4ClientId,
         ga4_session_id: ga4SessionId,
         utm_source: utmSource,
@@ -2359,20 +2390,11 @@
         small_team_accepted: true,
         campanha: params.get('utm_campaign') || '',
         landing_page: window.location.href,
-        gclid: (function() {
-          var u = params.get('gclid');
-          if (u) return u;
-          var m = document.cookie.match(/_gcl_aw=([^;]+)/);
-          return m ? m[1].split('.').slice(2).join('.') || m[1] : '';
-        })(),
-        ga4_client_id: (function() {
-          var m = document.cookie.match(/_ga=([^;]+)/);
-          return m ? m[1] : '';
-        })(),
-        ga4_session_id: (function() {
-          var m = document.cookie.match(/_ga_P9C84XP07E=GS1\.1\.(\d+)\./);
-          return m ? m[1] : '';
-        })(),
+        gclid: getGclid(),
+        gbraid: getGbraid(),
+        wbraid: getWbraid(),
+        ga4_client_id: getGA4ClientId(),
+        ga4_session_id: getGA4SessionId(),
         utm_source: params.get('utm_source') || '',
         utm_medium: params.get('utm_medium') || '',
         utm_term: params.get('utm_term') || '',
