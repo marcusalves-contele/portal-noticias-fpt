@@ -87,6 +87,13 @@ const SPREADSHEET_API = 'https://ge-prd-web-api.contele.com.br/api/v1/spreadshee
 const SDR_WEBHOOK = process.env.SDR_WEBHOOK_URL || 'https://marcofassa.app.n8n.cloud/webhook/inicio-sdr-teams-v2';
 const LEONARDO_PHONE = '5511999796461';
 
+// Contele OS (fonte de verdade de tracking GA4/UTM/gclid, issue growth#77)
+const CONTELE_OS_URL = process.env.CONTELE_OS_URL || 'https://os.contele.io';
+const CONTELE_OS_WEBHOOK_SECRET = process.env.CONTELE_OS_WEBHOOK_SECRET || '';
+if (!CONTELE_OS_WEBHOOK_SECRET) {
+  console.warn('[STARTUP] WARNING: CONTELE_OS_WEBHOOK_SECRET vazio! Tracking nao sera propagado pro Contele OS.');
+}
+
 // Vendor IDs
 const ID_DANIEL = 13133598;
 const ID_SHEILA = 6186902;
@@ -495,6 +502,45 @@ async function processLead(body, tamanho, ctaSource) {
 
   console.log(`[LEAD] Pipedrive: person=${personId} deal=${dealId} vendor=${vendor.nome}`);
 
+  // 2b. Propaga tracking completo pro Contele OS (fire-and-forget, nao bloqueia).
+  // Issue growth#77: ga4_session_id precisa chegar no webhook Pipedrive depois
+  // pra fechar attribution session-scoped no GA4 MP. Custom field Pipedrive
+  // `ga4` (client_id) continua populado acima como fallback.
+  if (CONTELE_OS_WEBHOOK_SECRET) {
+    fetch(`${CONTELE_OS_URL}/api/webhooks/sales-tracking`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-webhook-secret': CONTELE_OS_WEBHOOK_SECRET
+      },
+      body: JSON.stringify({
+        pipedrive_deal_id: dealId,
+        email: body.email,
+        phone: body.telefone,
+        gclid: body.gclid || null,
+        ga4_client_id: body.ga4_client_id || null,
+        ga4_session_id: body.ga4_session_id || null,
+        utm_source: body.utm_source || '',
+        utm_medium: body.utm_medium || '',
+        utm_campaign: body.campanha || '',
+        utm_term: body.utm_term || '',
+        utm_content: body.utm_content || '',
+        landing_page: body.landing_page || ''
+      })
+    }).then(async (r) => {
+      if (!r.ok) {
+        const txt = await r.text().catch(() => '');
+        console.error(`[TRACKING] Contele OS sales-tracking NON-OK [${r.status}]:`, txt.slice(0, 200));
+      } else {
+        console.log(`[TRACKING] Contele OS sales-tracking OK deal=${dealId} sid=${body.ga4_session_id ? 'yes' : 'no'}`);
+      }
+    }).catch(err => {
+      console.error('[TRACKING] Contele OS sales-tracking THROW:', err.message);
+    });
+  } else {
+    console.warn(`[TRACKING] Skipping Contele OS propagation (secret empty) deal=${dealId}`);
+  }
+
   // 3. Update sheet data with deal info
   sheetData['status'] = smallTeamAccepted ? '2-small-team-accepted-deal-created' : '1-success-deal-created-in-pipedrive';
   sheetData['Vendedor'] = vendor.nome;
@@ -690,19 +736,55 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
     return current[fieldKey] || '';
   }
 
-  const gclid = getCustomField(PD_FIELDS.gclid);
-  const ga4ClientId = getCustomField(PD_FIELDS.ga4);
+  const gclidFromPipe = getCustomField(PD_FIELDS.gclid);
+  const ga4ClientIdFromPipe = getCustomField(PD_FIELDS.ga4);
   const utmRaw = getCustomField(PD_FIELDS.utm);
   const dealValue = current.value || 0;
   const dealTitle = current.title || '';
 
   // Parse UTM string from Pipedrive (format: "utm_source=google&utm_medium=cpc&...")
-  const utmParams = Object.fromEntries(new URLSearchParams(utmRaw));
-  const utmSource = utmParams.utm_source || 'direct';
-  const utmMedium = utmParams.utm_medium || 'none';
-  const utmCampaign = utmParams.utm_campaign || '';
+  const utmParamsFromPipe = Object.fromEntries(new URLSearchParams(utmRaw));
 
-  console.log(`[PIPE] Deal ${dealId} "${dealTitle}" | gclid=${gclid ? 'yes' : 'no'} | ga4=${ga4ClientId ? 'yes' : 'no'}`);
+  // Lookup tracking no Contele OS (fonte de verdade, issue growth#77).
+  // Fallback: custom fields Pipedrive (ga4 client_id, gclid, utm string)
+  // pra nao quebrar conversoes em andamento se Contele OS falhar.
+  let ga4SessionId = '';
+  let gclid = gclidFromPipe;
+  let ga4ClientId = ga4ClientIdFromPipe;
+  let utmSource = utmParamsFromPipe.utm_source || 'direct';
+  let utmMedium = utmParamsFromPipe.utm_medium || 'none';
+  let utmCampaign = utmParamsFromPipe.utm_campaign || '';
+
+  if (CONTELE_OS_WEBHOOK_SECRET) {
+    try {
+      const lookup = await fetch(`${CONTELE_OS_URL}/api/webhooks/sales-tracking?deal_id=${dealId}`, {
+        headers: { 'x-webhook-secret': CONTELE_OS_WEBHOOK_SECRET }
+      });
+      if (lookup.ok) {
+        const j = await lookup.json().catch(() => ({}));
+        if (j && j.found) {
+          // Contele OS vence: sobrescreve campos que vieram preenchidos.
+          if (j.gclid) gclid = j.gclid;
+          if (j.ga4_client_id) ga4ClientId = j.ga4_client_id;
+          if (j.ga4_session_id) ga4SessionId = j.ga4_session_id;
+          if (j.utm_data && typeof j.utm_data === 'object') {
+            if (j.utm_data.utm_source) utmSource = j.utm_data.utm_source;
+            if (j.utm_data.utm_medium) utmMedium = j.utm_data.utm_medium;
+            if (j.utm_data.utm_campaign) utmCampaign = j.utm_data.utm_campaign;
+          }
+          console.log(`[PIPE] Tracking do Contele OS: deal=${dealId} sid=${ga4SessionId ? 'yes' : 'no'} cid=${ga4ClientId ? 'yes' : 'no'}`);
+        } else {
+          console.log(`[PIPE] Contele OS lookup: deal=${dealId} not_found, usando fallback Pipedrive`);
+        }
+      } else {
+        console.warn(`[PIPE] Contele OS lookup NON-OK [${lookup.status}] deal=${dealId}, usando fallback Pipedrive`);
+      }
+    } catch (err) {
+      console.error(`[PIPE] Contele OS lookup THROW deal=${dealId}:`, err.message);
+    }
+  }
+
+  console.log(`[PIPE] Deal ${dealId} "${dealTitle}" | gclid=${gclid ? 'yes' : 'no'} | ga4_cid=${ga4ClientId ? 'yes' : 'no'} | ga4_sid=${ga4SessionId ? 'yes' : 'no'}`);
 
   // QUALIFIED: deal entered a qualified stage (fire only once per deal)
   if (QUALIFIED_STAGES.includes(newStageId) && !QUALIFIED_STAGES.includes(oldStageId) && !firedQualified.has(dealId)) {
@@ -738,7 +820,8 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
                 campaign_source: utmSource,
                 campaign_medium: utmMedium,
                 campaign_name: utmCampaign,
-                engagement_time_msec: 1
+                engagement_time_msec: 1,
+                ...(ga4SessionId ? { session_id: ga4SessionId } : {})
               }
             }]
           })
@@ -816,7 +899,8 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
                 campaign_source: utmSource,
                 campaign_medium: utmMedium,
                 campaign_name: utmCampaign,
-                engagement_time_msec: 1
+                engagement_time_msec: 1,
+                ...(ga4SessionId ? { session_id: ga4SessionId } : {})
               }
             }]
           })

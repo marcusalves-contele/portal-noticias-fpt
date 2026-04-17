@@ -2222,6 +2222,14 @@
       return match ? match[1] : '';
     }
 
+    // GA4 session_id cookie: _ga_<MEASUREMENT_ID_HASH> format:
+    //   GS1.1.{session_id}.{session_count}.{engagement}.{timestamp}.0
+    // Ver issue growth#77 (session-scoped attribution).
+    function getGA4SessionId() {
+      const m = document.cookie.match(/_ga_P9C84XP07E=GS1\.1\.(\d+)\./);
+      return m ? m[1] : '';
+    }
+
     // Format phone: strip non-digits, add 55 if <= 11 digits
     function formatPhone(tel) {
       var digits = tel.replace(/\D/g, '');
@@ -2238,6 +2246,7 @@
 
     const gclid = getGclid();
     const ga4ClientId = getGA4ClientId();
+    const ga4SessionId = getGA4SessionId();
     const telefoneFormatado = formatPhone(telefone);
     const ctaSource = form.querySelector('[name="cta_source"]').value || 'testar';
 
@@ -2284,6 +2293,7 @@
         landing_page: window.location.href,
         gclid: gclid,
         ga4_client_id: ga4ClientId,
+        ga4_session_id: ga4SessionId,
         utm_source: utmSource,
         utm_medium: utmMedium,
         utm_term: utmTerm,
@@ -2357,6 +2367,10 @@
         })(),
         ga4_client_id: (function() {
           var m = document.cookie.match(/_ga=([^;]+)/);
+          return m ? m[1] : '';
+        })(),
+        ga4_session_id: (function() {
+          var m = document.cookie.match(/_ga_P9C84XP07E=GS1\.1\.(\d+)\./);
           return m ? m[1] : '';
         })(),
         utm_source: params.get('utm_source') || '',
