@@ -4,6 +4,20 @@ Registro de mudancas no Prism OS.
 
 ---
 
+## 20/04/2026: Token OAuth canal Teams (Leonardo) em producao
+
+- **Fix definitivo**: blog Teams agora extrai transcricao via Tier 3 (YouTube Data API) com token OAuth proprio do canal Leonardo Gazolli
+- Marco virou gerente do canal Teams, fez OAuth via brand account e gerou token_youtube_teams.pickle
+- Base64 setado em `YOUTUBE_TEAMS_TOKEN_B64` no Railway, isolado do token Fleet
+- Teste E2E em producao: video `OptcPLCSDRM` transcrito com 1009 segmentos, post publicado em blog.conteleteams.com.br/roteirizacao-equipe-externa-passo-a-passo/
+- Tier 1 (cookies) continua falhando em cloud IP: esperado, Tier 3 e o path feliz pra Teams
+- Novo script: `prism-os/nutella-creator/reauth_youtube_teams.py` (valida captions.list/download e imprime base64)
+- `*.pickle` e `token_*.json` no gitignore pra nao vazar token OAuth
+- Issue #74 atualizada com status
+- Commit: ddea208
+
+---
+
 ## 13/04/2026: Features + bug fixes batch
 
 ### Thumb Roteiro: Ajustar A/B (closes #66)
