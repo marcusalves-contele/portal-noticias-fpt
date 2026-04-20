@@ -318,3 +318,71 @@ python3 dashboard.py   # http://127.0.0.1:8765
    - Objetivo: base de dados ÚNICA com todos os vídeos + ações
    - Precisa alinhar formato com Marco (conversa pendente)
    - Proposta: vídeos + status thumb + link thumb + responsável + prioridade
+
+---
+
+## Landing Pages em `conteleteams.com.br/`
+
+Pastas servidas via Express static (server.js) direto em `conteleteams.com.br/`. Cada pasta com `index.html` vira uma rota publica.
+
+**Estrutura atual:**
+```
+conteleteams.com.br/
+├── index.html              # Home (NAO TOCAR sem aprovacao)
+├── presentation-en/        # Apresentacao EN (liberou demanda, visual nao e padrao)
+├── benchmark/vitamedic/    # Benchmark comercial Vitamedic
+└── [novas pastas]/         # Cada landing nova
+```
+
+### REGRA: `/presentation-en/` NAO e template
+
+Aquela pasta foi feita rapido pra liberar demanda (apresentacao em ingles pro Douglas). Visual e mal otimizado. NAO usar como base de nenhuma landing nova. Criar do zero.
+
+### Padrao pra landing nova (benchmark, proposta, comparativo)
+
+1. **Skill obrigatoria**: invocar `/frontend-design` antes de escrever HTML. Pensar visual bold intencional
+2. **Fonts distintivos** via Google Fonts (Fraunces, Instrument Serif, DM Sans, JetBrains Mono). ZERO Inter/Roboto/Arial
+3. **1 arquivo**: `{slug}/index.html` com CSS e JS inline. Simples, performante, zero build step
+4. **Meta**: `<meta name="robots" content="noindex, nofollow">` se for material dirigido a 1 cliente (nao polui SEO)
+5. **Mobile-first**: testar com viewport 375x812. Tabelas complexas = cards empilhados em mobile
+6. **QA obrigatorio**: rodar agent `QA Landing Page` antes de merge pra master (pega contraste WCAG, mobile discoverability, ortografia, links)
+
+### Deploy
+
+1. Feature branch: `git checkout -b feature/<nome>`
+2. Commit + push branch
+3. Preview local: `cd conteleteams.com.br && PORT=5174 node server.js`, abrir `http://localhost:5174/<slug>/`
+4. **Rodar QA Landing Page agent** (Playwright, screenshots, critica)
+5. Aplicar ajustes pos-QA
+6. `git checkout master && git merge <branch> --no-ff && git push origin master`
+7. **IMPORTANTE**: O webhook GitHub > Railway pode falhar silenciosamente. Verificar pos-push:
+   ```bash
+   curl -s -o /dev/null -w "%{size_download}b\n" "https://conteleteams.com.br/<slug>/?v=$(date +%s)"
+   # Tamanho deve ser o arquivo novo, nao 104kb (que e a home)
+   ```
+8. Se o deploy nao disparou em 60s, forcar via agent `railway-cli` pedindo: `railway up --service conteleteams` a partir de `/Users/marcofassa/Documents/growth-contele/conteleteams.com.br`
+
+### Gotcha: SPA fallback mascara deploy nao feito
+
+O `server.js` tem:
+```js
+app.get('*', (req, res) => {
+  const filePath = path.join(__dirname, req.path, 'index.html');
+  res.sendFile(filePath, err => {
+    if (err) res.sendFile(path.join(__dirname, 'index.html'));
+  });
+});
+```
+
+Se a pasta nao existe no disco deployado, express entrega a home raiz com HTTP 200. Facil confundir com "deploy OK mas cache". SEMPRE verificar com grep de conteudo unico ou tamanho esperado.
+
+### Referencia visual validada
+
+**`conteleteams.com.br/benchmark/vitamedic/`** (criada 09/04/2026):
+- Direcao: editorial tech magazine (FT Special Reports, Linear, Stripe Atlas)
+- Stack: Fraunces + DM Sans + JetBrains Mono, dark mode #0A0E1A
+- 9 secoes numeradas § 00 a § 09
+- Hero com number deck animado, noise texture, grid overlay
+- Matriz comparativa que vira cards em mobile via CSS-only (nth-child ::before pra labels)
+- Reading progress bar, scroll reveal IntersectionObserver
+- 2214 linhas em 1 arquivo, zero build step
