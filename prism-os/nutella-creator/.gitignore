@@ -1,6 +1,8 @@
 .env
 cookies.txt
 cookies_*.txt
+*.pickle
+token_*.json
 __pycache__/
 *.pyc
 output/
