@@ -724,12 +724,15 @@
     .equip-card {
       background: var(--white);
       border-radius: var(--radius);
-      padding: 24px;
+      padding: 28px 24px;
       text-align: center;
       box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
     }
-    .equip-card img { margin: 0 auto 12px; max-height: 180px; object-fit: contain; }
-    .equip-card h3 { font-family: var(--font-main); font-size: 16px; color: var(--blue-heading); }
+    .equip-card img { margin: 0 auto 16px; max-height: 220px; width: auto; object-fit: contain; }
+    .equip-card h3 { font-family: var(--font-main); font-size: 18px; color: var(--blue-heading); margin-bottom: 10px; font-weight: 800; }
+    .equip-card p { font-size: 14px; color: var(--text-sub); line-height: 1.6; }
 
     /* ===== DEPOIMENTOS ===== */
     #depoimentos { background: var(--white); }
@@ -1627,18 +1630,22 @@
     </div>
     <div class="equip-grid">
       <div class="equip-card">
-        <picture><source type="image/webp" srcset="/img/rastreadores-com-fio-contele-rastreador.webp"><img src="/img/rastreadores-com-fio-contele-rastreador.png" alt="Rastreador com fio" loading="lazy"></picture>
-        <h3>Rastreador com Fio</h3>
-      </div>
-      <div class="equip-card">
         <picture><source type="image/webp" srcset="/img/rastreador-plug-and-play-contele-fleet.webp"><img src="/img/rastreador-plug-and-play-contele-fleet.png" alt="Rastreador Plug and Play" loading="lazy"></picture>
         <h3>Rastreador Plug and Play</h3>
+        <p>Auto instalação simples: basta encaixar na entrada OBD do veículo que o rastreamento já começa a funcionar. Ideal para quem quer agilidade na ativação.</p>
       </div>
       <div class="equip-card">
-        <picture><source type="image/webp" srcset="/img/rele-de-corte-de-combustivel-contele-fleet.webp"><img src="/img/rele-de-corte-de-combustivel-contele-fleet.png" alt="Relé de corte de combustível" loading="lazy"></picture>
-        <h3>Relé de Corte de Combustível</h3>
+        <picture><source type="image/webp" srcset="/img/rastreadores-com-fio-contele-rastreador.webp"><img src="/img/rastreadores-com-fio-contele-rastreador.png" alt="Rastreador com fio" loading="lazy"></picture>
+        <h3>Rastreador com Fio</h3>
+        <p>Instalação discreta e conectada aos sistemas do veículo. Permite integração com relé de corte de combustível e sensores adicionais conforme a operação exigir.</p>
+      </div>
+      <div class="equip-card">
+        <picture><source type="image/webp" srcset="/img/carrossel-videotelemetria-1.webp"><img src="/img/carrossel-videotelemetria-1.png" alt="Câmera Veicular com videotelemetria" loading="lazy"></picture>
+        <h3>Câmera Veicular</h3>
+        <p>Videotelemetria inteligente que identifica automaticamente eventos de risco (sonolência, uso do celular, distração). Reduz custos com acidentes e protege a frota.</p>
       </div>
     </div>
+    <p style="text-align:center; margin-top: 28px; font-size: 14px; color: var(--text-sub); max-width: 720px; margin-left: auto; margin-right: auto;">As três opções contam com armazenamento interno para continuar funcionando em áreas de sombra de sinal.</p>
   </div>
 </section>
 
