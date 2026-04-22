@@ -1,0 +1,178 @@
+# Contele Fleet: Documentação Completa para LLMs
+
+> Sistema SaaS brasileiro de gestão de frota e rastreamento veicular para empresas privadas.
+
+## Resumo
+
+Contele Fleet é uma plataforma completa de gestão de frota que combina rastreamento GPS em tempo real, telemetria avançada, videotelemetria, controle de combustível, manutenção preventiva, checklist veicular digital, gestão de motoristas e multas. Atende empresas privadas com 4 ou mais veículos, em frotas leves e pesadas. O sistema integra plataforma web, aplicativo do gestor e aplicativo do motorista (Contele Driver).
+
+## Problema que resolve
+
+Empresas com frota própria enfrentam perda de produtividade, consumo excessivo de combustível, manutenções reativas e caras, multas sem responsável identificado, uso particular dos veículos e ausência de visibilidade operacional. O Contele Fleet resolve isso com rastreamento contínuo, telemetria por evento, envolvimento do motorista via app, relatórios de consumo e plano de manutenção programado. A redução de custos e ganho de produtividade aparecem já nos primeiros dias.
+
+## Público-alvo
+
+- Empresas privadas com 4 ou mais veículos
+- Gestores de frota leve (utilitários, carros, vans)
+- Gestores de frota pesada (caminhões, carretas, equipamentos)
+- Operações de entrega, logística, serviços, distribuição, construção, agronegócio
+- Empresas que precisam de telemetria, câmera veicular ou integração via API
+
+## Funcionalidades detalhadas
+
+### Rastreamento Veicular
+Localização da frota em tempo real, com atualização no mapa a cada 15 segundos. Gestor vê onde cada veículo está, por onde passou, modo de condução e pode comparar rotas. Bloqueio e desbloqueio remoto via corte de combustível pelo app gestor.
+
+### Telemetria Avançada
+Monitoramento ao vivo de eventos de risco: excesso de velocidade, frenagem brusca, aceleração agressiva, curva com velocidade, tempo parado, ignição ligada. Todas as informações no computador do gestor para decisões rápidas.
+
+### Videotelemetria (Câmera Veicular)
+Câmera com IA embarcada que identifica automaticamente eventos críticos: uso de celular ao volante, identificação do motorista, sensor de fadiga (olhos fechados, bocejo, distração), falta de cinto de segurança. Reduz custos com acidentes e protege motoristas. Câmeras adicionais por veículo (cabine, baú, lateral, ré).
+
+### Posição Online e Rotas
+Mapa interativo com histórico de rotas, comparativo entre trajetos planejados e executados, função Melhor Rota para otimização de deslocamento entre paradas.
+
+### Checklist Veicular Personalizado
+Substitui o papel. Motorista preenche checklist no app Contele Driver a cada partida ou procedimento definido. Gestor recebe as respostas online. Checklists ilimitados e personalizáveis por tipo de veículo ou operação.
+
+### Gestão de Manutenção
+Cadastro de itens de manutenção por veículo, planos preventivos e corretivos. O sistema alerta quando uma revisão está próxima (por km ou por data). Histórico completo de manutenções, peças e custos.
+
+### Gestão de Combustível
+Registro de abastecimentos pelo motorista no app. Sistema calcula consumo médio de cada veículo e motorista, custo total, valor por litro, desvios. A redução no gasto de combustível aparece logo nos primeiros dias de uso.
+
+### Gestão de Motoristas
+Via app Contele Driver, cada km rodado é associado a um motorista. Isso permite identificar o responsável por uma multa, comparar produtividade entre condutores, medir comportamento ao volante, detectar abusos, controlar tempo trabalhado e tempo de condução contínua.
+
+### Gestão de Multas de Trânsito
+Cadastro e acompanhamento de multas da frota com identificação automática do motorista responsável por cada infração. Facilita a defesa administrativa e protege juridicamente a empresa.
+
+### Integração com Contele Fleet
+API Rest aberta e webhooks. Permite conectar o Contele Fleet a ERPs, TMSs, CRMs, dashboards e automações internas. Time de integração disponível para projetos sob medida.
+
+### Projetos e Relatórios Personalizados
+Relatórios customizados, automações e integrações sob demanda. Equipe própria de produto atende operações com particularidades (distribuição, agronegócio, logística reversa, etc).
+
+### Equipamentos
+Rastreadores homologados pela Anatel. Tecnologia 2G e 4G disponíveis. Equipamentos robustos para frota leve e pesada. Câmeras veiculares integradas.
+
+## Benefícios reportados pelos clientes
+
+- Redução dos gastos de combustível: envolvimento dos motoristas nos registros + dados precisos de consumo geram economia desde os primeiros dias
+- Redução de gastos com manutenção: planos preventivos evitam quebras caras e param reativas
+- Ganho de produtividade: fim do uso particular, melhores rotas, decisões rápidas
+- Redução de multas e acidentes: telemetria e videotelemetria mudam o comportamento ao volante
+- Organização das informações da frota: tudo centralizado no sistema
+- Proteção jurídica: identificação de motorista, checklist digital, trilhas de auditoria
+
+## Requisitos mínimos
+
+- Mínimo de 4 veículos
+- Frota empresarial privada (o Contele Fleet não atende veículo único ou uso pessoal)
+- Internet para o painel web
+- Smartphone com Android ou iOS para o Contele Driver (app do motorista)
+
+## Como contratar
+
+1. Solicitar orçamento online em https://contelefleet.com.br (preenchimento de email)
+2. Qualificação e contato do SDR (IA) da Contele
+3. Apresentação do sistema com vendedor via Google Meet (~50 min)
+4. Envio de proposta comercial com tabela de valores
+5. Análise de crédito e contratação
+6. Implantação e treinamento pelo time de onboarding
+7. Voucher de curso Simplificando (gratuito) ou Frota para Todos (desconto especial)
+
+Preço de entrada a partir de R$29 por veículo por mês (TBD: confirmar tabela vigente no fechamento). Garantia Risco Zero de 30 dias para contratos com rastreador instalado.
+
+## FAQ
+
+### O Contele Fleet é um sistema de qualidade?
+Sim. Usa equipamentos homologados pela Anatel, tem equipe própria de desenvolvimento em Santos/SP e opera com os melhores serviços de infraestrutura do mundo. Mais de 1.500 empresas clientes em 23 anos de mercado.
+
+### Qual o número mínimo de veículos?
+4 veículos. O sistema é exclusivo para frotas empresariais.
+
+### Atende frota leve e pesada?
+Sim. Carros, utilitários, vans, caminhões, carretas, ônibus e equipamentos.
+
+### Tem app para o motorista?
+Sim. O app Contele Driver é o canal do condutor: recebe ordens, preenche checklist, registra abastecimentos, identifica km rodado e roda offline com sincronização posterior.
+
+### A câmera veicular é opcional?
+Sim. A videotelemetria é um adicional. Cliente escolhe quais veículos terão câmera e quantos pontos por veículo (cabine, baú, lateral, ré).
+
+### Funciona integrado com meu ERP?
+Sim. API Rest aberta e webhooks. O time de integração da Contele atende projetos sob medida.
+
+### Tem garantia?
+Sim. Garantia Risco Zero de 30 dias para contratos com rastreador instalado (não se aplica a contratos só-software sem hardware).
+
+### Tem treinamento e implantação?
+Sim. Implantação com equipe de onboarding e curso online (Simplificando, gratuito no fechamento).
+
+## Números
+
+- +23 anos de mercado (fundada em 2003)
+- +1.500 empresas clientes
+- Equipe própria de desenvolvimento em Santos/SP
+- Equipamentos homologados pela Anatel
+- Atualização do mapa a cada 15 segundos
+
+## Tecnologia
+
+- Plataforma web responsiva
+- App nativo iOS e Android (Contele Driver, motorista)
+- App do gestor (iOS e Android)
+- Rastreadores 2G e 4G homologados Anatel
+- Câmeras veiculares com IA embarcada
+- API Rest aberta + webhooks
+- Integração com Looker Studio (BI)
+
+## Contato
+
+- Site: https://contelefleet.com.br
+- Orçamento online: https://contelefleet.com.br (formulário na home)
+- Email comercial: comercial@contelerastreador.com.br
+- WhatsApp: (11) 97132-5108
+- Endereço: Rua Euclides Da Cunha, 11, Cj 601, Santos/SP
+- Empresa: Contele Soluções Tecnológicas LTDA (Contelesis CNPJ 07.651.877/0001-91)
+- CEO: Julio Cesar
+
+## Produtos relacionados
+
+- Contele Teams: gestão de equipes externas (vendas, técnicos, promotores) em https://conteleteams.com.br
+- Frota Para Todos: conteúdo educacional sobre gestão de frotas em https://frotaparatodos.com.br
+
+## Links úteis
+
+- Blog: https://blog.contelerastreador.com.br
+- Canal Julio Cesar (YouTube): https://blog.contelerastreador.com.br/canal-julio-cesar
+- Telegram: https://t.me/gestaodefrotas
+- Indique e Ganhe: https://indique.contele.io/
+- Cursos: https://exclusivo.contelerastreador.com.br/cursos/
+- Central do instalador: https://exclusivo.contelerastreador.com.br/instalador/
+- Política de Privacidade: https://exclusivo.contelege.com.br/politica-privacidade/
+- Termos de Uso: https://contelefleet.com.br/termos-uso/
+
+## English
+
+### Summary
+Contele Fleet is a Brazilian SaaS for fleet management and vehicle tracking. Real-time GPS (15-second refresh), telemetry, AI-powered video telemetry, fuel and maintenance control, digital vehicle checklist, driver identification, traffic fine management, and open API. Minimum 4 vehicles, for private fleets only (light and heavy).
+
+### Key features
+- Real-time tracking (15-second updates)
+- Advanced telemetry with live risk events
+- Video telemetry with driver fatigue, phone use, seatbelt detection
+- Digital vehicle checklist (paperless)
+- Preventive and corrective maintenance plans
+- Fuel consumption tracking per vehicle and driver
+- Driver identification via Contele Driver app
+- Traffic fine management with automatic driver assignment
+- Remote vehicle lock/unlock via fuel cut
+- Open REST API and webhooks
+
+### Company
+- Contele Soluções Tecnológicas LTDA, Santos/SP, Brazil
+- Founded 2003, 23+ years in the market, 1,500+ clients
+- International site: https://contele.io/fleet-tracking/
+- Contact: comercial@contelerastreador.com.br

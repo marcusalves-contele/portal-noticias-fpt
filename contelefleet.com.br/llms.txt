@@ -1,0 +1,54 @@
+# Contele Fleet
+
+> Sistema de gestão de frota e rastreamento veicular em tempo real para empresas.
+
+## O que é
+
+Contele Fleet é um SaaS brasileiro de gestão de frota e rastreamento veicular (GPS + telemetria) para empresas privadas com 4 ou mais veículos. Combina sistema web, app do gestor e app do motorista (Contele Driver) para reduzir custos de combustível, manutenção e multas, aumentar produtividade e proteger juridicamente a operação. Mais de 1.500 empresas clientes e 23 anos de mercado.
+
+## Recursos principais
+
+- Rastreamento veicular: localização em tempo real com atualização a cada 15 segundos
+- Telemetria avançada: eventos de risco ao vivo (excesso de velocidade, frenagem brusca, aceleração)
+- Videotelemetria: câmera veicular com detecção de uso de celular, fadiga, falta de cinto
+- Checklist veicular digital: personalizável, preenchido pelo motorista no app
+- Gestão de manutenção: planos preventivos e corretivos por veículo
+- Gestão de combustível: consumo médio, custo por litro, por veículo e motorista
+- Gestão de motoristas: identificação por km rodado via app Contele Driver
+- Gestão de multas: cadastro e identificação automática do motorista responsável
+- Bloqueio e desbloqueio remoto: corte de combustível pelo app gestor
+- Rotas e melhor rota: comparativo de trajetos e otimização
+- Projetos e relatórios personalizados: sob medida para a operação
+- Integração via API aberta: conecte com ERP, TMS, telemetria externa
+
+## Requisitos
+
+- Mínimo de 4 veículos
+- Exclusivo para frotas empresariais (uso privado não atendido)
+- Equipamentos homologados pela Anatel
+
+## Empresa
+
+- Contele Soluções Tecnológicas LTDA (Contelesis CNPJ 07.651.877/0001-91)
+- Fundada em 2003, +23 anos de mercado
+- +1.500 empresas clientes
+- Santos/SP, Brasil
+- Site: https://contelefleet.com.br
+- Contato: comercial@contelerastreador.com.br
+- WhatsApp: (11) 97132-5108
+
+## Links
+
+- Home: https://contelefleet.com.br/
+- Obrigado (pós orçamento): https://contelefleet.com.br/obrigado/
+- Obrigado (menos de 4 veículos): https://contelefleet.com.br/obrigado-2/
+- Termos de Uso: https://contelefleet.com.br/termos-uso/
+- Site institucional: https://contele.io
+- Contele Teams (gestão de equipes externas): https://conteleteams.com.br
+- Blog: https://blog.contelerastreador.com.br
+- Canal Julio Cesar (YouTube): https://blog.contelerastreador.com.br/canal-julio-cesar
+- Frota Para Todos: https://frotaparatodos.com.br
+
+## English
+
+Contele Fleet is a Brazilian SaaS for fleet management and vehicle tracking. GPS in real time, telemetry, video telemetry, fuel and maintenance control, digital checklist, driver identification, and open API. For private fleets with 4 or more vehicles. 1,500+ companies, 23+ years in the market. Headquartered in Santos/SP, Brazil. International site: https://contele.io/fleet-tracking/
