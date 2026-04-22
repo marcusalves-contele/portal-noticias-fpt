@@ -882,6 +882,7 @@
     #lead-form {
       background: linear-gradient(135deg, var(--dark-slate) 0%, var(--dark-navy) 100%);
       padding: 72px 0;
+      scroll-margin-top: 92px;
     }
     #lead-form h2 {
       font-family: var(--font-main);
@@ -1095,7 +1096,7 @@
       <div class="hero-content">
         <h1>Gestão de Frota e Rastreamento Veicular</h1>
         <p class="lead">Solução inteligente para o aumento de produtividade e redução de custos da sua frota.</p>
-        <form class="hero-form" onsubmit="event.preventDefault(); var v=(document.getElementById('ctxEmailHero')?.value||'').trim(); var tgt=document.getElementById('f-email'); if(tgt){tgt.value=v; tgt.dispatchEvent(new Event('input',{bubbles:true}));} document.getElementById('lead-form')?.scrollIntoView({behavior:'smooth', block:'start'}); setTimeout(function(){ var nxt=document.querySelector('#lead-form input[name=&quot;nome&quot;], #lead-form input[type=&quot;text&quot;]'); (nxt||tgt)?.focus(); }, 450);" aria-label="Início de orçamento">
+        <form class="hero-form" onsubmit="return openOrcamentoFromHero(event)" aria-label="Início de orçamento">
           <input type="email" name="ctxEmailHero" id="ctxEmailHero" required placeholder="Digite o seu melhor e-mail" autocomplete="email">
           <button type="submit">Fazer orçamento online</button>
         </form>
@@ -1115,6 +1116,47 @@
   </div>
 </section>
 <script>
+// Hero email: submeter, disparar RD Station (intent cedo), rolar ate o form principal sem pular o sticky header
+window.RD_PUBLIC_TOKEN = 'aa36284ab8fe7a6454aa43ecd7a22704';
+window.sendRdIntent = function(email, identifier){
+  try {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+    var body = {
+      event_type: 'CONVERSION',
+      event_family: 'CDP',
+      payload: {
+        conversion_identifier: identifier || 'fleet-landing-hero-email-intent',
+        email: email,
+        traffic_source: (document.referrer || '').slice(0, 500),
+        page_url: location.href
+      }
+    };
+    fetch('https://api.rd.services/platform/conversions?api_key=' + window.RD_PUBLIC_TOKEN, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      keepalive: true
+    }).catch(function(){});
+  } catch(e){}
+};
+window.openOrcamentoFromHero = function(ev){
+  if (ev && ev.preventDefault) ev.preventDefault();
+  var heroInput = document.getElementById('ctxEmailHero');
+  var email = (heroInput && heroInput.value || '').trim();
+  var tgt = document.getElementById('f-email');
+  if (tgt && email) {
+    tgt.value = email;
+    tgt.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+  window.sendRdIntent(email, 'fleet-landing-hero-email-intent');
+  var form = document.getElementById('lead-form');
+  if (form && form.scrollIntoView) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(function(){
+    var nome = document.querySelector('#lead-form input[name="nome"], #lead-form input[type="text"]');
+    if (nome) { try { nome.focus({ preventScroll: true }); } catch(e) { nome.focus(); } }
+  }, 600);
+  return false;
+};
 (function(){
   var wrap = document.getElementById('heroVideoWrapper');
   var slot = document.getElementById('heroVideoSlot');

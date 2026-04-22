@@ -358,6 +358,50 @@ async function sendSlack(text) {
   }
 }
 
+// RD Station conversion via token publico. Duplica o que o hero dispara client-side
+// (fleet-landing-hero-email-intent) com um evento completo quando o form principal e enviado.
+// conversion_identifier semantico permite segmentar entre "intencao" (so digitou email no hero)
+// e "lead completo" (preencheu formulario inteiro).
+const RDSTATION_PUBLIC_TOKEN = 'aa36284ab8fe7a6454aa43ecd7a22704';
+async function sendRdStationConversion(body, frota, ctaSource) {
+  if (!body?.email) return;
+  const payload = {
+    event_type: 'CONVERSION',
+    event_family: 'CDP',
+    payload: {
+      conversion_identifier: 'fleet-landing-form-completo',
+      email: body.email,
+      name: body.nome || '',
+      mobile_phone: body.telefone || '',
+      company_name: body.empresa || '',
+      cf_veiculos: String(frota || ''),
+      cf_cta: ctaSource || '',
+      cf_campanha: body.campanha || body.utm_campaign || '',
+      cf_gclid: body.gclid || '',
+      cf_utm_source: body.utm_source || '',
+      cf_utm_medium: body.utm_medium || '',
+      cf_utm_term: body.utm_term || '',
+      cf_utm_content: body.utm_content || '',
+      traffic_source: (body.landing_page || '').slice(0, 500)
+    }
+  };
+  try {
+    const r = await fetch(`https://api.rd.services/platform/conversions?api_key=${RDSTATION_PUBLIC_TOKEN}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) {
+      const txt = await r.text().catch(() => '');
+      console.error(`[RD] Conversion NON-OK [${r.status}] email=${body.email}:`, txt.slice(0, 200));
+    } else {
+      console.log(`[RD] Conversion OK email=${body.email} cta=${ctaSource}`);
+    }
+  } catch (err) {
+    console.error(`[RD] Conversion THROW email=${body.email}:`, err.message);
+  }
+}
+
 // Grava lead na planilha legada Fleet (Página1). Keys do `data` batem com os
 // headers reais da aba — API ge-prd-web-api matcha por nome de header.
 async function appendSheet(data) {
@@ -716,7 +760,8 @@ async function processLead(body, frota, ctaSource, isTest) {
   const tasks = [
     appendSheet(sheetData),
     sendSlack(slackText),
-    sendWhatsApp(VENDORS[vendor.id]?.phone, notifText)
+    sendWhatsApp(VENDORS[vendor.id]?.phone, notifText),
+    sendRdStationConversion(body, frota, ctaSource)
   ];
 
   // CEO notify (flag NOTIFY_CEO). Default: ligado (manter o que tem hoje).
