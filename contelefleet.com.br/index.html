@@ -1139,6 +1139,30 @@ window.sendRdIntent = function(email, identifier){
     }).catch(function(){});
   } catch(e){}
 };
+// Scroll robusto ate o form principal. Recomputa a posicao 3 vezes porque imagens
+// lazy-load entre hero e #lead-form fazem layout shift durante a animacao, fazendo
+// o scroll parar no meio no primeiro load (cache frio). Segundo load funciona porque
+// layout ja esta estavel. Fix: scrollTo recalculado em 3 passes cobre o reflow.
+window.scrollToLeadForm = function() {
+  var target = document.getElementById('lead-form');
+  if (!target) return;
+  var offset = 92;
+  var isMobile = window.matchMedia('(max-width: 900px)').matches;
+  function doScroll() {
+    var top = target.getBoundingClientRect().top + window.scrollY - offset;
+    try { window.scrollTo({ top: top, behavior: 'smooth' }); }
+    catch (e) { window.scrollTo(0, top); }
+  }
+  doScroll();
+  setTimeout(doScroll, 350);
+  setTimeout(doScroll, 900);
+  if (!isMobile) {
+    setTimeout(function(){
+      var nome = document.querySelector('#lead-form input[name="nome"], #lead-form input[type="text"]');
+      if (nome) { try { nome.focus({ preventScroll: true }); } catch(e) { nome.focus(); } }
+    }, 1100);
+  }
+};
 window.openOrcamentoFromHero = function(ev){
   if (ev && ev.preventDefault) ev.preventDefault();
   var heroInput = document.getElementById('ctxEmailHero');
@@ -1149,14 +1173,16 @@ window.openOrcamentoFromHero = function(ev){
     tgt.dispatchEvent(new Event('input', { bubbles: true }));
   }
   window.sendRdIntent(email, 'fleet-landing-hero-email-intent');
-  var form = document.getElementById('lead-form');
-  if (form && form.scrollIntoView) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  setTimeout(function(){
-    var nome = document.querySelector('#lead-form input[name="nome"], #lead-form input[type="text"]');
-    if (nome) { try { nome.focus({ preventScroll: true }); } catch(e) { nome.focus(); } }
-  }, 600);
+  window.scrollToLeadForm();
   return false;
 };
+// Hijacka clique de qualquer ancora href="#lead-form" pro scroll robusto (nav, subtext, CTAs).
+document.addEventListener('click', function(ev){
+  var a = ev.target && ev.target.closest && ev.target.closest('a[href="#lead-form"]');
+  if (!a) return;
+  ev.preventDefault();
+  window.scrollToLeadForm();
+});
 (function(){
   var wrap = document.getElementById('heroVideoWrapper');
   var slot = document.getElementById('heroVideoSlot');
