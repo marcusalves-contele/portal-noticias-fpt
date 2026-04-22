@@ -733,6 +733,25 @@
 
     /* ===== DEPOIMENTOS ===== */
     #depoimentos { background: var(--white); }
+    .dep-carousel { position: relative; max-width: 1080px; margin: 40px auto 0; padding: 0 8px; }
+    .dep-track { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding: 8px 4px 24px; -webkit-overflow-scrolling: touch; }
+    .dep-track::-webkit-scrollbar { display: none; }
+    .dep-track { scrollbar-width: none; }
+    .dep-card { flex: 0 0 calc(33.333% - 14px); min-width: 280px; scroll-snap-align: start; background: var(--white); border: 1px solid #eee; border-radius: 16px; padding: 28px 24px; box-shadow: 0 4px 20px rgba(32,37,46,0.06); display: flex; flex-direction: column; }
+    .dep-quote-mark { font-family: Georgia, serif; font-size: 44px; color: var(--purple-primary); line-height: 1; margin-bottom: 8px; font-weight: 700; }
+    .dep-quote { font-size: 14.5px; color: #3a3f52; line-height: 1.65; flex: 1; margin-bottom: 18px; }
+    .dep-author-row { display: flex; align-items: center; gap: 12px; margin-top: auto; }
+    .dep-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--purple-primary); color: var(--white); font-family: var(--font-main); font-weight: 800; font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .dep-meta { line-height: 1.3; }
+    .dep-name { font-family: var(--font-main); font-weight: 800; color: var(--purple-deep); font-size: 14.5px; }
+    .dep-company { font-size: 13px; color: var(--text-sub); }
+    .dep-nav { display: flex; justify-content: center; gap: 12px; margin-top: 16px; }
+    .dep-nav button { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--purple-primary); background: var(--white); color: var(--purple-primary); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s, color 0.15s; }
+    .dep-nav button:hover { background: var(--purple-primary); color: var(--white); }
+    .dep-nav button:disabled { opacity: 0.35; cursor: not-allowed; }
+    @media (max-width: 880px) {
+      .dep-card { flex: 0 0 calc(100% - 16px); min-width: 260px; }
+    }
     .depoimentos-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1673,18 +1692,95 @@
   <div class="container">
     <div class="text-center">
       <h2 class="section-title">Depoimentos de quem simplificou a gestão da frota</h2>
-      <p class="section-sub">Empresas de diferentes segmentos que confiam no Contele Fleet para operar suas frotas.</p>
+      <p class="section-sub">Clientes reais contando como usam o Contele Fleet no dia a dia.</p>
     </div>
-    <div class="depoimentos-grid">
-      <img src="/img/depoimento-contele-fleet-cejam.svg" alt="Cejam: depoimento Contele Fleet" loading="lazy">
-      <img src="/img/depoimento-contele-fleet-engecorps.svg" alt="Engecorps: depoimento Contele Fleet" loading="lazy">
-      <img src="/img/depoimento-contele-fleet-camptecnica.svg" alt="Camp Tecnica: depoimento Contele Fleet" loading="lazy">
-      <img src="/img/depoimento-contele-fleet-br27.svg" alt="BR27: depoimento Contele Fleet" loading="lazy">
-      <img src="/img/depoimento-contele-fleet-tmk.svg" alt="TMK: depoimento Contele Fleet" loading="lazy">
-      <img src="/img/depoimento-contele-fleet-termari.svg" alt="Termari: depoimento Contele Fleet" loading="lazy">
+
+    <div class="dep-carousel">
+      <div class="dep-track" id="dep-track">
+        <article class="dep-card">
+          <div class="dep-quote-mark">&ldquo;</div>
+          <p class="dep-quote">A gente tava rastreando o veículo 2407, aparece o nome da rua onde o veículo está. Clicamos ali, abre o Google Maps e eu consigo mandar a localização de onde está o ônibus. Isso achei muito interessante.</p>
+          <div class="dep-author-row">
+            <div class="dep-avatar" aria-hidden="true">RD</div>
+            <div class="dep-meta">
+              <div class="dep-name">Renan Dallazuanna</div>
+              <div class="dep-company">BVR Transportes</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="dep-card">
+          <div class="dep-quote-mark">&ldquo;</div>
+          <p class="dep-quote">Cada dia é uma surpresinha dentro daquele sistema. Entrega tudo que eu queria, aliás, até a mais do que a gente quer.</p>
+          <div class="dep-author-row">
+            <div class="dep-avatar" aria-hidden="true">TC</div>
+            <div class="dep-meta">
+              <div class="dep-name">Thaciana</div>
+              <div class="dep-company">LMP Transportes</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="dep-card">
+          <div class="dep-quote-mark">&ldquo;</div>
+          <p class="dep-quote">Desde o começo, qualquer dúvida, a gente entra em contato e já tem um pronto atendimento ali disponível pra gente tirar nossas dúvidas, esclarecer e ter um feedback de retorno muito breve.</p>
+          <div class="dep-author-row">
+            <div class="dep-avatar" aria-hidden="true">LJ</div>
+            <div class="dep-meta">
+              <div class="dep-name">Lucas Justino</div>
+              <div class="dep-company">Souza Barros</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="dep-card">
+          <div class="dep-quote-mark">&ldquo;</div>
+          <p class="dep-quote">Com o sistema, o motorista tem uma contraprova pra mostrar o que produziu no dia: combustível, rotas, checklist.</p>
+          <div class="dep-author-row">
+            <div class="dep-avatar" aria-hidden="true">RT</div>
+            <div class="dep-meta">
+              <div class="dep-name">Rehuel Tavares</div>
+              <div class="dep-company">Perfil X</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="dep-card">
+          <div class="dep-quote-mark">&ldquo;</div>
+          <p class="dep-quote">Com o sistema Contele Fleet, ao registrar um abastecimento eu vejo a foto do cupom, o odômetro, a média de litros, o nome do motorista e o valor pago. Eliminando totalmente o erro humano.</p>
+          <div class="dep-author-row">
+            <div class="dep-avatar" aria-hidden="true">LT</div>
+            <div class="dep-meta">
+              <div class="dep-name">Lucas Talysson</div>
+              <div class="dep-company">Guaibim Transportes</div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="dep-nav">
+        <button type="button" id="dep-prev" aria-label="Depoimento anterior">&#8592;</button>
+        <button type="button" id="dep-next" aria-label="Próximo depoimento">&#8594;</button>
+      </div>
     </div>
   </div>
 </section>
+<script>
+(function(){
+  var track = document.getElementById('dep-track');
+  var prev = document.getElementById('dep-prev');
+  var next = document.getElementById('dep-next');
+  if (!track || !prev || !next) return;
+  function step() {
+    var card = track.querySelector('.dep-card');
+    if (!card) return 320;
+    var gap = parseFloat(getComputedStyle(track).gap) || 20;
+    return card.getBoundingClientRect().width + gap;
+  }
+  prev.addEventListener('click', function(){ track.scrollBy({ left: -step(), behavior: 'smooth' }); });
+  next.addEventListener('click', function(){ track.scrollBy({ left: step(), behavior: 'smooth' }); });
+})();
+</script>
 
 <!-- ===== FAQ ===== -->
 <section id="faq">
