@@ -121,30 +121,31 @@ const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK_URL_FLEET || process.env.DIS
 // Nao mistura com notificacoes normais pra nao afogar o sinal critico.
 const DISCORD_LEAD_CRITICAL_WEBHOOK = process.env.DISCORD_LEAD_CRITICAL_WEBHOOK_URL || '';
 
-// Planilha Fleet (growth#79). A planilha "[base leads GV Fleet]"
-// (1LkTpcEbPqVfb...) tem um Apps Script onChange ligado na aba
-// "Registros de trials" que cria deal no Pipedrive + dispara fluxo n8n/WA.
-// Se o server.js escrever naquela aba, DUPLICA tudo (Apps Script + server.js).
+// Planilha Fleet (growth#79). Mesma planilha do fluxo legado
+// ([base leads GV Fleet] — 1LkTpcEbPqVfb...). Gravacao paridade 1:1 com
+// producao: schema de keys bate com os headers reais da Página1 (a API
+// ge-prd-web-api matcha por nome de header, nao posicional). `Processado='Sim'`
+// neutraliza o Apps Script onChange (se algum estiver ativo), evitando
+// duplicacao de deal.
 //
-// REGRA CRITICA: server.js NUNCA escreve na aba "Registros de trials".
-// Usa abas dedicadas da landing v2 (audit log qualificados / log inadequados),
-// passadas no payload da API Contele como `sheet` + `sheetName` (cobre as duas
-// convencoes usuais). Se a API ignorar o param e gravar na primeira aba
-// (Pagina1), o plano B e separar em planilhas novas por `FLEET_SHEET_HISTORICO_ID`
-// e `FLEET_SHEET_INADEQUADOS_ID` (ver CLAUDE.md - "Action do Marco").
+// Depois da v1 estabilizar (Opcao B da task), trocamos pra Sheets API direta
+// + aba dedicada. Por ora: mantem tudo na Página1 pra nao romper nada.
 const SPREADSHEET_ID = process.env.SPREADSHEET_ID_FLEET || '1LkTpcEbPqVfb-zWviJHxme0saVGGt3anxg10oz1MjLc';
-// IDs opcionais de planilhas dedicadas (plano B caso API ignore param sheet).
-// Se preenchidos, sobrescrevem a planilha principal nas chamadas correspondentes.
-const SPREADSHEET_ID_HISTORICO = process.env.FLEET_SHEET_HISTORICO_ID || '';
-const SPREADSHEET_ID_INADEQUADOS = process.env.FLEET_SHEET_INADEQUADOS_ID || '';
-// Nomes das abas dentro da planilha principal (default: abas novas).
-// NUNCA usar "Registros de trials" (Apps Script dispara fluxo duplicado).
-const SHEET_HISTORICO = process.env.FLEET_SHEET_HISTORICO || 'Landing v2 Historico';
-const SHEET_INADEQUADOS = process.env.FLEET_SHEET_INADEQUADOS || 'Leads Inadequados';
-const SHEET_BLOCKLIST = new Set(['Registros de trials']);
 const SPREADSHEET_API_BASE = 'https://ge-prd-web-api.contele.com.br/api/v1/spreadsheet';
 
-const SDR_WEBHOOK = process.env.SDR_WEBHOOK_URL_FLEET || process.env.SDR_WEBHOOK_URL || '';
+// URL fixa do webhook n8n Fleet SDR (mesmo workflow que o backend ge-prd-web-api chama hoje).
+// Workflow: Y6D2XUPSRjaYKcJA (n8n-cloud, projeto Contele). Dispara Zapster msg1 + wait 15s + msg2 menu 1-9.
+// Pode sobrescrever via env SDR_WEBHOOK_URL_FLEET em caso de rollover pra outro n8n.
+const SDR_WEBHOOK = process.env.SDR_WEBHOOK_URL_FLEET
+  || process.env.SDR_WEBHOOK_URL
+  || 'https://marcofassa.app.n8n.cloud/webhook/sdr-fleet-n8n-v2';
+
+// Formato de telefone identico ao Apps Script antigo: adiciona "55" se <=11 digitos.
+function formatPhoneForN8n(rawPhone) {
+  let cleaned = String(rawPhone || '').replace(/\D/g, '');
+  if (cleaned.length <= 11) cleaned = '55' + cleaned;
+  return cleaned;
+}
 
 // CEO Fleet: Julio Cesar. Flag NOTIFY_CEO liga/desliga o envio (Marco quer
 // manter o que tem hoje, mas com escape hatch). Default: ligado.
@@ -357,54 +358,23 @@ async function sendSlack(text) {
   }
 }
 
-// target: "historico" (lead qualificado / audit log) | "inadequados" (< MIN_VEHICLES)
-async function appendSheet(data, target = 'historico') {
-  // Resolve planilha + aba em funcao do target. Planilha dedicada (env *_ID)
-  // vence sobre aba dedicada na planilha principal.
-  let spreadsheetId;
-  let sheetName;
-  if (target === 'inadequados') {
-    spreadsheetId = SPREADSHEET_ID_INADEQUADOS || SPREADSHEET_ID;
-    sheetName = SPREADSHEET_ID_INADEQUADOS ? '' : SHEET_INADEQUADOS;
-  } else {
-    spreadsheetId = SPREADSHEET_ID_HISTORICO || SPREADSHEET_ID;
-    sheetName = SPREADSHEET_ID_HISTORICO ? '' : SHEET_HISTORICO;
-  }
-
-  // Guarda: nunca escrever em "Registros de trials" (Apps Script dispara
-  // deal duplicado + fluxo n8n). Bloqueia mesmo que env venha mal.
-  if (sheetName && SHEET_BLOCKLIST.has(sheetName)) {
-    console.error(`[SHEETS] BLOCKED: tentativa de append em aba proibida "${sheetName}" (Apps Script onChange). target=${target}`);
-    sendDiscordCritical(
-      `🚨 **appendSheet BLOCKED (Fleet)**: aba "${sheetName}" e proibida (Apps Script duplicaria deal).\n` +
-      `target=${target} | Lead: ${data.Nome || '?'} | ${data.Empresa || '?'}\n` +
-      `Ajuste a env FLEET_SHEET_${target === 'inadequados' ? 'INADEQUADOS' : 'HISTORICO'}.`
-    ).catch(() => {});
-    return false;
-  }
-
-  const url = `${SPREADSHEET_API_BASE}/${spreadsheetId}`;
-  // spreadsheetData: payload original. sheet/sheetName: hints pra API escolher
-  // aba (nomes comuns em APIs internas desse tipo). Se API ignorar ambos,
-  // grava na primeira aba da planilha - nesse caso Marco precisa criar as
-  // planilhas dedicadas (ver CLAUDE.md, env FLEET_SHEET_*_ID).
-  const payload = sheetName
-    ? { spreadsheetData: { ...data, __sheet__: sheetName }, sheet: sheetName, sheetName }
-    : { spreadsheetData: data };
-
+// Grava lead na planilha legada Fleet (Página1). Keys do `data` batem com os
+// headers reais da aba — API ge-prd-web-api matcha por nome de header.
+async function appendSheet(data) {
+  const url = `${SPREADSHEET_API_BASE}/${SPREADSHEET_ID}`;
   try {
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ spreadsheetData: data })
     });
     if (!res.ok) {
       const body = await res.text().catch(() => '');
-      console.error(`Sheets error [${res.status}] target=${target} sheet="${sheetName || 'DEDICATED_FILE'}":`, body.slice(0, 300));
+      console.error(`Sheets error [${res.status}]:`, body.slice(0, 300));
       sendDiscordCritical(
-        `🚨 **appendSheet FAILED (Fleet)** [${res.status}] target=${target} sheet="${sheetName || 'dedicated-file'}"\n` +
-        `Lead: ${data.Nome || '?'} | ${data.Empresa || '?'} | ${data.Telefone || '?'}\n` +
-        `Status: ${data.status || '?'} | ID Pipe: ${data['ID Pipe'] || 'sem'}\n` +
+        `🚨 **appendSheet FAILED (Fleet)** [${res.status}]\n` +
+        `Lead: ${data['Responsável'] || '?'} | ${data.Empresa || '?'} | ${data.WhatsApp || '?'}\n` +
+        `Status: ${data.status || '?'} | Pipe ID: ${data['Pipe ID'] || 'sem'}\n` +
         `Body: ${body.slice(0, 200)}`
       ).catch(() => {});
       return false;
@@ -413,13 +383,50 @@ async function appendSheet(data, target = 'historico') {
   } catch (err) {
     console.error('Sheets throw:', err.message);
     sendDiscordCritical(
-      `🚨 **appendSheet THROW (Fleet)** target=${target} sheet="${sheetName || 'dedicated-file'}"\n` +
-      `Lead: ${data.Nome || '?'} | ${data.Empresa || '?'} | ${data.Telefone || '?'}\n` +
-      `Status: ${data.status || '?'} | ID Pipe: ${data['ID Pipe'] || 'sem'}\n` +
+      `🚨 **appendSheet THROW (Fleet)**\n` +
+      `Lead: ${data['Responsável'] || '?'} | ${data.Empresa || '?'} | ${data.WhatsApp || '?'}\n` +
+      `Status: ${data.status || '?'} | Pipe ID: ${data['Pipe ID'] || 'sem'}\n` +
       `Erro: ${err.message}`
     ).catch(() => {});
     return false;
   }
+}
+
+// Monta payload Página1 (19 colunas: E-mail, Empresa, Responsável, WhatsApp,
+// Pessoa jurídica, Já utiliza rastreador?, Campanha, Representa órgão público?,
+// Quantidade de Veiculos, Valor estimado por unidade, Valor total estimado,
+// Referrer, Data de envio, WABA ID, Vendedor from Pipedrive, status, Info,
+// Processado, Pipe ID). Processado='Sim' neutraliza Apps Script onChange.
+function buildSheetDataFleet(body, frota, status, vendorName = '', dealId = '', infoText = '') {
+  // Campanha: string UTM completa no formato legacy da Página1
+  // (`utm_source=x&utm_medium=y&utm_campaign=z&...`). Se o frontend ja mandou
+  // composta em body.campanha (algumas campanhas antigas), respeita; senao
+  // monta via buildUtmString considerando body.campanha como campaign value.
+  const composedUtm = buildUtmString(body);
+  const campanha = (body.campanha && /[=&]/.test(body.campanha))
+    ? body.campanha
+    : composedUtm;
+  return {
+    'E-mail': body.email || '',
+    'Empresa': body.empresa || '',
+    'Responsável': body.nome || '',
+    'WhatsApp': body.telefone || '',
+    'Pessoa jurídica': 'Sim',
+    'Já utiliza rastreador?': '',
+    'Campanha': campanha,
+    'Representa órgão público?': 'Não',
+    'Quantidade de Veiculos': String(frota),
+    'Valor estimado por unidade': 70,
+    'Valor total estimado': 70 * frota,
+    'Referrer': body.landing_page || body.page_url || body.source_url || '',
+    'Data de envio': brDate(),
+    'WABA ID': '',
+    'Vendedor from Pipedrive': vendorName,
+    'status': status,
+    'Info': infoText,
+    'Processado': 'Sim',
+    'Pipe ID': dealId ? String(dealId) : ''
+  };
 }
 
 // ===== Round-robin vendor assignment =====
@@ -458,10 +465,14 @@ function assignVendor() {
 }
 
 function buildUtmString(body) {
+  // Ordem espelha o formato legado Fleet na Pagina1 e na "Campanha" do Pipedrive:
+  //   utm_campaign=X&utm_source=Y&utm_medium=Z&utm_term=W&utm_content=V
+  // Mudar a ordem quebra dashboards de Mkt que fazem regex posicional.
   const parts = [];
+  const campaign = body.utm_campaign || body.campanha;
+  if (campaign) parts.push('utm_campaign=' + campaign);
   if (body.utm_source) parts.push('utm_source=' + body.utm_source);
   if (body.utm_medium) parts.push('utm_medium=' + body.utm_medium);
-  if (body.campanha) parts.push('utm_campaign=' + body.campanha);
   if (body.utm_term) parts.push('utm_term=' + body.utm_term);
   if (body.utm_content) parts.push('utm_content=' + body.utm_content);
   return parts.join('&');
@@ -469,6 +480,20 @@ function buildUtmString(body) {
 
 function brDate() {
   return new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+}
+
+// Remove query string e fragmento de uma URL. Mantem protocolo+host+path
+// pra ficar <255 chars em quase todo caso (proteje Pipedrive varchar).
+function stripQuery(url) {
+  if (!url) return '';
+  try {
+    const u = new URL(url);
+    return u.origin + u.pathname;
+  } catch {
+    // fallback: remove manualmente se URL for malformada
+    const idx = url.search(/[?#]/);
+    return idx === -1 ? url : url.slice(0, idx);
+  }
 }
 
 // ===== LEAD ENDPOINT =====
@@ -493,26 +518,11 @@ app.post('/api/lead', async (req, res) => {
     // Resposta sincrona com flag de redirect, depois grava sheet em background
     res.json({ ok: true, redirect: '/obrigado-2/', reason: 'below_min_vehicles' });
 
-    const sheetData = {
-      'Data': brDate(),
-      'Nome': body.nome || '',
-      'Email': body.email || '',
-      'Telefone': body.telefone || '',
-      'Empresa': body.empresa || '',
-      'Campanha': body.campanha || '',
-      'Tamanho da Frota': String(frota),
-      'Landing Page': body.landing_page || '',
-      'status': '4_lead_inadequado',
-      'GCLID': body.gclid || '',
-      'GA4 Client ID': body.ga4_client_id || '',
-      'utm_source': body.utm_source || '',
-      'utm_medium': body.utm_medium || '',
-      'utm_term': body.utm_term || '',
-      'utm_content': body.utm_content || '',
-      'CTA': ctaSource
-    };
-    appendSheet(sheetData, 'inadequados').catch(err => console.error('[LEAD-FLEET] Sheet inadequado error:', err.message));
-    console.log(`[LEAD-FLEET] Inadequado: ${body.nome} (${frota} veic) -> sheet only (inadequados), redirect /obrigado-2/`);
+    const sheetData = buildSheetDataFleet(
+      body, frota, '4_lead_inadequado', '', '', `CTA: ${ctaSource} (inadequado)`
+    );
+    appendSheet(sheetData).catch(err => console.error('[LEAD-FLEET] Sheet inadequado error:', err.message));
+    console.log(`[LEAD-FLEET] Inadequado: ${body.nome} (${frota} veic) -> sheet only, redirect /obrigado-2/`);
     return;
   }
 
@@ -533,42 +543,16 @@ app.post('/api/lead', async (req, res) => {
 });
 
 async function processLead(body, frota, ctaSource, isTest) {
+  const ctaLabel = { testar: 'Teste Grátis', especialista: 'Falar com Especialista', contratar: 'Contratar Agora' }[ctaSource] || ctaSource;
+  const infoText = `CTA: ${ctaLabel}. ${body.info || ''}`.trim();
 
   // Filter test submissions: log to sheet but skip Pipedrive/SDR/notifications
   if (isTest) {
-    const sheetData = {
-      'Data': brDate(), 'Nome': body.nome || '', 'Email': body.email || '',
-      'Telefone': body.telefone || '', 'Empresa': body.empresa || '',
-      'Campanha': body.campanha || '', 'Tamanho da Frota': String(frota),
-      'Landing Page': body.landing_page || '', 'status': '3-temp-can-delete-teste',
-      'GCLID': body.gclid || '', 'GA4 Client ID': body.ga4_client_id || '',
-      'utm_source': body.utm_source || '', 'utm_medium': body.utm_medium || '',
-      'utm_term': body.utm_term || '', 'utm_content': body.utm_content || '',
-      'CTA': ctaSource
-    };
-    await appendSheet(sheetData, 'historico');
-    console.log(`[LEAD-FLEET] TEST FILTERED: ${body.nome} -> sheet only (historico)`);
+    const sheetData = buildSheetDataFleet(body, frota, '3-temp-can-delete-teste', '', '', infoText);
+    await appendSheet(sheetData);
+    console.log(`[LEAD-FLEET] TEST FILTERED: ${body.nome} -> sheet only`);
     return;
   }
-
-  // Build sheet data (common for all valid leads)
-  const sheetData = {
-    'Data': brDate(),
-    'Nome': body.nome || '',
-    'Email': body.email || '',
-    'Telefone': body.telefone || '',
-    'Empresa': body.empresa || '',
-    'Campanha': body.campanha || '',
-    'Tamanho da Frota': String(frota),
-    'Landing Page': body.landing_page || '',
-    'GCLID': body.gclid || '',
-    'GA4 Client ID': body.ga4_client_id || '',
-    'utm_source': body.utm_source || '',
-    'utm_medium': body.utm_medium || '',
-    'utm_term': body.utm_term || '',
-    'utm_content': body.utm_content || '',
-    'CTA': ctaSource
-  };
 
   // ===== LEAD QUALIFICADO (>= MIN_VEHICLES) =====
   const vendor = assignVendor();
@@ -583,10 +567,8 @@ async function processLead(body, frota, ctaSource, isTest) {
   const personId = personRes.ok ? personRes.data?.data?.id : null;
 
   if (!personRes.ok || !personId) {
-    sheetData['status'] = '5_pipedrive_person_failed';
-    sheetData['Vendedor'] = '';
-    sheetData['ID Pipe'] = '';
-    await appendSheet(sheetData, 'historico');
+    const sheetData = buildSheetDataFleet(body, frota, '5_pipedrive_person_failed', '', '', infoText);
+    await appendSheet(sheetData);
     await sendDiscordCritical(
       `🚨 **Pipedrive PERSON FAILED (Fleet)** (lead nao virou deal)\n` +
       `Lead: ${body.nome} | ${body.empresa} | ${body.telefone} | ${body.email}\n` +
@@ -609,22 +591,31 @@ async function processLead(body, frota, ctaSource, isTest) {
     visible_to: 3,
     status: 'open'
   };
-  const ctaLabel = { testar: 'Teste Grátis', especialista: 'Falar com Especialista', contratar: 'Contratar Agora' }[ctaSource] || ctaSource;
-  dealBody[PD_FIELDS.info] = `CTA: ${ctaLabel}. ${body.info || ''}`;
+  dealBody[PD_FIELDS.info] = infoText;
   dealBody[PD_FIELDS.utm] = utmString;
   dealBody[PD_FIELDS.veiculos] = frota;
-  dealBody[PD_FIELDS.origem] = body.landing_page || '';
+  // Pipedrive custom fields sao varchar(255) por padrao. landing_page completo
+  // (com gclid + UTMs) facilmente ultrapassa isso e trunca GCLID no meio.
+  // GCLID e UTMs ja vao em campos dedicados (51bccf... e f0fbb1...) full size,
+  // entao "Origem" grava apenas protocolo+host+path sem query string.
+  dealBody[PD_FIELDS.origem] = stripQuery(body.landing_page);
   dealBody[PD_FIELDS.gclid] = body.gclid || '';
   dealBody[PD_FIELDS.ga4] = body.ga4_client_id || '';
+
+  // Safety: Pipedrive custom fields sao varchar(255). GCLID real do Google Ads
+  // tem ~90-110 chars (bem abaixo do limite), mas edge cases podem truncar.
+  // Fallback: URL full com gclid fica na coluna "Referrer" da planilha e no
+  // campo raw_gclid do webhook Contele OS. Warn pra audit.
+  if (body.gclid && body.gclid.length > 200) {
+    console.warn(`[GCLID-WARN] deal=${dealBody.title} gclid.length=${body.gclid.length} (limite Pipe 255). Full fica em Sheets/Contele OS.`);
+  }
 
   const dealRes = await pipedrivePost('deals', dealBody);
   const dealId = dealRes.ok ? dealRes.data?.data?.id : null;
 
   if (!dealRes.ok || !dealId) {
-    sheetData['status'] = '5_pipedrive_deal_failed';
-    sheetData['Vendedor'] = vendor.nome;
-    sheetData['ID Pipe'] = '';
-    await appendSheet(sheetData, 'historico');
+    const sheetData = buildSheetDataFleet(body, frota, '5_pipedrive_deal_failed', vendor.nome, '', infoText);
+    await appendSheet(sheetData);
     await sendDiscordCritical(
       `🚨 **Pipedrive DEAL FAILED (Fleet)** (person criada mas deal nao, lead orfao)\n` +
       `Lead: ${body.nome} | ${body.empresa} | ${body.telefone} | ${body.email}\n` +
@@ -677,10 +668,11 @@ async function processLead(body, frota, ctaSource, isTest) {
     console.warn(`[TRACKING] Skipping Contele OS propagation (secret empty) deal=${dealId}`);
   }
 
-  // 3. Update sheet data with deal info
-  sheetData['status'] = '1-success-deal-created-in-pipedrive';
-  sheetData['Vendedor'] = vendor.nome;
-  sheetData['ID Pipe'] = String(dealId);
+  // 3. Build sheet payload com schema legacy Página1 (Processado='Sim' evita
+  // Apps Script onChange duplicar deal).
+  const sheetData = buildSheetDataFleet(
+    body, frota, '1-success-deal-created-in-pipedrive', vendor.nome, dealId, infoText
+  );
 
   // 4. Run remaining tasks in parallel
   const pipedriveUrl = `https://contelegv.pipedrive.com/deal/${dealId}`;
@@ -722,7 +714,7 @@ async function processLead(body, frota, ctaSource, isTest) {
   ].filter(Boolean).join('\n');
 
   const tasks = [
-    appendSheet(sheetData, 'historico'),
+    appendSheet(sheetData),
     sendSlack(slackText),
     sendWhatsApp(VENDORS[vendor.id]?.phone, notifText)
   ];
@@ -732,24 +724,40 @@ async function processLead(body, frota, ctaSource, isTest) {
     tasks.push(sendWhatsApp(CEO_FLEET_PHONE, notifText));
   }
 
-  // SDR webhook (so envia se configurado)
+  // SDR webhook n8n Fleet — payload bate 1:1 com producao (ge-prd-web-api -> n8n).
+  // Schema confirmado via execucao real 21/04/2026 do workflow Y6D2XUPSRjaYKcJA:
+  //   nome, whatsapp, email, pipedrive_id, vehicle_count, company,
+  //   idUsuarioPipedrive, info, vendedor, Campanha, Referrer
+  // Trocar nomes quebra o Zapster node (espera body.whatsapp como recipient) e
+  // o JS code "define vendedor" (espera body.vendedor e body.nome).
   if (SDR_WEBHOOK) {
+    const campaignStr = body.campanha || [
+      body.utm_campaign ? `utm_campaign=${body.utm_campaign}` : '',
+      body.utm_source ? `utm_source=${body.utm_source}` : '',
+      body.utm_medium ? `utm_medium=${body.utm_medium}` : '',
+      body.utm_term ? `utm_term=${body.utm_term}` : '',
+      body.utm_content ? `utm_content=${body.utm_content}` : ''
+    ].filter(Boolean).join('&');
+
+    const n8nPayload = {
+      nome: body.nome || '',
+      whatsapp: formatPhoneForN8n(body.telefone),
+      email: body.email || '',
+      pipedrive_id: dealId || 0,
+      vehicle_count: frota,
+      company: body.empresa || '',
+      idUsuarioPipedrive: vendor.id,
+      info: body.info || '',
+      vendedor: vendor.nome,
+      Campanha: campaignStr,
+      Referrer: body.landing_page || body.page_url || body.source_url || ''
+    };
+
     tasks.push(
       fetch(SDR_WEBHOOK, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nome: body.nome,
-          whatsapp: body.telefone,
-          email: body.email,
-          pipedrive_id: dealId,
-          veiculos: frota,
-          empresa: body.empresa,
-          idUsuarioPipedrive: vendor.id,
-          vendedor: vendor.nome,
-          info: body.info || '',
-          cta_source: ctaSource
-        })
+        body: JSON.stringify(n8nPayload)
       }).then(async (sdrRes) => {
         if (!sdrRes.ok) {
           const txt = await sdrRes.text().catch(() => '');
