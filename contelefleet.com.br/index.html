@@ -1095,7 +1095,7 @@
       <div class="hero-content">
         <h1>Gestão de Frota e Rastreamento Veicular</h1>
         <p class="lead">Solução inteligente para o aumento de produtividade e redução de custos da sua frota.</p>
-        <form class="hero-form" onsubmit="event.preventDefault(); document.querySelector('#lead-form input[name=&quot;ctxEmail&quot;], #lead-form input[type=&quot;email&quot;]')?.focus(); document.getElementById('lead-form')?.scrollIntoView({behavior:'smooth', block:'start'});" aria-label="Início de orçamento">
+        <form class="hero-form" onsubmit="event.preventDefault(); var v=(document.getElementById('ctxEmailHero')?.value||'').trim(); var tgt=document.getElementById('f-email'); if(tgt){tgt.value=v; tgt.dispatchEvent(new Event('input',{bubbles:true}));} document.getElementById('lead-form')?.scrollIntoView({behavior:'smooth', block:'start'}); setTimeout(function(){ var nxt=document.querySelector('#lead-form input[name=&quot;nome&quot;], #lead-form input[type=&quot;text&quot;]'); (nxt||tgt)?.focus(); }, 450);" aria-label="Início de orçamento">
           <input type="email" name="ctxEmailHero" id="ctxEmailHero" required placeholder="Digite o seu melhor e-mail" autocomplete="email">
           <button type="submit">Fazer orçamento online</button>
         </form>
