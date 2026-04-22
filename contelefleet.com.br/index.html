@@ -433,40 +433,49 @@
     .text-center .section-sub { margin-left: auto; margin-right: auto; }
 
     /* ===== PROVA SOCIAL LOGOS ===== */
-    #logos { background: var(--white); padding: 48px 0; }
+    #logos { background: var(--white); padding: 56px 0; }
     .logo-marquee {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 24px;
+      overflow: hidden;
       margin: 24px 0 8px;
+      -webkit-mask-image: linear-gradient(to right, transparent 0, black 8%, black 92%, transparent 100%);
+              mask-image: linear-gradient(to right, transparent 0, black 8%, black 92%, transparent 100%);
     }
     .logo-marquee-track {
-      display: contents;
-    }
-    .logo-marquee-track-unused {
       display: flex;
-      gap: 56px;
+      gap: 64px;
       align-items: center;
       width: max-content;
-      animation: logo-marquee-scroll 28s linear infinite;
+      animation: logo-marquee-scroll 36s linear infinite;
     }
     .logo-marquee:hover .logo-marquee-track { animation-play-state: paused; }
-    .logo-marquee img {
-      width: 100%;
-      height: auto;
-      max-height: none;
-      display: block;
-      border-radius: 16px;
-      box-shadow: 0 4px 16px rgba(32,37,46,0.06);
+    .logo-marquee picture {
+      flex: 0 0 auto;
     }
-    .logo-marquee picture[aria-hidden="true"],
-    .logo-marquee-track > picture:nth-child(n+6) { display: none; }
+    .logo-marquee img {
+      height: 110px;
+      width: auto;
+      max-width: none;
+      display: block;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(32,37,46,0.06);
+      filter: saturate(1.02);
+    }
     @keyframes logo-marquee-scroll {
       from { transform: translateX(0); }
       to { transform: translateX(-50%); }
     }
     @media (prefers-reduced-motion: reduce) {
-      .logo-marquee-track { animation: none; justify-content: center; flex-wrap: wrap; width: 100%; }
+      .logo-marquee-track {
+        animation: none;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 32px;
+      }
+    }
+    @media (max-width: 640px) {
+      .logo-marquee img { height: 88px; }
+      .logo-marquee-track { gap: 40px; animation-duration: 28s; }
     }
     .logos-bottom {
       font-family: var(--font-main);
