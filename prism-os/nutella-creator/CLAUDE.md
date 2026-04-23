@@ -8,12 +8,14 @@ Canal principal: Frota Para Todos (Julio César | `UCz31CtOANqSFuLEdFTi1iCQ`)
 
 ## O Que É Uma Nutella
 
-Um clip educacional autônomo de **90s a 4min** extraído de uma live longa. Funciona sozinho.
+Um clip educacional autônomo de **5-10min** extraído de uma live longa. Funciona sozinho, agrega conhecimento real ao gestor.
 
 ### Regras de duração
-- **Clip 16:9**: MÍNIMO 90 segundos (intro+CTA adicionam ~2min de wrapper)
+- **Clip 16:9**: PREFERÊNCIA >5 minutos. Mínimo absoluto: 3 minutos. Ideal: 5-10min.
 - **Short 9:16**: MÍNIMO 30 segundos, ideal 45-60s
-- Clip < 90s com wrapper > conteúdo → rejeitado
+- **Quantidade**: 2 a 3 nutellas por live (MÁXIMO 3). Qualidade > quantidade.
+- Clip deve ser EDUCATIVO ou PROMOCIONAL (Contele/parceiro oficial)
+- NUNCA cortar no meio de assunto, raciocínio ou palavra
 
 ### Tipos de nutella
 
@@ -122,7 +124,7 @@ Estado de aprovação: `{cuts_dir}/state.json` (server-side, não localStorage).
 
 | Campo | Descrição |
 |-------|-----------|
-| `clip_entrada` / `clip_saida` | Timestamps 16:9 (mín 90s) |
+| `clip_entrada` / `clip_saida` | Timestamps 16:9 (mín 3min, ideal 5-10min) |
 | `shorts_entrada` / `shorts_saida` | Timestamps 9:16 (mín 30s) |
 | `titulo_seo` | Keyword primária nos primeiros 40 chars |
 | `titulo_ctr` | Hook emocional na primeira palavra |
