@@ -4,6 +4,17 @@ Registro de mudancas no Prism OS.
 
 ---
 
+## 23/04/2026: Tier 4 transcricao (audio + Gemini Flash) + anti-silent-failure
+
+**Issues**: #73, #84
+
+- **Tier 4 novo**: quando tiers 1-3 (transcript-api, yt-dlp subtitles, YouTube Data API) falham, o sistema agora baixa o audio via yt-dlp em m4a 64k mono, divide em chunks de 15min via ffmpeg e transcreve cada chunk em paralelo com Gemini Flash (gemini-3-flash-preview). Segmentos com timestamps globais reajustados por offset. Funciona mesmo em videos sem captions (raiz de #73 e #84)
+- **Observabilidade**: `suggest.py` agora usa logger estruturado (antes era `print`) com nivel e modulo. Mensagens de erro consolidadas com detalhe por tier (`Tier1: ... | Tier2: ... | Tier3: ... | Tier4: ...`)
+- **Anti-silent-failure em thumb_live.transcribe_audio**: antes retornava `{"q1":"","q2":"","q3":"","raw_text":...}` silenciosamente quando o JSON falhava, corrompendo o pipeline de Thumb de Live (UI mostrava sucesso com briefing vazio). Agora lanca `RuntimeError` explicito com raw text pra debug
+- Teste E2E local: video `Qqohke8fsYw` (falha 404 em captions.list, Tier 3 morre) agora transcrito com sucesso via Tier 4
+
+---
+
 ## 23/04/2026: v0.3.0 shipped — fix credencial Julio, premissas de corte, badge topo, stream log
 
 **Issues**: #5, #6, #7, #8 | **Commits**: 95db7c0, da28328

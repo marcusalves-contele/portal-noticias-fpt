@@ -20,6 +20,7 @@ import os
 import sys
 import re
 import json
+import logging
 import argparse
 import requests
 from pathlib import Path
@@ -35,7 +36,15 @@ _THUMB_ENV = Path(__file__).parent.parent / "thumbnail-ai-creator" / ".env"
 ENV_PATH = _LOCAL_ENV if _LOCAL_ENV.exists() else _THUMB_ENV
 OUTPUT_DIR = Path(__file__).parent / "output"
 GEMINI_MODEL = "gemini-3.1-pro-preview"
+GEMINI_FLASH_MODEL = "gemini-3-flash-preview"
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models"
+
+logger = logging.getLogger("prism.suggest")
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
 
 
 def load_api_key() -> str:
@@ -234,7 +243,122 @@ def _get_transcript_youtube_api(video_id: str, channel: str = "fleet") -> list[d
     return segments
 
 
+def _get_transcript_gemini_audio(video_id: str, api_key: str) -> list[dict]:
+    """
+    Tier 4: baixa audio via yt-dlp e transcreve com Gemini Flash em chunks.
+
+    Funciona quando nao ha captions disponiveis (tiers 1-3 falharam). Audio
+    e cortado em chunks de 15min (cabe inline base64 <20MB em m4a 64k mono).
+    Cada chunk e transcrito em paralelo e os timestamps sao reajustados com
+    o offset do chunk.
+    """
+    import subprocess
+    import tempfile
+    import base64
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    cookies_file = _find_cookies_path()
+    cookies_arg = ["--cookies", str(cookies_file)] if cookies_file else []
+
+    with tempfile.TemporaryDirectory(prefix="tier4_audio_") as tmp:
+        tmp_path = Path(tmp)
+        audio_path = tmp_path / "full.m4a"
+
+        # 1) Baixa audio em m4a 64k mono pra reduzir tamanho
+        cmd_dl = [
+            "yt-dlp",
+            "-f", "bestaudio[ext=m4a]/bestaudio",
+            "--extract-audio", "--audio-format", "m4a", "--audio-quality", "5",
+            "--postprocessor-args", "-ac 1 -b:a 64k",
+            *cookies_arg,
+            "-o", str(tmp_path / "full.%(ext)s"),
+            f"https://youtube.com/watch?v={video_id}",
+        ]
+        proc = subprocess.run(cmd_dl, capture_output=True, text=True, timeout=900)
+        if proc.returncode != 0 or not audio_path.exists():
+            stderr_tail = (proc.stderr or "")[-400:]
+            raise RuntimeError(f"yt-dlp audio download falhou: {stderr_tail}")
+
+        # 2) Divide em chunks de 15min via ffmpeg (saida: chunk_000.m4a, chunk_001.m4a, ...)
+        chunk_dir = tmp_path / "chunks"
+        chunk_dir.mkdir()
+        chunk_seconds = 15 * 60
+        cmd_split = [
+            "ffmpeg", "-y", "-i", str(audio_path),
+            "-f", "segment", "-segment_time", str(chunk_seconds),
+            "-c", "copy",
+            str(chunk_dir / "chunk_%03d.m4a"),
+        ]
+        proc = subprocess.run(cmd_split, capture_output=True, text=True, timeout=600)
+        if proc.returncode != 0:
+            raise RuntimeError(f"ffmpeg segment falhou: {(proc.stderr or '')[-400:]}")
+
+        chunk_files = sorted(chunk_dir.glob("chunk_*.m4a"))
+        if not chunk_files:
+            raise RuntimeError("ffmpeg nao gerou chunks de audio")
+
+        logger.info("Tier 4: %d chunks de ate %ds pra transcrever", len(chunk_files), chunk_seconds)
+
+        # 3) Transcreve cada chunk em paralelo
+        flash_url = f"{GEMINI_API_URL}/{GEMINI_FLASH_MODEL}:generateContent"
+        headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
+
+        prompt = (
+            "Transcreva este audio em portugues brasileiro, dividindo em segmentos de "
+            "20 a 40 segundos. Preserve o sentido original, corrija erros obvios de "
+            "reconhecimento de fala. Contexto: live de canal de gestao de frota e logistica.\n\n"
+            "Responda SOMENTE com JSON array valido, sem markdown, sem preambulo, no formato:\n"
+            '[{"start": 0.0, "duration": 28.5, "text": "..."}, {"start": 28.5, "duration": 32.0, "text": "..."}]\n\n'
+            "Os tempos devem ser relativos ao INICIO DESTE TRECHO (comecando em 0)."
+        )
+
+        def _transcribe_chunk(idx: int, path: Path) -> list[dict]:
+            offset_sec = idx * chunk_seconds
+            data = base64.b64encode(path.read_bytes()).decode()
+            payload = {
+                "contents": [{
+                    "parts": [
+                        {"inlineData": {"mimeType": "audio/mp4", "data": data}},
+                        {"text": prompt},
+                    ]
+                }],
+                "generationConfig": {"temperature": 0.1, "maxOutputTokens": 16000},
+            }
+            resp = requests.post(flash_url, headers=headers, json=payload, timeout=300)
+            result = resp.json()
+            if "candidates" not in result:
+                err = result.get("error", {}).get("message", str(result)[:300])
+                raise RuntimeError(f"chunk {idx}: Gemini falhou: {err}")
+            raw = result["candidates"][0]["content"]["parts"][0]["text"].strip()
+            m = re.search(r"\[[\s\S]*\]", raw)
+            if not m:
+                raise RuntimeError(f"chunk {idx}: sem JSON array na resposta")
+            parsed = json.loads(m.group())
+            # Ajusta offset global
+            for seg in parsed:
+                seg["start"] = float(seg.get("start", 0)) + offset_sec
+                seg["duration"] = float(seg.get("duration", 0))
+                seg["text"] = str(seg.get("text", "")).strip()
+            return [s for s in parsed if s["text"]]
+
+        segments: list[dict] = []
+        with ThreadPoolExecutor(max_workers=min(4, len(chunk_files))) as pool:
+            futures = {pool.submit(_transcribe_chunk, i, p): i for i, p in enumerate(chunk_files)}
+            per_chunk: dict[int, list[dict]] = {}
+            for fut in as_completed(futures):
+                idx = futures[fut]
+                per_chunk[idx] = fut.result()
+            for i in sorted(per_chunk.keys()):
+                segments.extend(per_chunk[i])
+
+        if not segments:
+            raise RuntimeError("Tier 4: transcricao vazia apos merge de chunks")
+        return segments
+
+
 def get_transcript_with_timestamps(video_id: str, channel: str = "fleet") -> list[dict]:
+    errors: dict[str, str] = {}
+
     # Tier 1: youtube-transcript-api (rapido, sem auth)
     try:
         cookies_path = _find_cookies_path()
@@ -246,33 +370,48 @@ def get_transcript_with_timestamps(video_id: str, channel: str = "fleet") -> lis
             session = requests.Session()
             session.cookies = cj
             api = YouTubeTranscriptApi(http_client=session)
-            print(f"  Tier 1: usando cookies de {cookies_path}")
+            logger.info("Tier 1: usando cookies de %s", cookies_path)
         else:
             api = YouTubeTranscriptApi()
         result = api.fetch(video_id, **kwargs)
-        print(f"  Transcricao via youtube-transcript-api OK")
+        logger.info("Tier 1 OK: youtube-transcript-api (%d segmentos)", len(result))
         return [{"start": s.start, "duration": s.duration, "text": s.text} for s in result]
     except Exception as e1:
-        print(f"  Tier 1 falhou (transcript-api: {e1}), tentando yt-dlp...")
+        errors["tier1"] = f"transcript-api: {e1}"
+        logger.info("Tier 1 falhou (%s), tentando yt-dlp...", e1)
 
     # Tier 2: yt-dlp subtitles
     try:
         result = _get_transcript_ytdlp(video_id)
-        print(f"  Transcricao via yt-dlp OK ({len(result)} segmentos)")
+        logger.info("Tier 2 OK: yt-dlp subtitles (%d segmentos)", len(result))
         return result
     except Exception as e2:
-        print(f"  Tier 2 falhou (yt-dlp), tentando YouTube Data API...")
+        errors["tier2"] = f"yt-dlp: {e2}"
+        logger.info("Tier 2 falhou (%s), tentando YouTube Data API...", e2)
 
     # Tier 3: YouTube Data API captions (autenticado)
     try:
         result = _get_transcript_youtube_api(video_id, channel=channel)
-        print(f"  Transcricao via YouTube API OK ({len(result)} segmentos)")
+        logger.info("Tier 3 OK: YouTube Data API (%d segmentos)", len(result))
         return result
     except Exception as e3:
+        errors["tier3"] = f"youtube-api: {e3}"
+        logger.info("Tier 3 falhou (%s), tentando Tier 4 (audio + Gemini)...", e3)
+
+    # Tier 4: baixa audio e transcreve via Gemini Flash
+    try:
+        api_key = load_api_key()
+        result = _get_transcript_gemini_audio(video_id, api_key=api_key)
+        logger.info("Tier 4 OK: audio+Gemini (%d segmentos)", len(result))
+        return result
+    except Exception as e4:
+        errors["tier4"] = f"audio+gemini: {e4}"
+        logger.warning("Tier 4 falhou: %s", e4)
+        detail = " | ".join(f"{k}: {v}" for k, v in errors.items())
         raise RuntimeError(
-            f"Nenhum metodo conseguiu extrair legendas para {video_id}. "
+            f"Todos os tiers de transcricao falharam para {video_id}. "
             f"Cole a transcricao manualmente no campo abaixo e tente novamente. "
-            f"(Tier1: transcript-api bloqueado | Tier2: yt-dlp sem legendas | Tier3: {e3})"
+            f"Detalhes: {detail}"
         )
 
 

@@ -316,13 +316,24 @@ def transcribe_audio(audio_bytes: bytes, api_key: str, mime_type: str = "audio/m
     if json_match:
         try:
             parsed = json.loads(json_match.group())
+            if not all(k in parsed for k in ("q1", "q2", "q3")):
+                raise RuntimeError(
+                    f"Transcrição retornou JSON sem q1/q2/q3. Raw: {raw_text[:300]}"
+                )
             parsed["raw_text"] = raw_text
             return parsed
-        except json.JSONDecodeError:
-            pass
+        except json.JSONDecodeError as e:
+            raise RuntimeError(
+                f"Transcrição retornou JSON inválido: {e}. Raw: {raw_text[:300]}"
+            )
 
-    # Fallback: retorna texto bruto
-    return {"q1": "", "q2": "", "q3": "", "raw_text": raw_text}
+    # Sem JSON encontrado: falhar explicitamente em vez de silenciosamente
+    # retornar campos vazios (anteriormente isso corrompia o pipeline, UI
+    # mostrava "sucesso" mas briefing vinha em branco).
+    raise RuntimeError(
+        f"Transcrição não retornou JSON parseável. "
+        f"Raw (primeiras 300 chars): {raw_text[:300]}"
+    )
 
 
 # -------------------------------------------------------------------
