@@ -62,10 +62,12 @@ SHEET_GID      = "25167001"
 MODEL_IMAGE  = "gemini-3.1-flash-image-preview"   # Nano Banana v2
 MODEL_FLASH  = "gemini-3-flash-preview"
 MODEL_AUDIO  = "gemini-3-flash-preview"
+MODEL_PRO    = "gemini-3-pro-preview"             # strategy de live (exige raciocinio)
 
 API_BASE     = "https://generativelanguage.googleapis.com/v1beta/models"
 IMAGE_URL    = f"{API_BASE}/{MODEL_IMAGE}:generateContent"
 FLASH_URL    = f"{API_BASE}/{MODEL_FLASH}:generateContent"
+PRO_URL      = f"{API_BASE}/{MODEL_PRO}:generateContent"
 TIMEOUT      = 180
 
 STATUS_COL   = "Status"
@@ -334,6 +336,177 @@ def transcribe_audio(audio_bytes: bytes, api_key: str, mime_type: str = "audio/m
         f"Transcrição não retornou JSON parseável. "
         f"Raw (primeiras 300 chars): {raw_text[:300]}"
     )
+
+
+# -------------------------------------------------------------------
+# Live strategy (estrategia completa a partir de audio do apresentador)
+# -------------------------------------------------------------------
+
+KNOWLEDGE_DIR = PROJECT_DIR / "knowledge"
+
+def _load_live_strategy_knowledge(channel: str) -> str:
+    """
+    Carrega materiais de contexto pra injetar no prompt de strategy.
+    Retorna string concatenada com fallback gracioso se arquivos sumirem.
+    """
+    files = [
+        "playbook-conteudo-contele-2026.md",
+        "brand-manual-2024.md",
+    ]
+    chunks: list[str] = []
+    for name in files:
+        path = KNOWLEDGE_DIR / name
+        if path.exists():
+            try:
+                text = path.read_text(encoding="utf-8")
+                chunks.append(f"### {name}\n{text}")
+            except Exception:
+                continue
+    if chunks:
+        return "\n\n".join(chunks)
+    return (
+        "Canal: "
+        + ("Frota Para Todos (Julio Cesar)" if channel == "fleet"
+           else "Contele Teams (Leonardo Gazolli)")
+        + " — conteudo B2B sobre gestao de frota, logistica e equipes externas."
+    )
+
+
+def generate_live_strategy(audio_bytes: bytes, api_key: str, channel: str = "fleet",
+                           mime_type: str = "audio/m4a") -> dict:
+    """
+    Recebe audio de briefing do apresentador (Julio ou Leo) e retorna estrategia
+    completa pronta pra usar na producao da Live.
+
+    Saida (dict):
+      - q1, q2, q3: perfil, objetivo, conteudo (compat com fluxo briefing atual)
+      - keyword: palavra-chave SEO principal
+      - positioning: oportunidade de posicionamento (porque essa keyword, onde ganha)
+      - titles_seo: 6 titulos SEO otimizados pra busca
+      - titles_creative: 6 titulos criativos (emocional/curiosidade, pra thumb)
+      - tags: lista de tags SEO
+      - objective: objetivo resumido da live (1-2 frases)
+      - polls: 3 opcoes de enquete com pergunta + alternativas
+      - raw_text: resposta bruta do modelo (debug)
+
+    Modelo: Gemini Pro 3 com thinking adaptive (tarefa exige raciocinio).
+    """
+    audio_b64 = base64.b64encode(audio_bytes).decode()
+    knowledge = _load_live_strategy_knowledge(channel)
+
+    presenter = "Julio Cesar (Fleet)" if channel == "fleet" else "Leonardo Gazolli (Teams)"
+    audience_hint = (
+        "gestores e donos de frota/logistica com 10-500 veiculos, empresas B2B"
+        if channel == "fleet"
+        else "gestores de equipes externas (field service, tecnicos, vendedores), B2B"
+    )
+
+    prompt = f"""Voce e estrategista senior de conteudo de YouTube para o canal da Contele.
+
+CONTEXTO:
+- Apresentador: {presenter}
+- Publico base: {audience_hint}
+- Formato: LIVE no YouTube (depois vira video gravado no feed)
+
+MATERIAIS DE REFERENCIA (use como base, nao copie):
+{knowledge[:15000]}
+
+TAREFA:
+Voce vai receber um audio onde o apresentador explica sobre o que sera a live.
+Entregue uma estrategia completa pra maximizar alcance, SEO e engajamento.
+
+Responda SOMENTE com JSON valido (sem markdown, sem preambulo), no formato exato:
+
+{{
+  "q1": "Perfil do publico-alvo em 1-2 frases (quem assiste)",
+  "q2": "Objetivo da live em 1-2 frases (o que queremos que o espectador sinta ou faca)",
+  "q3": "Conteudo da live em 2-3 frases (tema principal, convidados se houver, demonstracoes)",
+  "keyword": "palavra-chave SEO principal (ex: gestao de frota de veiculos leves)",
+  "positioning": "1-3 frases explicando a oportunidade: por que essa keyword, que gap no mercado voce ataca, por que esse titulo ganha no algoritmo agora",
+  "titles_seo": [
+    "titulo SEO 1 (claro, keyword-first, ate 70 chars)",
+    "titulo SEO 2",
+    "titulo SEO 3",
+    "titulo SEO 4",
+    "titulo SEO 5",
+    "titulo SEO 6"
+  ],
+  "titles_creative": [
+    "titulo criativo 1 (emocional, curiosidade, contraste, numero; ate 60 chars)",
+    "titulo criativo 2",
+    "titulo criativo 3",
+    "titulo criativo 4",
+    "titulo criativo 5",
+    "titulo criativo 6"
+  ],
+  "tags": ["tag1", "tag2", "tag3", "tag4", "tag5", "tag6", "tag7", "tag8"],
+  "objective": "1-2 frases com o objetivo resumido (o que o espectador leva apos a live)",
+  "polls": [
+    {{"question": "pergunta da enquete 1", "options": ["opcao A", "opcao B", "opcao C"]}},
+    {{"question": "pergunta da enquete 2", "options": ["opcao A", "opcao B", "opcao C"]}},
+    {{"question": "pergunta da enquete 3", "options": ["opcao A", "opcao B", "opcao C"]}}
+  ]
+}}
+
+REGRAS:
+- NAO invente informacao fora do audio e dos materiais de referencia
+- Titulos SEO: clareza + keyword no inicio; Titulos criativos: tensao, numero ou contraste
+- Tags: mix de especificas (keyword variante) e amplas (categoria). Sem # na string
+- Use portugues brasileiro, sem emoji, sem travessao (---), sem aspas nas strings internas
+"""
+
+    payload = {
+        "contents": [{
+            "parts": [
+                {"inlineData": {"mimeType": mime_type, "data": audio_b64}},
+                {"text": prompt},
+            ]
+        }],
+        "generationConfig": {
+            "temperature": 0.5,
+            "maxOutputTokens": 8000,
+        },
+        "thinkingConfig": {"type": "adaptive"},
+    }
+    headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
+
+    resp = requests.post(PRO_URL, headers=headers, json=payload, timeout=TIMEOUT)
+    result = resp.json()
+
+    if "candidates" not in result:
+        err = result.get("error", {}).get("message", str(result)[:400])
+        raise RuntimeError(f"Estrategia de live falhou: {err}")
+
+    raw_text = result["candidates"][0]["content"]["parts"][0]["text"].strip()
+
+    import re
+    match = re.search(r"\{[\s\S]*\}", raw_text)
+    if not match:
+        raise RuntimeError(
+            f"Estrategia de live nao retornou JSON parseavel. "
+            f"Raw (primeiras 400 chars): {raw_text[:400]}"
+        )
+
+    try:
+        parsed = json.loads(match.group())
+    except json.JSONDecodeError as e:
+        raise RuntimeError(
+            f"Estrategia de live retornou JSON invalido: {e}. "
+            f"Raw (primeiras 400 chars): {raw_text[:400]}"
+        )
+
+    # Validacao minima dos campos obrigatorios
+    required = ["q1", "q2", "q3", "keyword", "titles_seo", "titles_creative",
+                "tags", "objective", "polls"]
+    missing = [k for k in required if k not in parsed]
+    if missing:
+        raise RuntimeError(
+            f"Estrategia de live retornou JSON sem campos: {missing}. "
+            f"Raw (primeiras 400 chars): {raw_text[:400]}"
+        )
+
+    parsed["raw_text"] = raw_text
+    return parsed
 
 
 # -------------------------------------------------------------------
