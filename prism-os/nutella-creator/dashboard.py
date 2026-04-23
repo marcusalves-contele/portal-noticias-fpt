@@ -34,6 +34,38 @@ from datetime import datetime
 
 PROJECT_DIR = Path(__file__).parent
 OUTPUT_DIR  = PROJECT_DIR / "output"
+
+
+def _classify_drive_error(err: Exception) -> tuple[int, str, str]:
+    """
+    Traduz erro generico em (status_code, error_type, hint_operacional).
+
+    Substitui o ``except Exception: 500`` que antes devolvia mensagem
+    crua sem o usuario saber se devia rautenticar, esperar ou escalar.
+    """
+    msg = str(err).lower()
+    # Tenta extrair status HTTP do googleapiclient.errors.HttpError
+    status_attr = getattr(getattr(err, "resp", None), "status", None)
+
+    if status_attr == 401 or "invalid_grant" in msg or "unauthorized" in msg:
+        return (401, "oauth_invalid",
+                "Token OAuth invalido ou expirado. Rode reauth_sheets.py pra regerar.")
+    if status_attr == 403 and ("quota" in msg or "rate" in msg or "userratelimit" in msg):
+        return (429, "drive_quota",
+                "Quota Drive excedida. Aguarde alguns minutos e tente novamente.")
+    if status_attr == 403:
+        return (403, "drive_forbidden",
+                "Sem permissao na pasta Drive. Verifique se a conta tem acesso de editor.")
+    if status_attr == 404:
+        return (404, "drive_not_found",
+                "Pasta Drive nao encontrada. Confirme o link/ID na planilha.")
+    if status_attr and status_attr >= 500:
+        return (502, "drive_transient",
+                "Drive instavel no momento. Tente de novo em 1-2 minutos.")
+    if "credentials" in msg or "token" in msg:
+        return (503, "missing_oauth",
+                "Credenciais Drive nao configuradas. Rode reauth_sheets.py.")
+    return (500, "unknown", "Erro nao classificado. Ver logs do servidor.")
 STATIC_DIR  = PROJECT_DIR / "static"
 VERSION     = (PROJECT_DIR / "VERSION").read_text().strip() if (PROJECT_DIR / "VERSION").exists() else "dev"
 
@@ -1360,7 +1392,12 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
             result = upload_to_drive_folder(thumb_path, folder_link, creds)
             self._json({"ok": True, "drive": result})
         except Exception as e:
-            self._json({"error": str(e)}, 500)
+            status, err_type, hint = _classify_drive_error(e)
+            self._json({
+                "error": str(e),
+                "error_type": err_type,
+                "hint": hint,
+            }, status)
 
     def _handle_upload_drive(self, body: dict):
         """POST /api/upload-drive — upload genérico de arquivo para pasta no Drive."""
@@ -1396,10 +1433,21 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
                 actual_path.unlink()
 
             self._json({"success": True, "link": result.get("link", ""), "drive": result})
-        except FileNotFoundError as e:
-            self._json({"success": False, "error": "Google Drive credentials not configured"}, 500)
+        except FileNotFoundError:
+            self._json({
+                "success": False,
+                "error": "Google Drive credentials not configured",
+                "error_type": "missing_oauth",
+                "hint": "Rode reauth_sheets.py pra regerar o token OAuth",
+            }, 503)
         except Exception as e:
-            self._json({"success": False, "error": str(e)}, 500)
+            status, err_type, hint = _classify_drive_error(e)
+            self._json({
+                "success": False,
+                "error": str(e),
+                "error_type": err_type,
+                "hint": hint,
+            }, status)
 
     def _handle_youtube_update_title(self, body: dict):
         """POST /api/youtube-update-title — atualiza titulo de video no YouTube."""

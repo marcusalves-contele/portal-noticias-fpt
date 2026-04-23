@@ -17,10 +17,18 @@ import io
 import json
 import base64
 import pickle
+import logging
 import requests
 from pathlib import Path
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+logger = logging.getLogger("prism.thumb_live")
+if not logger.handlers:
+    _h = logging.StreamHandler()
+    _h.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
+    logger.addHandler(_h)
+    logger.setLevel(logging.INFO)
 
 # -------------------------------------------------------------------
 # Paths & Constants
@@ -1675,7 +1683,12 @@ def upload_to_drive_folder(file_path: Path, folder_link: str, creds) -> dict:
 HISTORY_FILE = OUTPUT_DIR / "thumb_history.json"
 
 def _img_to_base64_preview(path: Path, max_width: int = 320) -> str:
-    """Gera preview base64 reduzida da thumb (salva espaco no JSON)."""
+    """Gera preview base64 reduzida da thumb (salva espaco no JSON).
+
+    Fallback graceful: se PIL falhar, usa arquivo original; se ate read
+    falhar, retorna "". Antes as duas branches eram silenciosas e UI
+    mostrava preview em branco sem log; agora cada fallback loga contexto.
+    """
     try:
         from PIL import Image
         img = Image.open(path)
@@ -1685,11 +1698,14 @@ def _img_to_base64_preview(path: Path, max_width: int = 320) -> str:
         buf = io.BytesIO()
         img.save(buf, format="PNG", optimize=True)
         return base64.b64encode(buf.getvalue()).decode()
-    except Exception:
-        # Fallback: base64 do arquivo original (sem resize)
+    except Exception as pil_err:
+        logger.warning("PIL resize falhou em %s (%s); usando arquivo original",
+                       path.name, pil_err)
         try:
             return base64.b64encode(path.read_bytes()).decode()
-        except Exception:
+        except Exception as read_err:
+            logger.error("Preview vazio pra %s: leitura tambem falhou (%s)",
+                         path, read_err)
             return ""
 
 
