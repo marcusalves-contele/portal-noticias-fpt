@@ -4,6 +4,15 @@ Registro de mudancas no Prism OS.
 
 ---
 
+## 23/04/2026: Anti-silent-failure em PIL preview e Drive upload
+
+**Divida tecnica** (nao era issue reportada, mas aparecia como thumb em branco e erros 500 sem acao clara).
+
+- `thumb_live._img_to_base64_preview`: antes tinha fallback duplo silencioso (`except: pass`) que resultava em preview em branco no historico sem log. Agora loga warning quando PIL falha e error quando a leitura do arquivo tambem falha. Continua retornando "" no pior caso (fallback gracioso), mas com visibilidade.
+- Drive upload: `_handle_thumb_drive_upload` e `_handle_upload_drive` agora classificam o erro via `_classify_drive_error` em vez de devolver 500 generico. Retornos distintos pra OAuth invalido (401), quota (429), forbidden (403), not found (404), transient 5xx (502), missing creds (503). Cada resposta leva `error_type` e `hint` operacional pra UI poder mostrar acao (ex: "rode reauth_sheets.py", "aguarde 1-2min").
+
+---
+
 ## 23/04/2026: Estrategia de Live nativa no Prism (mata workaround Gem externo)
 
 **Issue**: #83
