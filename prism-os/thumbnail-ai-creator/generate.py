@@ -3,7 +3,14 @@
 Thumbnail AI Creator - Gerador de Thumbnails com Nano Banana Pro
 Gera 3 variações de thumbnail baseado em prompt otimizado.
 
-Uso:
+DEPRECATED (23/04/2026): este CLI standalone foi substituido pelo fluxo
+integrado no dashboard do Prism OS (`nutella-creator/dashboard.py`). O
+diretorio `referencias/` continua sendo a fonte das fotos de Julio,
+Leonardo e convidados usadas pelo dashboard. Para gerar thumbnails novas,
+use o dashboard web. Este script continua funcional, mas nao recebe
+novos features e pode ser removido em uma release futura.
+
+Uso (legado):
     python3 generate.py --prompt "seu prompt aqui" --refs ref1.jpg ref2.jpg
     python3 generate.py --prompt-file prompts/live316.txt --refs referencias/julio/*.JPEG
     python3 generate.py --live 317  # Auto-detecta convidado e refs
@@ -18,6 +25,13 @@ import argparse
 import requests
 from pathlib import Path
 from datetime import datetime
+
+# Aviso de deprecation ao rodar o CLI
+if __name__ != "__main__" or True:
+    sys.stderr.write(
+        "[DEPRECATED] thumbnail-ai-creator/generate.py e legado. "
+        "Use o dashboard do Prism OS (nutella-creator/dashboard.py > /thumb-live).\n"
+    )
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Configuração

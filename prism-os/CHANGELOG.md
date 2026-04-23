@@ -4,6 +4,18 @@ Registro de mudancas no Prism OS.
 
 ---
 
+## 23/04/2026: Deprecacao do CLI thumbnail-ai-creator/
+
+O diretorio `thumbnail-ai-creator/` passa a ser legado. O fluxo integrado no `nutella-creator/dashboard.py` (UI web "Thumbnails de Live") e a fonte unica daqui pra frente. Objetivo: eliminar duplicacao de codigo (fix num path nao chegava no outro).
+
+- `generate.py`: banner de deprecation no docstring + aviso em stderr ao importar/rodar
+- `README.md`: marcado DEPRECATED, com instrucao clara (`cd nutella-creator && python3 dashboard.py`)
+- `referencias/` (Julio, Leonardo, convidados) continua ativo, e usado pelo dashboard. NAO deletar
+
+Nenhuma funcionalidade removida ainda. Script continua rodando se alguem chamar. Remocao completa dos .py planejada pra release futura.
+
+---
+
 ## 23/04/2026: Anti-silent-failure em PIL preview e Drive upload
 
 **Divida tecnica** (nao era issue reportada, mas aparecia como thumb em branco e erros 500 sem acao clara).
