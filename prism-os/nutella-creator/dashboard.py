@@ -514,6 +514,8 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._handle_briefing_from_text(body)
         elif path == "/api/thumb-transcribe":
             self._handle_thumb_transcribe(body)
+        elif path == "/api/thumb-live-strategy":
+            self._handle_thumb_live_strategy(body)
         elif path == "/api/thumb-generate":
             self._handle_thumb_generate(body)
         elif path == "/api/thumb-feedback":
@@ -1144,6 +1146,30 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
             api_key = load_api_key()
             audio_bytes = base64.b64decode(audio_b64)
             result = transcribe_audio(audio_bytes, api_key, mime_type)
+            self._json(result)
+        except Exception as e:
+            self._json({"error": str(e)}, 500)
+
+    def _handle_thumb_live_strategy(self, body: dict):
+        """
+        POST /api/thumb-live-strategy — estrategia completa de Live a partir do audio.
+
+        Input: audio_base64, mime_type (opcional), channel ("fleet"/"teams").
+        Output: dict com q1/q2/q3 + keyword + positioning + titles_seo (6) +
+                titles_creative (6) + tags + objective + polls (3).
+        """
+        audio_b64 = body.get("audio_base64", "")
+        mime_type = body.get("mime_type", "audio/m4a")
+        channel   = body.get("channel", "fleet")
+        if not audio_b64:
+            self._json({"error": "audio_base64 required"}, 400)
+            return
+        try:
+            from thumb_live import generate_live_strategy, load_api_key
+            api_key = load_api_key()
+            audio_bytes = base64.b64decode(audio_b64)
+            result = generate_live_strategy(audio_bytes, api_key, channel=channel,
+                                            mime_type=mime_type)
             self._json(result)
         except Exception as e:
             self._json({"error": str(e)}, 500)

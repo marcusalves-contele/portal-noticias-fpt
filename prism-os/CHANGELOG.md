@@ -4,6 +4,23 @@ Registro de mudancas no Prism OS.
 
 ---
 
+## 23/04/2026: Estrategia de Live nativa no Prism (mata workaround Gem externo)
+
+**Issue**: #83
+
+- Feature: ao subir audio de briefing no fluxo Thumbnails de Live, o Prism agora gera estrategia completa num shot (antes so extraia q1/q2/q3). Saida:
+  - Palavra-chave SEO principal + posicionamento
+  - 6 titulos SEO (otimizados pra busca, keyword-first)
+  - 6 titulos criativos (emocional/curiosidade, viram texto da thumb)
+  - Tags SEO (8+)
+  - Objetivo resumido da live
+  - 3 opcoes de enquete (pergunta + alternativas)
+- Backend: nova funcao `thumb_live.generate_live_strategy()` usando Gemini Pro 3 com thinking adaptive + injecao de knowledge base (`playbook-conteudo-contele-2026.md` + `brand-manual-2024.md`). Novo endpoint `/api/thumb-live-strategy`
+- Frontend: painel "Estrategia de Live" aparece apos upload do audio, cards editaveis, radio-select pro titulo criativo escolhido (vai como `thumb_text` no Step 3)
+- Motivacao: aposentar workaround do mkt que usava Gem externo no Google Gemini pra gerar a mesma coisa por fora do Prism
+
+---
+
 ## 23/04/2026: Tier 4 transcricao (audio + Gemini Flash) + anti-silent-failure
 
 **Issues**: #73, #84
