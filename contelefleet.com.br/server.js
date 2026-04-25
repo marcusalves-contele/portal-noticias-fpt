@@ -205,13 +205,19 @@ async function pipedrivePost(resource, body) {
 async function sendWhatsApp(number, text) {
   if (!number) return;
   try {
-    await fetch(`${EVOLUTION_URL}/message/sendText/${encodeURIComponent(EVOLUTION_INSTANCE)}`, {
+    const r = await fetch(`${EVOLUTION_URL}/message/sendText/${encodeURIComponent(EVOLUTION_INSTANCE)}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': EVOLUTION_KEY },
       body: JSON.stringify({ number, linkPreview: false, text })
     });
+    if (!r.ok) {
+      const body = await r.text().catch(() => '');
+      console.error(`[WhatsApp] Evolution NON-OK [${r.status}] inst="${EVOLUTION_INSTANCE}" to=${number}: ${body.slice(0, 300)}`);
+    } else {
+      console.log(`[WhatsApp] sent inst="${EVOLUTION_INSTANCE}" to=${number}`);
+    }
   } catch (err) {
-    console.error('WhatsApp send error:', err.message);
+    console.error(`[WhatsApp] send THROW inst="${EVOLUTION_INSTANCE}" to=${number}:`, err.message);
   }
 }
 
