@@ -149,6 +149,22 @@ npm run preview  # Serve SPA com fallback
 - **Remote**: `https://github.com/contele/growth.git`
 - **Nunca commitar**: `.env.local`, `node_modules/`, `dist/`
 
+### REGRA: CHANGELOG.md em cada subprojeto + indice na raiz
+
+Este monorepo tem N landing pages e ferramentas. Pra rastrear melhorias sem precisar `git log` em cada pasta, padronizamos:
+
+1. **Cada subprojeto** com mudancas (`contelefleet.com.br/`, `conteleteams.com.br/`, `prism-os/`, `contele-referral-page/`, etc) deve manter `CHANGELOG.md` proprio com formato:
+   ```
+   ## DD/MM/YYYY: Titulo da mudanca
+   **PR**: contele/growth#NN (opcional)
+   bullets curtos do que mudou e por que
+   ```
+2. **Raiz do repo** (`CHANGELOG.md` aqui) mantem indice consolidado: tabela apontando pra cada subprojeto + secao "Mudancas recentes (cross-projeto)" com 1-2 linhas por release apontando pra detalhe no subprojeto.
+3. **Quando voce mexer num subprojeto que ainda nao tem CHANGELOG.md**: crie agora (mesmo formato), atualize o indice da raiz, e nao espere acumular mudanca.
+4. **Frequencia**: registrar na hora junto com o commit/PR. Nao acumular semanal. Aprendizado consolidado da skill `/sessao` do Marco vale aqui tambem.
+
+Por que: mudancas pequenas (fix de copy, ajuste de paleta, novo botao CTA) somem no `git log` depois de 2 semanas. CHANGELOG conta a historia em linguagem de produto, util pra QA, retro, planejamento e pra Marco saber o que rodou na semana sem ler diff.
+
 ### REGRA: Sempre mergear no master antes de considerar "feito"
 
 Railway faz deploy automático a partir do `master`. Código em feature/fix branch **NÃO vai pra produção** até ser mergeado.
