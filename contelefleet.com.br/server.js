@@ -553,7 +553,7 @@ app.post('/api/lead', async (req, res) => {
   const body = req.body;
   const frota = parseInt(body.tamanho_frota || body.tamanho_equipe, 10) || 0;
 
-  const ctaSource = body.cta_source || 'testar';
+  const ctaSource = body.cta_source || 'consultor';
   console.log(`[LEAD-FLEET] ${body.nome} | ${body.empresa} | ${frota} veiculos | cta=${ctaSource} | gclid=${body.gclid ? 'yes' : 'no'}`);
 
   // ===== GATEKEEPING: < MIN_VEHICLES =====
@@ -593,7 +593,7 @@ app.post('/api/lead', async (req, res) => {
 });
 
 async function processLead(body, frota, ctaSource, isTest) {
-  const ctaLabel = { testar: 'Teste Grátis', especialista: 'Falar com Especialista', contratar: 'Contratar Agora' }[ctaSource] || ctaSource;
+  const ctaLabel = { consultor: 'Fale com Consultor', testar: 'Teste Grátis', especialista: 'Falar com Especialista', contratar: 'Contratar Agora' }[ctaSource] || ctaSource;
   const infoText = `CTA: ${ctaLabel}. ${body.info || ''}`.trim();
 
   // Filter test submissions: log to sheet but skip Pipedrive/SDR/notifications
