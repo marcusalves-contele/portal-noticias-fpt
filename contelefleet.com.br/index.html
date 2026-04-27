@@ -1067,6 +1067,56 @@
       .nav-login { display: none; }
       .nav-logo img { width: 120px; }
     }
+
+    /* ===== EXIT INTENT MODAL ===== */
+    .exit-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.65); z-index: 1100;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .exit-overlay.active { display: flex; }
+    .exit-modal {
+      background: var(--white); border-radius: 16px; padding: 32px 28px;
+      max-width: 460px; width: 100%; position: relative;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+      animation: exitFadeIn 0.25s ease-out;
+    }
+    @keyframes exitFadeIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .exit-close {
+      position: absolute; top: 12px; right: 12px;
+      background: transparent; border: none; font-size: 28px; line-height: 1;
+      cursor: pointer; color: var(--dark-slate); padding: 4px 10px;
+    }
+    .exit-modal h3 {
+      font-family: var(--font-main); font-weight: 800; font-size: 24px;
+      color: var(--dark-slate); margin: 0 0 12px; line-height: 1.2;
+    }
+    .exit-modal .exit-sub {
+      color: var(--gray-600, #555); font-size: 16px;
+      line-height: 1.45; margin: 0 0 22px;
+    }
+    .exit-btns { display: flex; flex-direction: column; gap: 10px; }
+    .exit-btns .btn-primary {
+      width: 100%; padding: 14px 18px; font-size: 15px;
+      text-align: center; text-decoration: none;
+    }
+    .exit-btns .btn-wpp {
+      width: 100%; padding: 14px 18px; border-radius: 8px;
+      background: #25D366; color: var(--white);
+      font-family: var(--font-main); font-weight: 700; font-size: 15px;
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 10px; text-decoration: none; border: none; cursor: pointer;
+    }
+    .exit-btns .btn-wpp:hover { background: #1ea854; }
+    .exit-rep-name { display: block; font-size: 13px; opacity: 0.9; font-weight: 500; }
+    @media (max-width: 480px) {
+      .exit-modal { padding: 26px 20px; }
+      .exit-modal h3 { font-size: 20px; }
+      .exit-modal .exit-sub { font-size: 14px; }
+    }
   </style>
 </head>
 <body>
@@ -2133,6 +2183,22 @@ document.addEventListener('click', function(ev){
   </div>
 </footer>
 
+<!-- ===== EXIT INTENT MODAL ===== -->
+<div class="exit-overlay" id="exitModal" role="dialog" aria-modal="true" aria-labelledby="exitTitle">
+  <div class="exit-modal">
+    <button class="exit-close" id="exitClose" type="button" aria-label="Fechar">&times;</button>
+    <h3 id="exitTitle">Antes de sair, fale com nosso time</h3>
+    <p class="exit-sub">Reduza custos e aumente a produtividade da sua frota com a Contele Fleet. Mais de 1.500 frotas já transformaram a operação.</p>
+    <div class="exit-btns">
+      <a href="#lead-form" class="btn btn-primary" id="exitCta">Fazer orçamento online</a>
+      <a href="#" class="btn-wpp" id="exitWppBtn" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        <span>Falar pelo WhatsApp<span class="exit-rep-name" id="exitWppRep"></span></span>
+      </a>
+    </div>
+  </div>
+</div>
+
 <!-- Cookie banner -->
 <div id="cookie-banner" style="display:none; position:fixed; bottom:16px; left:16px; right:16px; max-width:720px; margin:0 auto; background:var(--dark-slate); color:var(--white); padding:16px 20px; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.3); z-index:1000; font-size:14px; line-height:1.5;">
   <div style="display:flex; flex-wrap:wrap; align-items:center; gap:16px; justify-content:space-between;">
@@ -2607,6 +2673,170 @@ document.addEventListener('click', function(ev){
   }
 
   document.querySelectorAll('.carousel').forEach(initCarousel);
+})();
+</script>
+
+<!-- ===== EXIT INTENT POPUP (round-robin Marcia/Thiago, ferias-aware) ===== -->
+<script defer>
+(function () {
+  /**
+   * Config dos vendedores Fleet.
+   *
+   * Pra colocar alguem em ferias, edite o objeto 'vacation':
+   *   vacation: { from: '2026-05-10', to: '2026-05-25' }   // YYYY-MM-DD inclusivos
+   * Ou desative por completo:
+   *   active: false
+   *
+   * Round-robin alterna entre os ativos persistindo o counter em localStorage.
+   * Se ninguem estiver ativo, cai pro fallback (primeiro da lista) pra nunca
+   * sobrar o cliente sem alguem pra falar.
+   */
+  var SALES_REPS = [
+    {
+      name: 'Thiago',
+      phone: '5511937083424',
+      active: true,
+      vacation: null
+    },
+    {
+      name: 'Marcia',
+      phone: '5513997143896',
+      active: true,
+      vacation: null
+    }
+  ];
+
+  var WPP_MSG_TEMPLATE = 'Oi, vim pelo site contelefleet.com.br e queria saber mais sobre a Contele Fleet pra minha frota.';
+  var DELAY_BEFORE_ARM_MS = 15000;
+  var MOBILE_IDLE_MS = 45000;
+  var STORAGE_RR_KEY = 'fleet_exit_rr_counter';
+  var STORAGE_SHOWN_KEY = 'fleet_exit_shown';
+  var STORAGE_SUBMITTED_KEY = 'fleet_lead_submitted';
+
+  function todayISO() {
+    var d = new Date();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return d.getFullYear() + '-' + m + '-' + day;
+  }
+
+  function isOnVacation(rep) {
+    if (!rep.vacation || !rep.vacation.from || !rep.vacation.to) return false;
+    var today = todayISO();
+    return today >= rep.vacation.from && today <= rep.vacation.to;
+  }
+
+  function getEligibleReps() {
+    return SALES_REPS.filter(function (r) {
+      return r.active !== false && !isOnVacation(r);
+    });
+  }
+
+  function pickNextRep() {
+    var eligible = getEligibleReps();
+    if (eligible.length === 0) {
+      console.warn('[exit-intent] zero vendedores ativos, usando fallback', SALES_REPS[0]);
+      return SALES_REPS[0];
+    }
+    var counter = 0;
+    try { counter = parseInt(localStorage.getItem(STORAGE_RR_KEY) || '0', 10) || 0; } catch (_) {}
+    var rep = eligible[counter % eligible.length];
+    try { localStorage.setItem(STORAGE_RR_KEY, String((counter + 1) % 1000000)); } catch (_) {}
+    return rep;
+  }
+
+  function buildWppHref(rep) {
+    return 'https://wa.me/' + rep.phone + '?text=' + encodeURIComponent(WPP_MSG_TEMPLATE);
+  }
+
+  var modal = document.getElementById('exitModal');
+  var closeBtn = document.getElementById('exitClose');
+  var ctaBtn = document.getElementById('exitCta');
+  var wppBtn = document.getElementById('exitWppBtn');
+  var wppRepLabel = document.getElementById('exitWppRep');
+  if (!modal || !closeBtn || !ctaBtn || !wppBtn) return;
+
+  var canShow = false;
+  var shown = false;
+
+  setTimeout(function () { canShow = true; }, DELAY_BEFORE_ARM_MS);
+
+  function shouldBlock() {
+    if (shown) return true;
+    if (!canShow) return true;
+    try {
+      if (sessionStorage.getItem(STORAGE_SHOWN_KEY)) return true;
+      if (localStorage.getItem(STORAGE_SUBMITTED_KEY)) return true;
+    } catch (_) {}
+    // Bloqueia se o lead-form ja esta visivel na viewport (usuario ja chegou la)
+    var leadForm = document.getElementById('lead-form');
+    if (leadForm) {
+      var rect = leadForm.getBoundingClientRect();
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      if (rect.top < vh && rect.bottom > 0) return true;
+    }
+    return false;
+  }
+
+  function showExit() {
+    if (shouldBlock()) return;
+    shown = true;
+    var rep = pickNextRep();
+    wppBtn.setAttribute('href', buildWppHref(rep));
+    wppBtn.dataset.rep = rep.name;
+    if (wppRepLabel) wppRepLabel.textContent = 'com ' + rep.name;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    try { sessionStorage.setItem(STORAGE_SHOWN_KEY, '1'); } catch (_) {}
+    if (window.dataLayer) {
+      window.dataLayer.push({
+        event: 'exit_intent_shown',
+        exit_intent_rep: rep.name
+      });
+    }
+  }
+
+  function hideExit() {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // Desktop: mouse sai pela borda de cima
+  document.addEventListener('mouseout', function (e) {
+    if (!e.relatedTarget && (e.clientY === undefined || e.clientY < 10)) showExit();
+  });
+
+  // Mobile: 45s sem scroll/touch apos delay
+  var mobileTimer = null;
+  var isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  if (isMobile) {
+    var resetMobileTimer = function () {
+      clearTimeout(mobileTimer);
+      mobileTimer = setTimeout(showExit, MOBILE_IDLE_MS);
+    };
+    setTimeout(function () {
+      resetMobileTimer();
+      window.addEventListener('scroll', resetMobileTimer, { passive: true });
+      window.addEventListener('touchstart', resetMobileTimer, { passive: true });
+    }, DELAY_BEFORE_ARM_MS);
+  }
+
+  closeBtn.addEventListener('click', hideExit);
+  modal.addEventListener('click', function (e) { if (e.target === modal) hideExit(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.classList.contains('active')) hideExit();
+  });
+
+  // CTA primario: deixa o anchor fazer o scroll, mas fecha modal e marca evento
+  ctaBtn.addEventListener('click', function () {
+    if (window.dataLayer) window.dataLayer.push({ event: 'exit_intent_cta', exit_intent_action: 'lead_form' });
+    hideExit();
+  });
+  wppBtn.addEventListener('click', function () {
+    var repName = wppBtn.dataset.rep || '';
+    if (window.dataLayer) window.dataLayer.push({ event: 'exit_intent_cta', exit_intent_action: 'whatsapp', exit_intent_rep: repName });
+    try { localStorage.setItem(STORAGE_SUBMITTED_KEY, todayISO()); } catch (_) {}
+  });
 })();
 </script>
 
