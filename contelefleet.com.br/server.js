@@ -240,7 +240,7 @@ async function getGoogleAdsToken() {
   return data.access_token;
 }
 
-async function uploadGoogleAdsConversion(gclid, conversionAction, conversionValue, conversionDateTime) {
+async function uploadGoogleAdsConversion(gclid, conversionAction, conversionValue, conversionDateTime, hashedEmail, hashedPhone) {
   const token = await getGoogleAdsToken();
   if (!token) {
     const err = { error: 'no_access_token', success: false };
@@ -265,7 +265,13 @@ async function uploadGoogleAdsConversion(gclid, conversionAction, conversionValu
         conversionAction: conversionAction,
         conversionDateTime: conversionDateTime,
         conversionValue: conversionValue,
-        currencyCode: 'BRL'
+        currencyCode: 'BRL',
+        ...(hashedEmail || hashedPhone ? {
+          userIdentifiers: [
+            ...(hashedEmail ? [{ hashedEmail }] : []),
+            ...(hashedPhone ? [{ hashedPhoneNumber: hashedPhone }] : [])
+          ]
+        } : {})
       }],
       partialFailure: true
     })
@@ -1034,7 +1040,9 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
             gclid,
             GADS_CONV_QUALIFIED,
             1.0,
-            brConversionDateTime()
+            brConversionDateTime(),
+            hashedEmail,
+            hashedPhone
           );
           if (adsResult.success) {
             gadsStatus = 'SUCCESS';
@@ -1114,7 +1122,9 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
             gclid,
             GADS_CONV_WON,
             dealValue || 1.0,
-            brConversionDateTime()
+            brConversionDateTime(),
+            hashedEmail,
+            hashedPhone
           );
           if (adsResult.success) {
             gadsWonStatus = 'SUCCESS';
