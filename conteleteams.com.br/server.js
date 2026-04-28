@@ -117,7 +117,13 @@ const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK_URL || 'https://discord.com/
 // Nao mistura com notificacoes normais pra nao afogar o sinal critico.
 const DISCORD_LEAD_CRITICAL_WEBHOOK = process.env.DISCORD_LEAD_CRITICAL_WEBHOOK_URL || 'https://discord.com/api/webhooks/1460216471270723769/cEq-Rc-Dzgm_GYRZpGoVWNYWEMZAYQLNPcQ1cMu1upPw4rowRmc-x8ILTAQN5M8_Hip4';
 const SPREADSHEET_API = 'https://ge-prd-web-api.contele.com.br/api/v1/spreadsheet/1cM0RpSRWarWNqSYDfjqTkPnrWI1BSP8jicm77n3KiTY';
-const SDR_WEBHOOK = process.env.SDR_WEBHOOK_URL || 'https://marcofassa.app.n8n.cloud/webhook/inicio-sdr-teams-v2';
+// SDR v2 cutover (28/04/2026): server.js posta direto no Leo IA em
+// contele-os, sem passar pelo n8n. O fluxo antigo n8n (workflows
+// Q6wWoYNqQQVqcHly + pXUbMrLyOyTIqBNr) fica desativado mas nao deletado por
+// 30d como rollback. Spec: assistant-sexta-feira/docs/superpowers/specs/
+// 2026-04-28-sdr-v2-teams-cutover-design.md (M5).
+const SDR_WEBHOOK = process.env.SDR_WEBHOOK_URL || 'https://os.contele.io/api/webhooks/sales-lead';
+const SDR_WEBHOOK_SECRET = process.env.SALES_WEBHOOK_SECRET || 'leo-vendas-2026';
 const LEONARDO_PHONE = '5511999796461';
 
 // Contele OS (fonte de verdade de tracking GA4/UTM/gclid, issue growth#77)
@@ -641,10 +647,14 @@ async function processLead(body, tamanho, ctaSource) {
     sendWhatsApp(VENDORS[vendor.id]?.phone, notifText),
     // WhatsApp Leonardo
     sendWhatsApp(LEONARDO_PHONE, notifText),
-    // SDR (n8n Cloud: first WhatsApp message to lead)
+    // SDR v2 (cutover 28/04/2026): post direto no Leo IA em contele-os.
+    // Header x-webhook-secret obrigatorio (auth do endpoint).
     fetch(SDR_WEBHOOK, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-webhook-secret': SDR_WEBHOOK_SECRET
+      },
       body: JSON.stringify({
         nome: body.nome,
         whatsapp: body.telefone,
