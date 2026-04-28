@@ -840,6 +840,17 @@ async function processLead(body, frota, ctaSource, isTest) {
 
   await Promise.allSettled(tasks);
 
+  // Discord notify (Momento 1: lead novo entrou). Fire-and-forget, nao bloqueia response.
+  sendDiscord(
+    `🆕 **Novo lead Fleet**\n\n` +
+    `**${body.empresa}** • ${frota} veiculos\n` +
+    `Lead: ${body.nome}\n` +
+    `Contato: ${body.email} | ${body.telefone}\n` +
+    `Fonte: ${body.gclid ? 'Google Ads (GCLID ✓)' : 'orgânico'} | UTM: ${body.utm_source || '-'}/${body.utm_medium || '-'}\n` +
+    `CTA: ${ctaSource} | Vendor: ${vendor.nome}\n` +
+    `Pipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`
+  ).catch(() => {});
+
   console.log(`[LEAD-FLEET] Complete: ${body.empresa} -> deal ${dealId}, vendor ${vendor.nome}`);
 }
 

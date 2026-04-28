@@ -676,6 +676,17 @@ async function processLead(body, tamanho, ctaSource) {
     })
   ]);
 
+  // Discord notify (Momento 1: lead novo entrou). Fire-and-forget, nao bloqueia response.
+  sendDiscord(
+    `🆕 **Novo lead Teams**\n\n` +
+    `**${body.empresa}** • ${tamanho} licenças\n` +
+    `Lead: ${body.nome}\n` +
+    `Contato: ${body.email} | ${body.telefone}\n` +
+    `Fonte: ${body.gclid ? 'Google Ads (GCLID ✓)' : 'orgânico'} | UTM: ${body.utm_source || '-'}/${body.utm_medium || '-'}\n` +
+    `CTA: ${ctaLabel || ctaSource} | Vendor: ${vendor.nome}\n` +
+    `Pipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`
+  ).catch(() => {});
+
   console.log(`[LEAD] Complete: ${body.empresa} -> deal ${dealId}, vendor ${vendor.nome}`);
 }
 
