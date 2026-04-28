@@ -387,6 +387,11 @@ app.post('/api/lead', async (req, res) => {
   const body = req.body;
   let tamanho = parseInt(body.tamanho_equipe, 10) || 0;
 
+  // Normaliza telefone: garante DDI 55 quando ausente (closes #70)
+  let tel = (body.telefone || '').replace(/\D/g, '');
+  if (tel.length > 0 && tel.length <= 11) tel = '55' + tel;
+  body.telefone = tel;
+
   const ctaSource = body.cta_source || 'testar';
   console.log(`[LEAD] ${body.nome} | ${body.empresa} | ${tamanho} lic | cta=${ctaSource} | gclid=${body.gclid ? 'yes' : 'no'}`);
 
