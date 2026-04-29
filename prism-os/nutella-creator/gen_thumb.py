@@ -311,55 +311,65 @@ FLASH_URL   = f"https://generativelanguage.googleapis.com/v1beta/models/{FLASH_M
 
 
 def adjust_prompt_with_feedback(original_prompt: str, feedback: str, api_key: str) -> str:
-    """Usa Gemini Flash para ajustar o prompt baseado no feedback do usuário."""
-    system_prompt = (
-        "You are a prompt engineer for AI-generated YouTube thumbnails. "
-        "Given an original image generation prompt and user feedback about the result, "
-        "output an ADJUSTED prompt that incorporates the feedback. "
-        "Rules: keep same structure/style, only modify what feedback addresses, "
-        "output ONLY the adjusted prompt in English, no explanations."
+    """
+    Append feedback do usuario ao prompt original como instrucao adicional.
+
+    HISTORICO: chamada anterior pedia pra Flash REESCREVER o prompt inteiro.
+    Resultado: Flash perdia a face_lock do Julio + composicao + texto da thumb,
+    gerando imagens aleatorias fora de assunto (issue #89). Agora preservamos
+    o prompt cru e so adicionamos o feedback como diretiva final no fim do
+    contexto, mantendo todas as ancoras de fidelidade facial e composicao.
+
+    `api_key` mantido na assinatura por retrocompat com chamadores existentes,
+    mas nao e mais usado.
+    """
+    feedback_clean = (feedback or "").strip()
+    if not feedback_clean:
+        return original_prompt
+    return (
+        f"{original_prompt}\n\n"
+        f"ADDITIONAL INSTRUCTIONS FROM REVIEWER (apply on top of all rules above, "
+        f"DO NOT drop face references or composition): {feedback_clean}"
     )
-    user_msg = f"ORIGINAL PROMPT:\n{original_prompt}\n\nUSER FEEDBACK:\n{feedback}\n\nAdjusted prompt:"
-
-    payload = {
-        "contents": [{"parts": [{"text": user_msg}]}],
-        "systemInstruction": {"parts": [{"text": system_prompt}]},
-        "generationConfig": {"temperature": 0.3, "maxOutputTokens": 2000},
-    }
-    headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
-
-    try:
-        resp = requests.post(FLASH_URL, headers=headers, json=payload, timeout=30)
-        result = resp.json()
-        if "candidates" in result:
-            return result["candidates"][0]["content"]["parts"][0]["text"].strip()
-    except Exception as e:
-        print(f"  Feedback adjustment error: {e}")
-
-    return original_prompt + f"\n\nADDITIONAL INSTRUCTIONS: {feedback}"
 
 
 def generate_single(meta: dict, cuts_dir: Path, api_key: str,
                     feedback: str = None) -> Path | None:
-    """Gera 1 thumbnail. Se feedback, ajusta o prompt com IA primeiro."""
+    """Gera 1 thumbnail. Se feedback, anexa diretiva ao prompt original."""
     rank = meta["rank"]
-    clip_name = meta["clip"]["arquivo"]
-    parts_name = clip_name.split("_")
-    live_num = parts_name[0].replace("live", "") if parts_name else "0"
+    clip_obj = meta.get("clip") or {}
+    clip_name = clip_obj.get("arquivo", "")
+    parts_name = clip_name.split("_") if clip_name else []
+    live_num = parts_name[0].replace("live", "") if parts_name and parts_name[0].startswith("live") else "0"
 
     prompt = build_prompt(meta)
-    if feedback:
-        print(f"  Ajustando prompt com feedback...")
+    is_adjustment = bool(feedback and feedback.strip())
+    if is_adjustment:
+        print(f"  Ajustando prompt com feedback (preservando face_lock + composicao)...")
         prompt = adjust_prompt_with_feedback(prompt, feedback, api_key)
-        print(f"  Prompt ajustado OK")
 
     refs = select_refs(meta)
     if not refs:
         print(f"  ERRO: sem referências em {REFS_DIR}")
         return None
 
-    out_path = cuts_dir / f"live{live_num}_{rank:02d}_thumb.png"
-    print(f"  Gerando thumbnail #{rank}...")
+    if is_adjustment:
+        # Salva ajustes com sufixo incremental, nao sobrescreve original.
+        # Permite Rarissa/Isa comparar antes/depois lado a lado (issue #89).
+        adj_idx = 1
+        while True:
+            out_path = cuts_dir / f"live{live_num}_{rank:02d}_thumb_adj{adj_idx}.png"
+            if not out_path.exists():
+                break
+            adj_idx += 1
+            if adj_idx > 99:
+                # safety cap; substitui a ultima
+                out_path = cuts_dir / f"live{live_num}_{rank:02d}_thumb_adj{adj_idx-1}.png"
+                break
+    else:
+        out_path = cuts_dir / f"live{live_num}_{rank:02d}_thumb.png"
+
+    print(f"  Gerando thumbnail #{rank}{' (ajuste)' if is_adjustment else ''}...")
     return generate_one(api_key, prompt, refs, out_path, variation=1)
 
 

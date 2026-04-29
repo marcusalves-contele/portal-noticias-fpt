@@ -381,7 +381,32 @@ def _generate_image(api_key: str, prompt: str, refs: list[Path], output_name: st
 
 
 def _edit_image(api_key: str, base_image: Path, prompt: str, refs: list[Path], output_name: str) -> Path | None:
-    """Edit an existing image using Nano Banana 2."""
+    """
+    Edit an existing thumbnail using Gemini 3.1 Flash Image (Nano Banana 2).
+
+    Issue #101: Rarissa relatou qualidade ruim no Ajustar Thumb e leak de
+    prompt do Julio quando edicao falhava.
+
+    DECISAO (29/04/2026): mantemos o modelo Flash Image (Nano Banana 2). O
+    Marco confirmou que Flash com config certa supera Pro pra edicao com
+    referencia facial. O problema NAO era o modelo, era a configuracao.
+
+    Config corrigida (referencia: ai.google.dev/gemini-api/docs/image-generation):
+    - responseModalities = ["TEXT", "IMAGE"] como o doc oficial recomenda pra
+      edicao. Forcar so ["IMAGE"] e undocumented e gera respostas inconsistentes.
+      Vazamento de texto e tratado por post-filter (ignoramos parts sem inlineData).
+    - imageConfig.aspectRatio "16:9" + imageConfig.imageSize "2K" pra travar
+      composicao e nitidez. Sem aspectRatio o modelo derivava pra ratios random,
+      que e o sintoma "imagem aleatoria fora do assunto" relatado pela Rarissa.
+    - temperature 0.4 (era 0.8). Edicao precisa preservar subject e composicao;
+      temp alta causa drift.
+    - Auth via header x-goog-api-key (consistente com _generate_image e demais
+      chamadas do projeto; antes usava ?key= query param, divergencia gratuita).
+    - Order de parts: text primeiro, depois inline_data (per docs oficiais).
+    - Caller (run_pipeline) sanitiza error path pra nao expor `summary` da intent
+      (que tambem podia conter detalhes de prompt) na mensagem de erro. Esse e
+      gate fisico no cliente, independente do que a API retorna.
+    """
     parts = [{"text": prompt}]
 
     with open(base_image, "rb") as f:
@@ -399,17 +424,26 @@ def _edit_image(api_key: str, base_image: Path, prompt: str, refs: list[Path], o
 
     payload = {
         "contents": [{"parts": parts}],
-        "generationConfig": {"responseModalities": ["TEXT", "IMAGE"], "temperature": 0.8},
+        "generationConfig": {
+            "responseModalities": ["TEXT", "IMAGE"],  # per doc oficial
+            "imageConfig": {
+                "aspectRatio": "16:9",  # trava composicao 16:9 (era livre)
+                "imageSize": "2K",       # nitidez (default era 1K)
+            },
+            "temperature": 0.4,  # baixa pra preservar composicao original
+        },
     }
 
     try:
         resp = requests.post(
-            _image_url(MODEL_IMAGE_EDIT),
-            headers={"Content-Type": "application/json"},
-            params={"key": api_key},
+            _image_url(MODEL_IMAGE_EDIT),  # Nano Banana 2 (Flash Image) preferido
+            headers={"x-goog-api-key": api_key, "Content-Type": "application/json"},
             json=payload, timeout=TIMEOUT,
         )
         data = resp.json()
+        # Post-filter: so iteramos parts com inlineData. Se a API devolver
+        # texto (refusal/apologia), e descartado silenciosamente. Esse e o
+        # gate fisico contra leak de prompt: nunca propagamos text parts.
         for candidate in data.get("candidates", []):
             for part in candidate.get("content", {}).get("parts", []):
                 if "inlineData" in part:
@@ -589,11 +623,17 @@ def run_pipeline(message: str, image_b64: str | None = None, session_id: str = "
 
     if result_path:
         image_url = f"/output/{result_path.name}"
-        text = f"Pronto! {summary}"
+        # Issue #101: nao ecoamos `summary` da intent pra evitar vazar prompt
+        # interno do Julio na mensagem visivel. Frase generica + thumb anexa.
+        text = "Imagem ajustada." if action == "edit" else "Imagem gerada."
         history.append({"role": "assistant", "text": text, "image_path": str(result_path), "ts": time.time()})
         return {"text": text, "image_url": image_url, "mode": mode}
     else:
-        text = "Erro na geracao. Tente novamente com instrucoes diferentes."
+        # Issue #101: msg sanitizada, sem echo de summary/intent.
+        if action == "edit":
+            text = "Nao consegui aplicar o ajuste. Tente reformular o pedido em poucas palavras (ex: 'fundo mais escuro', 'texto maior')."
+        else:
+            text = "Nao consegui gerar a imagem. Tente reformular o pedido."
         history.append({"role": "assistant", "text": text, "image_path": None, "ts": time.time()})
         return {"text": text, "image_url": None, "error": "generation_failed", "mode": mode}
 

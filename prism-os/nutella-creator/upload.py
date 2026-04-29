@@ -365,9 +365,21 @@ def build_tags(meta: dict) -> list[str]:
 
 def find_thumb_for_meta(cuts_dir: Path, meta: dict) -> Path | None:
     rank = meta["rank"]
-    clip_name = meta["clip"]["arquivo"]
-    parts = clip_name.split("_")
-    live_num = parts[0].replace("live", "") if parts else "0"
+    clip_obj = meta.get("clip") or {}
+    clip_name = clip_obj.get("arquivo", "")
+    parts = clip_name.split("_") if clip_name else []
+    live_num = parts[0].replace("live", "") if parts and parts[0].startswith("live") else "0"
+
+    # Prefere ajustes mais recentes pra que upload pegue a ultima versao
+    # aprovada pelo time (issue #89).
+    adjusted = list(cuts_dir.glob(f"live*_{rank:02d}_thumb_adj*.png"))
+    if adjusted:
+        def _adj_idx(p: Path) -> int:
+            try:
+                return int(p.stem.split("_adj")[-1])
+            except (ValueError, IndexError):
+                return 0
+        return max(adjusted, key=_adj_idx)
 
     thumb = cuts_dir / f"live{live_num}_{rank:02d}_thumb.png"
     if thumb.exists():

@@ -294,9 +294,23 @@ def load_metas(cuts_dir: Path) -> list[dict]:
 
 def find_thumb(cuts_dir: Path, meta: dict) -> str | None:
     rank = meta["rank"]
-    clip_name = meta["clip"]["arquivo"]
-    parts = clip_name.split("_")
-    live_num = parts[0].replace("live", "") if parts else "0"
+    clip_obj = meta.get("clip") or {}
+    clip_name = clip_obj.get("arquivo", "")
+    parts = clip_name.split("_") if clip_name else []
+    live_num = parts[0].replace("live", "") if parts and parts[0].startswith("live") else "0"
+
+    # Prioridade: mais recente ajuste (_adj{N}) > original > versionado (_v*)
+    # Issue #89: Rarissa quer que o ajuste mais novo vire o canonico ao reabrir
+    # a tela. Numericamente: pega adj de maior N.
+    adjusted = list(cuts_dir.glob(f"live*_{rank:02d}_thumb_adj*.png"))
+    if adjusted:
+        def _adj_idx(p: Path) -> int:
+            try:
+                return int(p.stem.split("_adj")[-1])
+            except (ValueError, IndexError):
+                return 0
+        latest = max(adjusted, key=_adj_idx)
+        return latest.name
 
     new_thumb = cuts_dir / f"live{live_num}_{rank:02d}_thumb.png"
     if new_thumb.exists():
