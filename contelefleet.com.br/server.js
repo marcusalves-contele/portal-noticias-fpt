@@ -911,6 +911,65 @@ app.post('/api/pipedrive-webhook', async (req, res) => {
   res.json({ ok: true });
 
   try {
+    // DELETE EVENT: Pipedrive v2 sends meta.action="delete" / v1 sends event="deleted.deal".
+    // Header `x-event-action` = "deleted" tambem indica delete (v1).
+    // Encaminhar pro contele-os pra marcar lead como deletado (issue contele/growth#113).
+    const metaAction = req.body?.meta?.action;
+    const eventStr = req.body?.event;
+    const headerAction = req.headers?.['x-event-action'];
+    const isDelete = metaAction === 'delete' || metaAction === 'deleted'
+      || eventStr === 'deleted.deal'
+      || headerAction === 'deleted' || headerAction === 'delete';
+
+    if (isDelete) {
+      const prev = req.body.previous || {};
+      const meta = req.body.meta || {};
+      const dealId = prev.id || meta.id || req.body?.data?.id;
+      const pipelineId = parseInt(prev.pipeline_id ?? meta.pipeline_id, 10);
+
+      if (!dealId) {
+        console.warn('[PIPE-DELETE-FLEET] no deal_id em delete event:', JSON.stringify(req.body).slice(0, 400));
+        return;
+      }
+
+      // Pipeline 1 = Fleet. Outros pipelines: ignorar.
+      if (pipelineId && pipelineId !== 1) {
+        console.log(`[PIPE-DELETE-FLEET] ignorando deal=${dealId} pipeline=${pipelineId} (nao-Fleet)`);
+        return;
+      }
+
+      console.log(`[PIPE-DELETE-FLEET] forward deal=${dealId} pipeline=${pipelineId || 'n/a'} -> contele-os`);
+
+      if (CONTELE_OS_WEBHOOK_SECRET) {
+        const deletedAt = new Date().toISOString();
+        fetch(`${CONTELE_OS_URL}/api/webhooks/sales-lead-delete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-webhook-secret': CONTELE_OS_WEBHOOK_SECRET
+          },
+          body: JSON.stringify({ pipedrive_deal_id: dealId, deleted_at: deletedAt })
+        })
+          .then(r => console.log(`[PIPE-DELETE-FLEET] OS resp ${r.status} deal=${dealId}`))
+          .catch(err => console.error(`[PIPE-DELETE-FLEET] OS dispatch fail deal=${dealId}:`, err.message));
+      } else {
+        console.warn(`[PIPE-DELETE-FLEET] CONTELE_OS_WEBHOOK_SECRET vazio, skip dispatch deal=${dealId}`);
+      }
+
+      const hook = DISCORD_LEAD_CRITICAL_WEBHOOK || DISCORD_WEBHOOK;
+      if (hook) {
+        fetch(hook, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: `🗑️ Pipedrive delete (Fleet): deal=${dealId} -> contele-os/sales-lead-delete`
+          })
+        }).catch(() => {});
+      }
+
+      return;
+    }
+
     const current = req.body.data || req.body.current || {};
     const previous = req.body.previous || {};
     if (!current.id) return;

@@ -4,6 +4,28 @@ Registro de mudancas na landing Fleet em codigo proprio.
 
 ---
 
+## 29/04/2026: Forward de delete do Pipedrive pro contele-os
+
+**PR**: contele/growth#113
+
+Handler `/api/pipedrive-webhook` agora detecta delete de deal (Pipedrive v1 `event=deleted.deal`, v2 `meta.action=delete`, header `x-event-action=deleted`) **antes** do fluxo normal de `change.deal` e dispara fire-and-forget `POST /api/webhooks/sales-lead-delete` no contele-os com `{ pipedrive_deal_id, deleted_at }`.
+
+**Por que**:
+- Cutover SDR v2 (28/04) so capturava `change.deal`. Quando vendedor deletava deal no Pipedrive, lead virava fantasma na visao `/vendas` ate o cron horario `pipedrive-reconcile` reconciliar.
+- Real-time corta latencia de ate 1h pra <30s.
+
+**Tecnicamente**:
+- Filtro `pipelineId === 1` (Fleet). Outros pipelines: ignora.
+- Fallback de extracao de `deal_id`: `previous.id || meta.id || data.id` (cobre v1 + v2).
+- Notifica Discord (`DISCORD_LEAD_CRITICAL_WEBHOOK_URL` -> fallback `DISCORD_WEBHOOK_URL_FLEET`) com payload de delete.
+- Cron `/api/cron/pipedrive-reconcile` no contele-os continua como rede de protecao.
+
+**Pre-deploy**:
+- Criar subscription Pipedrive Fleet: `event_action=deleted`, `event_object=deal` -> `https://contelefleet.com.br/api/pipedrive-webhook`.
+- Endpoint `sales-lead-delete` no contele-os precisa estar no ar antes.
+
+---
+
 ## 27/04/2026: Exit intent popup com round-robin Marcia/Thiago ferias-aware
 
 **PR**: contele/growth#94 (commits 7938a94 + 093e00e, squash 0585bd2)

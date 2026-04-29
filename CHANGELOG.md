@@ -7,13 +7,13 @@ Indice consolidado de mudancas no monorepo growth. Cada subprojeto mantem seu pr
 | Subprojeto | Caminho | Foco |
 |---|---|---|
 | **Contele Fleet** | [`contelefleet.com.br/CHANGELOG.md`](contelefleet.com.br/CHANGELOG.md) | Landing principal Fleet, tracking GA4/Ads, integracao Pipedrive |
+| **Contele Teams** | [`conteleteams.com.br/CHANGELOG.md`](conteleteams.com.br/CHANGELOG.md) | Server Teams, tracking GA4/Ads, integracao Pipedrive |
 | **PRISM OS** | [`prism-os/CHANGELOG.md`](prism-os/CHANGELOG.md) | Producao de conteudo: Nutella Creator, Thumbnail AI Creator |
 
 ## Subprojetos sem CHANGELOG ainda
 
 Quando voce mexer num desses, **crie o CHANGELOG.md da pasta** (mesmo formato dos outros) e adicione um link aqui. Ver regra no [`CLAUDE.md`](CLAUDE.md) deste repo.
 
-- `conteleteams.com.br/`: home Teams + landings dirigidas (benchmark, propostas) servidas via Express
 - `contele-referral-page/`: Indique e Ganhe (React + Vite, deploy Railway)
 - `calculadora-reembolso-km/`: calculadora de reembolso quilometragem
 - `contele-io/`: hub contele.io
@@ -23,6 +23,7 @@ Quando voce mexer num desses, **crie o CHANGELOG.md da pasta** (mesmo formato do
 ## Mudancas recentes (cross-projeto)
 
 ### 29/04/2026
+- **contele/conteleteams + contelefleet**: forward de delete do Pipedrive pro contele-os (PR #113). Handler `/api/pipedrive-webhook` nos 2 servers gemeos detecta delete de deal (v1 `event=deleted.deal`, v2 `meta.action=delete`, header `x-event-action=deleted`) **antes** do fluxo normal e dispara fire-and-forget `POST sales-lead-delete` com `{ pipedrive_deal_id, deleted_at }`. Mata latencia de ate 1h (cron horario `pipedrive-reconcile`) pra <30s. Filtro `pipelineId` por server (Teams=12, Fleet=1). Discord notify pra observabilidade. Pre-deploy: subscriptions Pipedrive `event_action=deleted` + endpoint `sales-lead-delete` no contele-os no ar. CHANGELOG do `conteleteams.com.br/` criado nesse PR.
 - **prism-os**: Cortes Nutella + Studio thumb sem leak (3 PRs). PRs #109 + #110 + #111 mergeados em master, deploy Railway prism-os automatico. PR #111 (closes #95): Definition of Done dos cortes Nutella, prompt do `suggest.py` agora orienta o LLM a NAO cortar raciocinios incompletos, NAO cortar intros vazias e exigir entrega da promessa do titulo. PR #109 (closes #96): cortes manuais nao perdem mais historico entre etapas, fluxo agora tem CTA "proxima etapa" com persistencia server-side. PR #110 (closes #89 + #101): "Ajustar Thumb" no Studio agora preserva composicao + referencia da imagem original. Causa raiz era config (`imageConfig` ausente, `temperature 0.8`, `responseModalities` permitindo leak de prompt template), nao o modelo. Mantido `gemini-3.1-flash-image-preview` (Nano Banana 2) com `imageConfig.aspectRatio: "16:9"`, `imageSize: "2K"`, `temperature: 0.4`. Gate fisico no cliente filtra `inlineData` only e sanitiza `summary`. **Versionamento abandonado:** footer do dashboard nao mostra mais "PRISM OS v1.0.0", link "Changelog" agora aponta pra `prism-os/CHANGELOG.md` no repo com data dinamica via `/api/version`. Detalhe em [`prism-os/CHANGELOG.md`](prism-os/CHANGELOG.md).
 - **prism-os**: Planejador Senior v2 — plano + roteiro + redesign editorial. PRs #107 + #108 mergeados em master, deploy Railway prism-os automatico. Step 0 "Planejar Proximo Video" na home, 2 campos (Tema + Direcao opcional pra orientar agente), Gemini 3 Pro com `responseSchema` PLAN_SCHEMA 14 campos, knowledge layer novo (soul-canal-fpt + youtube-principles-2026 + template-roteiro-live-julio), runtime cruzando calendario FPT (Sheets) + dataset 2.786 videos, roteiro narrado Julio bloco a bloco, historico server-side versionado, refinar plano com feedback acumulado. Closes #97 (asset cta-final-pronto-v2.mp4 trocado 33MB->1.2MB). Detalhe em [`prism-os/CHANGELOG.md`](prism-os/CHANGELOG.md).
 
