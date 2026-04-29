@@ -83,6 +83,33 @@ KNOWLEDGE_REGISTRY = [
         "tokens_est": 7500,
     },
     {
+        "id": "soul-canal-fpt",
+        "filename": "soul-canal-fpt.md",
+        "category": "brand",
+        "description": "Alma do canal FPT: dado factual operacional, anatomia hit/flop, gates pre-producao, metricas-norte",
+        "enabled": True,
+        "priority": 1,
+        "tokens_est": 5500,
+    },
+    {
+        "id": "youtube-principles-2026",
+        "filename": "youtube-principles-2026.md",
+        "category": "reference",
+        "description": "Algoritmo YouTube 2026: 9 pilares, APV, Browse vs Suggested, Shorts decoupling, mitos, curadoria de videos",
+        "enabled": True,
+        "priority": 1,
+        "tokens_est": 3800,
+    },
+    {
+        "id": "template-roteiro-live-julio",
+        "filename": "template-roteiro-live-julio.md",
+        "category": "content",
+        "description": "Templates de roteiro: Aulao, Live tematica, Gravado tema-produto, Short, anti-templates. Decision tree por objetivo",
+        "enabled": True,
+        "priority": 1,
+        "tokens_est": 4200,
+    },
+    {
         "id": "brand-fpt",
         "filename": "brand-fpt.md",
         "category": "brand",
@@ -172,6 +199,7 @@ MODE_CATEGORIES = {
     "script": ["brand", "content", "reference"],
     "strategy": ["brand", "content", "technical", "reference"],
     "question": ["brand", "content", "technical", "reference"],
+    "plan": ["brand", "content", "technical", "reference"],
 }
 
 # In-memory cache

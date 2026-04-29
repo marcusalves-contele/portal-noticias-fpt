@@ -200,6 +200,35 @@ Scope: `yt-analytics.readonly` — habilita views por hora, retenção, origem d
 
 ---
 
+## Deploy Producao (Railway)
+
+### Env Vars obrigatorios
+- `GEMINI_NANO_BANANA_KEY` : ja configurado
+- `SHEETS_TOKEN_B64` : token OAuth pro calendario FPT. Gerar com:
+  ```bash
+  bash scripts/encode_sheets_token.sh
+  ```
+  Copiar output pro Railway dashboard. boot.py decodifica em runtime pra `/tmp/token_sheets.pickle`.
+
+### Volume Persistente
+- Storage de planos vai em `data/plans/{plan_id}.json` (default em `plan_storage.py`)
+- Volume Railway `prism-os-volume` ja monta `/app/nutella-creator/data` (8GB+ usados)
+- Por isso `data/plans/` ja sobrevive entre deploys sem config extra
+- Override via env `PLANS_DIR_PATH` se precisar mudar
+- `data/plans/` esta no `.gitignore` e `.railwayignore` (runtime only)
+
+### Dataset FPT
+- `data/dataset_classified_with_leads.json` (6.2MB) ja vai com o repo
+- Refresh: rodar `/canal-julio refresh` em assistant-sexta-feira + copiar pra
+  `prism-os/nutella-creator/data/`. Commit no repo growth-contele a cada
+  refresh trimestral
+
+### Smoke test pos-deploy
+```bash
+curl https://prism-os-PRODUCTION/api/health  # {ok: true}
+curl https://prism-os-PRODUCTION/api/live-plan/calendar-snapshot  # last_published, upcoming
+```
+
 ## Aprendizados
 
 - Gemini precisa timestamps `[MM:SS]` em chunks de 90s para cortes precisos

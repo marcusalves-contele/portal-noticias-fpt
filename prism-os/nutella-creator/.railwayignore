@@ -1,5 +1,6 @@
 output/
 downloads/
+data/plans/
 *.pickle
 __pycache__/
 *.pyc

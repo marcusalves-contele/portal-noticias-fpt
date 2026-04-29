@@ -2673,6 +2673,66 @@
           <div class="home-history-title">Recentes</div>
           <div id="history-list"></div>
         </div>
+
+        <!-- Step 0: Plano Senior (sempre visivel na home) -->
+        <div style="margin-top:40px;max-width:900px;width:100%;text-align:left">
+          <div id="tl-live-plan-row" style="margin-bottom:20px;padding:18px;border:1px solid #00ffd1;border-radius:12px;background:rgba(0,255,209,0.04);box-shadow:0 0 30px rgba(0,255,209,0.08)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+              <div>
+                <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#00ffd1;font-family:var(--font-mono)">STEP 0 · PLANO SENIOR · GEMINI PRO</div>
+                <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:4px">14 campos: hook, estrutura, slot, duplicate warnings, brief de thumb e mais. Cruza calendario FPT + dataset 2.786 videos.</div>
+              </div>
+              <button class="btn" id="tl-btn-toggle-plan" onclick="tlPlanToggle()" style="background:transparent;border:1px solid #00ffd1;color:#00ffd1;font-family:var(--font-mono);font-size:11px;padding:6px 14px;cursor:pointer">
+                ABRIR PLANEJADOR
+              </button>
+            </div>
+
+            <div id="tl-plan-form" style="display:none">
+              <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px">
+                <div class="tl-field">
+                  <div class="tl-label">TEMA / TOPICO</div>
+                  <input type="text" id="tl-plan-topic" class="tl-textarea" style="min-height:auto;padding:8px 12px"
+                    placeholder="Ex: cartao combustivel e CPK, multas ANTT, gestao de pneus..." />
+                </div>
+                <div class="tl-field">
+                  <div class="tl-label">FORMATO (opcional)</div>
+                  <select id="tl-plan-format" class="tl-textarea" style="min-height:auto;padding:8px 12px;background:#0a0a0a;color:#fff">
+                    <option value="">(deixar IA decidir)</option>
+                    <option value="aulao">Aulao formativo (130-170min)</option>
+                    <option value="live_tematica">Live tematica (60-90min)</option>
+                    <option value="gravado_tema_produto">Gravado tema-produto (10-20min)</option>
+                    <option value="short_cluster">Short com cluster</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+                <button class="btn btn-primary" id="tl-btn-plan-generate" onclick="tlPlanGenerate()" style="background:#00ffd1;border-color:#00ffd1;color:#000;cursor:pointer">
+                  GERAR PLANO COMPLETO
+                </button>
+                <button class="btn" id="tl-btn-plan-history" onclick="tlPlanHistoryToggle()" style="background:transparent;border:1px solid #00ffd1;color:#00ffd1;font-family:var(--font-mono);font-size:11px;cursor:pointer">
+                  📜 Historico
+                </button>
+                <button class="btn" id="tl-btn-plan-snapshot" onclick="tlPlanSnapshot()" style="background:transparent;border:1px solid var(--text-muted);color:var(--text-muted);font-family:var(--font-mono);font-size:11px;cursor:pointer">
+                  Ver calendario FPT
+                </button>
+                <button class="btn" id="tl-btn-plan-clear" onclick="tlPlanClear()" style="background:transparent;border:1px solid var(--text-muted);color:var(--text-muted);font-family:var(--font-mono);font-size:11px;cursor:pointer">
+                  Limpar plano local
+                </button>
+                <span id="tl-plan-status" style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);align-self:center"></span>
+              </div>
+
+              <!-- Historico de planos (server-side) -->
+              <div id="tl-plan-history-panel" style="display:none;margin-bottom:12px;padding:12px;background:rgba(0,0,0,0.4);border-radius:6px;font-family:var(--font-mono);font-size:11px"></div>
+
+              <div id="tl-plan-progress" style="display:none;flex-direction:column;gap:5px;margin-bottom:12px;padding:10px;background:rgba(0,0,0,0.3);border-radius:6px;font-family:var(--font-mono);font-size:11px"></div>
+
+              <div id="tl-plan-snapshot-panel" style="display:none;margin-bottom:12px;padding:12px;background:rgba(0,0,0,0.3);border-radius:6px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"></div>
+
+              <div id="tl-plan-result" style="display:none"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -2866,7 +2926,6 @@
           <!-- preenchido por JS -->
         </div>
 
-        <!-- Auto-briefing: só aparece quando a live tem URL YouTube -->
         <div id="tl-auto-briefing-row" style="display:none;margin-bottom:16px">
           <button class="btn btn-primary" id="tl-btn-auto-briefing" onclick="tlAutoBriefing()" style="background:transparent;border-color:var(--purple);color:var(--purple)">
             &#9889; Auto-preencher do vídeo
@@ -4646,6 +4705,808 @@
         detectedEl.querySelectorAll('div[style*="cursor:pointer"]').forEach(chip => chip.click());
       } catch(e) {
         console.warn('guest check failed', e);
+      }
+    }
+
+    // ===== TL: STEP 0 — PLANO SENIOR (Gemini Pro JSON estruturado) =====
+    function tlPlanToggle() {
+      const form = document.getElementById('tl-plan-form');
+      const btn = document.getElementById('tl-btn-toggle-plan');
+      const open = form.style.display === 'none';
+      form.style.display = open ? 'block' : 'none';
+      btn.textContent = open ? 'FECHAR PLANEJADOR' : 'ABRIR PLANEJADOR';
+    }
+
+    async function tlPlanSnapshot() {
+      const panel = document.getElementById('tl-plan-snapshot-panel');
+      panel.style.display = 'block';
+      panel.textContent = 'Lendo calendario FPT...';
+      try {
+        const resp = await fetch('/api/live-plan/calendar-snapshot');
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          panel.innerHTML = `<span style="color:#ff6b6b">Erro: ${err.error || resp.status} — ${err.detail || ''}</span>`;
+          if (err.error === 'sheets_token_missing') {
+            panel.innerHTML += '<br>Rodar <code>python3 reauth_sheets_marco.py</code> uma vez pra autorizar.';
+          }
+          return;
+        }
+        const data = await resp.json();
+        let html = '';
+        if (data.last_published) {
+          html += `<div><strong style="color:#00ffd1">Ultima live:</strong> #${data.last_published.number} (${data.last_published.date}) — ${(data.last_published.title || '').slice(0, 80)}</div>`;
+        }
+        if (data.upcoming && data.upcoming.length) {
+          html += `<div style="margin-top:8px"><strong style="color:#00ffd1">Proximas ${data.upcoming.length} agendadas:</strong></div>`;
+          data.upcoming.forEach(u => {
+            html += `<div>  · ${u.date} #${u.live_number || '?'}: ${(u.title || '').slice(0, 70)} <span style="color:var(--text-muted)">(${u.status})</span></div>`;
+          });
+        }
+        if (data.slot_gaps && data.slot_gaps.length) {
+          html += `<div style="margin-top:8px"><strong style="color:#ffa500">Slots vagos:</strong></div>`;
+          data.slot_gaps.forEach(g => {
+            html += `<div>  · ${g.date} (${g.weekday}) — semana +${g.weeks_ahead}</div>`;
+          });
+        }
+        if (data.ideas_lives_count) {
+          html += `<div style="margin-top:8px"><strong style="color:#00ffd1">Backlog:</strong> ${data.ideas_lives_count} ideias livres ativas</div>`;
+        }
+        panel.innerHTML = html || '(sem dado)';
+      } catch (e) {
+        panel.innerHTML = `<span style="color:#ff6b6b">Erro: ${e.message}</span>`;
+      }
+    }
+
+    async function tlPlanGenerate() {
+      const topic = document.getElementById('tl-plan-topic').value.trim();
+      const format = document.getElementById('tl-plan-format').value;
+      const status = document.getElementById('tl-plan-status');
+      const btn = document.getElementById('tl-btn-plan-generate');
+      const progress = document.getElementById('tl-plan-progress');
+      const result = document.getElementById('tl-plan-result');
+
+      if (!topic) {
+        status.textContent = 'Informe o topico';
+        status.style.color = '#ff6b6b';
+        return;
+      }
+
+      btn.disabled = true;
+      status.textContent = 'Iniciando...';
+      status.style.color = 'var(--text-muted)';
+      progress.style.display = 'flex';
+      progress.innerHTML = '';
+      result.style.display = 'none';
+      result.innerHTML = '';
+
+      try {
+        const resp = await fetch('/api/live-plan/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: `Monta plano completo pra live/video sobre: ${topic}`,
+            topic,
+            format_hint: format || undefined,
+          }),
+        });
+        const { job_id } = await resp.json();
+        if (!job_id) throw new Error('Sem job_id');
+
+        const evt = new EventSource(`/api/progress/${job_id}`);
+        evt.addEventListener('progress', (e) => {
+          const data = JSON.parse(e.data);
+          const line = document.createElement('div');
+          line.innerHTML = `<span style="color:#00ffd1">[${data.step || '?'}]</span> ${data.msg || ''} ${data.model ? `<span style="color:var(--text-muted)">· ${data.model}</span>` : ''}`;
+          progress.appendChild(line);
+        });
+        evt.addEventListener('complete', (e) => {
+          evt.close();
+          const result_data = JSON.parse(e.data);
+          if (result_data.error || !result_data.plan) {
+            status.textContent = `Erro: ${result_data.error || 'sem plan'}`;
+            status.style.color = '#ff6b6b';
+          } else {
+            tlPlanRender(result_data);
+            status.textContent = 'Plano gerado';
+            status.style.color = '#00ffd1';
+          }
+          btn.disabled = false;
+        });
+        evt.addEventListener('error', (e) => {
+          evt.close();
+          status.textContent = 'Erro de stream';
+          status.style.color = '#ff6b6b';
+          btn.disabled = false;
+        });
+      } catch (e) {
+        status.textContent = `Erro: ${e.message}`;
+        status.style.color = '#ff6b6b';
+        btn.disabled = false;
+      }
+    }
+
+    function tlPlanRender(payload) {
+      const result = document.getElementById('tl-plan-result');
+      const plan = payload.plan;
+      const val = payload.validation || {};
+
+      const card = (title, body) => `
+        <div style="margin-bottom:14px;padding:12px;background:rgba(0,0,0,0.25);border-left:3px solid #00ffd1;border-radius:4px">
+          <div style="font-family:var(--font-mono);font-size:10px;color:#00ffd1;letter-spacing:1.5px;margin-bottom:6px">${title}</div>
+          <div style="font-size:13px;color:#e0e0e0;line-height:1.5">${body}</div>
+        </div>`;
+
+      const esc = (s) => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      let html = '';
+
+      // Header valid
+      const valColor = val.ok ? '#00ffd1' : '#ffa500';
+      html += `<div style="margin-bottom:12px;padding:8px 12px;background:rgba(0,0,0,0.3);border-radius:4px;font-family:var(--font-mono);font-size:11px">
+        <span style="color:${valColor}">VALIDATION ${val.ok ? 'OK' : 'WARN'}</span>
+        · campos preenchidos: ${val.fields_filled || 0}/${val.fields_total || 14}
+        · obrigatorios: ${val.required_filled || 0}/${val.required_total || 7}
+        ${val.issues && val.issues.length ? '<br>Issues: ' + val.issues.map(esc).join('; ') : ''}
+      </div>`;
+
+      // Summary
+      html += card('PLAN SUMMARY', esc(plan.plan_summary));
+
+      // Slot recommendation
+      if (plan.slot_recommendation) {
+        const sr = plan.slot_recommendation;
+        html += card('SLOT RECOMENDADO', `
+          <strong>${esc(sr.date)}</strong> · Live #${sr.live_number || '?'}<br>
+          <em>${esc(sr.justification)}</em>
+          ${sr.alternative_dates && sr.alternative_dates.length ? '<br><span style="color:var(--text-muted)">Alternativas: ' + sr.alternative_dates.map(esc).join(', ') + '</span>' : ''}
+        `);
+      }
+
+      // Hook
+      if (plan.hook) {
+        const h = plan.hook;
+        html += card('HOOK (primeiros 30s)', `
+          <strong>0-3s:</strong> ${esc(h.first_3s)}<br>
+          <strong>Promessa:</strong> ${esc(h.promise_with_number)}<br>
+          ${h.credibility ? '<strong>Credibilidade:</strong> ' + esc(h.credibility) + '<br>' : ''}
+          ${h.outline ? '<strong>Outline:</strong> ' + esc(h.outline) : ''}
+        `);
+      }
+
+      // Structure
+      if (plan.structure) {
+        const s = plan.structure;
+        let blocks = '';
+        if (s.blocks) {
+          blocks = '<ul style="margin:6px 0 0 16px;padding:0">' + s.blocks.map(b =>
+            `<li style="margin-bottom:6px"><strong>${esc(b.name)}</strong>${b.start_minute != null ? ' (' + b.start_minute + '-' + b.end_minute + 'min)' : ''}: ${esc(b.purpose)}</li>`
+          ).join('') + '</ul>';
+        }
+        html += card('ESTRUTURA', `
+          Formato: <strong>${esc(s.format)}</strong> · Duracao: ${s.duration_minutes || '?'}min
+          ${blocks}
+        `);
+      }
+
+      // SEO + Titles
+      if (plan.seo) {
+        const seo = plan.seo;
+        html += card('SEO + TITULOS', `
+          <strong>Keyword:</strong> ${esc(seo.primary_keyword)}<br>
+          ${seo.secondary_keywords ? '<strong>Secundarias:</strong> ' + (seo.secondary_keywords || []).map(esc).join(', ') + '<br>' : ''}
+          <strong>Opcoes de titulo:</strong>
+          <ul style="margin:6px 0 0 16px;padding:0">
+            ${(seo.title_options || []).map(t => `<li>${esc(t)}</li>`).join('')}
+          </ul>
+          ${seo.tags ? '<strong style="margin-top:6px;display:block">Tags:</strong> ' + (seo.tags || []).map(esc).join(', ') : ''}
+        `);
+      }
+
+      // Thumbnail brief
+      if (plan.thumbnail_brief) {
+        const t = plan.thumbnail_brief;
+        const palette = t.palette || {};
+        html += card('THUMBNAIL BRIEF', `
+          <strong>Texto principal:</strong> "${esc(t.main_text)}"${t.secondary_text ? ' · "' + esc(t.secondary_text) + '"' : ''}<br>
+          <strong>Expressao:</strong> ${esc(t.expression)}<br>
+          <strong>Composicao:</strong> ${esc(t.composition)}<br>
+          ${palette.primary ? '<strong>Paleta:</strong> ' + esc(palette.primary) + ' + ' + esc(palette.accent) + ' <em>(' + esc(palette.justification) + ')</em><br>' : ''}
+          <strong>Foto real:</strong> ${t.use_real_photo ? 'Sim (retencao)' : 'Prism AI (descoberta)'}
+        `);
+      }
+
+      // Competitive landscape
+      if (plan.competitive_landscape) {
+        const cl = plan.competitive_landscape;
+        let similar = '';
+        if (cl.similar_videos_in_channel && cl.similar_videos_in_channel.length) {
+          similar = '<ul style="margin:6px 0 0 16px;padding:0">' + cl.similar_videos_in_channel.map(v =>
+            `<li>${esc(v.title)} · APV ${v.organic_apv_pct || '?'}% · views_org ${v.organic_views || '?'} · leads ${v.leads_contele || 0}<br><em style="color:var(--text-muted)">${esc(v.lesson)}</em></li>`
+          ).join('') + '</ul>';
+        }
+        html += card('COMPETITIVE LANDSCAPE', `
+          <strong>Gap:</strong> ${esc(cl.gap_identified)}<br>
+          ${cl.reference_top_organic ? '<strong>Referencia:</strong> ' + esc(cl.reference_top_organic) + '<br>' : ''}
+          ${similar ? '<strong>Similares no canal:</strong>' + similar : ''}
+        `);
+      }
+
+      // Duplicate warnings
+      if (plan.duplicate_warnings && plan.duplicate_warnings.length) {
+        const dups = plan.duplicate_warnings.map(d =>
+          `<li><strong>${esc(d.conflicting_title)}</strong> (${esc(d.where)}, overlap ${d.overlap_pct || '?'}%): ${esc(d.recommendation)}</li>`
+        ).join('');
+        html += card('⚠ DUPLICATE WARNINGS', `<ul style="margin:0 0 0 16px;padding:0">${dups}</ul>`);
+      }
+
+      // CTAs
+      if (plan.ctas && plan.ctas.length) {
+        const ctas = plan.ctas.map(c =>
+          `<li><strong>[${esc(c.moment)}]</strong> ${esc(c.action)}${c.wording ? ' — <em>' + esc(c.wording) + '</em>' : ''}</li>`
+        ).join('');
+        html += card('CTAs', `<ul style="margin:0 0 0 16px;padding:0">${ctas}</ul>`);
+      }
+
+      // Polls
+      if (plan.polls && plan.polls.length) {
+        const polls = plan.polls.map(p =>
+          `<li><strong>${esc(p.question)}</strong> (${p.publish_days_before || '?'} dias antes)<br>opcoes: ${(p.options || []).map(esc).join(' / ')}</li>`
+        ).join('');
+        html += card('ENQUETES PRE-LIVE', `<ul style="margin:0 0 0 16px;padding:0">${polls}</ul>`);
+      }
+
+      // Guests
+      if (plan.guest_suggestions && plan.guest_suggestions.length) {
+        const gs = plan.guest_suggestions.map(g =>
+          `<li><strong>${esc(g.name)}</strong> (${esc(g.source)}): ${esc(g.credential)}${g.contact ? ' · ' + esc(g.contact) : ''}</li>`
+        ).join('');
+        html += card('CONVIDADOS SUGERIDOS', `<ul style="margin:0 0 0 16px;padding:0">${gs}</ul>`);
+      }
+
+      // Idea pulled
+      if (plan.idea_pulled_from && plan.idea_pulled_from.source && plan.idea_pulled_from.source !== 'gerado_pelo_agente') {
+        const ip = plan.idea_pulled_from;
+        html += card('IDEIA APROVEITADA DO BACKLOG', `
+          Fonte: ${esc(ip.source)}<br>
+          ${ip.row_reference ? 'Ref: <code>' + esc(ip.row_reference) + '</code><br>' : ''}
+          ${ip.original_text ? '<em>"' + esc(ip.original_text) + '"</em>' : ''}
+        `);
+      }
+
+      // Risks
+      if (plan.risks && plan.risks.length) {
+        const risks = plan.risks.map(r =>
+          `<li>${esc(r.risk)}${r.mitigation ? ' <em>→ ' + esc(r.mitigation) + '</em>' : ''}</li>`
+        ).join('');
+        html += card('⚠ RISCOS / TENSOES', `<ul style="margin:0 0 0 16px;padding:0">${risks}</ul>`);
+      }
+
+      // Sources
+      if (plan.sources && plan.sources.length) {
+        html += `<div style="margin-top:10px;padding:8px;background:rgba(0,0,0,0.2);border-radius:4px;font-family:var(--font-mono);font-size:10px;color:var(--text-muted)">
+          Fontes: ${plan.sources.map(esc).join(' · ')}
+        </div>`;
+      }
+
+      // Action buttons + plan_id badge
+      const planIdBadge = payload.plan_id
+        ? `<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-left:auto;align-self:center">id: ${esc(payload.plan_id)}</span>`
+        : '';
+      html += `<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-primary" onclick="tlPlanApprovedScript()" style="background:#22C55E;border-color:#22C55E;color:#fff;font-weight:700">
+          ✓ APROVAR + GERAR ROTEIRO
+        </button>
+        <button class="btn btn-primary" onclick="tlPlanApplyToBriefing()" style="background:#00ffd1;border-color:#00ffd1;color:#000">
+          APLICAR AO BRIEFING (Q1/Q2/Q3 + thumb)
+        </button>
+        <button class="btn" onclick="tlPlanCopyJson()" style="background:transparent;border:1px solid var(--text-muted);color:var(--text-muted);font-family:var(--font-mono);font-size:11px">
+          Copiar JSON
+        </button>
+        ${planIdBadge}
+      </div>`;
+
+      // Refine block — comentar e melhorar
+      if (payload.plan_id) {
+        html += `<div style="margin-top:18px;padding:14px;background:rgba(255,170,0,0.04);border:1px solid #ffaa00;border-radius:8px">
+          <div style="font-family:var(--font-mono);font-size:10px;color:#ffaa00;letter-spacing:1.5px;margin-bottom:8px">REFINAR ESTE PLANO</div>
+          <textarea id="tl-plan-refine-input" class="tl-textarea" rows="3" placeholder="Ex: hook ta fraco, deixa mais agressivo. ou: encurta pra 60min. ou: usa Pareto pra fechar bloco 3..."></textarea>
+          <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;align-items:center">
+            <button class="btn btn-primary" onclick="tlPlanRefine()" style="background:#ffaa00;border-color:#ffaa00;color:#000">
+              REGENERAR COM ESSE FEEDBACK
+            </button>
+            <span id="tl-plan-refine-status" style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"></span>
+          </div>
+          <div id="tl-plan-refine-progress" style="display:none;flex-direction:column;gap:5px;margin-top:8px;padding:10px;background:rgba(0,0,0,0.3);border-radius:6px;font-family:var(--font-mono);font-size:11px"></div>
+        </div>`;
+      }
+
+      // Script block — placeholder, populado se script gerado
+      if (payload.script || (payload.plan && payload.plan.script)) {
+        // ja tem script, preenche depois
+      }
+      html += `<div id="tl-plan-script-section" style="display:none;margin-top:18px"></div>`;
+
+      result.innerHTML = html;
+      result.style.display = 'block';
+
+      // Cache pra apply + persistir entre refreshes
+      window._tlCurrentPlan = plan;
+      window._tlCurrentPlanId = payload.plan_id || null;
+      try {
+        localStorage.setItem('prism_last_plan', JSON.stringify({
+          payload: payload,
+          ts: Date.now(),
+        }));
+      } catch (e) {
+        console.warn('localStorage save failed', e);
+      }
+
+      // Garante que o form esteja aberto pra mostrar o resultado
+      const form = document.getElementById('tl-plan-form');
+      const btn = document.getElementById('tl-btn-toggle-plan');
+      if (form && form.style.display === 'none') {
+        form.style.display = 'block';
+        if (btn) btn.textContent = 'FECHAR PLANEJADOR';
+      }
+    }
+
+    async function tlPlanRestoreFromStorage() {
+      try {
+        const raw = localStorage.getItem('prism_last_plan');
+        if (!raw) return false;
+        const saved = JSON.parse(raw);
+        if (!saved || !saved.payload || !saved.payload.plan) return false;
+        // Limite de idade: 24h
+        const ageHours = (Date.now() - (saved.ts || 0)) / 3600000;
+        if (ageHours > 24) {
+          localStorage.removeItem('prism_last_plan');
+          return false;
+        }
+        let payload = saved.payload;
+        // Se nao tem plan_id (gerado pre-server-storage), importa pro server
+        if (!payload.plan_id) {
+          try {
+            const resp = await fetch('/api/live-plan/import', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ plan: payload.plan, validation: payload.validation }),
+            });
+            if (resp.ok) {
+              const { plan_id } = await resp.json();
+              payload = { ...payload, plan_id };
+              // Atualiza localStorage com plan_id agora
+              localStorage.setItem('prism_last_plan', JSON.stringify({ payload, ts: saved.ts }));
+            }
+          } catch (e) { console.warn('import on restore failed', e); }
+        }
+        tlPlanRender(payload);
+        const status = document.getElementById('tl-plan-status');
+        if (status) {
+          const ageMin = Math.round(ageHours * 60);
+          const idTag = payload.plan_id ? ` · id: ${payload.plan_id}` : '';
+          status.textContent = `Plano restaurado (${ageMin}min atras)${idTag}`;
+          status.style.color = '#00ffd1';
+        }
+        return true;
+      } catch (e) {
+        console.warn('plan restore failed', e);
+        return false;
+      }
+    }
+
+    function tlPlanClear() {
+      try { localStorage.removeItem('prism_last_plan'); } catch (e) {}
+      window._tlCurrentPlan = null;
+      const result = document.getElementById('tl-plan-result');
+      if (result) {
+        result.innerHTML = '';
+        result.style.display = 'none';
+      }
+      const status = document.getElementById('tl-plan-status');
+      if (status) {
+        status.textContent = 'Plano limpo';
+        status.style.color = 'var(--text-muted)';
+      }
+    }
+
+    // Restaura ao carregar a pagina
+    document.addEventListener('DOMContentLoaded', () => {
+      try { tlPlanRestoreFromStorage(); } catch (e) { console.warn(e); }
+    });
+
+    function tlPlanApplyToBriefing() {
+      const plan = window._tlCurrentPlan;
+      if (!plan) {
+        const status = document.getElementById('tl-plan-status');
+        if (status) {
+          status.textContent = 'Sem plano em cache. Gera de novo.';
+          status.style.color = '#ff6b6b';
+        }
+        return;
+      }
+
+      // Navega pra screen-thumb-live + step briefing (campos Q1/Q2/Q3 vivem la)
+      try {
+        if (typeof showScreen === 'function') showScreen('thumb-live');
+        if (typeof tlShowStep === 'function') tlShowStep('briefing');
+      } catch (err) {
+        console.error('navigation error', err);
+      }
+
+      const setVal = (id, v) => {
+        const el = document.getElementById(id);
+        if (el && v) el.value = v;
+      };
+
+      // Q1: persona/publico — derivar de competitive_landscape ou plan_summary
+      const q1 = plan.competitive_landscape && plan.competitive_landscape.gap_identified
+        ? `Publico-alvo do tema: ${plan.plan_summary || ''}\n\nGap identificado: ${plan.competitive_landscape.gap_identified}`
+        : plan.plan_summary || '';
+      setVal('tl-q1', q1);
+
+      // Q2: objetivo — primeiro CTA
+      const cta = (plan.ctas && plan.ctas[0]) || {};
+      const q2 = cta.action ? `Objetivo principal: ${cta.action}\n${cta.wording ? '\nComo Julio fala: ' + cta.wording : ''}` : (plan.plan_summary || '');
+      setVal('tl-q2', q2);
+
+      // Q3: conteudo — hook + estrutura resumida
+      let q3 = '';
+      if (plan.hook) q3 += `Hook: ${plan.hook.promise_with_number || ''}\n\n`;
+      if (plan.structure && plan.structure.blocks) {
+        q3 += `Estrutura (${plan.structure.format} ${plan.structure.duration_minutes || ''}min):\n`;
+        plan.structure.blocks.forEach(b => {
+          q3 += `- ${b.name}: ${b.purpose}\n`;
+        });
+      }
+      setVal('tl-q3', q3);
+
+      // Creative note: thumb brief
+      if (plan.thumbnail_brief) {
+        const t = plan.thumbnail_brief;
+        let note = `Thumb: "${t.main_text}"`;
+        if (t.expression) note += ` · expressao ${t.expression}`;
+        if (t.palette && t.palette.primary) note += ` · paleta ${t.palette.primary} + ${t.palette.accent || ''}`;
+        if (t.use_real_photo === false) note += ` · usar Prism AI`;
+        if (t.use_real_photo === true) note += ` · usar foto real`;
+        setVal('tl-creative-note', note);
+      }
+
+      // Trigger live strategy panel preencher com SEO
+      if (plan.seo) {
+        const panel = document.getElementById('tl-live-strategy-panel');
+        if (panel) {
+          panel.style.display = 'block';
+          setVal('tl-strat-keyword', plan.seo.primary_keyword);
+          setVal('tl-strat-tags', (plan.seo.tags || []).join(', '));
+          // Title options pro painel criativo
+          const seoTitlesEl = document.getElementById('tl-strat-titles-creative');
+          if (seoTitlesEl && plan.seo.title_options) {
+            seoTitlesEl.innerHTML = plan.seo.title_options.map((t, i) =>
+              `<label style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--purple);border-radius:4px;cursor:pointer">
+                <input type="radio" name="tl-strat-title-creative" value="${t.replace(/"/g, '&quot;')}" ${i === 0 ? 'checked' : ''}>
+                <span>${t}</span>
+              </label>`
+            ).join('');
+          }
+        }
+      }
+
+      // Status
+      const status = document.getElementById('tl-plan-status');
+      if (status) {
+        status.textContent = 'Briefing pre-preenchido em Thumbnails de Live';
+        status.style.color = '#00ffd1';
+      }
+
+      // Toast pra confirmar visualmente (a tela ja deve ter mudado)
+      try {
+        if (typeof toast === 'function') {
+          toast('Briefing pre-preenchido. Revise Q1/Q2/Q3 e segue', 'success');
+        }
+      } catch (e) {}
+
+      // Scroll suave pro briefing apos navegacao
+      setTimeout(() => {
+        const briefingForm = document.getElementById('tl-briefing-form');
+        if (briefingForm) briefingForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+
+    function tlPlanCopyJson() {
+      const plan = window._tlCurrentPlan;
+      if (!plan) return;
+      navigator.clipboard.writeText(JSON.stringify(plan, null, 2)).then(() => {
+        const status = document.getElementById('tl-plan-status');
+        status.textContent = 'JSON copiado';
+        status.style.color = '#00ffd1';
+      });
+    }
+
+    // ===== REFINE =====
+    async function tlPlanRefine() {
+      const input = document.getElementById('tl-plan-refine-input');
+      const feedback = (input?.value || '').trim();
+      const status = document.getElementById('tl-plan-refine-status');
+      const progress = document.getElementById('tl-plan-refine-progress');
+      const planId = window._tlCurrentPlanId;
+
+      if (!planId) {
+        if (status) { status.textContent = 'Sem plan_id ativo'; status.style.color = '#ff6b6b'; }
+        return;
+      }
+      if (!feedback) {
+        if (status) { status.textContent = 'Escreve o feedback antes'; status.style.color = '#ff6b6b'; }
+        return;
+      }
+
+      if (status) { status.textContent = 'Refinando...'; status.style.color = 'var(--text-muted)'; }
+      if (progress) { progress.style.display = 'flex'; progress.innerHTML = ''; }
+
+      try {
+        const resp = await fetch('/api/live-plan/refine', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan_id: planId, feedback }),
+        });
+        const { job_id } = await resp.json();
+        if (!job_id) throw new Error('Sem job_id');
+
+        const evt = new EventSource(`/api/progress/${job_id}`);
+        evt.addEventListener('progress', (e) => {
+          const data = JSON.parse(e.data);
+          const line = document.createElement('div');
+          line.innerHTML = `<span style="color:#ffaa00">[${data.step || '?'}]</span> ${data.msg || ''} ${data.model ? `<span style="color:var(--text-muted)">· ${data.model}</span>` : ''}`;
+          if (progress) progress.appendChild(line);
+        });
+        evt.addEventListener('complete', (e) => {
+          evt.close();
+          const result_data = JSON.parse(e.data);
+          if (result_data.error) {
+            if (status) { status.textContent = `Erro: ${result_data.error}`; status.style.color = '#ff6b6b'; }
+          } else {
+            // Re-renderiza com o plano refinado
+            tlPlanRender(result_data);
+            if (input) input.value = '';
+            if (status) { status.textContent = 'Refinamento aplicado, nova versao salva'; status.style.color = '#22C55E'; }
+          }
+        });
+        evt.addEventListener('error', () => {
+          evt.close();
+          if (status) { status.textContent = 'Erro de stream'; status.style.color = '#ff6b6b'; }
+        });
+      } catch (e) {
+        if (status) { status.textContent = `Erro: ${e.message}`; status.style.color = '#ff6b6b'; }
+      }
+    }
+
+    // ===== APPROVE + SCRIPT =====
+    async function tlPlanApprovedScript() {
+      const planId = window._tlCurrentPlanId;
+      const status = document.getElementById('tl-plan-status');
+      const section = document.getElementById('tl-plan-script-section');
+
+      if (!planId) {
+        if (status) { status.textContent = 'Sem plan_id ativo, salva o plano primeiro'; status.style.color = '#ff6b6b'; }
+        return;
+      }
+      if (!confirm('Aprovar este plano e gerar o roteiro narrado completo?\n\n(o roteiro detalha falas do Julio bloco a bloco. Pode levar 30-60s)')) return;
+
+      if (section) {
+        section.style.display = 'block';
+        section.innerHTML = `<div style="padding:14px;background:rgba(34,197,94,0.05);border:1px solid #22C55E;border-radius:8px">
+          <div style="font-family:var(--font-mono);font-size:11px;color:#22C55E;margin-bottom:8px">GERANDO ROTEIRO...</div>
+          <div id="tl-script-progress" style="font-family:var(--font-mono);font-size:11px;display:flex;flex-direction:column;gap:4px"></div>
+        </div>`;
+      }
+
+      try {
+        const resp = await fetch('/api/live-plan/script', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan_id: planId }),
+        });
+        const { job_id } = await resp.json();
+        if (!job_id) throw new Error('Sem job_id');
+
+        const evt = new EventSource(`/api/progress/${job_id}`);
+        const progEl = document.getElementById('tl-script-progress');
+        evt.addEventListener('progress', (e) => {
+          const data = JSON.parse(e.data);
+          if (progEl) {
+            const line = document.createElement('div');
+            line.innerHTML = `<span style="color:#22C55E">[${data.step || '?'}]</span> ${data.msg || ''} ${data.model ? `<span style="color:var(--text-muted)">· ${data.model}</span>` : ''}`;
+            progEl.appendChild(line);
+          }
+        });
+        evt.addEventListener('complete', (e) => {
+          evt.close();
+          const result_data = JSON.parse(e.data);
+          if (result_data.error) {
+            if (section) section.innerHTML = `<div style="padding:14px;color:#ff6b6b;font-family:var(--font-mono);font-size:12px">Erro: ${result_data.error}</div>`;
+          } else {
+            tlScriptRender(result_data.script, planId);
+          }
+        });
+        evt.addEventListener('error', () => {
+          evt.close();
+          if (section) section.innerHTML = `<div style="padding:14px;color:#ff6b6b">Erro de stream</div>`;
+        });
+      } catch (e) {
+        if (section) section.innerHTML = `<div style="padding:14px;color:#ff6b6b">Erro: ${e.message}</div>`;
+      }
+    }
+
+    function tlScriptRender(script, planId) {
+      const section = document.getElementById('tl-plan-script-section');
+      if (!script || !section) return;
+      const esc = (s) => (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      let blocksHtml = '';
+      (script.blocks || []).forEach((b, idx) => {
+        const narrationLines = (b.narration || []).map(n => {
+          const speakerColor = { julio: '#00ffd1', convidado: '#ffaa00', narrador: 'var(--text-muted)' }[n.speaker] || '#fff';
+          const direction = n.stage_direction ? `<div style="font-size:10px;color:var(--text-muted);font-style:italic;margin-left:8px;margin-top:2px">↳ ${esc(n.stage_direction)}</div>` : '';
+          return `<div style="margin-bottom:8px;padding:6px 10px;background:rgba(0,0,0,0.2);border-left:2px solid ${speakerColor};border-radius:3px">
+            <div style="font-family:var(--font-mono);font-size:9px;color:${speakerColor};text-transform:uppercase;margin-bottom:3px">${n.speaker}</div>
+            <div style="color:#e0e0e0;line-height:1.5">${esc(n.text)}</div>
+            ${direction}
+          </div>`;
+        }).join('');
+        const broll = (b.broll_suggestions || []).length
+          ? `<div style="margin-top:8px;padding:6px;background:rgba(124,58,237,0.1);border-radius:3px;font-size:10px;color:#a78bfa"><strong>B-roll:</strong> ${b.broll_suggestions.map(esc).join(' · ')}</div>`
+          : '';
+        const overlays = (b.graphic_overlays || []).length
+          ? `<div style="margin-top:6px;padding:6px;background:rgba(255,170,0,0.1);border-radius:3px;font-size:10px;color:#fbbf24"><strong>Overlay:</strong> ${b.graphic_overlays.map(esc).join(' · ')}</div>`
+          : '';
+        blocksHtml += `<div style="margin-bottom:14px;padding:12px;background:rgba(34,197,94,0.04);border-left:3px solid #22C55E;border-radius:4px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+            <div style="font-family:var(--font-mono);font-size:10px;color:#22C55E;letter-spacing:1.5px">BLOCO ${idx + 1} · ${esc(b.block_name)}</div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted)">${b.start_minute != null ? b.start_minute + '-' + b.end_minute + 'min' : ''}</div>
+          </div>
+          ${narrationLines}
+          ${broll}
+          ${overlays}
+        </div>`;
+      });
+
+      const notes = (script.production_notes || []).length
+        ? `<div style="margin-top:14px;padding:10px;background:rgba(0,0,0,0.3);border-radius:4px;font-family:var(--font-mono);font-size:11px"><strong style="color:#22C55E">PRODUCTION NOTES:</strong><ul style="margin:6px 0 0 16px">${script.production_notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul></div>`
+        : '';
+
+      section.innerHTML = `<div style="padding:16px;background:rgba(34,197,94,0.05);border:1px solid #22C55E;border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:11px;color:#22C55E;letter-spacing:1.5px">ROTEIRO NARRADO</div>
+            <div style="font-size:14px;color:#fff;font-weight:700;margin-top:4px">${esc(script.title)}</div>
+            <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px">~${script.duration_total_minutes || '?'}min · ~${script.estimated_word_count || '?'} palavras</div>
+          </div>
+          <button class="btn" onclick="tlScriptCopy()" style="background:transparent;border:1px solid #22C55E;color:#22C55E;font-family:var(--font-mono);font-size:11px;align-self:flex-start">
+            Copiar roteiro
+          </button>
+        </div>
+        ${blocksHtml}
+        ${notes}
+      </div>`;
+
+      window._tlCurrentScript = script;
+    }
+
+    function tlScriptCopy() {
+      const s = window._tlCurrentScript;
+      if (!s) return;
+      // Versao texto plain pra copiar
+      let plain = `${s.title}\n${'='.repeat(60)}\n\n`;
+      (s.blocks || []).forEach((b, i) => {
+        plain += `\n## BLOCO ${i + 1}: ${b.block_name} `;
+        if (b.start_minute != null) plain += `(${b.start_minute}-${b.end_minute}min)`;
+        plain += '\n';
+        (b.narration || []).forEach(n => {
+          plain += `\n[${n.speaker.toUpperCase()}] ${n.text}\n`;
+          if (n.stage_direction) plain += `  ↳ ${n.stage_direction}\n`;
+        });
+        if ((b.broll_suggestions || []).length) plain += `\nB-ROLL: ${b.broll_suggestions.join(' · ')}\n`;
+        if ((b.graphic_overlays || []).length) plain += `OVERLAY: ${b.graphic_overlays.join(' · ')}\n`;
+      });
+      if ((s.production_notes || []).length) {
+        plain += `\n\n## PRODUCTION NOTES\n`;
+        s.production_notes.forEach(n => plain += `- ${n}\n`);
+      }
+      navigator.clipboard.writeText(plain).then(() => {
+        const status = document.getElementById('tl-plan-status');
+        if (status) { status.textContent = 'Roteiro copiado'; status.style.color = '#22C55E'; }
+      });
+    }
+
+    // ===== HISTORICO =====
+    async function tlPlanHistoryToggle() {
+      const panel = document.getElementById('tl-plan-history-panel');
+      if (!panel) return;
+      const open = panel.style.display === 'none';
+      panel.style.display = open ? 'block' : 'none';
+      if (open) await tlPlanHistoryRefresh();
+    }
+
+    async function tlPlanHistoryRefresh() {
+      const panel = document.getElementById('tl-plan-history-panel');
+      if (!panel) return;
+      panel.innerHTML = 'Carregando historico...';
+      try {
+        const resp = await fetch('/api/live-plan/list?limit=50');
+        if (!resp.ok) {
+          panel.innerHTML = `<span style="color:#ff6b6b">Erro ${resp.status}</span>`;
+          return;
+        }
+        const data = await resp.json();
+        const plans = data.plans || [];
+        if (!plans.length) {
+          panel.innerHTML = '<em>Nenhum plano salvo ainda</em>';
+          return;
+        }
+
+        let html = `<div style="margin-bottom:8px"><strong style="color:#00ffd1">${plans.length} plano(s) salvos</strong></div>`;
+        html += '<div style="display:flex;flex-direction:column;gap:6px">';
+        plans.forEach(p => {
+          const statusColors = { draft: 'var(--text-muted)', refined: '#ffaa00', approved: '#22C55E', scripted: '#22C55E' };
+          const statusColor = statusColors[p.status] || 'var(--text-muted)';
+          const date = (p.created_at || '').slice(0, 16).replace('T', ' ');
+          const fb = p.feedback_count > 0 ? ` · ${p.feedback_count} refinamento(s)` : '';
+          const script = p.has_script ? ' · 📝 com roteiro' : '';
+          html += `<div style="padding:8px 10px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px">
+              <div style="color:#fff;font-size:12px"><strong>${p.topic || '(sem topico)'}</strong> <span style="color:${statusColor};text-transform:uppercase;font-size:10px;margin-left:6px">${p.status}${fb}${script}</span></div>
+              <div style="color:var(--text-muted);font-size:10px;margin-top:2px">${date} · ${p.format || '?'} · slot ${p.slot_date || '?'} #${p.live_number || '?'} · v${p.version} · ${p.plan_id}</div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="btn" onclick="tlPlanLoadFromHistory('${p.plan_id}')" style="background:transparent;border:1px solid #00ffd1;color:#00ffd1;font-family:var(--font-mono);font-size:10px;padding:4px 8px">CARREGAR</button>
+              <button class="btn" onclick="tlPlanDelete('${p.plan_id}')" style="background:transparent;border:1px solid #ff6b6b;color:#ff6b6b;font-family:var(--font-mono);font-size:10px;padding:4px 8px">×</button>
+            </div>
+          </div>`;
+        });
+        html += '</div>';
+        panel.innerHTML = html;
+      } catch (e) {
+        panel.innerHTML = `<span style="color:#ff6b6b">Erro: ${e.message}</span>`;
+      }
+    }
+
+    async function tlPlanLoadFromHistory(planId) {
+      try {
+        const resp = await fetch(`/api/live-plan/get/${encodeURIComponent(planId)}`);
+        if (!resp.ok) {
+          alert(`Erro carregando plan ${planId}`);
+          return;
+        }
+        const record = await resp.json();
+        // Reconstroi payload no shape que tlPlanRender espera
+        const payload = {
+          plan: record.plan,
+          plan_id: record.plan_id,
+          validation: record.validation,
+        };
+        tlPlanRender(payload);
+        // Se tem script, renderiza tambem
+        if (record.script) {
+          tlScriptRender(record.script, record.plan_id);
+        }
+        // Fecha historico
+        const panel = document.getElementById('tl-plan-history-panel');
+        if (panel) panel.style.display = 'none';
+      } catch (e) {
+        alert(`Erro: ${e.message}`);
+      }
+    }
+
+    async function tlPlanDelete(planId) {
+      if (!confirm(`Deletar plano ${planId}? Nao da pra desfazer.`)) return;
+      try {
+        await fetch('/api/live-plan/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan_id: planId }),
+        });
+        await tlPlanHistoryRefresh();
+      } catch (e) {
+        alert(`Erro: ${e.message}`);
       }
     }
 

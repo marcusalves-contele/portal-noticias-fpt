@@ -7,6 +7,7 @@ __pycache__/
 *.pyc
 output/
 downloads/
+data/plans/
 *.webp
 badge_preview.html
 .DS_Store

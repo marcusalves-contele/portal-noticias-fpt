@@ -628,7 +628,83 @@ Perfil demográfico: Homens (83%), 25-54 anos. Público maduro com poder de comp
 2. Verificar paleta e tipografia (bloco 3)
 3. Verificar tom de voz e frases reais (bloco 6)
 4. Verificar persona do público que o conteúdo atinge (bloco 7)
-5. Checar se há pendências no bloco 14 que afetam o que está sendo criado
+5. **Aplicar Soul do Canal (bloco 13.5)**: bucket de duracao vencedor, padroes de titulo, gates de patrocinio, diretiva foto real vs Prism AI
+6. Checar se há pendências no bloco 14 que afetam o que está sendo criado
+
+---
+
+## 13.5 SOUL DO CANAL — DADO OPERACIONAL (2026-04-28)
+
+> Complemento factual ao brand book qualitativo. Base: `/canal-julio` refresh 2026-04-28 (2.786 videos, 31.125 inscritos no periodo Analytics).
+> **Documento canonico**: `soul-canal-fpt.md` (mesma pasta knowledge). Este bloco e resumo executivo pra quando agente nao puder carregar os 2.
+
+### O canal hoje em numero
+
+- 33,9K inscritos / 2.62M views lifetime / 2.786 videos publicados
+- 53% dos subs do periodo vem de organico_puro, **41% de "misto"** (organico boostado depois), 6% de ad_boosted puro
+
+### Anatomia de hit organico (bucket vencedor)
+
+**Live "Aulao Do Zero ao Profissional" (formato master de subs)**
+- Top 8 lives organicas em subs/1k = todas "Aulao do Zero ao Profissional" em 8 versoes
+- Duracao: 130-170min (2h-2h45)
+- Estrutura: aulao didatico em N modulos, framework completo, iniciante->profissional
+- Performance: 138, 132, 101, 95 subs/1k_organic. APV organico 16-20% (baixo por duracao, alto em subs/1k)
+- Replicar 1-2x/ano
+
+**Gravado tema-produto 10-20min (bucket vencedor: 79 subs/video, 37,56 subs/1k)**
+- Tema: produto/ferramenta concreta (rastreador, sistema, app, dashboard, planilha, cartao)
+- **Estrutura de titulo validada (top 30 do bucket)**:
+  - 57% usam separador `:`, ` - ` ou ` | ` (ex: "Sistema de Rastreamento Veicular: O que e e como funciona?")
+  - 30% sao perguntas (`?`)
+  - 30% tem numero (mas NAO R$/%): "6 Melhores", "5 Dicas"
+  - **0% tem cifrao ou %**
+  - "frota" aparece em 53% dos titulos top
+- APV organico 17-46% (mediana 30%), subs/video 80-1200, leads/1k 0,4-2,6
+
+### Anatomia de flop organico (NAO replicar)
+
+| Tipo | Sintoma | Razao |
+|---|---|---|
+| Anuncio de evento/curso isolado | APV <22%, sem lead | Audiencia foge — anuncio nao e conteudo |
+| Review generico de veiculo | APV 21-26% | Fora do arquetipo (Julio nao e revisor) |
+| "Como" generico longo sem promessa | APV 22-28% | Clique mas nao retem |
+| Short isolado sem cluster | 0,6 subs/video | Descoberta, nao retencao |
+| Gravado 1-5min isolado | 3,8 subs/video | Sem tempo de gerar inscricao |
+
+### Politica de patrocinio (3 gates obrigatorios)
+
+Video so vai pra boost se passar:
+1. `organic_views >= 500` (provou audiencia)
+2. `organic_APV >= 25%` (provou retencao)
+3. **Tema-produto Contele** (rastreador, sistema, app, dashboard) ou **Vilao** (Apaga Fogo, Iniciante perdido)
+
+Por que: 49 videos misto (boostados quando ja eram organicamente fortes) geraram 41% dos subs do canal. 180 videos ad_boosted puro (criados pra ad) geraram 6%.
+
+### Diretiva pra Prism (geracao de thumb)
+
+**Foto real do Julio vs Prism AI** (validado em 91 thumbs 180d):
+
+| Tipo | APV organico | Views/dia | Quando usar |
+|---|---|---|---|
+| Foto real | 37,3% | 0,91 | Gravado tema-produto, live, profundidade |
+| Prism AI | 31,7% | 1,65 | Topo de funil, descoberta, short |
+
+Regra: Prism vence em views/dia (+81%) mas perde APV (-15%). Foto real pra video de produto/conversao. Prism pra descoberta.
+
+### Metricas-norte (so 5 numeros mensais)
+
+| Metrica | Meta |
+|---|---|
+| APV organico medio (organico_puro) | >=35% |
+| subsGained organico_puro / mes | >=500 |
+| Subs / 1k views organicos | >=15 |
+| Leads / 1k views organicos | >=2,0 |
+| % videos com sinal organico (APV>=25% E views>=500) | >=50% |
+
+### Refresh
+
+Trimestral via `/canal-julio refresh` no repo `assistant-sexta-feira`. Atualiza dataset, reclassifica trafego, regenera analises e este bloco.
 
 ---
 
@@ -647,6 +723,9 @@ Perfil demográfico: Homens (83%), 25-54 anos. Público maduro com poder de comp
 | Canais ativos confirmados | ✅ Concluído (mar/2026: Rarissa) | Estratégia multicanal |
 | Migrar arquivo Figma pro workspace CONTELE | Rarissa notificada 10/03 | Centralização |
 | Sincronizar página web brand board | ✅ Concluído (10/03/2026) | HTML refletir agent md |
+| Soul do canal (dado factual operacional) | ✅ Concluído (28/04/2026) — bloco 13.5 + soul-canal-fpt.md | Decisao editorial baseada em dado |
+| Atribuir 32 leads sem video_id | Pendente — Cris implementar UTM por video no site Contele | Fechar atribuicao 100% leads |
+| Validar formato "Aulao Do Zero ao Profissional" novo | Pendente — replicar 1-2x/ano | Top 8 lifetime de subs sao todas dessa serie |
 
 ---
 

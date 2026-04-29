@@ -484,6 +484,16 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
                 self._serve_file(file_path)
             else:
                 self._json({"error": "not found"}, 404)
+        elif path == "/api/live-plan/calendar-snapshot":
+            self._handle_live_plan_calendar_snapshot()
+        elif path == "/api/live-plan/list":
+            self._handle_live_plan_list(parsed)
+        elif path.startswith("/api/live-plan/get/"):
+            plan_id = path.split("/api/live-plan/get/")[1]
+            self._handle_live_plan_get(plan_id)
+        elif path.startswith("/api/live-plan/lineage/"):
+            plan_id = path.split("/api/live-plan/lineage/")[1]
+            self._handle_live_plan_lineage(plan_id)
         elif path == "/api/studio/knowledge":
             from knowledge_base import list_knowledge, get_tokens_summary
             parsed_qs = parse_qs(parsed.query)
@@ -587,6 +597,18 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
             self._json({"ok": True})
         elif path == "/api/blog-generate":
             self._handle_blog_generate(body)
+        elif path == "/api/live-plan/generate":
+            self._handle_live_plan_generate(body)
+        elif path == "/api/live-plan/refine":
+            self._handle_live_plan_refine(body)
+        elif path == "/api/live-plan/script":
+            self._handle_live_plan_script(body)
+        elif path == "/api/live-plan/approve":
+            self._handle_live_plan_approve(body)
+        elif path == "/api/live-plan/delete":
+            self._handle_live_plan_delete(body)
+        elif path == "/api/live-plan/import":
+            self._handle_live_plan_import(body)
         else:
             self._json({"error": "not found"}, 404)
 
@@ -1756,6 +1778,228 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
                     blog=blog,
                     transcript=transcript,
                     progress_cb=lambda data: _emit(job_id, "progress", data),
+                )
+                _emit(job_id, "complete", result)
+            except Exception as e:
+                _emit(job_id, "error", {"message": str(e)})
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    def _handle_live_plan_list(self, parsed):
+        """GET /api/live-plan/list?status=draft&limit=50 — historico de planos."""
+        from urllib.parse import parse_qs
+        qs = parse_qs(parsed.query)
+        status = (qs.get("status", [None])[0] or None)
+        try:
+            limit = int(qs.get("limit", ["50"])[0])
+        except ValueError:
+            limit = 50
+        try:
+            from plan_storage import list_plans
+            plans = list_plans(limit=limit, status_filter=status)
+            self._json({"plans": plans, "count": len(plans)})
+        except Exception as e:
+            self._json({"error": "list_failed", "detail": str(e)}, 500)
+
+    def _handle_live_plan_get(self, plan_id: str):
+        """GET /api/live-plan/get/{plan_id} — record completo."""
+        try:
+            from plan_storage import get_plan
+            record = get_plan(plan_id)
+            if not record:
+                self._json({"error": "not_found", "plan_id": plan_id}, 404)
+                return
+            self._json(record)
+        except Exception as e:
+            self._json({"error": "get_failed", "detail": str(e)}, 500)
+
+    def _handle_live_plan_lineage(self, plan_id: str):
+        """GET /api/live-plan/lineage/{plan_id} — chain de versoes."""
+        try:
+            from plan_storage import get_lineage
+            chain = get_lineage(plan_id)
+            self._json({"plan_id": plan_id, "chain": chain, "version_count": len(chain)})
+        except Exception as e:
+            self._json({"error": "lineage_failed", "detail": str(e)}, 500)
+
+    def _handle_live_plan_approve(self, body: dict):
+        """POST /api/live-plan/approve {plan_id} — marca status='approved'."""
+        plan_id = (body.get("plan_id") or "").strip()
+        if not plan_id:
+            self._json({"error": "plan_id required"}, 400)
+            return
+        try:
+            from plan_storage import update_status
+            ok = update_status(plan_id, "approved")
+            self._json({"ok": ok, "plan_id": plan_id, "status": "approved"})
+        except Exception as e:
+            self._json({"error": "approve_failed", "detail": str(e)}, 500)
+
+    def _handle_live_plan_delete(self, body: dict):
+        """POST /api/live-plan/delete {plan_id}."""
+        plan_id = (body.get("plan_id") or "").strip()
+        if not plan_id:
+            self._json({"error": "plan_id required"}, 400)
+            return
+        try:
+            from plan_storage import delete_plan
+            ok = delete_plan(plan_id)
+            self._json({"ok": ok, "plan_id": plan_id})
+        except Exception as e:
+            self._json({"error": "delete_failed", "detail": str(e)}, 500)
+
+    def _handle_live_plan_refine(self, body: dict):
+        """
+        POST /api/live-plan/refine {plan_id, feedback}
+        Refina plano existente com feedback. Cria nova versao (parent_id apontando pro original).
+        """
+        plan_id = (body.get("plan_id") or "").strip()
+        feedback = (body.get("feedback") or "").strip()
+        if not plan_id or not feedback:
+            self._json({"error": "plan_id e feedback obrigatorios"}, 400)
+            return
+
+        job_id = _create_job()
+        self._json({"job_id": job_id})
+
+        def _run():
+            try:
+                from studio_chat import run_plan_refine
+                from thumb_live import load_api_key
+                api_key = load_api_key()
+
+                def progress_cb(data):
+                    _emit(job_id, "progress", data)
+
+                result = run_plan_refine(plan_id, feedback, api_key, progress_cb=progress_cb)
+                _emit(job_id, "complete", result)
+            except Exception as e:
+                _emit(job_id, "error", {"message": str(e)})
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    def _handle_live_plan_script(self, body: dict):
+        """
+        POST /api/live-plan/script {plan_id}
+        Aprova plano (se nao aprovado ainda) + gera roteiro narrado completo.
+        """
+        plan_id = (body.get("plan_id") or "").strip()
+        if not plan_id:
+            self._json({"error": "plan_id required"}, 400)
+            return
+
+        job_id = _create_job()
+        self._json({"job_id": job_id})
+
+        def _run():
+            try:
+                from studio_chat import run_script_generation
+                from plan_storage import update_status
+                from thumb_live import load_api_key
+                api_key = load_api_key()
+
+                # Marca como approved antes de gerar (se ainda nao foi)
+                try:
+                    update_status(plan_id, "approved")
+                except Exception:
+                    pass
+
+                def progress_cb(data):
+                    _emit(job_id, "progress", data)
+
+                result = run_script_generation(plan_id, api_key, progress_cb=progress_cb)
+                _emit(job_id, "complete", result)
+            except Exception as e:
+                _emit(job_id, "error", {"message": str(e)})
+
+        threading.Thread(target=_run, daemon=True).start()
+
+    def _handle_live_plan_import(self, body: dict):
+        """
+        POST /api/live-plan/import {plan, validation, input?}
+        Importa um plano gerado fora (ex: localStorage do browser pre-persistencia
+        server). Salva como novo registro com status='draft'. Retorna plan_id.
+        """
+        plan = body.get("plan")
+        if not plan or not isinstance(plan, dict):
+            self._json({"error": "plan obrigatorio (objeto)"}, 400)
+            return
+        validation = body.get("validation") or {"ok": True, "issues": [], "imported": True}
+        input_data = body.get("input") or {
+            "topic": "(importado do localStorage)",
+            "format_hint": "",
+            "message": "(importado)",
+            "feedback_history": [],
+        }
+        try:
+            from plan_storage import save_new_plan
+            plan_id = save_new_plan(input_data, plan, validation)
+            self._json({"ok": True, "plan_id": plan_id})
+        except Exception as e:
+            self._json({"error": "import_failed", "detail": str(e)}, 500)
+
+    def _handle_live_plan_calendar_snapshot(self):
+        """GET /api/live-plan/calendar-snapshot -- snapshot do calendario FPT pra UI mostrar contexto."""
+        try:
+            from calendar_fpt import CalendarFPT
+            cal = CalendarFPT()
+            self._json({
+                "last_published": cal.last_published_live(),
+                "upcoming": cal.upcoming_planned_lives(weeks=4),
+                "slot_gaps": cal.slot_gaps(weeks_ahead=4),
+                "ideas_lives_count": len([i for i in cal.ideas_backlog().get("ideas_lives", []) if not i.get("used")]),
+            })
+        except FileNotFoundError as e:
+            self._json({"error": "sheets_token_missing", "detail": str(e)}, 503)
+        except Exception as e:
+            self._json({"error": "calendar_read_failed", "detail": str(e)}, 500)
+
+    def _handle_live_plan_generate(self, body: dict):
+        """
+        POST /api/live-plan/generate -- gera plano completo de live/video via Gemini Pro JSON estruturado.
+        Body:
+          - message (str, required): pedido do user. Ex: "monta plano pra live sobre cartao combustivel"
+          - topic (str, optional): topico explicito. Override do parsing
+          - format_hint (str, optional): aulao | live_tematica | gravado_tema_produto | short_cluster
+          - session_id (str, optional)
+        Retorna { job_id, session_id }. Resultado vem via SSE em /api/progress/{job_id}
+        com event=complete contendo {plan, validation, mode}.
+        """
+        message = body.get("message", "").strip()
+        topic = body.get("topic", "").strip()
+        format_hint = body.get("format_hint", "").strip()
+        session_id = body.get("session_id", str(uuid.uuid4())[:8])
+
+        if not message and not topic:
+            self._json({"error": "message ou topic required"}, 400)
+            return
+
+        # Constroi message rica se topic/format vierem explicitos
+        if topic and not message:
+            message = f"Monta o plano completo pra live/video sobre: {topic}"
+        elif topic and message:
+            message = f"{message}\n\nTopico explicito: {topic}"
+        if format_hint:
+            message = f"{message}\n\nFormato sugerido: {format_hint}"
+
+        job_id = _create_job()
+        self._json({"job_id": job_id, "session_id": session_id})
+
+        def _run():
+            try:
+                from studio_chat import run_pipeline
+                from thumb_live import load_api_key
+                api_key = load_api_key()
+
+                def progress_cb(data):
+                    _emit(job_id, "progress", data)
+
+                result = run_pipeline(
+                    message,
+                    session_id=session_id,
+                    api_key=api_key,
+                    progress_cb=progress_cb,
+                    mode_hint="plan",
                 )
                 _emit(job_id, "complete", result)
             except Exception as e:
