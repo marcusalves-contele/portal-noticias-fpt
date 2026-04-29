@@ -4,6 +4,31 @@ Registro de mudancas no Prism OS.
 
 ---
 
+## 29/04/2026: Planejador Senior v2 — plano + roteiro + redesign editorial
+
+PR #107 (consolidacao de 4 PRs encadeados) + PR #108 (redesign + fix) mergeados em master. Auto-deploy Railway prism-os.
+
+**O que entra:**
+
+- **Step 0 "Planejar Proximo Video"** na home: card editorial com numeral `01`, gradient cyan->roxo, CTA pill com seta animada, glow seguindo mouse, conic gradient border (16s).
+- **2 campos de entrada**: Tema/Topico (textarea) + **Direcao** (textarea opcional) pra orientar o agente com temas obrigatorios, angulo, restricoes, ferramentas a citar. Direcao vai pro prompt do Pro como "DIRECAO ADICIONAL DO MARCO (priorizar)".
+- **Backend Gemini Pro**: `mode plan` em `studio_chat.py` com `responseSchema` (PLAN_SCHEMA 14 campos). Cruza calendario FPT (Sheets `[FLEET] Calendario`) + dataset 2.786 videos classificados em runtime. Gera plano com hook, estrutura, slot, brief de thumb, duplicate warnings detectados contra calendario, CTAs com voz Julio.
+- **Knowledge layer novo**: `soul-canal-fpt.md` (alma operacional canal), `youtube-principles-2026.md` (9 pilares algoritmo + curadoria TR Peter), `template-roteiro-live-julio.md` (4 templates: aulao/live tematica/gravado/short).
+- **Roteiro narrado**: botao "APROVAR + GERAR ROTEIRO" pega plano e gera roteiro bloco a bloco com falas Julio (vocabulario USAR/PROIBIDO), stage_direction, b-roll, graphic overlays, production notes.
+- **Historico server-side**: `data/plans/{plan_id}.json` (versionado por `parent_id`). Volume Railway `prism-os-volume` em `/app/nutella-creator/data` ja persiste entre deploys. Endpoints `/api/live-plan/{list,get,refine,script,approve,delete,import,calendar-snapshot}`.
+- **Refinar plano**: textarea de feedback regenera mantendo contexto da conversa + historico acumulado. Cria nova versao apontando `parent_id`.
+- **Persistencia localStorage**: ultimo plano sobrevive refresh. Auto-import server-side de planos antigos.
+- **2 docs Google alimentados**: roteiros de "Camera Veicular Maio Amarelo" e "5 Acoes Maio Amarelo" injetados nos docs originais via Docs API.
+- **Closes #97**: substituiu `assets/cta-final-pronto-v2.mp4` (33MB -> 1.2MB, mantem 1920x1080 30fps 13.6s).
+
+**Bug fix critico:** `SyntaxError: 'card' already declared` em `tlPlanRender` estava parando todo o JS inline (canvas animados drawPrism + drawMind + tlPlanToggle). Renomeado pra `cardEl`.
+
+**Removido visual:** referencias a "GEMINI PRO" no UI (so backend menciona).
+
+**Ainda nao entra (proximos PRs):** #96 cortes manuais sem botao proxima etapa, #89 ajustar thumb aleatoria, #95 cortes interrompem raciocinio, #101 Studio qualidade imagem.
+
+---
+
 ## 23/04/2026: Deprecacao do CLI thumbnail-ai-creator/
 
 O diretorio `thumbnail-ai-creator/` passa a ser legado. O fluxo integrado no `nutella-creator/dashboard.py` (UI web "Thumbnails de Live") e a fonte unica daqui pra frente. Objetivo: eliminar duplicacao de codigo (fix num path nao chegava no outro).
