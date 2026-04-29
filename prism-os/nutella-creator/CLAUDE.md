@@ -6,6 +6,18 @@ Canal principal: Frota Para Todos (Julio César | `UCz31CtOANqSFuLEdFTi1iCQ`)
 
 ---
 
+## Regras críticas (não ignorar)
+
+- **`node --check` em JS inline depois de qualquer edit no `static/index.html`**. HTML tem 7k+ linhas com `<script>` inline gigante. SyntaxError em UMA linha quebra TODO o bloco (canvas drawPrism + drawMind, todos os handlers, tudo). Caso real abr/26: `const card` redeclarado parou tudo, Marco viu canvas vazio + botão morto. Validar com:
+  ```bash
+  python3 -c "import re; html=open('static/index.html').read(); m=re.search(r'<script[^>]*>(.*?)</script>',html,flags=re.DOTALL); open('/tmp/inline_js.js','w').write(m.group(1))" && node --check /tmp/inline_js.js
+  ```
+- **Persistir output de geração cara** (Gemini Pro 25-60s+) em **localStorage 24h + server-side** (plan_storage com plan_id). Marco perde plano = perde 60s de Pro = paywall. Migrar localStorage antigos pro server no load (auto-import).
+- **2 níveis de navegação** (importante pra preencher campos via JS): `screen-{home,thumb-live,roteiro,studio,...}` (atributo `class="active"` controla) + dentro de `screen-thumb-live` há `tl-step-{queue,briefing,review}` (display none/block). Pra preencher Q1/Q2/Q3, primeiro `showScreen('thumb-live')` + `tlShowStep('briefing')` antes de `setVal`.
+- **Volume Railway prism-os já em `data/`**, não `output/`. `output/` é effemeral (`.railwayignore`). Storage de planos vai em `data/plans/` pra reusar volume existente. Override via env `PLANS_DIR_PATH`.
+
+---
+
 ## O Que É Uma Nutella
 
 Um clip educacional autônomo de **5-10min** extraído de uma live longa. Funciona sozinho, agrega conhecimento real ao gestor.
