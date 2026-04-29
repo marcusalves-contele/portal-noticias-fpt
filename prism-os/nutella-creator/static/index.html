@@ -477,6 +477,397 @@
     .home-input-btn:hover { background: var(--purple-dim); }
     .home-input-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+    /* ===========================================================
+       PLANNER — editorial console card
+       =========================================================== */
+    :root {
+      --planner-cyan: #5eead4;
+      --planner-cyan-hot: #2dd4bf;
+      --planner-cyan-glow: rgba(94, 234, 212, 0.18);
+      --planner-cyan-soft: rgba(94, 234, 212, 0.06);
+    }
+
+    .planner {
+      width: 100%;
+      max-width: 880px;
+      margin: 36px auto 0;
+      text-align: left;
+      animation: fadeUp 0.6s var(--ease-out) 0.45s both;
+    }
+
+    .planner-card {
+      position: relative;
+      background:
+        radial-gradient(1200px 200px at var(--mx, 50%) 0%, var(--planner-cyan-soft), transparent 60%),
+        linear-gradient(180deg, rgba(20, 24, 28, 0.6), rgba(12, 14, 16, 0.85));
+      border-radius: 14px;
+      padding: 28px 32px;
+      overflow: hidden;
+      transition: transform 0.35s var(--ease-out), box-shadow 0.35s var(--ease-out);
+      cursor: default;
+    }
+
+    /* Animated conic border */
+    .planner-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      padding: 1px;
+      background: conic-gradient(
+        from var(--ang, 0deg),
+        rgba(94, 234, 212, 0.55),
+        rgba(139, 35, 229, 0.35) 40%,
+        rgba(94, 234, 212, 0.15) 60%,
+        rgba(94, 234, 212, 0.55) 100%
+      );
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      pointer-events: none;
+      animation: planner-rotate 16s linear infinite;
+      opacity: 0.55;
+      transition: opacity 0.4s;
+    }
+
+    /* CSS-only hue rotation via @property */
+    @property --ang {
+      syntax: '<angle>';
+      inherits: false;
+      initial-value: 0deg;
+    }
+    @keyframes planner-rotate {
+      to { --ang: 360deg; }
+    }
+
+    .planner-card:hover { transform: translateY(-2px); }
+    .planner-card:hover::before { opacity: 1; }
+    .planner-card:hover .planner-card__cta { box-shadow: 0 8px 30px var(--planner-cyan-glow); }
+
+    .planner-card__head {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 28px;
+    }
+
+    /* Editorial numeral block */
+    .planner-card__edition {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      padding-right: 24px;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .planner-card__numeral {
+      font-family: var(--font-brand);
+      font-weight: 800;
+      font-size: 42px;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      background: linear-gradient(160deg, var(--planner-cyan) 0%, #c084fc 70%, var(--purple) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      filter: drop-shadow(0 0 12px rgba(94, 234, 212, 0.18));
+    }
+
+    .planner-card__kicker {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      color: var(--planner-cyan);
+      text-transform: uppercase;
+    }
+
+    .planner-card__body { min-width: 0; }
+
+    .planner-card__title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 20px;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      color: var(--text-primary);
+      margin: 0 0 6px;
+    }
+    .planner-card__title em {
+      font-style: normal;
+      color: var(--planner-cyan);
+    }
+
+    .planner-card__desc {
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      max-width: 52ch;
+      margin: 0;
+    }
+
+    /* CTA — refined ghost button with trailing arrow */
+    .planner-card__cta {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px 12px 22px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #08161a;
+      background: linear-gradient(135deg, var(--planner-cyan) 0%, var(--planner-cyan-hot) 100%);
+      border: 1px solid transparent;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.2s var(--ease-spring), box-shadow 0.3s, filter 0.2s;
+      white-space: nowrap;
+      box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.35), 0 4px 18px rgba(94, 234, 212, 0.12);
+    }
+    .planner-card__cta:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08) saturate(1.1);
+    }
+    .planner-card__cta:active { transform: translateY(0) scale(0.98); }
+
+    .planner-card__cta-arrow {
+      width: 14px; height: 14px;
+      transition: transform 0.3s var(--ease-spring);
+    }
+    .planner-card__cta:hover .planner-card__cta-arrow { transform: translateX(3px); }
+    .planner-card.is-open .planner-card__cta-arrow { transform: rotate(90deg); }
+
+    /* Subtle metric strip below head — hairline divider with stat */
+    .planner-card__strip {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .planner-card__strip strong {
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .planner-card__strip-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--planner-cyan);
+      box-shadow: 0 0 10px var(--planner-cyan);
+      animation: planner-pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes planner-pulse {
+      0%, 100% { opacity: 0.5; transform: scale(0.85); }
+      50%      { opacity: 1;   transform: scale(1.1); }
+    }
+
+    /* ============ Expanded form ============ */
+    .planner-form {
+      display: none;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .planner-card.is-open .planner-form { display: block; }
+    .planner-card.is-open .planner-form > * {
+      animation: planner-fade-up 0.5s var(--ease-out) both;
+    }
+    .planner-card.is-open .planner-form > *:nth-child(1) { animation-delay: 0.05s; }
+    .planner-card.is-open .planner-form > *:nth-child(2) { animation-delay: 0.12s; }
+    .planner-card.is-open .planner-form > *:nth-child(3) { animation-delay: 0.18s; }
+    .planner-card.is-open .planner-form > *:nth-child(n+4) { animation-delay: 0.22s; }
+
+    @keyframes planner-fade-up {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .planner-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px 28px;
+      margin-bottom: 22px;
+    }
+    .planner-grid > .planner-field--full { grid-column: 1 / -1; }
+
+    .planner-field { display: flex; flex-direction: column; }
+
+    .planner-field-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .planner-input,
+    .planner-textarea,
+    .planner-select {
+      width: 100%;
+      background: transparent;
+      border: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 10px 0;
+      font-family: var(--font-display);
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--text-primary);
+      transition: border-color 0.25s, color 0.25s;
+      outline: none;
+    }
+    .planner-input::placeholder,
+    .planner-textarea::placeholder { color: var(--text-muted); }
+    .planner-input:focus,
+    .planner-textarea:focus,
+    .planner-select:focus {
+      border-color: var(--planner-cyan);
+    }
+
+    .planner-textarea {
+      resize: vertical;
+      min-height: 64px;
+      font-family: var(--font-display);
+    }
+    .planner-textarea--tall { min-height: 120px; }
+
+    .planner-field-hint {
+      margin-top: 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+
+    .planner-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--text-muted) 50%),
+        linear-gradient(135deg, var(--text-muted) 50%, transparent 50%);
+      background-position: calc(100% - 14px) center, calc(100% - 9px) center;
+      background-size: 5px 5px, 5px 5px;
+      background-repeat: no-repeat;
+      padding-right: 28px;
+      cursor: pointer;
+    }
+    .planner-select option {
+      background: var(--surface-1);
+      color: var(--text-primary);
+    }
+
+    .planner-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .planner-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 18px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      border: 1px solid;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s var(--ease-out);
+      white-space: nowrap;
+    }
+    .planner-btn--primary {
+      color: #08161a;
+      background: linear-gradient(135deg, var(--planner-cyan) 0%, var(--planner-cyan-hot) 100%);
+      border-color: transparent;
+      box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.35), 0 4px 18px rgba(94, 234, 212, 0.18);
+    }
+    .planner-btn--primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08) saturate(1.1);
+      box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.5), 0 8px 26px rgba(94, 234, 212, 0.28);
+    }
+
+    .planner-btn--ghost {
+      color: var(--planner-cyan);
+      border-color: rgba(94, 234, 212, 0.32);
+    }
+    .planner-btn--ghost:hover {
+      border-color: var(--planner-cyan);
+      background: var(--planner-cyan-soft);
+    }
+
+    .planner-btn--quiet {
+      color: var(--text-muted);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    .planner-btn--quiet:hover {
+      color: var(--text-secondary);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .planner-btn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .planner-status {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .planner-status:empty { display: none; }
+
+    .planner-panel {
+      display: none;
+      margin-top: 14px;
+      padding: 14px 16px;
+      background: rgba(0, 0, 0, 0.32);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .planner-panel--progress { display: none; flex-direction: column; gap: 5px; }
+
+    /* Mobile */
+    @media (max-width: 720px) {
+      .planner-card { padding: 22px; }
+      .planner-card__head {
+        grid-template-columns: auto 1fr;
+        gap: 18px;
+        row-gap: 16px;
+      }
+      .planner-card__edition {
+        padding-right: 18px;
+      }
+      .planner-card__numeral { font-size: 34px; }
+      .planner-card__cta { grid-column: 1 / -1; justify-self: stretch; justify-content: center; }
+      .planner-grid { grid-template-columns: 1fr; gap: 16px; }
+    }
+
     .home-history {
       margin-top: 48px;
       text-align: left;
@@ -2669,69 +3060,88 @@
           </button>
         </div>
 
-        <div class="home-history" id="history-section">
-          <div class="home-history-title">Recentes</div>
-          <div id="history-list"></div>
-        </div>
-
-        <!-- Step 0: Plano Senior (sempre visivel na home) -->
-        <div style="margin-top:40px;max-width:900px;width:100%;text-align:left">
-          <div id="tl-live-plan-row" style="margin-bottom:20px;padding:18px;border:1px solid #00ffd1;border-radius:12px;background:rgba(0,255,209,0.04);box-shadow:0 0 30px rgba(0,255,209,0.08)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-              <div>
-                <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:#00ffd1;font-family:var(--font-mono)">STEP 0 · PLANO SENIOR · GEMINI PRO</div>
-                <div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);margin-top:4px">14 campos: hook, estrutura, slot, duplicate warnings, brief de thumb e mais. Cruza calendario FPT + dataset 2.786 videos.</div>
+        <!-- Step 0 — Planner (editorial console card) -->
+        <section class="planner">
+          <article id="tl-live-plan-row" class="planner-card" onmousemove="this.style.setProperty('--mx', ((event.offsetX/this.clientWidth)*100).toFixed(0)+'%')">
+            <header class="planner-card__head">
+              <div class="planner-card__edition">
+                <span class="planner-card__numeral">01</span>
+                <span class="planner-card__kicker">Planejar</span>
               </div>
-              <button class="btn" id="tl-btn-toggle-plan" onclick="tlPlanToggle()" style="background:transparent;border:1px solid #00ffd1;color:#00ffd1;font-family:var(--font-mono);font-size:11px;padding:6px 14px;cursor:pointer">
-                ABRIR PLANEJADOR
+
+              <div class="planner-card__body">
+                <h2 class="planner-card__title">Próximo vídeo, planejado <em>por dado</em>.</h2>
+                <p class="planner-card__desc">Hook, estrutura, slot, brief de thumb. Cruza calendário FPT com dataset de 2.786 vídeos. Vira roteiro narrado com um clique.</p>
+              </div>
+
+              <button id="tl-btn-toggle-plan" class="planner-card__cta" onclick="tlPlanToggle()" type="button">
+                <span>Abrir planejador</span>
+                <svg class="planner-card__cta-arrow" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M3 7h8M8 4l3 3-3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
               </button>
+            </header>
+
+            <div class="planner-card__strip">
+              <span class="planner-card__strip-dot"></span>
+              <span>Calendário FPT vivo · Dataset 2.786 vídeos · Roteiro em 1 clique</span>
             </div>
 
-            <div id="tl-plan-form" style="display:none">
-              <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px">
-                <div class="tl-field">
-                  <div class="tl-label">TEMA / TOPICO</div>
-                  <input type="text" id="tl-plan-topic" class="tl-textarea" style="min-height:auto;padding:8px 12px"
-                    placeholder="Ex: cartao combustivel e CPK, multas ANTT, gestao de pneus..." />
+            <div id="tl-plan-form" class="planner-form">
+              <div class="planner-grid">
+                <div class="planner-field planner-field--full">
+                  <label class="planner-field-label" for="tl-plan-topic">Tema / Tópico</label>
+                  <textarea id="tl-plan-topic" class="planner-textarea" rows="2"
+                    placeholder="Ex: Maio Amarelo · 5 ações práticas pra reduzir acidentes na frota" autocomplete="off"></textarea>
+                  <div class="planner-field-hint">A frase-chave do vídeo. Curto e específico.</div>
                 </div>
-                <div class="tl-field">
-                  <div class="tl-label">FORMATO (opcional)</div>
-                  <select id="tl-plan-format" class="tl-textarea" style="min-height:auto;padding:8px 12px;background:#0a0a0a;color:#fff">
-                    <option value="">(deixar IA decidir)</option>
-                    <option value="aulao">Aulao formativo (130-170min)</option>
-                    <option value="live_tematica">Live tematica (60-90min)</option>
-                    <option value="gravado_tema_produto">Gravado tema-produto (10-20min)</option>
+
+                <div class="planner-field planner-field--full">
+                  <label class="planner-field-label" for="tl-plan-direction">Direção <span style="color:var(--text-muted);text-transform:none;letter-spacing:0">— opcional</span></label>
+                  <textarea id="tl-plan-direction" class="planner-textarea planner-textarea--tall" rows="5"
+                    placeholder="Use pra orientar o agente: temas obrigatórios, ângulo, ferramentas a citar, restrições, referências internas, convidados, ponto de venda do Contele…&#10;&#10;Ex: incluir prompt de IA pra campanha · falar de Pareto 80/20 · mencionar Cartão Fleet · evitar tom de palestrinha"></textarea>
+                  <div class="planner-field-hint">Quanto mais contexto, mais aderente o plano. Vai pro system prompt do Pro junto com o tema.</div>
+                </div>
+
+                <div class="planner-field planner-field--full">
+                  <label class="planner-field-label" for="tl-plan-format">Formato</label>
+                  <select id="tl-plan-format" class="planner-select">
+                    <option value="">Deixar a IA decidir</option>
+                    <option value="aulao">Aulão formativo · 130–170min</option>
+                    <option value="live_tematica">Live temática · 60–90min</option>
+                    <option value="gravado_tema_produto">Gravado tema-produto · 10–20min</option>
                     <option value="short_cluster">Short com cluster</option>
                   </select>
                 </div>
               </div>
 
-              <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-                <button class="btn btn-primary" id="tl-btn-plan-generate" onclick="tlPlanGenerate()" style="background:#00ffd1;border-color:#00ffd1;color:#000;cursor:pointer">
-                  GERAR PLANO COMPLETO
+              <div class="planner-actions">
+                <button id="tl-btn-plan-generate" class="planner-btn planner-btn--primary" onclick="tlPlanGenerate()" type="button">
+                  Gerar plano completo
                 </button>
-                <button class="btn" id="tl-btn-plan-history" onclick="tlPlanHistoryToggle()" style="background:transparent;border:1px solid #00ffd1;color:#00ffd1;font-family:var(--font-mono);font-size:11px;cursor:pointer">
-                  📜 Historico
+                <button id="tl-btn-plan-history" class="planner-btn planner-btn--ghost" onclick="tlPlanHistoryToggle()" type="button">
+                  Histórico
                 </button>
-                <button class="btn" id="tl-btn-plan-snapshot" onclick="tlPlanSnapshot()" style="background:transparent;border:1px solid var(--text-muted);color:var(--text-muted);font-family:var(--font-mono);font-size:11px;cursor:pointer">
-                  Ver calendario FPT
+                <button id="tl-btn-plan-snapshot" class="planner-btn planner-btn--quiet" onclick="tlPlanSnapshot()" type="button">
+                  Calendário FPT
                 </button>
-                <button class="btn" id="tl-btn-plan-clear" onclick="tlPlanClear()" style="background:transparent;border:1px solid var(--text-muted);color:var(--text-muted);font-family:var(--font-mono);font-size:11px;cursor:pointer">
-                  Limpar plano local
+                <button id="tl-btn-plan-clear" class="planner-btn planner-btn--quiet" onclick="tlPlanClear()" type="button">
+                  Limpar local
                 </button>
-                <span id="tl-plan-status" style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);align-self:center"></span>
+                <span id="tl-plan-status" class="planner-status"></span>
               </div>
 
-              <!-- Historico de planos (server-side) -->
-              <div id="tl-plan-history-panel" style="display:none;margin-bottom:12px;padding:12px;background:rgba(0,0,0,0.4);border-radius:6px;font-family:var(--font-mono);font-size:11px"></div>
-
-              <div id="tl-plan-progress" style="display:none;flex-direction:column;gap:5px;margin-bottom:12px;padding:10px;background:rgba(0,0,0,0.3);border-radius:6px;font-family:var(--font-mono);font-size:11px"></div>
-
-              <div id="tl-plan-snapshot-panel" style="display:none;margin-bottom:12px;padding:12px;background:rgba(0,0,0,0.3);border-radius:6px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"></div>
-
+              <div id="tl-plan-history-panel" class="planner-panel"></div>
+              <div id="tl-plan-progress" class="planner-panel planner-panel--progress"></div>
+              <div id="tl-plan-snapshot-panel" class="planner-panel"></div>
               <div id="tl-plan-result" style="display:none"></div>
             </div>
-          </div>
+          </article>
+        </section>
+
+        <div class="home-history" id="history-section">
+          <div class="home-history-title">Recentes</div>
+          <div id="history-list"></div>
         </div>
       </div>
     </div>
@@ -4708,13 +5118,14 @@
       }
     }
 
-    // ===== TL: STEP 0 — PLANO SENIOR (Gemini Pro JSON estruturado) =====
+    // ===== TL: STEP 0 — Planejador (editorial console card) =====
     function tlPlanToggle() {
-      const form = document.getElementById('tl-plan-form');
+      const card = document.getElementById('tl-live-plan-row');
       const btn = document.getElementById('tl-btn-toggle-plan');
-      const open = form.style.display === 'none';
-      form.style.display = open ? 'block' : 'none';
-      btn.textContent = open ? 'FECHAR PLANEJADOR' : 'ABRIR PLANEJADOR';
+      const willOpen = !card.classList.contains('is-open');
+      card.classList.toggle('is-open', willOpen);
+      const labelEl = btn.querySelector('span');
+      if (labelEl) labelEl.textContent = willOpen ? 'Fechar planejador' : 'Abrir planejador';
     }
 
     async function tlPlanSnapshot() {
@@ -4759,6 +5170,7 @@
 
     async function tlPlanGenerate() {
       const topic = document.getElementById('tl-plan-topic').value.trim();
+      const direction = document.getElementById('tl-plan-direction')?.value?.trim() || '';
       const format = document.getElementById('tl-plan-format').value;
       const status = document.getElementById('tl-plan-status');
       const btn = document.getElementById('tl-btn-plan-generate');
@@ -4786,6 +5198,7 @@
           body: JSON.stringify({
             message: `Monta plano completo pra live/video sobre: ${topic}`,
             topic,
+            direction: direction || undefined,
             format_hint: format || undefined,
           }),
         });
@@ -5041,12 +5454,13 @@
         console.warn('localStorage save failed', e);
       }
 
-      // Garante que o form esteja aberto pra mostrar o resultado
-      const form = document.getElementById('tl-plan-form');
-      const btn = document.getElementById('tl-btn-toggle-plan');
-      if (form && form.style.display === 'none') {
-        form.style.display = 'block';
-        if (btn) btn.textContent = 'FECHAR PLANEJADOR';
+      // Garante que o card esteja aberto pra mostrar o resultado
+      const cardEl = document.getElementById('tl-live-plan-row');
+      if (cardEl && !cardEl.classList.contains('is-open')) {
+        cardEl.classList.add('is-open');
+        const btn = document.getElementById('tl-btn-toggle-plan');
+        const labelEl = btn?.querySelector('span');
+        if (labelEl) labelEl.textContent = 'Fechar planejador';
       }
     }
 

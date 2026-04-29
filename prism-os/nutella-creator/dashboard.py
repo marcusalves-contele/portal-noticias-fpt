@@ -1960,6 +1960,7 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
         Body:
           - message (str, required): pedido do user. Ex: "monta plano pra live sobre cartao combustivel"
           - topic (str, optional): topico explicito. Override do parsing
+          - direction (str, optional): instrucoes adicionais do user (temas obrigatorios, angulo, restricoes)
           - format_hint (str, optional): aulao | live_tematica | gravado_tema_produto | short_cluster
           - session_id (str, optional)
         Retorna { job_id, session_id }. Resultado vem via SSE em /api/progress/{job_id}
@@ -1967,6 +1968,7 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
         """
         message = body.get("message", "").strip()
         topic = body.get("topic", "").strip()
+        direction = body.get("direction", "").strip()
         format_hint = body.get("format_hint", "").strip()
         session_id = body.get("session_id", str(uuid.uuid4())[:8])
 
@@ -1974,13 +1976,15 @@ JSON puro, sem markdown. "why" curto (max 10 palavras):
             self._json({"error": "message ou topic required"}, 400)
             return
 
-        # Constroi message rica se topic/format vierem explicitos
+        # Constroi message rica se topic/format/direction vierem explicitos
         if topic and not message:
             message = f"Monta o plano completo pra live/video sobre: {topic}"
         elif topic and message:
             message = f"{message}\n\nTopico explicito: {topic}"
         if format_hint:
             message = f"{message}\n\nFormato sugerido: {format_hint}"
+        if direction:
+            message = f"{message}\n\nDIRECAO ADICIONAL DO MARCO (priorizar):\n{direction}"
 
         job_id = _create_job()
         self._json({"job_id": job_id, "session_id": session_id})

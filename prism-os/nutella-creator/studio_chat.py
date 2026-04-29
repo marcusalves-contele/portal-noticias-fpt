@@ -734,8 +734,14 @@ REGRAS FINAIS:
     plan_id = None
     try:
         from plan_storage import save_new_plan
+        # Extrai bloco DIRECAO ADICIONAL do message pra indexar no historico
+        direction_text = ""
+        marker = "DIRECAO ADICIONAL DO MARCO"
+        if marker in message:
+            direction_text = message.split(marker, 1)[1].split(":", 1)[-1].strip()
         input_data = {
             "topic": intent.get("plan_topic") or "",
+            "direction": direction_text,
             "format_hint": intent.get("plan_format_hint") or "",
             "message": message,
             "feedback_history": [],
