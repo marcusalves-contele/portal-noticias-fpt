@@ -4,6 +4,20 @@ Registro de mudancas no Prism OS.
 
 ---
 
+## 29/04/2026: Cortes Nutella + Studio thumb sem leak (3 PRs)
+
+PRs #109 + #110 + #111 mergeados em master. Auto-deploy Railway prism-os.
+
+**O que entra:**
+
+- **PR #111 / closes #95**: Definition of Done dos cortes Nutella. `suggest.py` agora orienta o LLM a NAO cortar raciocinios incompletos, NAO cortar intros vazias, e exigir que cada corte entregue a promessa do titulo. Sem mais cortes truncados ou clickbait.
+- **PR #109 / closes #96**: cortes manuais nao perdem mais o historico entre etapas. Fluxo agora tem CTA explicito "proxima etapa" ao final de cada corte, com persistencia server-side.
+- **PR #110 / closes #89 + #101**: "Ajustar Thumb" no Studio agora preserva composicao + referencia da imagem original. Causa raiz era config (`imageConfig` ausente, `temperature 0.8`, `responseModalities` permitindo leak de prompt template como texto), nao o modelo. Mantido `gemini-3.1-flash-image-preview` (Nano Banana 2) com `imageConfig.aspectRatio: "16:9"`, `imageSize: "2K"`, `temperature: 0.4`. Gate fisico no cliente filtra `inlineData` parts apenas e sanitiza `summary` antes de exibir, garantindo que prompt do Julio nao vaza em mensagens de erro.
+
+**Versionamento abandonado:** o footer do dashboard nao mostra mais "PRISM OS v1.0.0". A partir desta entrada, o link "Changelog" passa a apontar pra `prism-os/CHANGELOG.md` no repo `contele/growth`, com a data da ultima mudanca exposta dinamicamente via `/api/version`. Releases na GitHub abandonadas (overhead desnecessario pra fluxo dev em master).
+
+---
+
 ## 29/04/2026: Planejador Senior v2 — plano + roteiro + redesign editorial
 
 PR #107 (consolidacao de 4 PRs encadeados) + PR #108 (redesign + fix) mergeados em master. Auto-deploy Railway prism-os.

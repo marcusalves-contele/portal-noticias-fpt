@@ -69,6 +69,25 @@ def _classify_drive_error(err: Exception) -> tuple[int, str, str]:
 STATIC_DIR  = PROJECT_DIR / "static"
 VERSION     = (PROJECT_DIR / "VERSION").read_text().strip() if (PROJECT_DIR / "VERSION").exists() else "dev"
 
+# Caminho do CHANGELOG.md do prism-os (parent do nutella-creator)
+CHANGELOG_PATH = PROJECT_DIR.parent / "CHANGELOG.md"
+
+def _read_last_changelog_date() -> str:
+    """Le a primeira data DD/MM/YYYY do CHANGELOG.md (entry mais recente).
+    Marco abandonou versionamento semantico em 29/04/2026 - footer mostra data
+    da ultima mudanca, nao versao.
+    Retorna string "DD/MM/YYYY" ou "" se nao achar.
+    """
+    try:
+        if not CHANGELOG_PATH.exists():
+            return ""
+        # Match "## DD/MM/YYYY" no comeco de linha
+        pattern = re.compile(r"^##\s+(\d{2}/\d{2}/\d{4})", re.MULTILINE)
+        match = pattern.search(CHANGELOG_PATH.read_text(encoding="utf-8"))
+        return match.group(1) if match else ""
+    except Exception:
+        return ""
+
 # Progress queues per job
 _jobs: dict[str, dict] = {}
 _jobs_lock = threading.Lock()
@@ -438,7 +457,11 @@ class DashboardHandler(http.server.SimpleHTTPRequestHandler):
         if path == "/api/health":
             self._json({"ok": True})
         elif path == "/api/version":
-            self._json({"version": VERSION, "changelog": "https://github.com/contele/growth/releases"})
+            self._json({
+                "version": VERSION,
+                "last_changelog_date": _read_last_changelog_date(),
+                "changelog_url": "https://github.com/contele/growth/blob/master/prism-os/CHANGELOG.md",
+            })
         elif path == "/api/videos":
             self._handle_list_videos()
         elif path == "/api/video-title":
