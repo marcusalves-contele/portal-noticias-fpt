@@ -460,6 +460,33 @@ PÚBLICO: Gestores de frota/equipes, 35-55 anos, cargo médio/alto, buscam solu�
 
 ## FRAMEWORK DE CLIPS VIRAIS
 
+### 0. DEFINITION OF DONE — INTEGRIDADE DE RACIOCINIO (issue #95)
+
+**Todo corte e uma UNIDADE DE VALOR AUTONOMA.** O espectador termina o video sabendo
+algo completo, sem sensacao de "cortou errado" ou "faltou a parte boa".
+
+#### O QUE NAO PODE virar corte (rejeitar)
+- **Introducoes vazias**: apresentacao do convidado, boas-vindas da live, "estamos no ar"
+- **Momentos administrativos**: leitura de chats, resultados de enquetes, avisos tecnicos, "obrigado pelo super chat"
+- **Raciocinio incompleto**: terminar o clip antes da conclusao logica do argumento ser entregue
+- **Promessa nao cumprida**: clip cujo titulo pergunta algo mas o conteudo nao responde de forma completa
+
+#### O QUE TODO CORTE DEVE TER (Definition of Done)
+1. **Inicio logico**: o clip comeca exatamente na pergunta, no problema, ou no topico que sera tratado. NUNCA no meio de uma frase ou de um setup que nao se completa dentro do clip.
+2. **Fim logico**: o clip termina apos o fechamento da ideia — Julio entregou a resposta, o insight, ou a conclusao. Se a resposta termina em 4:15, o clip vai ate 4:25 (10s de respiro), nao corta em 4:00 deixando frase no ar.
+3. **Promessa cumprida**: se titulo_seo ou titulo_ctr fazem uma pergunta, o conteudo do clip OBRIGATORIAMENTE traz a resposta completa. Sem clickbait sem entrega.
+4. **Tempo subordinado a clareza**: se o raciocinio precisa de 8 minutos pra fechar, clip tem 8 minutos. Prioridade e a clareza, nao o tempo. Cortar pra encurtar e quebrar a regra de unidade autonoma.
+
+#### Antes de aprovar cada corte, valide:
+- [ ] O espectador termina entendendo algo POR COMPLETO?
+- [ ] O clip funciona pra alguem que NAO assistiu a live?
+- [ ] O titulo entrega o que promete?
+- [ ] O fim e uma conclusao, nao uma interrupcao?
+
+Se QUALQUER uma das 4 falhar, o trecho NAO vira corte. Procura outro com integridade completa.
+
+---
+
 ### 1. Hook formula (primeiros 3 segundos)
 - **Dor direta**: "Você sabia que [problema real que o gestor tem]?"
 - **Contraste brutal**: "Antes: R$2.000 e 2 meses. Agora: grátis em minutos."
@@ -554,7 +581,11 @@ Identifique de 2 a 3 nutellas (MÁXIMO 3). Priorize qualidade e profundidade sob
     "thumbnail_pairing": "A|B",
 
     "por_que_viraliza": "1 linha: mecanismo psicológico + comportamento esperado do espectador",
-    "hook_transcricao": "Copie as primeiras 1-2 frases exatas do clip que funcionam como hook"
+    "hook_transcricao": "Copie as primeiras 1-2 frases exatas do clip que funcionam como hook",
+
+    "raciocinio_fechado": true,
+    "promessa_titulo_cumprida": true,
+    "checklist_dod": "1 frase: confirma que clip comeca em ponto logico, fecha raciocinio, entrega promessa do titulo, funciona standalone"
   }}
 ]
 ```
@@ -567,6 +598,15 @@ REGRAS FINAIS:
 - Shorts DEVEM ter MÍNIMO 30 segundos
 - tags_especificas: 5-8 tags específicas do TEMA deste clip (não genéricas)
 - thumbnail_composicao: MÁXIMO 2 elementos visuais (Julio + 1 coisa)
+
+DEFINITION OF DONE (issue #95) — bloqueio obrigatorio:
+- Cada clip retornado DEVE passar nos 4 criterios da secao 0 acima.
+- raciocinio_fechado=true e promessa_titulo_cumprida=true OBRIGATORIAMENTE.
+- checklist_dod NAO pode ser placeholder generico. Tem que descrever
+  especificamente como ESTE clip atende aos 4 criterios.
+- Se nao consegue achar 2-3 trechos que passem na DoD, retorne menos
+  nutellas (1 ou ate 0). NUNCA force quantidade afrouxando qualidade.
+
 - Responda APENAS o JSON, sem texto antes ou depois.
 """
 
@@ -595,6 +635,24 @@ def suggest_nutellas(video_id: str) -> dict:
         raise ValueError(f"Gemini não retornou JSON válido:\n{raw[:500]}")
 
     nutellas = json.loads(json_match.group())
+
+    # Issue #95: audita Definition of Done. Loga warning pra cada clip
+    # que volta sem raciocinio_fechado=true ou promessa_titulo_cumprida=true.
+    # Nao bloqueia (pra nao quebrar review existente), so flag visivel.
+    for n in nutellas:
+        rank = n.get("rank", "?")
+        if n.get("raciocinio_fechado") is not True:
+            logger.warning(
+                f"DoD: clip #{rank} sem raciocinio_fechado=true. "
+                "Reler trecho antes de aprovar publicacao."
+            )
+        if n.get("promessa_titulo_cumprida") is not True:
+            logger.warning(
+                f"DoD: clip #{rank} sem promessa_titulo_cumprida=true. "
+                "Verificar se titulo entrega o que promete."
+            )
+        if not n.get("checklist_dod"):
+            logger.warning(f"DoD: clip #{rank} sem checklist_dod preenchido.")
 
     return {
         "video_id": video_id,
@@ -656,6 +714,14 @@ def print_results(result: dict):
         print(f"")
         print(f"HOOK:      \"{n['hook_transcricao']}\"")
         print(f"VIRAL:     {n['por_que_viraliza']}")
+
+        # Issue #95: surfacing Definition of Done checks pro reviewer humano
+        dod_ok = n.get("raciocinio_fechado") is True and n.get("promessa_titulo_cumprida") is True
+        dod_marker = "OK " if dod_ok else "REVISAR"
+        print(f"")
+        print(f"DoD:       [{dod_marker}] raciocinio_fechado={n.get('raciocinio_fechado')!r} | promessa_titulo_cumprida={n.get('promessa_titulo_cumprida')!r}")
+        if n.get("checklist_dod"):
+            print(f"           {n['checklist_dod']}")
 
     print(f"\n{'='*65}")
     print(f"Salvo em: output/{video_id}_nutellas.json")

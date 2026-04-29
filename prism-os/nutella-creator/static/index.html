@@ -4418,6 +4418,19 @@
                 <div class="meta-section-title">Por que viraliza</div>
                 <div class="viral-block">${m.por_que_viraliza}</div>
               </div>` : ''}
+
+              ${(m.raciocinio_fechado !== undefined || m.checklist_dod) ? `
+              <div>
+                <div class="meta-section-title">Definition of Done <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);font-weight:400">(issue #95)</span></div>
+                <div class="viral-block" style="border-left:3px solid ${(m.raciocinio_fechado === true && m.promessa_titulo_cumprida === true) ? 'var(--green)' : 'var(--amber)'};padding-left:10px;">
+                  <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:4px;">
+                    raciocinio_fechado=<strong style="color:${m.raciocinio_fechado === true ? 'var(--green)' : 'var(--amber)'}">${String(m.raciocinio_fechado)}</strong>
+                    &nbsp;&middot;&nbsp;
+                    promessa_titulo_cumprida=<strong style="color:${m.promessa_titulo_cumprida === true ? 'var(--green)' : 'var(--amber)'}">${String(m.promessa_titulo_cumprida)}</strong>
+                  </div>
+                  ${m.checklist_dod ? `<div style="font-size:13px;color:var(--text-secondary)">${m.checklist_dod}</div>` : ''}
+                </div>
+              </div>` : ''}
             </div>
           </div>
 
