@@ -4788,20 +4788,22 @@
           es.close();
           const d = JSON.parse(e.data);
           toast('Corte pronto! ' + (d.message || ''));
-          steps.innerHTML = '<div class="progress-step" style="color:var(--green)">&#10003; ' + (d.message || 'Corte concluido') + '</div>';
+          steps.innerHTML = '<div class="progress-step" style="color:var(--green)">&#10003; ' + (d.message || 'Corte concluido') + '</div>'
+            + '<div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">'
+            +   '<button class="btn btn-primary" id="manual-go-review" onclick="goReviewAfterManual()" style="flex:1;min-width:180px;">Ver corte e aprovar</button>'
+            +   '<button class="btn btn-ghost" onclick="goHome()" style="flex:1;min-width:140px;">Voltar pro inicio</button>'
+            + '</div>';
           btn.disabled = false;
           btn.textContent = 'Cortar';
 
           if (d.video_id) {
             currentVideoId = d.video_id;
-            setTimeout(() => {
-              fetch('/api/metas/' + d.video_id).then(r => r.json()).then(mdata => {
-                if (mdata.nutellas) {
-                  currentNutellas = mdata.nutellas;
-                  showNutellasSelect(currentNutellas);
-                }
-              });
-            }, 1000);
+            // Pre-fetch metas to warm cache; navigation happens via CTA so user controls timing
+            fetch('/api/metas/' + d.video_id).then(r => r.json()).then(mdata => {
+              if (mdata && mdata.nutellas) {
+                currentNutellas = mdata.nutellas;
+              }
+            }).catch(() => {});
           }
         });
 
@@ -4810,6 +4812,8 @@
           let msg = 'Erro no corte';
           try { msg = JSON.parse(e.data).message; } catch(x) {}
           toast(msg, 'error');
+          steps.innerHTML = '<div class="progress-step" style="color:var(--red)">&#10007; ' + msg + '</div>'
+            + '<div style="margin-top:12px;font-size:13px;color:var(--text-muted)">Ajuste os parametros e clique em Cortar de novo, ou volte pro inicio.</div>';
           btn.disabled = false;
           btn.textContent = 'Cortar';
         });
@@ -4825,6 +4829,20 @@
         toast('Erro: ' + e.message, 'error');
         btn.disabled = false;
         btn.textContent = 'Cortar';
+      }
+    }
+
+    async function goReviewAfterManual() {
+      // Apos corte manual, leva direto pra tela de review (cuts ja existem em disco).
+      if (!currentVideoId) {
+        toast('video_id ausente, volte pro inicio', 'error');
+        return;
+      }
+      try {
+        await loadReview(currentVideoId);
+        showScreen('review');
+      } catch (e) {
+        toast('Falha ao abrir review: ' + (e.message || e), 'error');
       }
     }
 
