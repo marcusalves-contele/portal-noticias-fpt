@@ -2214,6 +2214,14 @@
 
   // ===== FORM SUBMISSION =====
   function handleInsideForm(form) {
+    // Race-free guard: bloqueia re-entry sincrona de double-click
+    // ANTES de qualquer validacao/await. Caso 12887/12888 da planilha:
+    // 2 submits no mesmo segundo passavam pelas validacoes em paralelo
+    // porque submitBtn.disabled so era setado depois.
+    if (window._formSubmitting) return;
+
+    const submitBtn = form.querySelector('[type="submit"]');
+
     const qtdRaw = form.querySelector('[name="qtdPessoas"]').value;
     const qtd = parseInt(qtdRaw, 10);
     const nome = form.querySelector('[name="nome"]').value.trim();
@@ -2252,7 +2260,9 @@
       return;
     }
 
-    const submitBtn = form.querySelector('[type="submit"]');
+    // Lock SINCRONO antes de qualquer fetch async. window._formSubmitting
+    // pega ate double-click no mesmo tick (passou validacoes simultaneas).
+    window._formSubmitting = true;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Enviando...';
     localStorage.setItem('lastSubmit', Date.now().toString());
@@ -2364,12 +2374,17 @@
 
   // ===== SMALL TEAM: ACCEPT MIN PACKAGE =====
   document.getElementById('btn-accept-small-team').addEventListener('click', function() {
+    // Mesmo race guard do submit principal (handleInsideForm).
+    if (window._formSubmitting) return;
+
     var data = window._smallTeamData;
     if (!data) return;
 
     var btn = this;
+    window._formSubmitting = true;
     btn.disabled = true;
     btn.textContent = 'Enviando...';
+    localStorage.setItem('lastSubmit', Date.now().toString());
 
     var phoneDigits = data.telefone.replace(/\D/g, '');
     if (phoneDigits.length <= 11) phoneDigits = '55' + phoneDigits;

@@ -172,6 +172,79 @@ async function pipedrivePost(resource, body) {
   }
 }
 
+async function pipedriveGet(resource, qs = '') {
+  try {
+    const sep = qs ? '&' : '';
+    const url = `https://api.pipedrive.com/v1/${resource}?api_token=${PIPEDRIVE_TOKEN}${sep}${qs}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.success) {
+      console.error(`Pipedrive GET ${resource} error [${res.status}]:`, JSON.stringify(data.error).slice(0, 400));
+      return { ok: false, data, error: data.error, status: res.status };
+    }
+    return { ok: true, data };
+  } catch (err) {
+    console.error(`Pipedrive GET ${resource} throw:`, err.message);
+    return { ok: false, data: null, error: err.message, status: 0 };
+  }
+}
+
+// ===== DEDUP: busca deal aberto recente no Pipedrive antes de criar duplicado =====
+// Trata o caso classico onde o lead submete o form de novo (double-click,
+// reload acidental, ou retorno em outro dia) e cai 2x na pipeline. Sem esse
+// gate, server.js sempre cria pessoa+deal novos, e Daniel acaba fechando
+// duplicados como DUPLICADO manualmente toda semana.
+//
+// Estrategia: search por email (exato) e por telefone, juntar candidatos,
+// pedir os deals abertos de cada pessoa, retornar o MAIS RECENTE em pipeline
+// 12 (Teams) com idade < DEDUP_WINDOW_DAYS.
+//
+// Exact-match no Pipedrive search exige `exact_match=true` + `fields` certo.
+const DEDUP_WINDOW_DAYS = 30;
+const TEAMS_PIPELINE_ID = 12;
+
+async function findExistingTeamsDeal(email, phone) {
+  const qsEmail = email
+    ? `term=${encodeURIComponent(email)}&fields=email&exact_match=true&limit=5`
+    : null;
+  const qsPhone = phone
+    ? `term=${encodeURIComponent(phone)}&fields=phone&exact_match=false&limit=5`
+    : null;
+
+  const [byEmail, byPhone] = await Promise.all([
+    qsEmail ? pipedriveGet('persons/search', qsEmail) : Promise.resolve({ ok: false }),
+    qsPhone ? pipedriveGet('persons/search', qsPhone) : Promise.resolve({ ok: false })
+  ]);
+
+  const itemsEmail = byEmail.ok ? (byEmail.data?.data?.items || []) : [];
+  const itemsPhone = byPhone.ok ? (byPhone.data?.data?.items || []) : [];
+  const personIds = new Set();
+  for (const it of [...itemsEmail, ...itemsPhone]) {
+    const pid = it?.item?.id;
+    if (pid) personIds.add(pid);
+  }
+  if (personIds.size === 0) return null;
+
+  const cutoff = Date.now() - DEDUP_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+  let best = null; // { person_id, deal }
+
+  for (const pid of personIds) {
+    const r = await pipedriveGet(`persons/${pid}/deals`, 'status=open&limit=20');
+    if (!r.ok) continue;
+    const deals = r.data?.data || [];
+    for (const d of deals) {
+      if (d.pipeline_id !== TEAMS_PIPELINE_ID) continue;
+      const addedAt = d.add_time ? new Date(d.add_time + 'Z').getTime() : 0;
+      if (!addedAt || addedAt < cutoff) continue;
+      if (!best || addedAt > best.addedAt) {
+        best = { person_id: pid, deal: d, addedAt };
+      }
+    }
+  }
+
+  return best ? { person_id: best.person_id, deal: best.deal } : null;
+}
+
 async function sendWhatsApp(number, text) {
   try {
     await fetch(`${EVOLUTION_URL}/message/sendText/${encodeURIComponent(EVOLUTION_INSTANCE)}`, {
@@ -481,6 +554,69 @@ async function processLead(body, tamanho, ctaSource) {
   // ===== LEAD QUALIFICADO =====
   const vendor = assignVendor(tamanho);
   const utmString = buildUtmString(body);
+
+  // ===== DEDUP GATE (Pipedrive-aware) =====
+  // Casos cobertos:
+  //  - Double-click no botao (passou pela trava client): chega 2 requests aqui
+  //    em janela de segundos. A 2a vai achar o deal recem criado pela 1a.
+  //  - Re-submit em outro dia (caso Rogerio Siqueira 23/04 + 29/04): pessoa
+  //    ja existe no Pipe com deal aberto na pipeline 12. Nao queremos virar
+  //    DUPLICADO manual pro Daniel toda semana.
+  //  - Re-submit de outro browser/device: localStorage do client nao cobre,
+  //    Pipedrive cobre.
+  // Atualiza tracking no contele-os com o deal_id existente (pra capturar UTMs
+  // novos do retorno) e sai antes de criar pessoa/deal duplicado.
+  const dedup = await findExistingTeamsDeal(body.email, body.telefone);
+  if (dedup) {
+    const existingDealId = dedup.deal.id;
+    sheetData['status'] = '6_duplicado_pipedrive';
+    sheetData['Vendedor'] = VENDORS[dedup.deal.user_id?.value ?? dedup.deal.user_id]?.nome || '';
+    sheetData['ID Pipe'] = String(existingDealId);
+    await appendSheet(sheetData);
+
+    // Atualiza tracking (UTMs/gclid/GA4) no deal existente via contele-os.
+    // Sales-tracking webhook ja faz match por pipedrive_deal_id e patch.
+    if (CONTELE_OS_WEBHOOK_SECRET) {
+      fetch(`${CONTELE_OS_URL}/api/webhooks/sales-tracking`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-webhook-secret': CONTELE_OS_WEBHOOK_SECRET
+        },
+        body: JSON.stringify({
+          pipedrive_deal_id: existingDealId,
+          email: body.email || null,
+          phone: body.telefone || null,
+          gclid: body.gclid || null,
+          ga4_client_id: body.ga4_client_id || null,
+          ga4_session_id: body.ga4_session_id || null,
+          utm_source: body.utm_source || null,
+          utm_medium: body.utm_medium || null,
+          utm_campaign: body.campanha || null,
+          utm_term: body.utm_term || null,
+          utm_content: body.utm_content || null,
+          landing_page: body.landing_page || null,
+          hashed_email: hashEmail(body.email),
+          hashed_phone: hashPhoneBR(body.telefone),
+          raw_gclid: body.gclid || null
+        })
+      }).catch(err => {
+        console.error('[DEDUP] sales-tracking refresh threw:', err.message);
+      });
+    }
+
+    sendDiscord(
+      `🔁 **Submit duplicado bloqueado** (Teams)\n\n` +
+      `**${body.empresa || body.nome}** | ${tamanho} lic | CTA: ${ctaSource}\n` +
+      `${body.email} | ${body.telefone}\n` +
+      `Deal aberto existente: <https://contelegv.pipedrive.com/deal/${existingDealId}>\n` +
+      `Adicionado em: ${dedup.deal.add_time} | Owner: ${VENDORS[dedup.deal.user_id?.value ?? dedup.deal.user_id]?.nome || 'desconhecido'}\n` +
+      `Tracking atualizado no contele-os. Nao criamos pessoa/deal duplicado.`
+    ).catch(() => {});
+
+    console.log(`[LEAD] DEDUP: skipped duplicate for ${body.empresa} (${body.email}) -> existing deal=${existingDealId} person=${dedup.person_id}`);
+    return;
+  }
 
   // 1. Create Person in Pipedrive
   const personRes = await pipedrivePost('persons', {

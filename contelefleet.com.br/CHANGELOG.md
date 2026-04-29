@@ -4,6 +4,16 @@ Registro de mudancas na landing Fleet em codigo proprio.
 
 ---
 
+## 29/04/2026: Dedup Pipedrive-aware no /api/lead + race guard no submit
+
+Mesmo padrao aplicado no Teams (conteleteams.com.br#115). Sintoma identico: `submitBtn.disabled` so era setado depois das validacoes async, double-click no mesmo tick passava 2x na pipeline 1 (Fleet) gerando deals duplicados que vendedor fechava como DUPLICADO depois.
+
+**Frontend (index.html)**: flag `window._formSubmitting` no inicio de `handleFleetForm` antes de qualquer validacao. Lock sincrono.
+
+**Backend (server.js)**: `findExistingFleetDeal(email, phone)` (analogo ao `findExistingTeamsDeal`, pipeline 1 ao inves de 12). Se achar deal aberto < 30d na pipeline Fleet, atualiza tracking via contele-os/sales-tracking, marca sheet `6_duplicado_pipedrive`, posta Discord com link, retorna sem criar pessoa/deal duplicado.
+
+---
+
 ## 29/04/2026: Forward de delete do Pipedrive pro contele-os
 
 **PR**: contele/growth#113

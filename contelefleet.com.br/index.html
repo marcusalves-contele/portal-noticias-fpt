@@ -2407,6 +2407,11 @@ document.addEventListener('click', function(ev){
 
   // ===== FORM SUBMISSION =====
   function handleFleetForm(form) {
+    // Race-free guard: bloqueia re-entry sincrona de double-click
+    // ANTES de qualquer validacao. submitBtn.disabled abaixo so seta depois
+    // das validacoes async, e double-click no mesmo tick passava 2x.
+    if (window._formSubmitting) return;
+
     var veiculosRaw = form.querySelector('[name="veiculos"]').value;
     var qtd = parseInt(veiculosRaw, 10);
     var nome = form.querySelector('[name="nome"]').value.trim();
@@ -2479,6 +2484,9 @@ document.addEventListener('click', function(ev){
     var ga4SessionId = getGA4SessionId();
     var telefoneFormatado = formatPhone(telefone);
 
+    // Lock SINCRONO antes de qualquer fetch. Pega double-click no mesmo tick
+    // que tenha passado por todas as validacoes em paralelo.
+    window._formSubmitting = true;
     var submitBtn = form.querySelector('[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Enviando...';
