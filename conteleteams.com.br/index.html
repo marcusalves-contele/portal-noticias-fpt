@@ -63,7 +63,7 @@
     "description": "Sistema para gestão de equipes externas com monitoramento em tempo real, planejamento de visitas, formulários, checklists, reembolso de KM e controle de jornada.",
     "offers": {
       "@type": "Offer",
-      "price": "59.90",
+      "price": "62.50",
       "priceCurrency": "BRL",
       "priceValidUntil": "2027-12-31",
       "availability": "https://schema.org/InStock"
@@ -109,7 +109,7 @@
         "name": "Qual o preco do Contele Teams?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "A partir de R$59,90 por usuário/mês, com mínimo de 4 usuários (R$239,60/mês)."
+          "text": "A partir de R$62,50 por usuário/mês, com mínimo de 4 usuários (R$250,00/mês)."
         }
       },
       {
@@ -1347,7 +1347,7 @@
 
   <div id="sidebar-small-team-msg" style="display:none; padding: 40px 20px 20px; text-align: center;">
     <h3 style="color:#273896; margin-bottom:16px; font-family: 'Nunito Sans', sans-serif;">O plano mínimo do Contele Teams é de 4 licenças</h3>
-    <p style="color:#666; margin-bottom:12px; line-height:1.6;">O valor é de <strong>R$239,60/mês</strong> (4 licenças x R$59,90 por usuário). Inclui todos os recursos: app iOS/Android, roteirização, check-in GPS, checklists, relatórios e suporte completo.</p>
+    <p style="color:#666; margin-bottom:12px; line-height:1.6;">O valor é de <strong>R$250,00/mês</strong> (4 licenças x R$62,50 por usuário). Inclui todos os recursos: app iOS/Android, roteirização, check-in GPS, checklists, relatórios e suporte completo.</p>
     <p style="color:#666; margin-bottom:20px; line-height:1.6;">Você pode iniciar com o pacote mínimo e ajustar conforme sua equipe crescer.</p>
     <button id="btn-accept-small-team"
             style="display:inline-block; background:#273896; color:#fff; padding:14px 28px; border-radius:8px; border:none; cursor:pointer; font-weight:700; font-size:16px; font-family:'Nunito Sans',sans-serif; width:100%; margin-bottom:12px;">
@@ -1860,14 +1860,20 @@
     <div class="plans-grid">
       <div class="plan-card">
         <h3>De 4 a 40 usuários</h3>
-        <img src="img/preco-4-40-usuarios-contele-teams.svg" alt="Plano 4 a 40 usuários Contele Teams" loading="lazy">
+        <div class="plan-price">
+          <span class="currency">R$</span><span class="value">62</span><span class="cents">,50</span>
+          <span class="period">por usuário/mês</span>
+        </div>
         <div style="margin-top: 24px;">
           <button class="btn btn-primary" onclick="openSidebar('testar')" style="width: 100%; padding: 14px;">Teste Grátis</button>
         </div>
       </div>
       <div class="plan-card">
         <h3>A partir de 41 usuários</h3>
-        <img src="img/preco-mais-de-41-usuarios-contele-teams.svg" alt="Plano 41+ usuários Contele Teams" loading="lazy">
+        <div class="plan-price">
+          <span class="currency">R$</span><span class="value">52</span><span class="cents">,00</span>
+          <span class="period">por usuário/mês</span>
+        </div>
         <div style="margin-top: 24px;">
           <button class="btn btn-primary" onclick="openSidebar('testar')" style="width: 100%; padding: 14px;">Teste Grátis</button>
         </div>
@@ -2204,7 +2210,7 @@
       return;
     }
     if (val < MIN_TEAM_SIZE) {
-      fb.textContent = 'Nosso plano mínimo é de 4 licenças (R$239,60/mês).';
+      fb.textContent = 'Nosso plano mínimo é de 4 licenças (R$250,00/mês).';
       fb.className = 'qtd-feedback warn';
     } else {
       fb.textContent = 'Perfeito! Solicite sua demonstração.';

@@ -4,6 +4,27 @@ Registro de mudancas no server / landings Teams servidos via Express.
 
 ---
 
+## 11/05/2026: Atualizacao de precos prateleira Teams (mai/26)
+
+**Issue**: contele/demandas_para_desenvolvimento#6281
+
+Reajuste oficial dos precos de prateleira do Contele Teams a partir de mai/26:
+- 4 a 40 usuarios: R$59,90 -> **R$62,50** / usuario / mes
+- 41+ usuarios: R$49,90 -> **R$52,00** / usuario / mes
+- Minimo de 4 licencas: R$239,60 -> **R$250,00** / mes (4 x R$62,50)
+
+**Alteracoes em `index.html`**:
+- JSON-LD `Offer.price` 59.90 -> 62.50
+- FAQPage "Qual o preco" atualizado pro novo minimo
+- Cards de plano: trocados os `<img>` SVG (`preco-4-40-usuarios-contele-teams.svg`, `preco-mais-de-41-usuarios-contele-teams.svg`) por markup HTML usando classes ja existentes (`.plan-price .currency/.value/.cents/.period`). Evita regerar SVG e fica consistente com o card Enterprise.
+- Mensagem do sidebar pra equipe < 4 e validacao real-time de qtd: R$239,60 -> R$250,00.
+
+**Tambem atualizado**: `llms.txt` e `llms-full.txt` substituindo nomenclatura legada (Essencial/Profissional) pela faixa real exibida na LP (4-40 / 41+).
+
+**Out of scope** (issue trata so de LP): atualizacao no fluxo de contratacao e integracao Vindi vive na issue irma #6251 (ja fechada).
+
+---
+
 ## 29/04/2026: Dedup Pipedrive-aware no /api/lead + race guard no submit
 
 **Sintoma**: planilha de leads tinha 2 linhas com mesmo `nome | email | telefone | empresa` e timestamp identico (caso Lucas / MP do Brasil 26/04 09:01:26). Casos similares com janela maior (Rogerio Siqueira 23/04 + 29/04) viravam deals duplicados na pipeline 12 que Daniel fechava como DUPLICADO toda semana.

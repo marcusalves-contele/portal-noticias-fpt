@@ -52,7 +52,7 @@ API Rest documentada e webhooks para integração com ERPs, CRMs e outras ferram
 
 ## Planos e Preços (2026)
 
-### Essencial: R$59,90/usuário/mês
+### De 4 a 40 usuários: R$62,50/usuário/mês
 - Mínimo 4 usuários
 - Todos os recursos inclusos
 - App iOS e Android
@@ -60,13 +60,12 @@ API Rest documentada e webhooks para integração com ERPs, CRMs e outras ferram
 - Implantação gratuita (com compromisso de 30 dias)
 - Treinamento com certificação
 
-### Profissional: R$64,90/usuário/mês
-- A partir de 10 usuários
-- Tudo do Essencial
-- Dashboards ilimitados (Looker Studio)
+### A partir de 41 usuários: R$52,00/usuário/mês
+- Desconto por volume aplicado automaticamente
+- Tudo do plano de 4 a 40
+- Dashboards (Looker Studio)
 - Atendimento prioritário
 - Acesso ao time de integração e automações
-- Consultoria de implantação dedicada
 
 ### Enterprise: R$99,90/usuário/mês
 - SSO (Microsoft + Google)

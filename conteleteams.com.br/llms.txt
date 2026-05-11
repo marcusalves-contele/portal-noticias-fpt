@@ -21,8 +21,8 @@ Contele Teams é um SaaS brasileiro para gestão de equipes externas (vendas, t�
 
 ## Planos
 
-- Essencial: R$59,90/usuário/mês (mínimo 4 usuários)
-- Profissional: R$64,90/usuário/mês (10+ usuários, dashboards ilimitados, time de integração)
+- De 4 a 40 usuários: R$62,50/usuário/mês
+- A partir de 41 usuários: R$52,00/usuário/mês
 - Enterprise: R$99,90/usuário/mês (SSO Microsoft/Google, SCIM 2.0, SLA 99,5%)
 
 ## Empresa
