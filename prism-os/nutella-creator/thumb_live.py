@@ -473,8 +473,8 @@ REGRAS:
         "generationConfig": {
             "temperature": 0.5,
             "maxOutputTokens": 8000,
+            "thinkingConfig": {"thinkingBudget": -1},
         },
-        "thinkingConfig": {"type": "adaptive"},
     }
     headers = {"x-goog-api-key": api_key, "Content-Type": "application/json"}
 

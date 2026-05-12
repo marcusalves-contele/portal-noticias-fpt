@@ -4,6 +4,26 @@ Registro de mudancas no Prism OS.
 
 ---
 
+## 12/05/2026: Fix upload de audio no briefing da Estrategia de Live (closes #116)
+
+Reportado pela Rarissa: ao subir o audio no fluxo de Estrategia de Live, a API
+retornava `Invalid JSON payload received. Unknown name "thinkingConfig":
+Cannot find field.` e o briefing nao gerava.
+
+Causa: em `nutella-creator/thumb_live.py:466` (funcao `generate_live_strategy`)
+o campo `thinkingConfig` estava no nivel raiz do payload da Gemini API, mas a
+spec exige que ele fique dentro de `generationConfig`. Alem disso, o valor
+`{"type": "adaptive"}` nao corresponde a nenhum campo valido do schema de
+`thinkingConfig`. Trocado por `{"thinkingBudget": -1}`, que e a forma oficial
+de habilitar raciocinio dinamico (modelo decide quanto pensar). Mantido o
+modelo `gemini-3-pro-preview` que continua exigindo raciocinio para a
+estrategia.
+
+A outra ocorrencia do campo (linha 857, `auto_briefing_from_transcript`) ja
+estava correta dentro de `generationConfig` e nao precisou de mudanca.
+
+---
+
 ## 29/04/2026: Cortes Nutella + Studio thumb sem leak (3 PRs)
 
 PRs #109 + #110 + #111 mergeados em master. Auto-deploy Railway prism-os.
