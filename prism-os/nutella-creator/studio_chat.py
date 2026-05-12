@@ -27,6 +27,38 @@ API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 TIMEOUT = 180
 TIMEOUT_PRO = 240  # plan mode pode levar mais
 
+# Aspect ratios suportados pela Gemini Image API (imageConfig.aspectRatio).
+# Aliases pt-BR/EN mapeados pro canonical, pra Rarissa poder escrever
+# "vertical", "shorts", "quadrado" no chat sem precisar saber a sintaxe.
+DEFAULT_ASPECT_RATIO = "16:9"
+_SUPPORTED_ASPECT_RATIOS = {"1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3", "21:9"}
+_ASPECT_RATIO_ALIASES = {
+    "16:9": "16:9", "16x9": "16:9", "landscape": "16:9", "horizontal": "16:9",
+    "widescreen": "16:9", "youtube": "16:9", "thumbnail": "16:9", "thumb": "16:9",
+    "9:16": "9:16", "9x16": "9:16", "vertical": "9:16", "portrait": "9:16",
+    "shorts": "9:16", "short": "9:16", "reels": "9:16", "reel": "9:16",
+    "tiktok": "9:16", "story": "9:16", "stories": "9:16",
+    "1:1": "1:1", "1x1": "1:1", "quadrado": "1:1", "square": "1:1",
+    "instagram": "1:1", "feed": "1:1", "post": "1:1",
+    "4:3": "4:3", "4x3": "4:3",
+    "3:4": "3:4", "3x4": "3:4",
+    "3:2": "3:2", "3x2": "3:2",
+    "2:3": "2:3", "2x3": "2:3",
+    "21:9": "21:9", "21x9": "21:9", "ultrawide": "21:9", "cinema": "21:9",
+}
+
+
+def _normalize_aspect_ratio(value) -> str:
+    """Normaliza valor vindo da intent pra um ratio suportado pela API.
+    Retorna DEFAULT_ASPECT_RATIO se for None, vazio ou nao reconhecido.
+    """
+    if not value or not isinstance(value, str):
+        return DEFAULT_ASPECT_RATIO
+    key = value.strip().lower().replace(" ", "")
+    if key in _SUPPORTED_ASPECT_RATIOS:
+        return key
+    return _ASPECT_RATIO_ALIASES.get(key, DEFAULT_ASPECT_RATIO)
+
 # In-memory session storage
 _sessions: dict[str, list[dict]] = {}
 
@@ -195,6 +227,7 @@ Return ONLY valid JSON with these fields:
   "background_desc": "background description" or null,
   "live_number": "323" or null,
   "edit_feedback": "what to change" or null,
+  "aspect_ratio": "16:9" | "9:16" | "1:1" | "4:3" | "3:4" | "3:2" | "2:3" | "21:9" | null,
   "summary": "1-line Portuguese summary of what was understood",
   "mode": "thumbnail" | "research" | "script" | "strategy" | "question" | "plan",
   "plan_topic": "topic of the live/video being planned" or null,
@@ -210,6 +243,20 @@ Rules:
 - title_text should be the text the user wants ON the thumbnail
 - edit_feedback captures what to change from the previous generation
 - summary should be in Portuguese, concise
+
+Aspect ratio extraction (aspect_ratio field):
+- ONLY fill if the user explicitly requests a proportion/orientation; otherwise null
+- Map common variants to canonical form:
+  - "16:9", "horizontal", "landscape", "youtube", "widescreen" -> "16:9"
+  - "9:16", "vertical", "portrait", "shorts", "short", "reels", "tiktok", "story", "stories" -> "9:16"
+  - "1:1", "quadrado", "square", "instagram", "feed", "post" -> "1:1"
+  - "4:3", "3:4", "3:2", "2:3", "21:9", "ultrawide", "cinema" -> own canonical
+- Examples:
+  - "gera um short do Julio" -> aspect_ratio: "9:16"
+  - "thumb vertical pra reels" -> aspect_ratio: "9:16"
+  - "imagem quadrada pro instagram" -> aspect_ratio: "1:1"
+  - "thumbnail do Julio sobre multas" -> aspect_ratio: null (deixa default)
+  - "muda pra vertical" (em edit) -> aspect_ratio: "9:16"
 
 Mode detection rules:
 - "thumbnail": user wants to generate or edit a YouTube thumbnail image
@@ -279,6 +326,7 @@ def _build_prompt(intent: dict) -> str:
     background = intent.get("background_desc", "dark cinematic background with warm orange accent lighting")
     live_num = intent.get("live_number", "")
     guest = intent.get("guest_name")
+    aspect_ratio = _normalize_aspect_ratio(intent.get("aspect_ratio"))
 
     host_desc = {
         "fleet": (
@@ -295,7 +343,35 @@ def _build_prompt(intent: dict) -> str:
         ),
     }.get(channel, "")
 
-    brand_context = """BRAND SPECS (FOLLOW EXACTLY):
+    # Composicao muda conforme orientacao. 16:9 mantem layout horizontal
+    # (host na direita, texto na esquerda). Vertical/quadrado precisam de
+    # layout empilhado (texto em cima, host abaixo) pra nao cortar rosto.
+    if aspect_ratio == "9:16" or aspect_ratio.endswith(":4") or aspect_ratio == "2:3":
+        composition_block = (
+            "- Host CENTERED, head and shoulders visible, facing camera\n"
+            "- Text block on TOP, large white bold with black drop shadow (line 1)\n"
+            "- Secondary text in red/orange bold below (line 2, if any)\n"
+            "- Live number badge (if any): top-left corner, red rounded pill\n"
+            "- Guest (if any): bottom of frame, smaller than host\n"
+        )
+    elif aspect_ratio == "1:1":
+        composition_block = (
+            "- Host CENTERED, head and shoulders visible, facing camera\n"
+            "- Text overlay BOTTOM half, large white bold with black drop shadow (line 1)\n"
+            "- Secondary text in red/orange bold below (line 2, if any)\n"
+            "- Live number badge (if any): top-left corner, red rounded pill\n"
+            "- Guest (if any): beside host, slightly smaller\n"
+        )
+    else:
+        composition_block = (
+            "- Host on the RIGHT side, waist up, facing slightly left toward camera\n"
+            "- Text block on the LEFT, large white bold with black drop shadow (line 1)\n"
+            "- Secondary text in red/orange bold (line 2, if any)\n"
+            "- Live number badge (if any): top-left corner, red rounded pill\n"
+            "- Guest (if any): LEFT side, slightly smaller than host\n"
+        )
+
+    brand_context = f"""BRAND SPECS (FOLLOW EXACTLY):
 - Primary purple: #8B23E5 | Deep purple: #4E0091 | Light purple: #6C12B9
 - NEVER use #7C3AED, #6D28D9 or any other Tailwind purple — ONLY #8B23E5 family
 - Typography: Montserrat ONLY (no Comic Sans, no decorative fonts)
@@ -310,16 +386,11 @@ ABSOLUTE RULES (NEVER VIOLATE):
 - NEVER paraphrase or alter the requested text. Reproduce EXACTLY as written.
 
 COMPOSITION:
-- Host on the RIGHT side, waist up, facing slightly left toward camera
-- Text block on the LEFT, large white bold with black drop shadow (line 1)
-- Secondary text in red/orange bold (line 2, if any)
-- Live number badge (if any): top-left corner, red rounded pill
-- Guest (if any): LEFT side, slightly smaller than host
-- Aspect ratio: ALWAYS 16:9
+{composition_block}- Aspect ratio: {aspect_ratio}
 - Cinematic warm orange accent lighting from the side
 """
 
-    prompt = f"{brand_context}\n\nYouTube thumbnail, 16:9 aspect ratio.\n\n"
+    prompt = f"{brand_context}\n\nYouTube thumbnail, {aspect_ratio} aspect ratio.\n\n"
     prompt += f"REFERENCE IMAGES: Face references for {host_name}. Match this person exactly.\n\n"
     prompt += f"{host_desc}\nExpression: {expression}\n\n"
     prompt += f"SCENE: {host_name} on the RIGHT side, waist up. {background}.\n\n"
@@ -342,7 +413,13 @@ COMPOSITION:
     return prompt
 
 
-def _generate_image(api_key: str, prompt: str, refs: list[Path], output_name: str) -> Path | None:
+def _generate_image(
+    api_key: str,
+    prompt: str,
+    refs: list[Path],
+    output_name: str,
+    aspect_ratio: str = DEFAULT_ASPECT_RATIO,
+) -> Path | None:
     """Generate a thumbnail image using Gemini Pro."""
     from thumb_live import image_to_part
 
@@ -353,7 +430,7 @@ def _generate_image(api_key: str, prompt: str, refs: list[Path], output_name: st
         "contents": [{"parts": parts}],
         "generationConfig": {
             "responseModalities": ["IMAGE"],
-            "imageConfig": {"aspectRatio": "16:9"},
+            "imageConfig": {"aspectRatio": aspect_ratio},
             "temperature": 0.6,
         },
     }
@@ -380,7 +457,14 @@ def _generate_image(api_key: str, prompt: str, refs: list[Path], output_name: st
         return None
 
 
-def _edit_image(api_key: str, base_image: Path, prompt: str, refs: list[Path], output_name: str) -> Path | None:
+def _edit_image(
+    api_key: str,
+    base_image: Path,
+    prompt: str,
+    refs: list[Path],
+    output_name: str,
+    aspect_ratio: str = DEFAULT_ASPECT_RATIO,
+) -> Path | None:
     """
     Edit an existing thumbnail using Gemini 3.1 Flash Image (Nano Banana 2).
 
@@ -427,8 +511,8 @@ def _edit_image(api_key: str, base_image: Path, prompt: str, refs: list[Path], o
         "generationConfig": {
             "responseModalities": ["TEXT", "IMAGE"],  # per doc oficial
             "imageConfig": {
-                "aspectRatio": "16:9",  # trava composicao 16:9 (era livre)
-                "imageSize": "2K",       # nitidez (default era 1K)
+                "aspectRatio": aspect_ratio,  # trava composicao (default 16:9, configuravel via intent)
+                "imageSize": "2K",            # nitidez (default era 1K)
             },
             "temperature": 0.4,  # baixa pra preservar composicao original
         },
@@ -593,6 +677,20 @@ def run_pipeline(message: str, image_b64: str | None = None, session_id: str = "
     ts = datetime.now().strftime("%Y%m%d-%H%M%S")
     output_name = f"studio_{session_id}_{ts}.png"
 
+    # Aspect ratio: explicito na intent vence; senao mantem o ultimo usado na
+    # sessao (pra edit/regeneracao preservar orientacao); senao default 16:9.
+    raw_ratio = intent.get("aspect_ratio")
+    if raw_ratio:
+        aspect_ratio = _normalize_aspect_ratio(raw_ratio)
+    else:
+        last_ratio = next(
+            (m.get("aspect_ratio") for m in reversed(history) if m.get("aspect_ratio")),
+            None,
+        )
+        aspect_ratio = _normalize_aspect_ratio(last_ratio) if last_ratio else DEFAULT_ASPECT_RATIO
+    intent["aspect_ratio"] = aspect_ratio
+    emit("aspect", f"Proporcao: {aspect_ratio}")
+
     if action == "edit":
         # Find last generated image
         if not base_image_path:
@@ -611,23 +709,32 @@ def run_pipeline(message: str, image_b64: str | None = None, session_id: str = "
             f"TASK: Edit this image based on feedback.\n"
             f"Image 1 is the current thumbnail to modify.\n"
             f"CHANGES REQUESTED: {feedback}\n"
+            f"Target aspect ratio: {aspect_ratio}.\n"
             f"Keep everything else the same. Only apply the requested changes."
         )
         emit("generate", "Editando imagem...", "Nano Banana 2")
-        result_path = _edit_image(api_key, base_image_path, edit_prompt, refs[:2], output_name)
+        result_path = _edit_image(
+            api_key, base_image_path, edit_prompt, refs[:2], output_name, aspect_ratio=aspect_ratio,
+        )
     else:
         emit("prompt", "Montando prompt...")
         prompt = _build_prompt(intent)
         emit("generate", "Gerando thumbnail...", "Gemini Pro")
-        result_path = _generate_image(api_key, prompt, refs, output_name)
+        result_path = _generate_image(api_key, prompt, refs, output_name, aspect_ratio=aspect_ratio)
 
     if result_path:
         image_url = f"/output/{result_path.name}"
         # Issue #101: nao ecoamos `summary` da intent pra evitar vazar prompt
         # interno do Julio na mensagem visivel. Frase generica + thumb anexa.
         text = "Imagem ajustada." if action == "edit" else "Imagem gerada."
-        history.append({"role": "assistant", "text": text, "image_path": str(result_path), "ts": time.time()})
-        return {"text": text, "image_url": image_url, "mode": mode}
+        history.append({
+            "role": "assistant",
+            "text": text,
+            "image_path": str(result_path),
+            "aspect_ratio": aspect_ratio,
+            "ts": time.time(),
+        })
+        return {"text": text, "image_url": image_url, "mode": mode, "aspect_ratio": aspect_ratio}
     else:
         # Issue #101: msg sanitizada, sem echo de summary/intent.
         if action == "edit":

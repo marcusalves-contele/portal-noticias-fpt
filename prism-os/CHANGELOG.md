@@ -24,6 +24,24 @@ estava correta dentro de `generationConfig` e nao precisou de mudanca.
 
 ---
 
+## 12/05/2026: Studio respeita proporcao pedida no chat (closes #118)
+
+**PR**: contele/growth#TBD
+
+Rarissa reportou que imagens no Studio saiam sempre em 16:9 mesmo quando ela pedia outra proporcao no chat. Causa raiz: aspect ratio estava hardcoded em 3 pontos do `nutella-creator/studio_chat.py` (prompt textual + `imageConfig.aspectRatio` no generate e no edit), e o parser de intent (`parse_intent`) nem extraia esse campo da mensagem.
+
+**O que mudou:**
+- `parse_intent` agora extrai `aspect_ratio` (com aliases pt-BR/EN: vertical/shorts/reels -> 9:16, quadrado/instagram/feed -> 1:1, etc).
+- `_normalize_aspect_ratio` mapeia tudo pros 8 ratios suportados pela Gemini Image API (1:1, 16:9, 9:16, 4:3, 3:4, 3:2, 2:3, 21:9), com fallback 16:9 quando nada bate.
+- `_build_prompt` adapta o bloco de composicao por orientacao: 16:9 (host direita + texto esquerda), 9:16/vertical (host central + texto topo), 1:1 (host central + texto bottom).
+- `_generate_image` e `_edit_image` aceitam `aspect_ratio` e passam pra `imageConfig.aspectRatio` da API.
+- Edit/regeneracao herda o ultimo ratio da sessao quando o usuario nao especifica de novo (nao quebra fluxo "ajusta isso aqui").
+- Default permanece 16:9 — fluxo de thumbnail YouTube nao muda.
+
+**Como testar:** mandar "gera um short vertical do Julio sobre multas" ou "thumb quadrada pro instagram" no Studio. Imagem sai na proporcao pedida.
+
+---
+
 ## 29/04/2026: Cortes Nutella + Studio thumb sem leak (3 PRs)
 
 PRs #109 + #110 + #111 mergeados em master. Auto-deploy Railway prism-os.
