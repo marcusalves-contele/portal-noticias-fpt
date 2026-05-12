@@ -51,6 +51,7 @@ jobs:
             ## Sua missao
             1. **Investigar** o codigo afetado (provavelmente em `prism-os/`). Leia AGENTS.md e o CLAUDE.md do submodulo relevante antes de mexer.
             2. **Refinar como PO**: descreva no PR o problema real, hipotese de causa, e plano. Se a issue nao fizer sentido tecnico ou estiver mal especificada, abra PR draft com analise e recomende fechar/refinar (nao implemente as cegas).
+            2b. **Early-exit em 15 turns sem causa raiz unica**: se apos ~15 turns voce ainda tem mais de uma hipotese plausivel e nao consegue decidir sem mais info (estado real do banco, exemplo concreto do reporter, screenshot), PARE. Abra PR draft com `[needs-refinement]` no titulo contendo: as hipoteses identificadas, qual info falta, e pergunta especifica pro reporter. Aplique label `needs-refinement`. NAO especule fix. Melhor PR de diagnostico em 15 turns do que estourar 40 sem chegar a lugar nenhum.
             3. **Implementar** a correcao. Pequeno escopo. Nao refatore alem do necessario.
             4. **Testar** localmente o que conseguir (sintaxe Python, import check). Nao tem suite formal de testes.
             5. **Abrir PR draft** contra `master` com:

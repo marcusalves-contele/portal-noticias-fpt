@@ -98,6 +98,17 @@ Closes #<numero>
 <o que pode quebrar / o que nao foi alterado mas e adjacente>
 ```
 
+## Early-exit em causa raiz ambigua
+
+Se em ~15 turns de investigacao voce ainda tem mais de uma hipotese plausivel e a decisao entre elas depende de info que voce nao tem (filename real, estado do banco, screenshot da tela do reporter, qual fluxo o usuario seguiu), PARE de investigar.
+
+Abra PR draft com prefixo `[needs-refinement]` no titulo + label `needs-refinement`. Body deve listar:
+- As 2-3 hipoteses identificadas com codigo apontando linha exata
+- Qual info especifica falta pra decidir
+- Pergunta direta pro reporter (em pt-BR)
+
+Issues ambiguas estouram max-turns sem produzir nada util. PR de diagnostico curto e mais valioso que 40 turns especulando.
+
 ## Cenarios de bloqueio (escalar pro Marco)
 
 Pare a execucao e pinge `@MarcoFassa` em comentario se:
