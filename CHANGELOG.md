@@ -10,6 +10,10 @@ Indice consolidado de mudancas no monorepo growth. Cada subprojeto mantem seu pr
 | **Contele Teams** | [`conteleteams.com.br/CHANGELOG.md`](conteleteams.com.br/CHANGELOG.md) | Server Teams, tracking GA4/Ads, integracao Pipedrive |
 | **PRISM OS** | [`prism-os/CHANGELOG.md`](prism-os/CHANGELOG.md) | Producao de conteudo: Nutella Creator, Thumbnail AI Creator |
 
+## 2026-05-12
+
+- feat(automation): pipeline autonomo Claude end-to-end (PR #123). Label `auto-implement` em issue dispara: investigacao, plano, implementacao, PR draft -> review automatico -> notify pos-merge. Workflows em `.github/workflows/auto-*.yml`. Auth via Team subscription (OAuth, sem API key). Detalhes em [`AGENTS.md`](AGENTS.md).
+
 ## Subprojetos sem CHANGELOG ainda
 
 Quando voce mexer num desses, **crie o CHANGELOG.md da pasta** (mesmo formato dos outros) e adicione um link aqui. Ver regra no [`CLAUDE.md`](CLAUDE.md) deste repo.
