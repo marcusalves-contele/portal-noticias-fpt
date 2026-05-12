@@ -29,7 +29,7 @@ Fluxo:
 
 ### Seguranca
 - NUNCA exponha secrets em logs, codigo, ou commits.
-- NUNCA toque em `.github/workflows/` (esses arquivos so o Marco autoriza alteracao).
+- NUNCA toque em `.github/workflows/` quando rodando como pipeline autonomo (label `auto-implement`). Em sessao interativa Marco+Claude essa regra nao se aplica.
 - NUNCA mexa em `.env` ou arquivos com credenciais.
 - Se precisar de variavel de ambiente nova, documente no PR e adicione em `.env.example` (nao commit `.env`).
 

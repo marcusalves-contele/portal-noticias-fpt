@@ -2,7 +2,7 @@ name: Auto-Review PR
 
 on:
   pull_request:
-    types: [opened, ready_for_review, synchronize]
+    types: [opened, ready_for_review, synchronize, labeled]
     branches: [master]
 
 permissions:
