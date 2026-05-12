@@ -1,0 +1,61 @@
+name: Auto-Review PR
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, synchronize]
+    branches: [master]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    # so revisa PRs com label auto-implement (gerados pelo pipeline) ou explicitamente solicitados
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'auto-implement') ||
+      contains(github.event.pull_request.labels.*.name, 'auto-review')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Review PR
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --model claude-opus-4-7
+            --max-turns 15
+          prompt: |
+            Voce e um code reviewer senior revisando o PR #${{ github.event.pull_request.number }}.
+
+            **Titulo**: ${{ github.event.pull_request.title }}
+            **Branch**: ${{ github.event.pull_request.head.ref }}
+            **Autor**: ${{ github.event.pull_request.user.login }}
+
+            ## Sua missao
+            1. Leia o diff completo (`gh pr diff ${{ github.event.pull_request.number }}`).
+            2. Leia AGENTS.md e CLAUDE.md relevantes.
+            3. Avalie:
+               - **Correcao**: o codigo resolve o problema da issue?
+               - **Escopo**: mudanca esta contida no minimo necessario?
+               - **Riscos**: regressao em outras partes? side effects?
+               - **Padroes**: segue convencoes do repo? imports, estilo, naming?
+               - **Seguranca**: secrets, injection, validacao input?
+            4. Decida:
+               - **APROVAR**: tirar o PR de draft (`gh pr ready ${{ github.event.pull_request.number }}`), postar review approve com `gh pr review --approve --body "..."`, adicionar label `ready-to-merge`.
+               - **SOLICITAR MUDANCAS**: postar review com `gh pr review --request-changes --body "..."` listando o que precisa mudar. NAO mergeie.
+               - **BLOQUEAR**: se identificou risco grave (perda de dado, bug critico, brecha de seguranca), comentar na issue original cc:@MarcoFassa pedindo revisao humana.
+
+            ## Regras
+            - NAO mergeie. Merge fica pra humano ou pipeline separado.
+            - NAO comente trivialidades ("bom trabalho"). Seja direto: o que esta certo, o que precisa mudar.
+            - Comentarios em portugues, sem emojis, sem travessao (use `:` ou `-`).
+            - Se o PR fizer sentido e for low-risk, APROVE sem fricar. Nao seja teatral.
+
+            Use `gh` CLI pra todas as operacoes no PR.

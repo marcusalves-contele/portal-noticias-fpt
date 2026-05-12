@@ -1,0 +1,69 @@
+name: Auto-Notify Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [master]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: read
+
+jobs:
+  notify:
+    if: |
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.labels.*.name, 'auto-implement')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update changelog and notify
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --model claude-haiku-4-5
+            --max-turns 8
+          prompt: |
+            PR #${{ github.event.pull_request.number }} acabou de ser merged em master.
+
+            **Titulo**: ${{ github.event.pull_request.title }}
+            **Branch**: ${{ github.event.pull_request.head.ref }}
+            **Merge SHA**: ${{ github.event.pull_request.merge_commit_sha }}
+
+            ## Sua missao
+            1. Leia `gh pr view ${{ github.event.pull_request.number }} --json title,body,files,closingIssuesReferences`.
+            2. Identifique qual submodulo foi tocado (`prism-os/nutella-creator/`, `prism-os/thumbnail-ai-creator/`, etc).
+            3. Atualize o CHANGELOG.md do submodulo correspondente: adicione entry em `## [unreleased]` (ou crie a secao) com data de hoje + 1 linha curta. Formato:
+               ```
+               ## YYYY-MM-DD
+               - fix: <descricao curta> (#PR)
+               ```
+            4. Commit direto em master com mensagem `chore(changelog): registra PR #${{ github.event.pull_request.number }}`. Use `git config user.email "noreply@anthropic.com"` e `git config user.name "Claude (auto-notify)"`.
+            5. Push.
+            6. Comente nas issues fechadas pelo PR (closingIssuesReferences) confirmando: "Implementado e mergeado via PR #${{ github.event.pull_request.number }}. Disponivel apos proximo deploy."
+
+            ## Regras
+            - Mensagem curta, sem emojis, sem travessao.
+            - Se CHANGELOG nao existir no submodulo, crie.
+            - Se o PR nao tocou em prism-os/, atualize CHANGELOG.md da raiz.
+            - NAO faca nada alem disso. Sem refactor, sem melhoria.
+
+  zap-marco:
+    needs: notify
+    if: |
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.labels.*.name, 'auto-implement')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Marco
+        run: |
+          echo "PR #${{ github.event.pull_request.number }} merged. Notif local nao disponivel em GH Actions (zap roda local)."
+          # placeholder: implementar webhook ou enviar via API publica se disponivel
