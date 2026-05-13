@@ -627,15 +627,35 @@ app.post('/api/lead', async (req, res) => {
   const ctaSource = body.cta_source || 'consultor';
   console.log(`[LEAD-FLEET] ${body.nome} | ${body.empresa} | ${frota} veiculos | cta=${ctaSource} | gclid=${body.gclid ? 'yes' : 'no'}`);
 
-  // ===== GATEKEEPING: < MIN_VEHICLES =====
-  // Fleet NAO cria deal pra quem tem menos de 4 veiculos. Grava planilha e
-  // RETORNA flag pro frontend redirecionar pra /obrigado-2/ (pagina de "ops,
-  // nao e pra voce"). Diferente do Teams que sempre respondia { ok: true }.
   const isTest = /teste|test|prova|fake/i.test(body.nome || '') ||
                  /teste|test|fake|@contele\.com/i.test(body.email || '') ||
                  /contele/i.test(body.empresa || '');
 
-  if (!isTest && frota < MIN_VEHICLES) {
+  // ===== DETECCAO DE CAMPAIGN-REPLY (vem ANTES do gatekeeping) =====
+  // Quando o caller eh o webhook campaign-reply do contele-os (WABA), ele
+  // precisa do `pipedrive_deal_id` na resposta pra popular custom_attributes
+  // no contact Chatwoot. Pra esse caller, RESPONDEMOS SYNC apos processLead
+  // terminar. Pra forms do site (consultor/testar/etc), seguimos async como
+  // antes pra nao bloquear o redirect /obrigado/.
+  //
+  // Identificacao por cta_source comecar com "campanha-" ou flag explicita
+  // body.from_campaign === true. Issue contele-os#557 + master TODO 13/05.
+  //
+  // BYPASS GATEKEEPING: leads de campanha-reply WABA podem chegar com
+  // tamanho_frota=4 (default do enrich Math.max(licenses, vehicles, 4) no
+  // contele-os PR #542). Mesmo que algum caso edge venha com frota=0,
+  // o caller espera o deal_id no response e o lead JA passou pelo CTA "EU
+  // QUERO" — eh um lead qualificado por intent, nao por frota. Gatekeeping
+  // de tamanho_frota se aplica a forms do site, nao a campanha.
+  const isFromCampaign =
+    body.from_campaign === true ||
+    /^campanha-/i.test(ctaSource);
+
+  // ===== GATEKEEPING: < MIN_VEHICLES (so pra forms do site) =====
+  // Fleet NAO cria deal pra quem tem menos de 4 veiculos via form. Grava
+  // planilha e RETORNA flag pro frontend redirecionar pra /obrigado-2/.
+  // Diferente do Teams que sempre respondia { ok: true }.
+  if (!isFromCampaign && !isTest && frota < MIN_VEHICLES) {
     // Resposta sincrona com flag de redirect, depois grava sheet em background
     res.json({ ok: true, redirect: '/obrigado-2/', reason: 'below_min_vehicles' });
 
@@ -645,6 +665,28 @@ app.post('/api/lead', async (req, res) => {
     appendSheet(sheetData).catch(err => console.error('[LEAD-FLEET] Sheet inadequado error:', err.message));
     console.log(`[LEAD-FLEET] Inadequado: ${body.nome} (${frota} veic) -> sheet only, redirect /obrigado-2/`);
     return;
+  }
+
+  if (isFromCampaign) {
+    try {
+      const result = await processLead(body, frota, ctaSource, isTest);
+      return res.json({
+        ok: true,
+        redirect: '/obrigado/',
+        pipedrive_deal_id: result?.pipedrive_deal_id ?? null,
+        vendor: result?.vendor ?? null,
+        status: result?.status ?? 'processed',
+      });
+    } catch (err) {
+      console.error('[LEAD-FLEET] Handler crashed (campaign path):', err);
+      await sendDiscordCritical(
+        `🚨 **LEAD FLEET HANDLER CRASHED (campaign)**\n` +
+        `Lead: ${body?.nome || '?'} | ${body?.empresa || '?'} | ${body?.telefone || '?'} | ${body?.email || '?'}\n` +
+        `Veiculos: ${frota} | CTA: ${ctaSource}\n` +
+        `Erro: ${err.message}\n\`\`\`${(err.stack || '').slice(0, 400)}\`\`\``
+      ).catch(() => {});
+      return res.status(500).json({ ok: false, error: err.message });
+    }
   }
 
   // Quick response to frontend (lead valido, processa em background)
@@ -672,7 +714,7 @@ async function processLead(body, frota, ctaSource, isTest) {
     const sheetData = buildSheetDataFleet(body, frota, '3-temp-can-delete-teste', '', '', infoText);
     await appendSheet(sheetData);
     console.log(`[LEAD-FLEET] TEST FILTERED: ${body.nome} -> sheet only`);
-    return;
+    return { status: 'test_filtered', pipedrive_deal_id: null, vendor: null };
   }
 
   // ===== LEAD QUALIFICADO (>= MIN_VEHICLES) =====
@@ -734,7 +776,7 @@ async function processLead(body, frota, ctaSource, isTest) {
     ).catch(() => {});
 
     console.log(`[LEAD-FLEET] DEDUP: skipped duplicate for ${body.empresa} (${body.email}) -> existing deal=${existingDealId} person=${dedup.person_id}`);
-    return;
+    return { status: 'dedup_existing', pipedrive_deal_id: existingDealId, vendor: ownerName };
   }
 
   // 1. Create Person in Pipedrive
@@ -755,7 +797,7 @@ async function processLead(body, frota, ctaSource, isTest) {
       `Status: ${personRes.status} | Erro: ${JSON.stringify(personRes.error).slice(0, 200)}`
     ).catch(() => {});
     console.error(`[LEAD-FLEET] ABORT: person creation failed for ${body.empresa}`);
-    return;
+    return { status: 'pipedrive_person_failed', pipedrive_deal_id: null, vendor: null };
   }
 
   // 2. Create Deal in Pipedrive (Pipeline 1 Fleet, stage 2 CONTATANDO)
@@ -803,7 +845,7 @@ async function processLead(body, frota, ctaSource, isTest) {
       `Status: ${dealRes.status} | Erro: ${JSON.stringify(dealRes.error).slice(0, 200)}`
     ).catch(() => {});
     console.error(`[LEAD-FLEET] ABORT: deal creation failed for ${body.empresa} (person=${personId})`);
-    return;
+    return { status: 'pipedrive_deal_failed', pipedrive_deal_id: null, vendor: vendor.nome };
   }
 
   console.log(`[LEAD-FLEET] Pipedrive: person=${personId} deal=${dealId} vendor=${vendor.nome}`);
@@ -975,6 +1017,10 @@ async function processLead(body, frota, ctaSource, isTest) {
   ).catch(() => {});
 
   console.log(`[LEAD-FLEET] Complete: ${body.empresa} -> deal ${dealId}, vendor ${vendor.nome}`);
+
+  // Retorna pra caller (campaign-reply) usar o pipedrive_deal_id na response.
+  // Forms do site (sync response antes deste processLead) ignoram esse retorno.
+  return { status: 'success', pipedrive_deal_id: dealId, vendor: vendor.nome };
 }
 
 // ===== PIPEDRIVE WEBHOOK: Deal Stage Change =====
