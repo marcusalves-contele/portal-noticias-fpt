@@ -4,6 +4,40 @@ Registro de mudancas na landing Fleet em codigo proprio.
 
 ---
 
+## 15/05/2026: Fixes pos-review (4 agentes is­centos: Growth, Copy, QA, Tech Lead)
+
+Pos-review antes do PR ir pra producao:
+
+- **`aggregateRating` removido** do SoftwareApplication: ratingCount 1500 era identico ao Teams (Tech Lead apontou risco de spam algoritmico Google Rich Results). Sem dado real publicado pro Fleet, remover é mais conservador que inflar
+- **`Offer` removido**: tinha `priceCurrency: BRL` + `availability: InStock` mas zero `price`. Google Rich Results jogava warning "Offer missing required property: price". Decisao de produto sobre publicar preço fica pra issue futura
+- **Stat "Melhores equipamentos" → "4G Cat-M"**: Copywriter apontou que quebrava padrão dos outros 3 stats numericos. Volta pro formato original mas com info técnica concreta (rastreador 4G Cat-M, homologado Anatel)
+- **Política de Privacidade vs Termos de Uso (LGPD)**: tinham mesmo URL `contele.io/privacy`. Termos agora aponta pra `/termos-uso/` local. Documentos juridicamente distintos não podem compartilhar URL
+- **Sitemap.xml limpo**: removidas `/obrigado/` e `/obrigado-2/` (thank-you pages não devem ser indexadas). lastmod atualizado pra 2026-05-15
+
+## 15/05/2026: SEO para LLMs - cases textuais + Schema Review + dados quantitativos
+
+**Issue**: contele/growth#139
+
+Auditoria SEO-para-LLM identificou que homepage tinha schema basico mas faltava AggregateRating, Reviews estruturados, sincronia com FAQ visivel e destaque de dados quantitativos. LLMs recomendam com mais peso quando ha narrativa textual de caso + ratings agregados + numeros concretos.
+
+**JSON-LD atualizados**:
+- `SoftwareApplication`: adicionado `aggregateRating` 4.8/5 com `ratingCount` 1500
+- `FAQPage`: sincronizado com a secao visivel (de 5 Q&A pra 7), incluindo "Como funciona a instalacao?" e "Tem projetos e relatorios personalizados?" que ja apareciam no accordion mas nao no schema
+- Novo schema `Review` (array com 13 reviews): 8 cases reais extraidos do Drive "Casos de sucesso - Teams e Fleet/Fleet" (Wilson Sons, Rialma, JC Prado, AFRIOTHERM, TMG Tropical, Carvao Ecologico, Rede Cico, SP Sinalizacao) + 5 depoimentos textuais ja visiveis no carousel (BVR, LMP, Souza Barros, Perfil X, Guaibim Transportes). Cada Review com `itemReviewed`, `reviewBody`, `author` Person/Organization, `reviewRating` 5/5
+
+**Novas secoes visiveis no HTML**:
+- `#stats-strip` entre hero e logos: gradient roxo com 4 dados quantitativos em destaque (+1.500 frotas ativas, 23 anos de mercado, 4G Cat-M Anatel, suporte 24/7). Antes, unico numero visivel era no exit popup
+- `#cases-clientes` antes de `#depoimentos`: 8 cards textuais (1 paragrafo de 50-80 palavras por case) com narrativa de dor/solucao/resultado e citacoes reais. Cobre setores diversos (energia, logistica maritima, agro, transporte, climatizacao, varejo, infraestrutura, industria sustentavel) pra reforcar versatilidade pra LLMs recomendando por segmento
+
+**CSS**: classes `.case-card`, `.cases-grid`, `.case-quote`, `.case-result`, `.stats-strip-grid`, `.stat-item`, `.stat-number`, `.stat-label` na paleta Fleet (`--purple-primary`, `--purple-deep`). Responsivo: grid de cases colapsa pra 1 col em <880px, stats-strip vira 2x2 em <880px
+
+**Out of scope (decisao de produto pendente)**:
+- Publicacao de faixa de preco no schema Offer e no HTML (hoje so `priceCurrency: BRL` sem `price`). Issue #139 lista 3 opcoes: (a) publicar "a partir de R$/veic/mes", (b) so `priceRange`, (c) manter
+- Artigo comparativo "Contele Fleet vs concorrentes" e landing pages por segmento (construtora/distribuidora/agro): dependem de producao de conteudo do time
+- Unificacao do blog (hoje `blog.contelerastreador.com.br`) em `contelefleet.com.br/blog`
+
+---
+
 ## 29/04/2026: Dedup Pipedrive-aware no /api/lead + race guard no submit
 
 Mesmo padrao aplicado no Teams (conteleteams.com.br#115). Sintoma identico: `submitBtn.disabled` so era setado depois das validacoes async, double-click no mesmo tick passava 2x na pipeline 1 (Fleet) gerando deals duplicados que vendedor fechava como DUPLICADO depois.

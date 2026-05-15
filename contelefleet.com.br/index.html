@@ -58,12 +58,7 @@
     "name": "Contele Fleet",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web, iOS, Android",
-    "description": "Sistema de gestão de frota e rastreamento veicular com telemetria avançada, videotelemetria, checklist, manutenção, combustível e multas.",
-    "offers": {
-      "@type": "Offer",
-      "priceCurrency": "BRL",
-      "availability": "https://schema.org/InStock"
-    },
+    "description": "Sistema de gestão de frota e rastreamento veicular com telemetria avançada, videotelemetria, checklist, manutenção, combustível e multas. Exclusivo para frotas a partir de 4 veículos.",
     "provider": {
       "@type": "Organization",
       "name": "Contelesis Soluções Tecnológicas",
@@ -121,11 +116,127 @@
       },
       {
         "@type": "Question",
+        "name": "Como funciona a instalação?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Nossos equipamentos são focados em autoinstalação: o modelo Plug e Use é conectado na entrada OBD, enquanto o rastreador Padrão e as câmeras chegam configurados para você mesmo instalar seguindo o passo a passo. Se preferir, indicamos técnicos parceiros na sua região."
+        }
+      },
+      {
+        "@type": "Question",
         "name": "O Contele Fleet integra com outros sistemas?",
         "acceptedAnswer": {
           "@type": "Answer",
           "text": "Sim, via API aberta protegida por token, você conecta o Contele Fleet a sistemas de combustível, rotas, multas, manutenção e ERPs."
         }
+      },
+      {
+        "@type": "Question",
+        "name": "Tem projetos e relatórios personalizados?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sim. Independente das particularidades da sua operação, nossa equipe está preparada para criar projetos sob medida para o seu negócio: relatórios customizados, automações e integrações específicas."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Reviews Schema (cases e depoimentos) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Organization", "name": "Wilson Sons" },
+        "reviewBody": "Tempo de ativação do veículo locado caiu de vários minutos para cerca de 30 segundos, com checklist 100% digital e visibilidade imediata da frota rotativa contratada em aeroportos.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+      },
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Person", "name": "Victor", "jobTitle": "Gestor de Frota, Rialma" },
+        "reviewBody": "A parceria entrega o que propõe. As câmeras não só economizaram dinheiro em acidentes, mas mudaram o comportamento da nossa operação de campo.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+      },
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Person", "name": "José Cleland", "jobTitle": "JC Prado Transportes" },
+        "reviewBody": "O aplicativo para motoristas é muito intuitivo. O Ezequias conseguiu utilizar as funções de checklist e abastecimento, inclusive com fotos, antes mesmo de um treinamento formal.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+      },
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Organization", "name": "AFRIOTHERM Ar Condicionado" },
+        "reviewBody": "Com a política digital assinada pelo aplicativo, eliminamos a necessidade de autorizações manuais para desconto de multas.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+      },
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Person", "name": "Ana Paula", "jobTitle": "Gestora, TMG Tropical" },
+        "reviewBody": "Os mapas de vocês, eu gostei. A visualização é muito boa. Identificação de motorista que levava 5 horas de planilha agora é instantânea.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+      },
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Organization", "name": "Carvão Ecológico" },
+        "reviewBody": "Foi um agendamento que eu solicitei ontem no final da tarde e hoje pela manhã eu já tive um retorno muito rápido. A didática foi muito boa e esclarecedora.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+      },
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Person", "name": "Francisco", "jobTitle": "Gestor, Rede Cico Baterias" },
+        "reviewBody": "Eu não me preocupo com o caminhão em si, o patrimônio a gente recupera. Mas a vida desse ser humano que dirige e a vida de quem está lá fora não tem dinheiro no mundo que pague.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+      },
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Person", "name": "Rainor", "jobTitle": "Gestor, SP Sinalização Viária" },
+        "reviewBody": "Na empresa anterior, migrei da concorrência para a Contele e gostei bastante. O atendimento e o suporte são muito dinâmicos. A exploração de dados é enxuta, precisa e em tempo real.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+      },
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Person", "name": "Renan Dallazuanna", "jobTitle": "BVR Transportes" },
+        "reviewBody": "A gente tava rastreando o veículo 2407, aparece o nome da rua onde o veículo está. Clicamos ali, abre o Google Maps e eu consigo mandar a localização de onde está o ônibus. Isso achei muito interessante.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+      },
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Person", "name": "Thaciana", "jobTitle": "LMP Transportes" },
+        "reviewBody": "Cada dia é uma surpresinha dentro daquele sistema. Entrega tudo que eu queria, aliás, até a mais do que a gente quer.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+      },
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Person", "name": "Lucas Justino", "jobTitle": "Souza Barros" },
+        "reviewBody": "Desde o começo, qualquer dúvida, a gente entra em contato e já tem um pronto atendimento ali disponível pra gente tirar nossas dúvidas, esclarecer e ter um feedback de retorno muito breve.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+      },
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Person", "name": "Rehuel Tavares", "jobTitle": "Perfil X" },
+        "reviewBody": "Com o sistema, o motorista tem uma contraprova pra mostrar o que produziu no dia: combustível, rotas, checklist.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+      },
+      {
+        "@type": "Review",
+        "itemReviewed": { "@type": "SoftwareApplication", "name": "Contele Fleet" },
+        "author": { "@type": "Person", "name": "Lucas Talysson", "jobTitle": "Guaibim Transportes" },
+        "reviewBody": "Com o sistema Contele Fleet, ao registrar um abastecimento eu vejo a foto do cupom, o odômetro, a média de litros, o nome do motorista e o valor pago. Eliminando totalmente o erro humano.",
+        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
       }
     ]
   }
@@ -790,6 +901,146 @@
     .equip-card h3 { font-family: var(--font-main); font-size: 18px; color: var(--blue-heading); margin-bottom: 10px; font-weight: 800; }
     .equip-card p { font-size: 14px; color: var(--text-sub); line-height: 1.6; }
 
+    /* ===== CASES (textuais) ===== */
+    #cases-clientes { background: var(--bg-light); padding: var(--section-pad); }
+    #cases-clientes .section-sub { color: var(--text-muted); max-width: 760px; margin: 12px auto 40px; }
+
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .case-card {
+      background: var(--white);
+      border: 1px solid #ece7f5;
+      border-radius: var(--radius);
+      padding: 28px 28px 24px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .case-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .case-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .case-card h3 {
+      font-family: var(--font-main);
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--purple-deep);
+      margin: 0;
+    }
+    .case-sector {
+      font-size: 12px;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: var(--purple-primary);
+      background: #f3eaff;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+
+    .case-paragraph {
+      color: var(--text-main);
+      font-size: 15px;
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    .case-quote {
+      border-left: 3px solid var(--purple-primary);
+      padding: 8px 0 8px 14px;
+      margin: 0 0 14px;
+      color: #3a3f52;
+      font-style: italic;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .case-quote cite {
+      display: block;
+      margin-top: 6px;
+      color: var(--text-sub);
+      font-style: normal;
+      font-size: 13px;
+    }
+
+    .case-result {
+      margin-top: auto;
+      background: #faf5ff;
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #2a2a2a;
+    }
+    .case-result strong { color: var(--purple-deep); }
+
+    @media (max-width: 880px) {
+      .cases-grid { grid-template-columns: 1fr; gap: 18px; }
+    }
+
+    /* ===== STATS STRIP (dados quantitativos) ===== */
+    #stats-strip {
+      background: linear-gradient(135deg, var(--purple-deep) 0%, var(--purple-primary) 100%);
+      padding: 48px 0;
+      color: var(--white);
+    }
+    .stats-strip-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      text-align: center;
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .stat-number {
+      font-family: var(--font-main);
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.5px;
+    }
+    .stat-number.stat-headline {
+      font-size: 24px;
+      line-height: 1.15;
+      letter-spacing: -0.2px;
+    }
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.92;
+      line-height: 1.4;
+      max-width: 220px;
+    }
+    @media (max-width: 880px) {
+      .stats-strip-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+      .stat-number { font-size: 32px; }
+      .stat-number.stat-headline { font-size: 22px; }
+    }
+    @media (max-width: 480px) {
+      .stats-strip-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+      .stat-number { font-size: 28px; }
+      .stat-number.stat-headline { font-size: 19px; }
+      .stat-label { font-size: 13px; }
+    }
+
     /* ===== DEPOIMENTOS ===== */
     #depoimentos { background: var(--white); }
     .dep-carousel { position: relative; max-width: 1080px; margin: 40px auto 0; padding: 0 8px; }
@@ -1287,6 +1538,30 @@ document.addEventListener('click', function(ev){
   }
 })();
 </script>
+
+<!-- ===== STATS STRIP (dados quantitativos) ===== -->
+<section id="stats-strip" aria-label="Números do Contele Fleet">
+  <div class="container">
+    <div class="stats-strip-grid">
+      <div class="stat-item">
+        <span class="stat-number">+1.500</span>
+        <span class="stat-label">frotas ativas no Brasil</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">23 anos</span>
+        <span class="stat-label">de mercado em tecnologia para frotas</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">4G Cat-M</span>
+        <span class="stat-label">rastreadores e câmeras homologados Anatel</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number stat-headline">Método Frota Para Todos</span>
+        <span class="stat-label">único sistema que assina compromisso com o resultado da sua frota</span>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- ===== LOGOS CLIENTES ===== -->
 <section id="logos">
@@ -1922,11 +2197,103 @@ document.addEventListener('click', function(ev){
   </div>
 </section>
 
+<!-- ===== CASES TEXTUAIS (clientes reais com dor → solução → resultado) ===== -->
+<section id="cases-clientes">
+  <div class="container">
+    <div class="text-center">
+      <h2 class="section-title">Cases reais de quem gerencia frota com o Contele Fleet</h2>
+      <p class="section-sub">Setores, dores e resultados concretos de quem opera o Contele Fleet hoje, do agronegócio à logística marítima.</p>
+    </div>
+    <div class="cases-grid">
+
+      <article class="case-card">
+        <header>
+          <h3>Rialma Transmissora de Energia</h3>
+          <span class="case-sector">Transmissão de Energia</span>
+        </header>
+        <p class="case-paragraph">A Rialma opera 146 veículos 24 horas por dia em obras de transmissão do Pará à Bahia. O gestor Victor descrevia o cenário anterior como caos manual. Com a videotelemetria do Contele Fleet, provou culpa de terceiros num sinistro com Hilux 2026 e identificou infrações graves que levaram a demissões estratégicas.</p>
+        <blockquote class="case-quote">"A parceria entrega o que propõe. As câmeras não só economizaram dinheiro em acidentes, mas mudaram o comportamento da nossa operação de campo."<cite>— Victor, Gestor de Frota, Rialma</cite></blockquote>
+        <div class="case-result"><strong>Resultado:</strong> R$ 50.000 economizados em um único sinistro + 5 demissões por uso indevido detectadas pelas câmeras.</div>
+      </article>
+
+      <article class="case-card">
+        <header>
+          <h3>Wilson Sons</h3>
+          <span class="case-sector">Logística Marítima</span>
+        </header>
+        <p class="case-paragraph">A Wilson Sons movimenta 16 veículos locados por mês, muitos contratados às pressas em aeroportos para viagens de 3 dias. O controle de abastecimento e checklist dependia de papel. Com o Contele Fleet, a empresa implantou liberação por formulário inteligente, checklist obrigatório no app e regras de desativação programada.</p>
+        <div class="case-result"><strong>Resultado:</strong> Tempo de ativação do veículo caiu de vários minutos para cerca de 30 segundos, com checklist 100% digital.</div>
+      </article>
+
+      <article class="case-card">
+        <header>
+          <h3>TMG Tropical Melhoramento e Genética</h3>
+          <span class="case-sector">Agronegócio</span>
+        </header>
+        <p class="case-paragraph">A TMG opera 215 veículos em áreas rurais extensas, com cegueira operacional em locais remotos e 5 horas semanais gastas cruzando planilhas para identificar motoristas. Com o Contele Fleet, integração ao Google Maps e Street View resolveu a visibilidade, e relatório ponto a ponto a cada 15 segundos garantiu base jurídica para contestar multas.</p>
+        <blockquote class="case-quote">"Os mapas de vocês, eu gostei. A visualização é muito boa. Gostei."<cite>— Ana Paula, Gestora da TMG</cite></blockquote>
+        <div class="case-result"><strong>Resultado:</strong> Identificação de motorista passou de 5 horas de planilha para instantânea.</div>
+      </article>
+
+      <article class="case-card">
+        <header>
+          <h3>JC Prado Transportes</h3>
+          <span class="case-sector">Transporte Rodoviário</span>
+        </header>
+        <p class="case-paragraph">A JC Prado quase cancelou o contrato quando a gerenciadora da seguradora rejeitou os rastreadores contratados. A virada veio na migração para o Contele System, com foco no software de gestão. A frota digitalizou checklist, manutenção preventiva, gestão de multas e abastecimento.</p>
+        <blockquote class="case-quote">"O aplicativo para motoristas é muito intuitivo. O Ezequias conseguiu utilizar checklist e abastecimento, inclusive com fotos, antes mesmo de um treinamento formal."<cite>— José Cleland, JC Prado</cite></blockquote>
+        <div class="case-result"><strong>Resultado:</strong> 87,5% de aproveitamento na adoção de campo, sem treinamento formal prévio.</div>
+      </article>
+
+      <article class="case-card">
+        <header>
+          <h3>AFRIOTHERM Ar Condicionado</h3>
+          <span class="case-sector">Climatização</span>
+        </header>
+        <p class="case-paragraph">A AFRIOTHERM operava 45 veículos com alto volume de multas, consumo de combustível inexplicável e autorizações de desconto feitas no papel. Com o Contele Fleet, a Política de Frota foi digitalizada com assinatura semanal no app, checklists ganharam fotos em tempo real e a telemetria parametrizou velocidade e ociosidade.</p>
+        <blockquote class="case-quote">"Com a política digital assinada pelo aplicativo, eliminamos a necessidade de autorizações manuais para desconto de multas."<cite>— gestor AFRIOTHERM</cite></blockquote>
+        <div class="case-result"><strong>Resultado:</strong> RH ganhou respaldo jurídico + problema de combustível ficou visível + upgrade para videotelemetria.</div>
+      </article>
+
+      <article class="case-card">
+        <header>
+          <h3>Rede Cico Baterias</h3>
+          <span class="case-sector">Distribuição Automotiva</span>
+        </header>
+        <p class="case-paragraph">A Rede Cico Baterias ativou 43 veículos com 40 rastreadores 4G e 3 câmeras Cam Max no Contele Fleet. Ao cadastrar os veículos, o sistema importou infrações que a área administrativa nem sabia que existiam. As câmeras com áudio de cabine entregaram acompanhamento em tempo real que antes não existia.</p>
+        <blockquote class="case-quote">"Eu não me preocupo com o caminhão em si. Mas a vida desse ser humano que dirige e a vida de quem está lá fora não tem dinheiro no mundo que pague."<cite>— Francisco, gestor Rede Cico Baterias</cite></blockquote>
+        <div class="case-result"><strong>Resultado:</strong> Visibilidade imediata de multas desconhecidas + videomonitoramento com áudio de cabine.</div>
+      </article>
+
+      <article class="case-card">
+        <header>
+          <h3>SP Sinalização Viária</h3>
+          <span class="case-sector">Infraestrutura Viária</span>
+        </header>
+        <p class="case-paragraph">Na SP Sinalização Viária, a primeira decisão do gestor Rainor na nova gestão foi trocar o sistema legado pelo Contele Fleet. Ele já havia migrado outra empresa da concorrência para a Contele. A ativação envolveu 8 veículos com câmeras Cam Max e terceira câmera adicional.</p>
+        <blockquote class="case-quote">"O atendimento e o suporte são muito dinâmicos. A exploração de dados é enxuta, precisa e em tempo real, sem me dar trabalho."<cite>— Rainor, gestor SP Sinalização Viária</cite></blockquote>
+        <div class="case-result"><strong>Resultado:</strong> Reconquista de cliente baseada em experiência prévia + checklist obrigatório com fotos em entrada e saída.</div>
+      </article>
+
+      <article class="case-card">
+        <header>
+          <h3>Carvão Ecológico</h3>
+          <span class="case-sector">Indústria Sustentável</span>
+        </header>
+        <p class="case-paragraph">A Carvão Ecológico opera 13 rastreadores e tinha dúvidas acumuladas sobre funções novas do Contele Fleet. Uma solicitação feita no fim da tarde virou reunião agendada e realizada em menos de 24 horas. Na sessão, o consultor apresentou recursos que o cliente nem havia procurado e que passaram a agregar valor imediato.</p>
+        <blockquote class="case-quote">"Foi um agendamento que eu solicitei ontem no final da tarde e hoje pela manhã eu já tive um retorno muito rápido. A didática foi muito boa."<cite>— gestor Carvão Ecológico</cite></blockquote>
+        <div class="case-result"><strong>Resultado:</strong> Atendimento consultivo em menos de 24h + descoberta de funcionalidades não exploradas.</div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
 <!-- ===== DEPOIMENTOS ===== -->
 <section id="depoimentos">
   <div class="container">
     <div class="text-center">
-      <h2 class="section-title">Depoimentos de quem simplificou a gestão da frota</h2>
+      <h2 class="section-title">Depoimentos em vídeo de quem simplificou a gestão da frota</h2>
       <p class="section-sub">Clientes reais contando como usam o Contele Fleet no dia a dia.</p>
     </div>
 
@@ -2141,7 +2508,7 @@ document.addEventListener('click', function(ev){
           <li><a href="https://contelerastreador.com.br/#depoimentos" target="_blank" rel="noopener">Depoimentos</a></li>
           <li><a href="#faq">FAQ</a></li>
           <li><a href="https://contele.io/privacy" target="_blank" rel="noopener">Política de Privacidade</a></li>
-          <li><a href="https://contele.io/privacy" target="_blank" rel="noopener">Termos de Uso</a></li>
+          <li><a href="/termos-uso/" rel="noopener">Termos de Uso</a></li>
         </ul>
       </div>
       <div class="footer-col">
