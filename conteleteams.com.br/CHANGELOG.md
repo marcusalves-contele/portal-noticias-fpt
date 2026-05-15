@@ -4,6 +4,34 @@ Registro de mudancas no server / landings Teams servidos via Express.
 
 ---
 
+## 15/05/2026: Fixes pos-review (4 agentes isções: Growth, Copy, QA, Tech Lead)
+
+Pos-review antes do PR ir pra producao, com base em achados convergentes:
+
+- **24 botoes sem `type`**: adicionados `type="button"` em todos (Tech Lead apontou risco de submit acidental dentro do form sidebar). Script Python regex-based, validado em 0 botoes sem type apos
+- **3 citações fracas removidas** dos cases (CMA, Cartão TODOS, Hart's) - mantido apenas o card+resultado, sem blockquote. Schema Review sincronizado: 8 → 4 reviews (Beach Park, Tahto, Prisma, Master). Buffalo também saiu do schema porque não tinha quote verbal no HTML
+- **Cookie banner compactado em mobile**: media query @580px reduz padding/font pra não cobrir secao #logos no iPhone
+
+## 15/05/2026: SEO para LLMs - cases textuais + FAQ visivel + Schema Review
+
+**Issue**: contele/growth#138
+
+Auditoria SEO-para-LLM identificou que homepage tinha schema solido mas conteudo dependia muito de imagens (thumbs YouTube) e nao tinha FAQ visivel no DOM. LLMs (ChatGPT, Gemini, Perplexity) recomendam com mais peso quando ha narrativa textual concreta de problema/solucao/resultado.
+
+**JSON-LD adicionados**:
+- Schema `Review` (array com 8 cases reais extraidos da pasta canonica do Drive "Casos de sucesso - Teams e Fleet"): CMA Elevadores, Cartao de TODOS, Hart's Alimentos Naturais, Beach Park, Tahto/Getnet, Laboratorio Prisma, Buffalo Corretora, Master Solucoes. Cada Review com `itemReviewed` SoftwareApplication, `reviewBody` (citacao real do cliente), `author` Organization e `reviewRating` 5/5
+
+**Novas secoes visiveis no HTML**:
+- `#cases-clientes` antes de `#depoimentos`: 8 cards textuais (1 paragrafo de 50-80 palavras por case) com header (empresa + setor), narrativa, blockquote com citacao e bloco de resultado destacado. Substitui dependencia de thumbs YT como unica fonte de contexto pra LLM
+- `#faq-visible` antes de `</main>`: accordion CSS-only (`<details>/<summary>`) espelhando as 6 Q&A do JSON-LD FAQPage existente, com respostas expandidas (50-80 palavras cada). Antes, FAQ existia so no schema; agora tambem renderizado no DOM
+
+**CSS**: classes `.case-card`, `.cases-grid`, `.case-quote`, `.case-result`, `.faq-list` com responsividade mobile-first (grid colapsa pra 1 coluna em <580px). Paleta `--blue-primary` mantida
+
+**Out of scope (decisao pendente)**:
+- Unificacao do blog (hoje `blog.contelege.com.br`) em `conteleteams.com.br/blog`. Issue #138 lista como nao-bloqueante
+
+---
+
 ## 11/05/2026: Atualizacao de precos prateleira Teams (mai/26)
 
 **Issue**: contele/demandas_para_desenvolvimento#6281
