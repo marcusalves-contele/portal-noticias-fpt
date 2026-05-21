@@ -124,9 +124,9 @@ const DISCORD_LEAD_CRITICAL_WEBHOOK = process.env.DISCORD_LEAD_CRITICAL_WEBHOOK_
 // Planilha Fleet (growth#79). Mesma planilha do fluxo legado
 // ([base leads GV Fleet] — 1LkTpcEbPqVfb...). Gravacao paridade 1:1 com
 // producao: schema de keys bate com os headers reais da Página1 (a API
-// ge-prd-web-api matcha por nome de header, nao posicional). `Processado='Sim'`
-// neutraliza o Apps Script onChange (se algum estiver ativo), evitando
-// duplicacao de deal.
+// ge-prd-web-api matcha por nome de header, nao posicional).
+// O Apps Script onChange checa a coluna `status` (col 16) pra evitar
+// duplicacao — `Processado` (col 18) e deixado vazio pra o fluxo n8n usar.
 //
 // Depois da v1 estabilizar (Opcao B da task), trocamos pra Sheets API direta
 // + aba dedicada. Por ora: mantem tudo na Página1 pra nao romper nada.
@@ -517,7 +517,7 @@ async function appendSheet(data) {
 // Pessoa jurídica, Já utiliza rastreador?, Campanha, Representa órgão público?,
 // Quantidade de Veiculos, Valor estimado por unidade, Valor total estimado,
 // Referrer, Data de envio, WABA ID, Vendedor from Pipedrive, status, Info,
-// Processado, Pipe ID). Processado='Sim' neutraliza Apps Script onChange.
+// Processado, Pipe ID). Processado vazio — n8n usa essa coluna como gatilho.
 function buildSheetDataFleet(body, frota, status, vendorName = '', dealId = '', infoText = '') {
   // Campanha: string UTM completa no formato legacy da Página1
   // (`utm_source=x&utm_medium=y&utm_campaign=z&...`). Se o frontend ja mandou
@@ -545,7 +545,7 @@ function buildSheetDataFleet(body, frota, status, vendorName = '', dealId = '', 
     'Vendedor from Pipedrive': vendorName,
     'status': status,
     'Info': infoText,
-    'Processado': 'Sim',
+    'Processado': '',
     'Pipe ID': dealId ? String(dealId) : ''
   };
 }
@@ -889,8 +889,7 @@ async function processLead(body, frota, ctaSource, isTest) {
     console.warn(`[TRACKING] Skipping Contele OS propagation (secret empty) deal=${dealId}`);
   }
 
-  // 3. Build sheet payload com schema legacy Página1 (Processado='Sim' evita
-  // Apps Script onChange duplicar deal).
+  // 3. Build sheet payload com schema legacy Página1.
   const sheetData = buildSheetDataFleet(
     body, frota, '1-success-deal-created-in-pipedrive', vendor.nome, dealId, infoText
   );
