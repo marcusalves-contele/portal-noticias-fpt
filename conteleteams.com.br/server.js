@@ -461,6 +461,62 @@ function brDate() {
   return new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 }
 
+// ===== LEAD INTAKE: persistencia + trace async (incidente Pipedrive 429 25/05) =====
+// Reporta o lead pro contele-os (fonte de verdade + trace por-etapa + fila de
+// retry). FORA do hot path: gated por LEAD_INTAKE_ENABLED (default off),
+// fire-and-forget, try/catch interno. Se o POST falhar, persiste num arquivo
+// no volume Railway pra flush posterior. NUNCA pode regredir o caminho de
+// sucesso do lead. Decisao claude-code-founder 26/05 (async-parallel).
+const LEAD_INTAKE_ENABLED = process.env.LEAD_INTAKE_ENABLED === 'true';
+const LEAD_INTAKE_URL = `${CONTELE_OS_URL}/api/webhooks/lead-intake`;
+
+function persistIntakeFallback(payload) {
+  try {
+    const dir = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/tmp';
+    require('fs').appendFileSync(path.join(dir, 'lead-intake-unsent.jsonl'), JSON.stringify(payload) + '\n');
+  } catch (err) {
+    console.error('[INTAKE] fallback persist failed:', err.message);
+  }
+}
+
+function reportLeadIntake(body, status, extra = {}) {
+  if (!LEAD_INTAKE_ENABLED) return;
+  try {
+    const payload = {
+      lead_intake_id: (body && body._replay && body._replay.lead_intake_id) || undefined,
+      product: 'teams',
+      raw_payload: body,
+      name: body.nome || null,
+      email: body.email || null,
+      phone: body.telefone || null,
+      company: body.empresa || null,
+      qty: parseInt(body.tamanho_equipe, 10) || null,
+      gclid: body.gclid || null,
+      utm: {
+        utm_source: body.utm_source || null,
+        utm_medium: body.utm_medium || null,
+        utm_campaign: body.campanha || null,
+        utm_term: body.utm_term || null,
+        utm_content: body.utm_content || null
+      },
+      source: body.landing_page || null,
+      status,
+      pipedrive_deal_id: extra.dealId || null,
+      pipedrive_person_id: extra.personId || null,
+      last_error: extra.error || null,
+      events: extra.events || null
+    };
+    fetch(LEAD_INTAKE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-webhook-secret': SDR_WEBHOOK_SECRET },
+      body: JSON.stringify(payload)
+    }).then((r) => { if (!r.ok) persistIntakeFallback(payload); })
+      .catch(() => persistIntakeFallback(payload));
+  } catch (err) {
+    console.error('[INTAKE] report threw:', err.message);
+  }
+}
+
 // ===== LEAD ENDPOINT =====
 app.post('/api/lead', async (req, res) => {
   const body = req.body;
@@ -614,6 +670,11 @@ async function processLead(body, tamanho, ctaSource) {
       `Tracking atualizado no contele-os. Nao criamos pessoa/deal duplicado.`
     ).catch(() => {});
 
+    reportLeadIntake(body, 'dedup_existing', {
+      dealId: existingDealId,
+      personId: dedup.person_id,
+      events: [{ step: 'dedup', status: 'ok', metadata: { existing_deal_id: existingDealId } }]
+    });
     console.log(`[LEAD] DEDUP: skipped duplicate for ${body.empresa} (${body.email}) -> existing deal=${existingDealId} person=${dedup.person_id}`);
     return;
   }
@@ -639,6 +700,10 @@ async function processLead(body, tamanho, ctaSource) {
       `Licencas: ${tamanho} | CTA: ${ctaSource}\n` +
       `Status: ${personRes.status} | Erro: ${JSON.stringify(personRes.error).slice(0, 200)}`
     ).catch(() => {});
+    reportLeadIntake(body, 'pipedrive_failed', {
+      error: `person: ${personRes.status} ${JSON.stringify(personRes.error).slice(0, 200)}`,
+      events: [{ step: 'pipedrive_person', status: 'failed', http_status: personRes.status }]
+    });
     console.error(`[LEAD] ABORT: person creation failed for ${body.empresa}`);
     return;
   }
@@ -682,6 +747,14 @@ async function processLead(body, tamanho, ctaSource) {
       `Person ID: ${personId}\n` +
       `Status: ${dealRes.status} | Erro: ${JSON.stringify(dealRes.error).slice(0, 200)}`
     ).catch(() => {});
+    reportLeadIntake(body, 'pipedrive_failed', {
+      personId,
+      error: `deal: ${dealRes.status} ${JSON.stringify(dealRes.error).slice(0, 200)}`,
+      events: [
+        { step: 'pipedrive_person', status: 'ok' },
+        { step: 'pipedrive_deal', status: 'failed', http_status: dealRes.status }
+      ]
+    });
     console.error(`[LEAD] ABORT: deal creation failed for ${body.empresa} (person=${personId})`);
     return;
   }
@@ -774,6 +847,9 @@ async function processLead(body, tamanho, ctaSource) {
     `:link: <${pipedriveUrl}|Abrir no Pipedrive>`
   ].filter(Boolean).join('\n');
 
+  // Replay do cron de retry com atraso >2h: nao redispara Leo (lead frio).
+  const replaySkipLeo = !!(body._replay && body._replay.skip_leo === true);
+
   await Promise.allSettled([
     // Sheet
     appendSheet(sheetData),
@@ -785,7 +861,7 @@ async function processLead(body, tamanho, ctaSource) {
     sendWhatsApp(LEONARDO_PHONE, notifText),
     // SDR v2 (cutover 28/04/2026): post direto no Leo IA em contele-os.
     // Header x-webhook-secret obrigatorio (auth do endpoint).
-    fetch(SDR_WEBHOOK, {
+    replaySkipLeo ? Promise.resolve('leo_skipped_stale') : fetch(SDR_WEBHOOK, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -837,6 +913,17 @@ async function processLead(body, tamanho, ctaSource) {
     `CTA: ${ctaLabel || ctaSource} | Vendor: ${vendor.nome}\n` +
     `Pipedrive: <https://contelegv.pipedrive.com/deal/${dealId}>`
   ).catch(() => {});
+
+  reportLeadIntake(body, 'deal_created', {
+    dealId,
+    personId,
+    events: [
+      { step: 'pipedrive_deal', status: 'ok' },
+      replaySkipLeo
+        ? { step: 'leo_ia', status: 'skipped', metadata: { reason: 'stale_lead_>2h' } }
+        : { step: 'leo_ia', status: 'ok' }
+    ]
+  });
 
   console.log(`[LEAD] Complete: ${body.empresa} -> deal ${dealId}, vendor ${vendor.nome}`);
 }

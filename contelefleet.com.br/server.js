@@ -620,6 +620,83 @@ function stripQuery(url) {
 // ===== LEAD ENDPOINT =====
 // Fleet usa `tamanho_frota` (numero de veiculos) no lugar de `tamanho_equipe`.
 // Aceita ambos no body pro caso do form mandar o nome antigo.
+// ===== LEAD INTAKE: persistencia + trace async (incidente Pipedrive 429 25/05) =====
+// Reporta o lead pro contele-os (fonte de verdade + trace + fila de retry).
+// FORA do hot path: gated por LEAD_INTAKE_ENABLED (default off), fire-and-forget,
+// try/catch interno. Fallback no volume Railway se o POST falhar. NUNCA regride
+// o caminho de sucesso. Decisao claude-code-founder 26/05 (async-parallel).
+const LEAD_INTAKE_ENABLED = process.env.LEAD_INTAKE_ENABLED === 'true';
+const LEAD_INTAKE_URL = `${CONTELE_OS_URL}/api/webhooks/lead-intake`;
+const LEAD_INTAKE_SECRET = process.env.SALES_WEBHOOK_SECRET || 'leo-vendas-2026';
+
+function persistIntakeFallback(payload) {
+  try {
+    const dir = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/tmp';
+    require('fs').appendFileSync(path.join(dir, 'lead-intake-unsent.jsonl'), JSON.stringify(payload) + '\n');
+  } catch (err) {
+    console.error('[INTAKE] fallback persist failed:', err.message);
+  }
+}
+
+const FLEET_STATUS_MAP = {
+  success: 'deal_created',
+  pipedrive_person_failed: 'pipedrive_failed',
+  pipedrive_deal_failed: 'pipedrive_failed',
+  dedup_existing: 'dedup_existing',
+  test_filtered: 'test_filtered'
+};
+
+function reportLeadIntakeFleet(body, frota, result) {
+  if (!LEAD_INTAKE_ENABLED) return;
+  try {
+    const status = FLEET_STATUS_MAP[result && result.status] || 'received';
+    const skipLeo = !!(body._replay && body._replay.skip_leo === true);
+    let events = null;
+    if (status === 'deal_created') {
+      events = [
+        { step: 'pipedrive_deal', status: 'ok' },
+        skipLeo ? { step: 'leo_ia', status: 'skipped', metadata: { reason: 'stale_lead_>2h' } } : { step: 'leo_ia', status: 'ok' }
+      ];
+    } else if (result && result.status === 'pipedrive_person_failed') {
+      events = [{ step: 'pipedrive_person', status: 'failed' }];
+    } else if (result && result.status === 'pipedrive_deal_failed') {
+      events = [{ step: 'pipedrive_person', status: 'ok' }, { step: 'pipedrive_deal', status: 'failed' }];
+    } else if (status === 'dedup_existing') {
+      events = [{ step: 'dedup', status: 'ok' }];
+    }
+    const payload = {
+      lead_intake_id: (body && body._replay && body._replay.lead_intake_id) || undefined,
+      product: 'fleet',
+      raw_payload: body,
+      name: body.nome || null,
+      email: body.email || null,
+      phone: body.telefone || null,
+      company: body.empresa || null,
+      qty: frota || null,
+      gclid: body.gclid || null,
+      utm: {
+        utm_source: body.utm_source || null,
+        utm_medium: body.utm_medium || null,
+        utm_campaign: body.utm_campaign || body.campanha || null,
+        utm_term: body.utm_term || null,
+        utm_content: body.utm_content || null
+      },
+      source: body.landing_page || null,
+      status,
+      pipedrive_deal_id: (result && result.pipedrive_deal_id) || null,
+      events
+    };
+    fetch(LEAD_INTAKE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-webhook-secret': LEAD_INTAKE_SECRET },
+      body: JSON.stringify(payload)
+    }).then((r) => { if (!r.ok) persistIntakeFallback(payload); })
+      .catch(() => persistIntakeFallback(payload));
+  } catch (err) {
+    console.error('[INTAKE] report threw:', err.message);
+  }
+}
+
 app.post('/api/lead', async (req, res) => {
   const body = req.body;
   const frota = parseInt(body.tamanho_frota || body.tamanho_equipe, 10) || 0;
@@ -670,6 +747,7 @@ app.post('/api/lead', async (req, res) => {
   if (isFromCampaign) {
     try {
       const result = await processLead(body, frota, ctaSource, isTest);
+      reportLeadIntakeFleet(body, frota, result);
       return res.json({
         ok: true,
         redirect: '/obrigado/',
@@ -693,7 +771,8 @@ app.post('/api/lead', async (req, res) => {
   res.json({ ok: true, redirect: '/obrigado/' });
 
   try {
-    await processLead(body, frota, ctaSource, isTest);
+    const result = await processLead(body, frota, ctaSource, isTest);
+    reportLeadIntakeFleet(body, frota, result);
   } catch (err) {
     console.error('[LEAD-FLEET] Handler crashed:', err);
     await sendDiscordCritical(
@@ -951,7 +1030,9 @@ async function processLead(body, frota, ctaSource, isTest) {
   //   idUsuarioPipedrive, info, vendedor, Campanha, Referrer
   // Trocar nomes quebra o Zapster node (espera body.whatsapp como recipient) e
   // o JS code "define vendedor" (espera body.vendedor e body.nome).
-  if (SDR_WEBHOOK) {
+  // replaySkipLeo: lead re-processado pelo cron de retry com atraso >2h NAO
+  // redispara o SDR/Leo (evita abordagem "fresca" tardia). Decisao founder 26/05.
+  if (SDR_WEBHOOK && !(body._replay && body._replay.skip_leo === true)) {
     const campaignStr = body.campanha || [
       body.utm_campaign ? `utm_campaign=${body.utm_campaign}` : '',
       body.utm_source ? `utm_source=${body.utm_source}` : '',
