@@ -20,7 +20,7 @@ _THUMB_REFS = PROJECT_DIR.parent / "thumbnail-ai-creator" / "referencias"
 REFS_DIR = _THUMB_REFS if _THUMB_REFS.exists() else PROJECT_DIR / "referencias"
 
 MODEL_FLASH = "gemini-3-flash-preview"
-MODEL_PRO = "gemini-3-pro-preview"
+MODEL_PRO = "gemini-2.5-pro"
 MODEL_IMAGE_PRO = "gemini-3-pro-image-preview"
 MODEL_IMAGE_EDIT = "gemini-3.1-flash-image-preview"
 API_BASE = "https://generativelanguage.googleapis.com/v1beta/models"

@@ -70,7 +70,7 @@ SHEET_GID      = "25167001"
 MODEL_IMAGE  = "gemini-3.1-flash-image-preview"   # Nano Banana v2
 MODEL_FLASH  = "gemini-3-flash-preview"
 MODEL_AUDIO  = "gemini-3-flash-preview"
-MODEL_PRO    = "gemini-3-pro-preview"             # strategy de live (exige raciocinio)
+MODEL_PRO    = "gemini-2.5-pro"                  # strategy de live (exige raciocinio)
 
 API_BASE     = "https://generativelanguage.googleapis.com/v1beta/models"
 IMAGE_URL    = f"{API_BASE}/{MODEL_IMAGE}:generateContent"

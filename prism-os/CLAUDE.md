@@ -112,6 +112,7 @@ Linhas com "Tarefa no Asana" preenchido = pendentes.
 | Thumbnails (qualidade) | `gemini-3-pro-image-preview` |
 | Thumbnails nutella (face-lock) | `gemini-3.1-flash-image-preview` (Nano Banana 2) |
 | Análise / briefing | `gemini-3-flash-preview` |
+| Strategy / plano / roteiro (raciocínio) | `gemini-2.5-pro` (substituto do `gemini-3-pro-preview`, que retorna 404) |
 
 **API Key**: `GEMINI_NANO_BANANA_KEY` (env var no Railway, `.env` local)
 
