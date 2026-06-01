@@ -467,6 +467,11 @@ function brDate() {
 // fire-and-forget, try/catch interno. Se o POST falhar, persiste num arquivo
 // no volume Railway pra flush posterior. NUNCA pode regredir o caminho de
 // sucesso do lead. Decisao claude-code-founder 26/05 (async-parallel).
+//
+// intake-first leve (01/06): primeiro call em background logo apos 200 usa
+// status='received' e captura o lead_intake_id retornado. Calls subsequentes
+// passam esse id pra fazer UPDATE na mesma linha (1 lead = 1 linha). O flush
+// do .jsonl tambem foi adicionado aqui (arquivo vive no volume do growth).
 const LEAD_INTAKE_ENABLED = process.env.LEAD_INTAKE_ENABLED === 'true';
 const LEAD_INTAKE_URL = `${CONTELE_OS_URL}/api/webhooks/lead-intake`;
 
@@ -479,11 +484,69 @@ function persistIntakeFallback(payload) {
   }
 }
 
-function reportLeadIntake(body, status, extra = {}) {
+// Drena o arquivo de fallback (lead-intake-unsent.jsonl) que acumula payloads
+// quando o POST pro contele-os falha. Chamado no startup do servidor.
+// Fire-and-forget, bounded (processa ate MAX_FLUSH linhas por chamada).
+// Idempotente: payloads com lead_intake_id existente viram UPDATE no endpoint.
+const UNSENT_FILE = path.join(process.env.RAILWAY_VOLUME_MOUNT_PATH || '/tmp', 'lead-intake-unsent.jsonl');
+const MAX_FLUSH = 50;
+
+async function flushUnsentIntake() {
   if (!LEAD_INTAKE_ENABLED) return;
+  const fsSync = require('fs');
+  let lines;
+  try {
+    if (!fsSync.existsSync(UNSENT_FILE)) return;
+    lines = fsSync.readFileSync(UNSENT_FILE, 'utf8').split('\n').filter(Boolean);
+  } catch (err) {
+    console.error('[INTAKE-FLUSH] read error:', err.message);
+    return;
+  }
+  if (lines.length === 0) return;
+  console.log(`[INTAKE-FLUSH] draining ${Math.min(lines.length, MAX_FLUSH)} of ${lines.length} unsent payloads`);
+
+  const toProcess = lines.slice(0, MAX_FLUSH);
+  const remaining = lines.slice(MAX_FLUSH);
+  const confirmed = [];
+
+  for (const line of toProcess) {
+    try {
+      const payload = JSON.parse(line);
+      const r = await fetch(LEAD_INTAKE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-webhook-secret': SDR_WEBHOOK_SECRET },
+        body: JSON.stringify(payload)
+      });
+      if (r.ok) {
+        confirmed.push(line);
+      } else {
+        remaining.push(line); // retry na proxima startup
+      }
+    } catch (err) {
+      remaining.push(line);
+    }
+  }
+
+  try {
+    if (remaining.length > 0) {
+      fsSync.writeFileSync(UNSENT_FILE, remaining.join('\n') + '\n');
+    } else {
+      fsSync.unlinkSync(UNSENT_FILE);
+    }
+    console.log(`[INTAKE-FLUSH] flushed=${confirmed.length} remaining=${remaining.length}`);
+  } catch (err) {
+    console.error('[INTAKE-FLUSH] write error:', err.message);
+  }
+}
+
+// Retorna Promise<string|null> com o lead_intake_id inserido, ou null se
+// LEAD_INTAKE_ENABLED=false ou se o POST falhar. Usado pelo call 'received'
+// na entrada do processamento em background, antes do Pipedrive.
+function reportLeadIntakeAsync(body, status, extra = {}, explicitId = undefined) {
+  if (!LEAD_INTAKE_ENABLED) return Promise.resolve(null);
   try {
     const payload = {
-      lead_intake_id: (body && body._replay && body._replay.lead_intake_id) || undefined,
+      lead_intake_id: explicitId || (body && body._replay && body._replay.lead_intake_id) || undefined,
       product: 'teams',
       raw_payload: body,
       name: body.nome || null,
@@ -506,15 +569,26 @@ function reportLeadIntake(body, status, extra = {}) {
       last_error: extra.error || null,
       events: extra.events || null
     };
-    fetch(LEAD_INTAKE_URL, {
+    return fetch(LEAD_INTAKE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-webhook-secret': SDR_WEBHOOK_SECRET },
       body: JSON.stringify(payload)
-    }).then((r) => { if (!r.ok) persistIntakeFallback(payload); })
-      .catch(() => persistIntakeFallback(payload));
+    }).then(async (r) => {
+      if (!r.ok) { persistIntakeFallback(payload); return null; }
+      try {
+        const j = await r.json();
+        return j.lead_intake_id || null;
+      } catch { return null; }
+    }).catch(() => { persistIntakeFallback(payload); return null; });
   } catch (err) {
     console.error('[INTAKE] report threw:', err.message);
+    return Promise.resolve(null);
   }
+}
+
+// Wrapper fire-and-forget (retrocompativel com os call sites existentes).
+function reportLeadIntake(body, status, extra = {}, explicitId = undefined) {
+  reportLeadIntakeAsync(body, status, extra, explicitId).catch(() => {});
 }
 
 // ===== LEAD ENDPOINT =====
@@ -533,11 +607,17 @@ app.post('/api/lead', async (req, res) => {
   // Quick response to frontend (don't block)
   res.json({ ok: true });
 
+  // intake-first: persiste 'received' no banco IMEDIATAMENTE em background,
+  // antes do Pipedrive. Se o server crashar a partir daqui, o lead ja consta
+  // no banco. O id retornado e propagado pra updates subsequentes (1 lead = 1 linha).
+  const leadIntakeIdPromise = reportLeadIntakeAsync(body, 'received');
+
   // Wrapper global: qualquer throw nao-tratado dispara alerta critico pra
   // nao perder lead silenciosamente. Frontend ja recebeu 200, entao processar
   // em background com guard.
   try {
-  await processLead(body, tamanho, ctaSource);
+  const leadIntakeId = await leadIntakeIdPromise;
+  await processLead(body, tamanho, ctaSource, leadIntakeId);
   } catch (err) {
     console.error('[LEAD] Handler crashed:', err);
     await sendDiscordCritical(
@@ -549,7 +629,7 @@ app.post('/api/lead', async (req, res) => {
   }
 });
 
-async function processLead(body, tamanho, ctaSource) {
+async function processLead(body, tamanho, ctaSource, leadIntakeId = undefined) {
 
   // Filter test submissions: log to sheet but skip Pipedrive/SDR/notifications
   const isTest = /teste|test|prova|fake/i.test(body.nome || '') ||
@@ -674,7 +754,7 @@ async function processLead(body, tamanho, ctaSource) {
       dealId: existingDealId,
       personId: dedup.person_id,
       events: [{ step: 'dedup', status: 'ok', metadata: { existing_deal_id: existingDealId } }]
-    });
+    }, leadIntakeId);
     console.log(`[LEAD] DEDUP: skipped duplicate for ${body.empresa} (${body.email}) -> existing deal=${existingDealId} person=${dedup.person_id}`);
     return;
   }
@@ -703,7 +783,7 @@ async function processLead(body, tamanho, ctaSource) {
     reportLeadIntake(body, 'pipedrive_failed', {
       error: `person: ${personRes.status} ${JSON.stringify(personRes.error).slice(0, 200)}`,
       events: [{ step: 'pipedrive_person', status: 'failed', http_status: personRes.status }]
-    });
+    }, leadIntakeId);
     console.error(`[LEAD] ABORT: person creation failed for ${body.empresa}`);
     return;
   }
@@ -754,7 +834,7 @@ async function processLead(body, tamanho, ctaSource) {
         { step: 'pipedrive_person', status: 'ok' },
         { step: 'pipedrive_deal', status: 'failed', http_status: dealRes.status }
       ]
-    });
+    }, leadIntakeId);
     console.error(`[LEAD] ABORT: deal creation failed for ${body.empresa} (person=${personId})`);
     return;
   }
@@ -923,7 +1003,7 @@ async function processLead(body, tamanho, ctaSource) {
         ? { step: 'leo_ia', status: 'skipped', metadata: { reason: 'stale_lead_>2h' } }
         : { step: 'leo_ia', status: 'ok' }
     ]
-  });
+  }, leadIntakeId);
 
   console.log(`[LEAD] Complete: ${body.empresa} -> deal ${dealId}, vendor ${vendor.nome}`);
 }
@@ -1336,4 +1416,10 @@ app.get('*', (req, res) => {
 
 // ===== START =====
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`ConTele Teams landing running on :${PORT}`));
+app.listen(PORT, () => {
+  console.log(`ConTele Teams landing running on :${PORT}`);
+  // Drena leads que falharam no POST pro contele-os (ficaram no .jsonl do volume).
+  // O arquivo vive no volume do growth; o cron de retry do contele-os so alcanca
+  // o banco (lead_intake table) — nao esse arquivo. Por isso o flush e aqui.
+  flushUnsentIntake().catch(err => console.error('[INTAKE-FLUSH] startup error:', err.message));
+});

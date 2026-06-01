@@ -4,6 +4,15 @@ Registro de mudancas na landing Fleet em codigo proprio.
 
 ---
 
+## 01/06/2026: intake-first leve + flush do volume .jsonl (feat/lead-intake-first-on-entry)
+
+- **Problema**: lead so virava duravel no banco DEPOIS do Pipedrive. Crash entre o 200 e o desfecho = lead perdido (incidente 25/05).
+- **Fix intake-first**: logo apos `res.json(200)` (e no inicio do caminho de campanha-reply), dispara `reportLeadIntakeFleetAsync(body, frota, 'received')` e captura o `lead_intake_id`. Calls seguintes passam esse id pra UPDATE na mesma linha: 1 lead = 1 linha.
+- **Fix flush .jsonl**: no startup do servidor, `flushUnsentIntake()` le o `lead-intake-unsent.jsonl` do volume Railway, re-tenta o POST de cada linha pro contele-os e remove as confirmadas. O arquivo vive no volume do growth: por isso o flush fica aqui.
+- Zero impacto no hot path: tudo fire-and-forget apos o 200.
+
+---
+
 ## 15/05/2026: Fixes pos-review (4 agentes is­centos: Growth, Copy, QA, Tech Lead)
 
 Pos-review antes do PR ir pra producao:

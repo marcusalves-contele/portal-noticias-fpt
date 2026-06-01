@@ -625,6 +625,11 @@ function stripQuery(url) {
 // FORA do hot path: gated por LEAD_INTAKE_ENABLED (default off), fire-and-forget,
 // try/catch interno. Fallback no volume Railway se o POST falhar. NUNCA regride
 // o caminho de sucesso. Decisao claude-code-founder 26/05 (async-parallel).
+//
+// intake-first leve (01/06): primeiro call em background logo apos 200 usa
+// status='received' e captura o lead_intake_id retornado. Calls subsequentes
+// passam esse id pra fazer UPDATE na mesma linha (1 lead = 1 linha). O flush
+// do .jsonl tambem foi adicionado aqui (arquivo vive no volume do growth).
 const LEAD_INTAKE_ENABLED = process.env.LEAD_INTAKE_ENABLED === 'true';
 const LEAD_INTAKE_URL = `${CONTELE_OS_URL}/api/webhooks/lead-intake`;
 const LEAD_INTAKE_SECRET = process.env.SALES_WEBHOOK_SECRET || 'leo-vendas-2026';
@@ -638,6 +643,61 @@ function persistIntakeFallback(payload) {
   }
 }
 
+// Drena o arquivo de fallback (lead-intake-unsent.jsonl) que acumula payloads
+// quando o POST pro contele-os falha. Chamado no startup do servidor.
+// Fire-and-forget, bounded (processa ate MAX_FLUSH linhas por chamada).
+// Idempotente: payloads com lead_intake_id existente viram UPDATE no endpoint.
+const UNSENT_FILE = path.join(process.env.RAILWAY_VOLUME_MOUNT_PATH || '/tmp', 'lead-intake-unsent.jsonl');
+const MAX_FLUSH = 50;
+
+async function flushUnsentIntake() {
+  if (!LEAD_INTAKE_ENABLED) return;
+  const fsSync = require('fs');
+  let lines;
+  try {
+    if (!fsSync.existsSync(UNSENT_FILE)) return;
+    lines = fsSync.readFileSync(UNSENT_FILE, 'utf8').split('\n').filter(Boolean);
+  } catch (err) {
+    console.error('[INTAKE-FLUSH] read error:', err.message);
+    return;
+  }
+  if (lines.length === 0) return;
+  console.log(`[INTAKE-FLUSH] draining ${Math.min(lines.length, MAX_FLUSH)} of ${lines.length} unsent payloads`);
+
+  const toProcess = lines.slice(0, MAX_FLUSH);
+  const remaining = lines.slice(MAX_FLUSH);
+  const confirmed = [];
+
+  for (const line of toProcess) {
+    try {
+      const payload = JSON.parse(line);
+      const r = await fetch(LEAD_INTAKE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-webhook-secret': LEAD_INTAKE_SECRET },
+        body: JSON.stringify(payload)
+      });
+      if (r.ok) {
+        confirmed.push(line);
+      } else {
+        remaining.push(line); // retry na proxima startup
+      }
+    } catch (err) {
+      remaining.push(line);
+    }
+  }
+
+  try {
+    if (remaining.length > 0) {
+      fsSync.writeFileSync(UNSENT_FILE, remaining.join('\n') + '\n');
+    } else {
+      fsSync.unlinkSync(UNSENT_FILE);
+    }
+    console.log(`[INTAKE-FLUSH] flushed=${confirmed.length} remaining=${remaining.length}`);
+  } catch (err) {
+    console.error('[INTAKE-FLUSH] write error:', err.message);
+  }
+}
+
 const FLEET_STATUS_MAP = {
   success: 'deal_created',
   pipedrive_person_failed: 'pipedrive_failed',
@@ -646,10 +706,13 @@ const FLEET_STATUS_MAP = {
   test_filtered: 'test_filtered'
 };
 
-function reportLeadIntakeFleet(body, frota, result) {
-  if (!LEAD_INTAKE_ENABLED) return;
+// Retorna Promise<string|null> com o lead_intake_id inserido/atualizado.
+// Usado pelo call 'received' na entrada do background, e internamente pelos
+// calls de desfecho (via reportLeadIntakeFleet wrapper).
+function reportLeadIntakeFleetAsync(body, frota, result, explicitId = undefined) {
+  if (!LEAD_INTAKE_ENABLED) return Promise.resolve(null);
   try {
-    const status = FLEET_STATUS_MAP[result && result.status] || 'received';
+    const status = result === 'received' ? 'received' : (FLEET_STATUS_MAP[result && result.status] || 'received');
     const skipLeo = !!(body._replay && body._replay.skip_leo === true);
     let events = null;
     if (status === 'deal_created') {
@@ -665,7 +728,7 @@ function reportLeadIntakeFleet(body, frota, result) {
       events = [{ step: 'dedup', status: 'ok' }];
     }
     const payload = {
-      lead_intake_id: (body && body._replay && body._replay.lead_intake_id) || undefined,
+      lead_intake_id: explicitId || (body && body._replay && body._replay.lead_intake_id) || undefined,
       product: 'fleet',
       raw_payload: body,
       name: body.nome || null,
@@ -683,18 +746,29 @@ function reportLeadIntakeFleet(body, frota, result) {
       },
       source: body.landing_page || null,
       status,
-      pipedrive_deal_id: (result && result.pipedrive_deal_id) || null,
+      pipedrive_deal_id: (result && typeof result === 'object' && result.pipedrive_deal_id) || null,
       events
     };
-    fetch(LEAD_INTAKE_URL, {
+    return fetch(LEAD_INTAKE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-webhook-secret': LEAD_INTAKE_SECRET },
       body: JSON.stringify(payload)
-    }).then((r) => { if (!r.ok) persistIntakeFallback(payload); })
-      .catch(() => persistIntakeFallback(payload));
+    }).then(async (r) => {
+      if (!r.ok) { persistIntakeFallback(payload); return null; }
+      try {
+        const j = await r.json();
+        return j.lead_intake_id || null;
+      } catch { return null; }
+    }).catch(() => { persistIntakeFallback(payload); return null; });
   } catch (err) {
     console.error('[INTAKE] report threw:', err.message);
+    return Promise.resolve(null);
   }
+}
+
+// Wrapper fire-and-forget (retrocompativel com call sites existentes).
+function reportLeadIntakeFleet(body, frota, result, explicitId = undefined) {
+  reportLeadIntakeFleetAsync(body, frota, result, explicitId).catch(() => {});
 }
 
 app.post('/api/lead', async (req, res) => {
@@ -746,8 +820,11 @@ app.post('/api/lead', async (req, res) => {
 
   if (isFromCampaign) {
     try {
-      const result = await processLead(body, frota, ctaSource, isTest);
-      reportLeadIntakeFleet(body, frota, result);
+      // intake-first: persiste 'received' antes do Pipedrive mesmo no caminho sync
+      // de campanha. O id e propagado pro desfecho para UPDATE na mesma linha.
+      const leadIntakeId = await reportLeadIntakeFleetAsync(body, frota, 'received');
+      const result = await processLead(body, frota, ctaSource, isTest, leadIntakeId);
+      reportLeadIntakeFleet(body, frota, result, leadIntakeId);
       return res.json({
         ok: true,
         redirect: '/obrigado/',
@@ -770,9 +847,15 @@ app.post('/api/lead', async (req, res) => {
   // Quick response to frontend (lead valido, processa em background)
   res.json({ ok: true, redirect: '/obrigado/' });
 
+  // intake-first: persiste 'received' no banco IMEDIATAMENTE em background,
+  // antes do Pipedrive. Se o server crashar a partir daqui, o lead ja consta
+  // no banco. O id retornado e propagado pra updates subsequentes (1 lead = 1 linha).
+  const leadIntakeIdPromise = reportLeadIntakeFleetAsync(body, frota, 'received');
+
   try {
-    const result = await processLead(body, frota, ctaSource, isTest);
-    reportLeadIntakeFleet(body, frota, result);
+    const leadIntakeId = await leadIntakeIdPromise;
+    const result = await processLead(body, frota, ctaSource, isTest, leadIntakeId);
+    reportLeadIntakeFleet(body, frota, result, leadIntakeId);
   } catch (err) {
     console.error('[LEAD-FLEET] Handler crashed:', err);
     await sendDiscordCritical(
@@ -784,7 +867,7 @@ app.post('/api/lead', async (req, res) => {
   }
 });
 
-async function processLead(body, frota, ctaSource, isTest) {
+async function processLead(body, frota, ctaSource, isTest, _leadIntakeId = undefined) {
   const ctaLabel = { consultor: 'Fale com Consultor', testar: 'Teste Grátis', especialista: 'Falar com Especialista', contratar: 'Contratar Agora' }[ctaSource] || ctaSource;
   const infoText = `CTA: ${ctaLabel}. ${body.info || ''}`.trim();
 
@@ -1486,4 +1569,10 @@ app.get('*', (req, res) => {
 
 // ===== START =====
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`ConTele Fleet landing running on :${PORT}`));
+app.listen(PORT, () => {
+  console.log(`ConTele Fleet landing running on :${PORT}`);
+  // Drena leads que falharam no POST pro contele-os (ficaram no .jsonl do volume).
+  // O arquivo vive no volume do growth; o cron de retry do contele-os so alcanca
+  // o banco (lead_intake table) — nao esse arquivo. Por isso o flush e aqui.
+  flushUnsentIntake().catch(err => console.error('[INTAKE-FLUSH] startup error:', err.message));
+});
