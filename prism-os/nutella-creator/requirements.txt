@@ -1,6 +1,6 @@
 requests
 Flask==3.0.3
-Authlib==1.5.2
+Authlib>=1.6.9
 Werkzeug==3.0.6
 google-api-python-client
 google-auth
@@ -10,4 +10,4 @@ opencv-python-headless
 mediapipe
 youtube-transcript-api
 yt-dlp
-Pillow
+Pillow>=12.2.0
