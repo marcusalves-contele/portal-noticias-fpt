@@ -8,9 +8,7 @@ app.use(express.json());
 
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+app.get('/', (req, res) => res.redirect('/teams/'));
 
 app.use(express.static(__dirname));
 
