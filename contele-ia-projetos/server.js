@@ -4,6 +4,7 @@ const path = require('path');
 
 const app = express();
 app.use(compression());
+app.use(express.json());
 
 app.get('/health', (req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
 
