@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerador de Política de Frota Gratuito — Contele Fleet</title>
+  <meta name="description" content="Crie sua Política de Frota personalizada em minutos. Gratuito, rápido e pronto para baixar. Proteja sua empresa e reduza multas." />
+
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'purple-deep':  '#080010',
+            'purple-900':   '#4E0091',
+            'purple-700':   '#6C12B9',
+            'purple-500':   '#8B23E5',
+            'purple-light': '#b56fff',
+          },
+          fontFamily: { sans: ['Montserrat', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * { font-family: 'Montserrat', sans-serif; }
+    html { scroll-behavior: smooth; }
+
+    .bg-grid {
+      background-color: #080010;
+      background-image:
+        linear-gradient(rgba(139,35,229,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139,35,229,0.08) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .gradient-purple { background: linear-gradient(135deg, #4E0091, #8B23E5); }
+    .btn-glow:hover  { box-shadow: 0 0 28px rgba(139,35,229,0.65); }
+    .progress-bar    { transition: width 0.4s ease; }
+    .card-purple     { border: 1px solid rgba(139,35,229,0.2); box-shadow: 0 4px 24px rgba(139,35,229,0.08); }
+    .field-input:focus { border-color: #8B23E5; box-shadow: 0 0 0 3px rgba(139,35,229,0.1); }
+    .field-error     { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.1) !important; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #080010; }
+    ::-webkit-scrollbar-thumb { background: #6C12B9; border-radius: 3px; }
+    .section-fade { animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .video-wrapper { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; }
+    .video-wrapper iframe { position:absolute; top:0; left:0; width:100%; height:100%; border-radius:12px; }
+    .text-gradient { background: linear-gradient(135deg, #b56fff, #8B23E5); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .hero-glow { position:absolute; width:600px; height:600px; background:radial-gradient(circle, rgba(139,35,229,0.18) 0%, transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; }
+    @keyframes pulse-green { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4);} 50%{box-shadow:0 0 0 6px rgba(34,197,94,0);} }
+    .badge-pulse { animation: pulse-green 2.5s ease infinite; }
+    .benefit-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .benefit-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(139,35,229,0.15); }
+
+    /* Radio button customizado */
+    .radio-option { display:flex; align-items:flex-start; gap:12px; padding:12px 16px; border:1.5px solid #e5e7eb; border-radius:12px; cursor:pointer; transition:all 0.2s; }
+    .radio-option:hover { border-color: rgba(139,35,229,0.4); background: rgba(139,35,229,0.03); }
+    .radio-option.selected { border-color: #8B23E5; background: rgba(139,35,229,0.06); }
+    .radio-option input[type="radio"] { margin-top:2px; accent-color: #8B23E5; flex-shrink:0; width:18px; height:18px; }
+    .radio-option label { cursor:pointer; font-size:0.875rem; line-height:1.5; color:#374151; }
+
+    #print-area { display: none; }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 antialiased">
+
+  <!-- ===== HERO ===== -->
+  <section class="bg-grid min-h-screen flex flex-col justify-center items-center text-center px-4 py-24 relative overflow-hidden">
+    <div class="hero-glow"></div>
+
+    <span class="badge-pulse inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 text-green-400 text-sm font-semibold px-5 py-2 rounded-full mb-8 relative z-10">
+      <span class="w-2 h-2 bg-green-400 rounded-full inline-block"></span>
+      100% Gratuito — Sem cadastro prévio
+    </span>
+
+    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight max-w-4xl mb-6 relative z-10">
+      Crie uma <span class="text-gradient">Política de Frota</span><br />
+      Personalizada em 5 Minutos
+    </h1>
+
+    <p class="text-gray-400 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed relative z-10">
+      Proteja seu patrimônio, reduza multas em até <strong class="text-white">40%</strong> e garanta a conformidade com a LGPD.
+      Gratuito, rápido e pronto para baixar.
+    </p>
+
+    <a href="#form" class="gradient-purple btn-glow text-white font-bold text-lg px-12 py-4 rounded-2xl transition-all duration-300 hover:scale-105 inline-flex items-center gap-3 mb-20 relative z-10">
+      <i class="fa-solid fa-bolt"></i> Gerar Minha Política Agora
+    </a>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl w-full relative z-10">
+      <div class="card-purple bg-white/5 backdrop-blur-sm rounded-2xl p-5 flex flex-col items-center gap-3">
+        <div class="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-shield-halved text-white text-xl"></i>
+        </div>
+        <span class="text-white text-sm font-semibold">Segurança Jurídica</span>
+        <span class="text-gray-500 text-xs text-center">Proteção contra passivos trabalhistas</span>
+      </div>
+      <div class="card-purple bg-white/5 backdrop-blur-sm rounded-2xl p-5 flex flex-col items-center gap-3">
+        <div class="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-gauge-high text-white text-xl"></i>
+        </div>
+        <span class="text-white text-sm font-semibold">Controle Total</span>
+        <span class="text-gray-500 text-xs text-center">Regras claras para condutores</span>
+      </div>
+      <div class="card-purple bg-white/5 backdrop-blur-sm rounded-2xl p-5 flex flex-col items-center gap-3">
+        <div class="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-file-contract text-white text-xl"></i>
+        </div>
+        <span class="text-white text-sm font-semibold">Documento Pronto</span>
+        <span class="text-gray-500 text-xs text-center">Baixe em PDF ou TXT na hora</span>
+      </div>
+    </div>
+
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 text-gray-600 animate-bounce">
+      <i class="fa-solid fa-chevron-down text-xl"></i>
+    </div>
+  </section>
+
+  <!-- ===== BENEFÍCIOS ===== -->
+  <section class="bg-gray-50 py-24 px-4">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-14">
+        <span class="text-purple-500 font-semibold text-xs uppercase tracking-widest">Por que você precisa disso</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mt-3">O que uma Política de Frota resolve</h2>
+        <p class="text-gray-500 mt-4 max-w-xl mx-auto">Empresas sem política de frota perdem dinheiro todos os meses. Veja o que você resolve com um único documento.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="benefit-card card-purple bg-white rounded-2xl p-8 flex flex-col gap-4">
+          <div class="w-14 h-14 gradient-purple rounded-xl flex items-center justify-center">
+            <i class="fa-solid fa-circle-dollar-to-slot text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900">Redução de Custos e Multas</h3>
+          <p class="text-gray-500 leading-relaxed text-sm">Regras claras de velocidade máxima e condutores autorizados eliminam infrações e reduzem o desgaste prematuro dos veículos.</p>
+          <div class="mt-auto pt-4 border-t border-gray-100">
+            <span class="text-purple-500 text-xs font-semibold">Economia comprovada de até 40% em multas</span>
+          </div>
+        </div>
+        <div class="benefit-card card-purple bg-white rounded-2xl p-8 flex flex-col gap-4">
+          <div class="w-14 h-14 gradient-purple rounded-xl flex items-center justify-center">
+            <i class="fa-solid fa-scale-balanced text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900">Segurança Jurídica Total</h3>
+          <p class="text-gray-500 leading-relaxed text-sm">Documente responsabilidades e proteja a empresa contra passivos trabalhistas. Com assinatura do colaborador, a empresa fica blindada.</p>
+          <div class="mt-auto pt-4 border-t border-gray-100">
+            <span class="text-purple-500 text-xs font-semibold">Cláusulas validadas juridicamente</span>
+          </div>
+        </div>
+        <div class="benefit-card card-purple bg-white rounded-2xl p-8 flex flex-col gap-4">
+          <div class="w-14 h-14 gradient-purple rounded-xl flex items-center justify-center">
+            <i class="fa-solid fa-lock text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900">Conformidade com LGPD</h3>
+          <p class="text-gray-500 leading-relaxed text-sm">Inclua cláusulas de telemetria e rastreamento veicular com consentimento documentado, evitando sanções da ANPD.</p>
+          <div class="mt-auto pt-4 border-t border-gray-100">
+            <span class="text-purple-500 text-xs font-semibold">Termo de consentimento incluso</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VÍDEO ===== -->
+  <section class="bg-grid py-24 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <span class="text-purple-light font-semibold text-xs uppercase tracking-widest">Veja na prática</span>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white mt-3 mb-12">
+        Como funciona o Gerador de<br class="hidden md:block" /> Política de Frota
+      </h2>
+      <div class="video-wrapper rounded-2xl overflow-hidden" style="border:1px solid rgba(139,35,229,0.3); box-shadow:0 0 40px rgba(139,35,229,0.2);">
+        <iframe src="https://www.youtube.com/embed/7jbr0301cE4" title="Gerador de Política de Frota — Contele Fleet" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FORMULÁRIO ===== -->
+  <section id="form" class="bg-gray-50 py-24 px-4">
+    <div class="max-w-2xl mx-auto">
+      <div class="text-center mb-12">
+        <span class="text-purple-500 font-semibold text-xs uppercase tracking-widest">É grátis e leva 2 minutos</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900 mt-3">Gere sua Política Agora</h2>
+        <p class="text-gray-500 mt-3">Preencha os campos abaixo e receba o documento pronto na tela, imediatamente.</p>
+      </div>
+
+      <div class="card-purple bg-white rounded-3xl p-8 md:p-10">
+
+        <!-- Barra de progresso -->
+        <div class="mb-8">
+          <div class="flex justify-between text-sm font-semibold mb-2">
+            <span id="step-label" class="text-purple-500">Passo 1 de 7 — Dados da Empresa</span>
+            <span id="step-percent" class="text-gray-400">14%</span>
+          </div>
+          <div class="w-full bg-gray-100 rounded-full h-2.5">
+            <div id="progress-bar" class="gradient-purple h-2.5 rounded-full progress-bar" style="width:14%"></div>
+          </div>
+        </div>
+
+        <!-- ===== STEP 1: Dados da empresa ===== -->
+        <div id="step-1" class="section-fade">
+          <div class="grid grid-cols-1 gap-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Razão Social da Empresa <span class="text-red-500">*</span></label>
+              <input id="razao-social" type="text" placeholder="Sua resposta"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">E-mail <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-1.5">Coloque o seu melhor e-mail para receber sua política de frotas pronta</p>
+              <input id="email" type="email" placeholder="Sua resposta"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Nome da Política de Frota <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-1.5">Escolha o nome dessa Política de Frota. Ex: CONTELE VEÍCULOS LEVES (Ficará: POLÍTICA DE FROTA CONTELE VEÍCULOS LEVES).</p>
+              <input id="nome-politica" type="text" placeholder="Sua resposta"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+          </div>
+          <div class="mt-8 flex justify-end">
+            <button onclick="nextStep(1)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+              Avançar <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+          <p class="text-center text-xs text-gray-400 mt-4"><i class="fa-solid fa-lock mr-1"></i> Seus dados são protegidos pela LGPD</p>
+        </div>
+
+        <!-- ===== STEP 2: Responsável ===== -->
+        <div id="step-2" class="section-fade hidden">
+          <div class="grid grid-cols-1 gap-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nome do responsável da frota <span class="text-red-500">*</span></label>
+              <input id="nome-responsavel" type="text" placeholder="Sua resposta"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">CPF do responsável da frota <span class="text-red-500">*</span></label>
+              <input id="cpf-responsavel" type="text" placeholder="Sua resposta" maxlength="14"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1.5">RG do responsável da frota <span class="text-red-500">*</span></label>
+              <input id="rg-responsavel" type="text" placeholder="Sua resposta"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+          </div>
+          <div class="mt-8 flex gap-3 justify-between">
+            <button onclick="prevStep(2)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
+              <i class="fa-solid fa-arrow-left"></i> Voltar
+            </button>
+            <button onclick="nextStep(2)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+              Avançar <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 3: Velocidade e horário ===== -->
+        <div id="step-3" class="section-fade hidden">
+          <div class="grid grid-cols-1 gap-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Velocidade máxima permitida dos veículos dessa Política de Frota <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-1.5">Digite apenas números, por exemplo: 100 (Caso seja 100km/h)</p>
+              <input id="velocidade" type="number" placeholder="Sua resposta" min="20" max="300"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Horários e dias permitidos da utilização do veículo <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-1.5">Escreva o horário e dia que é permitido o uso do veículo. Ex. "08:00h às 18:00h de segunda a sexta, e das 08:00h Às 12:00h nos sábados"</p>
+              <input id="horario" type="text" placeholder="Sua resposta"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+          </div>
+          <div class="mt-8 flex gap-3 justify-between">
+            <button onclick="prevStep(3)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
+              <i class="fa-solid fa-arrow-left"></i> Voltar
+            </button>
+            <button onclick="nextStep(3)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+              Avançar <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 4: Nível do tanque ===== -->
+        <div id="step-4" class="section-fade hidden">
+          <div class="grid grid-cols-1 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Os veículos devem ser entregues sempre com o tanque de combustível em qual nível? <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-3">Sempre ao entregar o veículo para a empresa, o CONDUTOR DO VEÍCULO deve deixar o tanque de combustível em qual nível?</p>
+              <div class="grid grid-cols-1 gap-3" id="tanque-group">
+                <div class="radio-option" onclick="selectRadio('tanque','25% do tanque de combustível',this)">
+                  <input type="radio" name="tanque" value="25% do tanque de combustível" /> <label>25% do tanque de combustível</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('tanque','50% do tanque de combustível',this)">
+                  <input type="radio" name="tanque" value="50% do tanque de combustível" /> <label>50% do tanque de combustível</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('tanque','100% do tanque de combustível',this)">
+                  <input type="radio" name="tanque" value="100% do tanque de combustível" /> <label>100% do tanque de combustível</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('tanque','outro-tanque',this)">
+                  <input type="radio" name="tanque" value="outro-tanque" />
+                  <label>Outro: <input id="tanque-outro" type="text" onclick="event.stopPropagation()" placeholder="Especifique..." class="ml-2 border-b border-gray-300 focus:border-purple-500 outline-none text-sm w-40" /></label>
+                </div>
+              </div>
+              <p id="tanque-error" class="text-red-500 text-xs mt-2 hidden">Selecione uma opção.</p>
+            </div>
+          </div>
+          <div class="mt-8 flex gap-3 justify-between">
+            <button onclick="prevStep(4)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
+              <i class="fa-solid fa-arrow-left"></i> Voltar
+            </button>
+            <button onclick="nextStep(4)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+              Avançar <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 5: Registro de abastecimentos ===== -->
+        <div id="step-5" class="section-fade hidden">
+          <div class="grid grid-cols-1 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Como o CONDUTOR DO VEÍCULO deve registrar os abastecimentos? <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-3">Escolha a forma que o condutor deverá registrar o abastecimento, ou caso ele não precise registrar.</p>
+              <div class="grid grid-cols-1 gap-3" id="abastecimento-group">
+                <div class="radio-option" onclick="selectRadio('abastecimento','É responsabilidade do CONDUTOR DO VEÍCULO o registro dos abastecimentos por meio do aplicativo fornecido pela empresa, marcando sempre o odômetro correto do veículo.',this)">
+                  <input type="radio" name="abastecimento" value="app" />
+                  <label>É responsabilidade do CONDUTOR DO VEÍCULO o registro dos abastecimentos por meio do aplicativo fornecido pela empresa, marcando sempre o odômetro correto do veículo.</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('abastecimento','É responsabilidade do CONDUTOR DO VEÍCULO a coleta das notas fiscais dos abastecimentos, com o odômetro do veículo preenchido a caneta, que deverá ser entregue ao RESPONSÁVEL PELA FROTA.',this)">
+                  <input type="radio" name="abastecimento" value="nota" />
+                  <label>É responsabilidade do CONDUTOR DO VEÍCULO a coleta das notas fiscais dos abastecimentos, com o odômetro do veículo preenchido a caneta, que deverá ser entregue ao RESPONSÁVEL PELA FROTA.</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('abastecimento','O CONDUTOR DO VEÍCULO não tem responsabilidade nos registros de abastecimentos dos veículos.',this)">
+                  <input type="radio" name="abastecimento" value="sem" />
+                  <label>O CONDUTOR DO VEÍCULO não tem responsabilidade nos registros de abastecimentos dos veículos.</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('abastecimento','outro-abastecimento',this)">
+                  <input type="radio" name="abastecimento" value="outro-abastecimento" />
+                  <label>Outro: <input id="abastecimento-outro" type="text" onclick="event.stopPropagation()" placeholder="Especifique..." class="ml-2 border-b border-gray-300 focus:border-purple-500 outline-none text-sm w-40" /></label>
+                </div>
+              </div>
+              <p id="abastecimento-error" class="text-red-500 text-xs mt-2 hidden">Selecione uma opção.</p>
+            </div>
+          </div>
+          <div class="mt-8 flex gap-3 justify-between">
+            <button onclick="prevStep(5)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
+              <i class="fa-solid fa-arrow-left"></i> Voltar
+            </button>
+            <button onclick="nextStep(5)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+              Avançar <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 6: Localização e data ===== -->
+        <div id="step-6" class="section-fade hidden">
+          <div class="grid grid-cols-1 gap-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Complete a frase "Só é permitida a utilização do veículo..." <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-1.5">Descreva as cidades ou estados em que são permitidos o uso do veículo. Ex: "...nos Estados de São Paulo e Rio de Janeiro" ou "...na Baixada Santista".</p>
+              <input id="localizacao" type="text" placeholder="Sua resposta"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Local e Data de Criação</label>
+              <p class="text-xs text-gray-500 mb-1.5">Coloque o Local, Dia, Mês e Ano de criação, que ficará no final da Política de Frota. Preencha no formato (São Paulo, 20 de Novembro de 2019)</p>
+              <input id="local-data" type="text" placeholder="Ex: São Paulo, 20 de Novembro de 2019"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+          </div>
+          <div class="mt-8 flex gap-3 justify-between">
+            <button onclick="prevStep(6)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
+              <i class="fa-solid fa-arrow-left"></i> Voltar
+            </button>
+            <button onclick="nextStep(6)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+              Avançar <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 7: Quantidade e WhatsApp ===== -->
+        <div id="step-7" class="section-fade hidden">
+          <div class="grid grid-cols-1 gap-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Qual a quantidade de veículos na sua empresa? <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-1.5">Informe a quantidade de veículos que tem na frota da sua empresa. Digite apenas números.</p>
+              <input id="qtd-veiculos" type="number" placeholder="Sua resposta" min="1"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Número do seu WhatsApp <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-1.5">Informe o número do seu WhatsApp, com o DDD. Ex: 013981659501</p>
+              <input id="whatsapp" type="tel" placeholder="Sua resposta"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Logo da sua empresa <span class="text-gray-400 font-normal">(opcional)</span></label>
+              <p class="text-xs text-gray-500 mb-2">Será exibida no cabeçalho da Política de Frota. PNG ou JPG.</p>
+              <label for="logo-upload" class="cursor-pointer inline-flex items-center gap-2 border-2 border-dashed border-gray-300 hover:border-purple-500 text-gray-500 hover:text-purple-500 font-semibold px-5 py-3 rounded-xl transition-all duration-200">
+                <i class="fa-solid fa-image"></i> Adicionar logo
+              </label>
+              <input id="logo-upload" type="file" accept="image/png,image/jpeg,image/jpg" class="hidden" />
+              <div id="logo-preview" class="hidden mt-3 flex items-center gap-3">
+                <img id="logo-preview-img" src="" class="max-h-12 object-contain rounded border border-gray-200 p-1" />
+                <button type="button" onclick="removeLogo()" class="text-xs text-red-400 hover:text-red-600 font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-trash"></i> Remover
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="mt-8 flex gap-3 justify-between">
+            <button onclick="prevStep(7)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
+              <i class="fa-solid fa-arrow-left"></i> Voltar
+            </button>
+            <button onclick="generatePolicy()" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+              <i class="fa-solid fa-file-circle-check"></i> Gerar Minha Política
+            </button>
+          </div>
+          <p class="text-center text-xs text-gray-400 mt-4"><i class="fa-solid fa-bolt mr-1 text-purple-500"></i> Documento gerado instantaneamente, sem espera</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DOCUMENTO GERADO ===== -->
+  <section id="policy-section" class="bg-gray-50 py-10 px-4 hidden">
+    <div class="max-w-3xl mx-auto">
+
+      <div class="text-center mb-8 section-fade">
+        <div class="w-16 h-16 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <i class="fa-solid fa-check text-green-500 text-2xl"></i>
+        </div>
+        <h2 class="text-2xl font-extrabold text-gray-900">Sua Política de Frota está pronta!</h2>
+        <p class="text-gray-500 mt-2 text-sm">Visualize o documento abaixo e clique em <strong>Baixar PDF</strong> para salvar.</p>
+      </div>
+
+      <!-- Botões de ação -->
+      <div class="flex flex-wrap gap-3 mb-6 justify-center">
+        <button onclick="downloadPDF()"
+          class="inline-flex items-center gap-2 gradient-purple btn-glow text-white font-bold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg">
+          <i class="fa-solid fa-file-pdf"></i> Baixar PDF
+        </button>
+        <button onclick="resetForm()"
+          class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 font-semibold px-6 py-3 rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-300">
+          <i class="fa-solid fa-rotate-left"></i> Gerar Nova Política
+        </button>
+      </div>
+
+      <!-- Preview do PDF -->
+      <div class="rounded-3xl overflow-hidden section-fade" style="border:1px solid rgba(139,35,229,0.3); box-shadow:0 0 40px rgba(139,35,229,0.08);">
+        <iframe id="pdf-frame" src="" style="width:100%; height:1100px; border:none; display:block;"></iframe>
+      </div>
+
+    </div>
+  </section>
+
+  <div id="print-area"></div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="bg-grid py-12 px-4">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="text-center md:text-left">
+          <p class="text-white font-bold text-lg">Contele Fleet</p>
+          <p class="text-gray-500 text-sm mt-1">© 2003–2026 Contele Soluções Tecnológicas LTDA</p>
+          <p class="text-gray-600 text-xs mt-0.5">Rua Euclides da Cunha, nº 11 — Cj 601 — Santos/SP</p>
+        </div>
+        <div class="flex gap-6 text-sm text-gray-500">
+          <a href="#" class="hover:text-purple-light transition-colors duration-200">Política de Privacidade</a>
+          <a href="#" class="hover:text-purple-light transition-colors duration-200">Termos de Uso</a>
+          <a href="https://contelerotas.com.br" target="_blank" rel="noopener noreferrer" class="hover:text-purple-light transition-colors duration-200">Contele Fleet</a>
+        </div>
+      </div>
+      <div class="border-t border-white/5 mt-8 pt-6 text-center">
+        <p class="text-gray-600 text-xs">Gerador de Política de Frota — Ferramenta gratuita da Contele Fleet para gestores de frotas corporativas.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+
+    // ============================================
+    // CONFIG DOS STEPS
+    // ============================================
+    const STEPS_CONFIG = {
+      1: { label: 'Passo 1 de 7 — Dados da Empresa',           percent: '14%',  width: '14%'  },
+      2: { label: 'Passo 2 de 7 — Responsável pela Frota',     percent: '29%',  width: '29%'  },
+      3: { label: 'Passo 3 de 7 — Velocidade e Horários',      percent: '43%',  width: '43%'  },
+      4: { label: 'Passo 4 de 7 — Nível do Tanque',            percent: '57%',  width: '57%'  },
+      5: { label: 'Passo 5 de 7 — Registro de Abastecimentos', percent: '71%',  width: '71%'  },
+      6: { label: 'Passo 6 de 7 — Localização e Data',         percent: '86%',  width: '86%'  },
+      7: { label: 'Passo 7 de 7 — Quantidade e Contato',       percent: '100%', width: '100%' },
+    };
+
+    let currentStep = 1;
+
+    function showStep(n) {
+      for (let i = 1; i <= 7; i++) {
+        document.getElementById(`step-${i}`).classList.add('hidden');
+      }
+      const el = document.getElementById(`step-${n}`);
+      el.classList.remove('hidden');
+      el.classList.remove('section-fade');
+      void el.offsetWidth;
+      el.classList.add('section-fade');
+
+      document.getElementById('step-label').textContent   = STEPS_CONFIG[n].label;
+      document.getElementById('step-percent').textContent = STEPS_CONFIG[n].percent;
+      document.getElementById('progress-bar').style.width = STEPS_CONFIG[n].width;
+      currentStep = n;
+    }
+
+    function nextStep(from) {
+      if (!validateStep(from)) return;
+      showStep(from + 1);
+      document.getElementById('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function prevStep(from) {
+      showStep(from - 1);
+      document.getElementById('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ============================================
+    // RADIO BUTTONS
+    // ============================================
+    function selectRadio(name, value, el) {
+      // Desmarcar todos do grupo
+      document.querySelectorAll(`[name="${name}"]`).forEach(r => {
+        r.checked = false;
+        r.closest('.radio-option').classList.remove('selected');
+      });
+      // Marcar o clicado
+      el.classList.add('selected');
+      const radio = el.querySelector('input[type="radio"]');
+      radio.checked = true;
+      // Esconder erro
+      const errEl = document.getElementById(`${name}-error`);
+      if (errEl) errEl.classList.add('hidden');
+    }
+
+    function getRadioValue(name) {
+      const checked = document.querySelector(`[name="${name}"]:checked`);
+      if (!checked) return null;
+      if (checked.value === `outro-${name}`) {
+        return document.getElementById(`${name}-outro`).value.trim() || null;
+      }
+      return checked.value;
+    }
+
+    // ============================================
+    // VALIDAÇÃO
+    // ============================================
+    function validateStep(step) {
+      let valid = true;
+
+      const textFields = {
+        1: ['razao-social', 'email', 'nome-politica'],
+        2: ['nome-responsavel', 'cpf-responsavel', 'rg-responsavel'],
+        3: ['velocidade', 'horario'],
+        6: ['localizacao'],
+        7: ['qtd-veiculos', 'whatsapp'],
+      };
+
+      if (textFields[step]) {
+        textFields[step].forEach(id => {
+          const el = document.getElementById(id);
+          const empty = !el.value.trim();
+          el.classList.toggle('field-error', empty);
+          if (empty) {
+            valid = false;
+            el.addEventListener('input', () => el.classList.remove('field-error'), { once: true });
+          }
+        });
+        // Validação de e-mail
+        if (step === 1) {
+          const emailEl = document.getElementById('email');
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value.trim())) {
+            emailEl.classList.add('field-error');
+            valid = false;
+          }
+        }
+      }
+
+      if (step === 4) {
+        const val = getRadioValue('tanque');
+        if (!val) {
+          document.getElementById('tanque-error').classList.remove('hidden');
+          valid = false;
+        }
+      }
+
+      if (step === 5) {
+        const val = getRadioValue('abastecimento');
+        if (!val) {
+          document.getElementById('abastecimento-error').classList.remove('hidden');
+          valid = false;
+        }
+      }
+
+      return valid;
+    }
+
+    // ============================================
+    // GERAÇÃO DO DOCUMENTO
+    // ============================================
+    function generatePolicy() {
+      if (!validateStep(7)) return;
+
+      const empresa       = document.getElementById('razao-social').value.trim();
+      const email         = document.getElementById('email').value.trim();
+      const nomePolitica  = document.getElementById('nome-politica').value.trim().toUpperCase();
+      const responsavel   = document.getElementById('nome-responsavel').value.trim();
+      const cpf           = document.getElementById('cpf-responsavel').value.trim();
+      const rg            = document.getElementById('rg-responsavel').value.trim();
+      const velocidade    = document.getElementById('velocidade').value.trim();
+      const horario       = document.getElementById('horario').value.trim();
+      const tanque        = getRadioValue('tanque');
+      const abastecimento = getRadioValue('abastecimento');
+      const localizacao   = document.getElementById('localizacao').value.trim();
+      const localData     = document.getElementById('local-data').value.trim() || new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'});
+      const qtd           = document.getElementById('qtd-veiculos').value.trim();
+      const whatsapp      = document.getElementById('whatsapp').value.trim();
+
+      const hoje = new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'});
+
+      const d = { empresa, email, nomePolitica, responsavel, cpf, rg, velocidade, horario, tanque, abastecimento, localizacao, localData, qtd, whatsapp, hoje };
+      window._formData = d;
+
+      // Enviar lead para o servidor proxy (fire-and-forget)
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, responsavel, empresa, whatsapp })
+      }).catch(() => {});
+
+      const pdfHtml = buildPdfHtml(d, window.location.origin);
+      window._pdfHtml = pdfHtml;
+
+      if (window._prevBlobUrl) URL.revokeObjectURL(window._prevBlobUrl);
+      const blob = new Blob([pdfHtml], { type: 'text/html;charset=utf-8' });
+      window._prevBlobUrl = URL.createObjectURL(blob);
+      document.getElementById('pdf-frame').src = window._prevBlobUrl;
+
+      document.getElementById('form').classList.add('hidden');
+      const sec = document.getElementById('policy-section');
+      sec.classList.remove('hidden');
+      setTimeout(() => sec.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+
+    // ============================================
+    // AÇÕES DO DOCUMENTO
+    // ============================================
+
+    function buildPdfHtml(d, baseUrl) {
+      baseUrl = baseUrl || window.location.origin;
+      const logoHtml = window._clientLogo
+        ? `<img src="${window._clientLogo}" style="max-width:160pt; max-height:52pt; object-fit:contain;" />`
+        : '[SEU LOGO AQUI]';
+      return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<title>Política de Frota — ${d.empresa}</title>
+<style>
+  @page { size: A4; margin: 1.8cm 2cm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 10pt; color: #000; line-height: 1.5; background: #fff; }
+
+  /* ── Tabela de cabeçalho ── */
+  table.header { width: 100%; border-collapse: collapse; margin-bottom: 12pt; }
+  table.header td { border: 1px solid #000; padding: 6pt 8pt; vertical-align: middle; }
+  .cell-logo { width: 58%; min-height: 52pt; font-size: 9pt; color: #777; font-style: italic; }
+  .cell-brand { width: 42%; text-align: center; padding: 8pt; vertical-align: middle; }
+  .cell-title { text-align: center; font-weight: bold; font-size: 11pt; letter-spacing: 2pt; padding: 5pt; }
+  .cell-info { font-size: 9pt; padding: 5pt 8pt; vertical-align: top; }
+  .cell-info strong { display: block; margin-bottom: 2pt; }
+
+  /* ── Corpo ── */
+  .sec-title { font-weight: bold; font-size: 10pt; margin-top: 11pt; margin-bottom: 3pt; }
+  .sec-body  { font-size: 10pt; margin-bottom: 4pt; text-align: justify; }
+  .highlight { color: #c0392b; font-style: italic; font-weight: bold; }
+  ol.alpha   { padding-left: 20pt; margin: 3pt 0 5pt 0; }
+  ol.alpha li { font-size: 10pt; margin-bottom: 2pt; text-align: justify; }
+
+  /* ── Assinaturas ── */
+  .sig-wrap  { margin-top: 22pt; }
+  .sig-block { display: inline-block; width: 45%; margin-right: 5%; vertical-align: top; margin-top: 14pt; }
+  .sig-line  { border-top: 1px solid #000; margin-bottom: 3pt; }
+  .sig-name  { font-size: 9pt; font-weight: bold; }
+  .sig-info  { font-size: 9pt; }
+  .date-line { font-size: 10pt; margin-bottom: 8pt; }
+</style>
+</head>
+<body>
+
+<!-- CABEÇALHO -->
+<table class="header">
+  <tr>
+    <td class="cell-logo">${logoHtml}</td>
+    <td class="cell-brand">
+      <img src="${baseUrl}/logo-contele-fleet.png" style="max-width:130pt; max-height:55pt; object-fit:contain;" />
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" class="cell-title">POLÍTICA DE FROTA</td>
+  </tr>
+  <tr>
+    <td class="cell-info"><strong>Responsável pela Frota:</strong> ${d.responsavel}</td>
+    <td class="cell-info"><strong>CONDUTOR DO VEÍCULO:</strong><br/><br/>Data de criação: ${d.localData}<br/>Data da última revisão: ${d.hoje}</td>
+  </tr>
+</table>
+
+<!-- CORPO -->
+<div class="sec-title">1. OBJETIVO</div>
+<div class="sec-body">Definir diretrizes, regras e procedimentos de utilização dos veículos da <span class="highlight">${d.empresa}</span> a um colaborador, para execução de atividades ligadas à empresa.</div>
+
+<div class="sec-title">2. CONDUTOR DO VEÍCULO</div>
+<div class="sec-body">São todos os colaboradores legalmente aptos a utilização dos veículos com fins de desempenho das atividades ligadas à empresa, e com a devida permissão do RESPONSÁVEL PELA FROTA.</div>
+
+<div class="sec-title">3. RESPONSÁVEL PELA FROTA</div>
+<div class="sec-body">São todos os colaboradores, incluindo o responsável pela frota, que trabalham com a administração de recursos humanos, materiais e financeiros, providenciando meios para a realização das atividades profissionais relacionadas à utilização dos veículos da empresa.</div>
+
+<div class="sec-title">3. RESPONSÁVEIS</div>
+
+<div class="sec-title">3.1. CONDUTOR DO VEÍCULO</div>
+<ol class="alpha" type="a">
+  <li>Ler regras disponíveis no presente documento, rubricando todas as páginas e assinando ao final;</li>
+  <li>Obedecer todas as leis de trânsito vigentes, incluindo leis federais, estaduais e municipais;</li>
+  <li>Manter a sua CNH em dia, devidamente regularizada, constando a licença EAR (Exerce Atividade Remunerada);</li>
+  <li>Entregar semestralmente a certidão de pontos na CNH, que pode ser consultada no site do DETRAN do estado do condutor;</li>
+  <li>Zelar pela conservação do veículo e do patrimônio da empresa.</li>
+  <li>Ter a ciência de que o veículo é monitorado e rastreado, por uma questão de logística, proteção e segurança.</li>
+</ol>
+
+<div class="sec-title">3.2. RESPONSÁVEL PELA FROTA</div>
+<ol class="alpha" type="a">
+  <li>Garantir a assinatura do presente documento por parte do CONDUTOR DO VEÍCULO;</li>
+  <li>Contratar e estabelecer parcerias com os fornecedores ligados aos recursos utilizados na frota de veículos, seguindo os procedimentos para tal;</li>
+  <li>Controlar e gerenciar a manutenção dos veículos da empresa;</li>
+  <li>Promover ações que busca estimular a direção mais segura, redução de custos e melhorias de produtividade;</li>
+  <li>Garantir a regularidade dos veículos, relacionados a questões legais e obrigatoriedades da empresa;</li>
+  <li>Garantir que o CONDUTOR DO VEÍCULO esteja com a CNH em dia e regularizada;</li>
+  <li>Gerenciar os custos da frota, relacionados a combustível, multas, manutenções e tudo que envolva os veículos da empresa;</li>
+  <li>Manter a política de frota atualizada.</li>
+</ol>
+
+<div class="sec-title">4. PROCEDIMENTOS PARA UTILIZAÇÃO DO VEÍCULO</div>
+
+<div class="sec-title">4.1 DAS DISPOSIÇÕES GERAIS:</div>
+<ol class="alpha" type="a">
+  <li>O colaborador deverá ter conhecimento da Legislação de Trânsito em vigor, sendo sujeito a penalidades legais em caso de descumprimento da lei.</li>
+  <li>Entregar o veículo semanalmente para uma lavagem, recolhendo notas e comprovantes da realização e entregando para o RESPONSÁVEL PELA FROTA;</li>
+  <li>A condução só poderá ser realizada pelo CONDUTOR DO VEÍCULO, não podendo ser repassado ou cedido a outros, salvo mediante expressa autorização da empresa;</li>
+  <li>A utilização do veículo só poderá ser feita para atividades da empresa, sendo expressamente proibida a sua utilização para fins particulares, salvo mediante expressa autorização da empresa;</li>
+  <li>As despesas ocorridas devido a utilização particular do veículo correrão por conta exclusiva do CONDUTOR DO VEÍCULO, incluindo indenizações de acidentes e multas de trânsito;</li>
+  <li>O CONDUTOR DO VEÍCULO não está autorizado a permanecer com o veículo nos finais de semana, salvo mediante expressa autorização da empresa.</li>
+  <li>Não é permitido fazer alterações nas características dos veículos, como a instalação de equipamentos, fixação de adesivos, etc.</li>
+  <li>É de responsabilidade do CONDUTOR DO VEÍCULO cumprir a lei de jornada do motorista, e de responsabilidade do RESPONSÁVEL PELA FROTA a fiscalização.</li>
+  <li>É de dever do colaborador fazer uma parada de 20 (vinte) a 30 (trinta) minutos, a cada 04 (quatro) horas de condução e/ou operação do veículo;</li>
+  <li>Os horários e dias permitidos para utilização do veículo são: <strong>${d.horario}</strong>.</li>
+</ol>
+
+<div class="sec-title">4.2 DA UTILIZAÇÃO DO VEÍCULO</div>
+<ol class="alpha" type="a">
+  <li>É terminantemente proibida a utilização do veículo por terceiros não ligados a empresa;</li>
+  <li>É terminantemente proibida a utilização do veículo para a concessão de carona;</li>
+  <li>É terminantemente proibido utilizar aparelhos celulares para falar, ler ou escrever ao dirigir, exceto GPS conforme a lei vigente;</li>
+  <li>É terminantemente proibido exceder a velocidade máxima de <strong>${d.velocidade} km/h</strong> permitida pela legislação vigente em vias urbanas e rurais;</li>
+  <li>Portar objetos que representam risco, como armas de fogo, explosivos, combustíveis e/ou materiais químicos ou inflamáveis;</li>
+  <li>Transportar substâncias entorpecentes ou consideradas ilegais perante a lei;</li>
+  <li>Utilizar o veículo em desacordo com o manual do veículo fornecido pelo fabricante;</li>
+  <li>Fumar e/ou beber bebidas alcoólicas dentro do veículo;</li>
+  <li>É terminantemente proibido dirigir após 12 (doze) horas de ter ingerido bebida alcoólica.</li>
+  <li>Só é permitida a utilização do veículo <strong>${d.localizacao}</strong>.</li>
+</ol>
+
+<div class="sec-title">4.3 DOS ABASTECIMENTOS</div>
+<ol class="alpha" type="a">
+  <li>O carro deve ser entregue sempre com <strong>${d.tanque}</strong>;</li>
+  <li>${d.abastecimento}</li>
+</ol>
+
+<div class="sec-title">5. PROCEDIMENTO PARA MANUTENÇÕES E AUTUAÇÕES</div>
+
+<div class="sec-title">5.2 MANUTENÇÃO</div>
+<ol class="alpha" type="a">
+  <li>É de responsabilidade do colaborador CONDUTOR DO VEÍCULO realizar a inspeção de operação do veículo, vistoriando sempre: Calibragem de pneus; nível de óleo; nível de água; funcionamento de lanternas, entre outros itens solicitados pelo RESPONSÁVEL PELA FROTA;</li>
+  <li>Cabe ao CONDUTOR DO VEÍCULO estar atento ao programa de revisão obrigatório determinada pelo fabricante;</li>
+  <li>Quando for necessária a manutenção do veículo, é de responsabilidade do CONDUTOR DO VEÍCULO informar o RESPONSÁVEL PELA FROTA;</li>
+  <li>As despesas de manutenção decorrentes do mau uso do veículo ou uso indevido, correrão por conta do CONDUTOR DO VEÍCULO.</li>
+</ol>
+
+<div class="sec-title">5.3 MULTAS</div>
+<ol class="alpha" type="a">
+  <li>As infrações recebidas devem ser entregues ao CONDUTOR DO VEÍCULO, para que fique ciente do valor a ser descontado em folha de pagamento;</li>
+  <li>No recebimento de uma notificação no ato da multa, o CONDUTOR DO VEÍCULO se compromete a encaminhar a notificação preenchida e assinada para o RESPONSÁVEL PELA FROTA;</li>
+  <li>A responsabilidade pelo ressarcimento de multas e infrações a lei de trânsito é do CONDUTOR DO VEÍCULO.</li>
+  <li>É expressamente proibido fazer a identificação do condutor na multa utilizando-se de dados de terceiros, devendo ser feita obrigatoriamente com o nome do CONDUTOR DO VEÍCULO infrator;</li>
+  <li>Se a CNH do CONDUTOR DO VEÍCULO for suspensa, o veículo concedido será recolhido pela empresa, até que a situação seja devidamente regularizada;</li>
+  <li>O CONDUTOR DO VEÍCULO responde civil e criminalmente pelos atos praticados na condução do veículo cedidos;</li>
+  <li>Colaboradores reincidentes de multa são passíveis de advertência por escrito.</li>
+</ol>
+
+<div class="sec-title">5.6 SINISTROS</div>
+<ol class="alpha" type="a">
+  <li>Ao ocorrer avaria, acidente, furto ou roubo, é de responsabilidade do CONDUTOR DO VEÍCULO registrar Boletim de Ocorrência, acionando o RESPONSÁVEL PELA FROTA da empresa e, se solicitado pela empresa, a seguradora ou locadora do veículo.</li>
+  <li>As despesas decorrentes de Sinistro (exceto multas e infrações), serão de responsabilidade da empresa, exceto nos casos de: Dolo (direto ou eventual), culpa (negligência, imperícia ou imprudência), por condução fora das leis e normas brasileiras; ou no uso para fins particulares sem autorização do RESPONSÁVEL PELA FROTA.</li>
+</ol>
+
+<div class="sec-title">6. AUTORIZAÇÃO DE DESCONTO</div>
+<div class="sec-body">Em caso de eventuais multas de trânsito, que sob a responsabilidade do CONDUTOR DO VEÍCULO tenham sido cometidas, a assinatura do presente documento AUTORIZA, desde já, que a EMPRESA efetue os descontos correspondentes no contracheque do CONDUTOR DO VEÍCULO.</div>
+<div class="sec-body">Em caso de rescisão do contrato de trabalho, os eventuais valores devidos de infrações serão integralmente descontados, em uma única parcela, no Termo de Rescisão do Controle de Trabalho do Empregado.</div>
+
+<div class="sec-title">7. CONSIDERAÇÕES FINAIS</div>
+<div class="sec-body">As normas acima estabelecidas entram em vigor a partir da data de elaboração deste documento, podendo ser alteradas sem aviso prévio por parte do RESPONSÁVEL PELA FROTA.</div>
+
+<div class="sec-title">8. ASSINATURAS E DATAS</div>
+<div class="date-line" style="margin-top:8pt;">${d.localData}</div>
+<div class="sig-wrap">
+  <div class="sig-block">
+    <div class="sig-line"></div>
+    <div class="sig-name">RESPONSÁVEL PELA FROTA</div>
+    <div class="sig-info">CPF: ${d.cpf}</div>
+    <div class="sig-info">RG: ${d.rg}</div>
+  </div>
+  <div class="sig-block">
+    <div class="sig-line"></div>
+    <div class="sig-name">CONDUTOR DO VEÍCULO</div>
+    <div class="sig-info">CPF:</div>
+    <div class="sig-info">RG:</div>
+  </div>
+</div>
+
+</body></html>`;
+    }
+
+    function downloadPDF() {
+      if (!window._pdfHtml) return;
+      const printHtml = window._pdfHtml.replace('</body>', '<script>window.onload=function(){window.print();}<\/script></body>');
+      const win = window.open('', '_blank');
+      win.document.write(printHtml);
+      win.document.close();
+    }
+
+    function downloadTXT() {
+      if (!window._policyText) return;
+      const empresa = (window._policyEmpresa || 'empresa').normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9\s]/g, '')
+        .replace(/\s+/g, '-').toLowerCase();
+      const blob = new Blob([window._policyText], { type: 'text/plain;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url; a.download = `politica-de-frota-${empresa}.txt`;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+
+    function copyText() {
+      if (!window._policyText) return;
+      navigator.clipboard.writeText(window._policyText).then(() => {
+        const btn = document.getElementById('btn-copy');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copiado!';
+        btn.classList.add('bg-green-50', 'border-green-500', 'text-green-600');
+        btn.classList.remove('border-purple-500', 'text-purple-500');
+        setTimeout(() => {
+          btn.innerHTML = orig;
+          btn.classList.remove('bg-green-50', 'border-green-500', 'text-green-600');
+          btn.classList.add('border-purple-500', 'text-purple-500');
+        }, 2500);
+      });
+    }
+
+    // ============================================
+    // LOGO DO CLIENTE
+    // ============================================
+    document.getElementById('logo-upload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        window._clientLogo = event.target.result;
+        document.getElementById('logo-preview-img').src = event.target.result;
+        document.getElementById('logo-preview').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function removeLogo() {
+      window._clientLogo = null;
+      document.getElementById('logo-upload').value = '';
+      document.getElementById('logo-preview').classList.add('hidden');
+      document.getElementById('logo-preview-img').src = '';
+    }
+
+    function resetForm() {
+      // Limpar campos de texto
+      ['razao-social','email','nome-politica','nome-responsavel','cpf-responsavel',
+       'rg-responsavel','velocidade','horario','localizacao','local-data',
+       'qtd-veiculos','whatsapp','tanque-outro','abastecimento-outro'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.value = ''; el.classList.remove('field-error'); }
+      });
+      // Limpar radios
+      document.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = false; });
+      document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
+      // Limpar erros
+      ['tanque-error','abastecimento-error'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      // Reset
+      removeLogo();
+      window._pdfHtml = null;
+      window._formData = null;
+      if (window._prevBlobUrl) { URL.revokeObjectURL(window._prevBlobUrl); window._prevBlobUrl = null; }
+      document.getElementById('pdf-frame').src = '';
+      document.getElementById('policy-section').classList.add('hidden');
+      document.getElementById('form').classList.remove('hidden');
+      showStep(1);
+      setTimeout(() => document.getElementById('form').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+  </script>
+
+</body>
+</html>
