@@ -196,11 +196,11 @@
         <!-- Barra de progresso -->
         <div class="mb-8">
           <div class="flex justify-between text-sm font-semibold mb-2">
-            <span id="step-label" class="text-purple-500">Passo 1 de 7 — Dados da Empresa</span>
-            <span id="step-percent" class="text-gray-400">14%</span>
+            <span id="step-label" class="text-purple-500">Passo 1 de 9 — Dados da Empresa</span>
+            <span id="step-percent" class="text-gray-400">11%</span>
           </div>
           <div class="w-full bg-gray-100 rounded-full h-2.5">
-            <div id="progress-bar" class="gradient-purple h-2.5 rounded-full progress-bar" style="width:14%"></div>
+            <div id="progress-bar" class="gradient-purple h-2.5 rounded-full progress-bar" style="width:11%"></div>
           </div>
         </div>
 
@@ -419,6 +419,80 @@
             <button onclick="prevStep(7)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
               <i class="fa-solid fa-arrow-left"></i> Voltar
             </button>
+            <button onclick="nextStep(7)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+              Avançar <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 8: Identificação de Multas ===== -->
+        <div id="step-8" class="section-fade hidden">
+          <div class="grid grid-cols-1 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Como será feita a identificação e a responsabilização pelas infrações de trânsito (multas)? <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-3">Escolha a forma como a empresa identificará o condutor infrator e como será conduzido o processo de indicação de condutor e cobrança.</p>
+              <div class="grid grid-cols-1 gap-3" id="multas-group">
+                <div class="radio-option" onclick="selectRadio('multas','A identificação é feita de forma automática pelo sistema da empresa, que consulta os órgãos públicos e cruza os dados do veículo e do motorista no momento da infração. O CONDUTOR DO VEÍCULO fica ciente de que a indicação ao órgão de trânsito e o desconto do valor da multa em folha de pagamento serão processados de maneira automatizada.',this)">
+                  <input type="radio" name="multas" value="automatica" />
+                  <label>A identificação é feita de forma <strong>automática pelo sistema da empresa</strong>, que consulta os órgãos públicos e cruza os dados do veículo e do motorista no momento da infração. O CONDUTOR DO VEÍCULO fica ciente de que a indicação ao órgão de trânsito e o desconto do valor da multa em folha de pagamento serão processados de maneira automatizada.</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('multas','O RESPONSÁVEL PELA FROTA identificará o condutor através do histórico de uso do sistema. Após a identificação, o CONDUTOR DO VEÍCULO será notificado para assinar manualmente o formulário de indicação de condutor infrator e o termo de autorização de desconto em folha.',this)">
+                  <input type="radio" name="multas" value="manual" />
+                  <label>O <strong>RESPONSÁVEL PELA FROTA</strong> identificará o condutor através do histórico de uso do sistema. Após a identificação, o CONDUTOR DO VEÍCULO será notificado para assinar manualmente o formulário de indicação de condutor infrator e o termo de autorização de desconto em folha.</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('multas','A identificação do CONDUTOR DO VEÍCULO será realizada via sistema para fins de aplicação de medidas administrativas (advertências/suspensões) de acordo com a política interna, sendo o pagamento financeiro da multa assumido integralmente pela empresa.',this)">
+                  <input type="radio" name="multas" value="administrativa" />
+                  <label>A identificação do CONDUTOR DO VEÍCULO será realizada via sistema para fins de aplicação de <strong>medidas administrativas</strong> (advertências/suspensões) de acordo com a política interna, sendo o pagamento financeiro da multa assumido integralmente pela empresa.</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('multas','outro-multas',this)">
+                  <input type="radio" name="multas" value="outro-multas" />
+                  <label>Outro: <input id="multas-outro" type="text" onclick="event.stopPropagation()" placeholder="Especifique..." class="ml-2 border-b border-gray-300 focus:border-purple-500 outline-none text-sm w-40" /></label>
+                </div>
+              </div>
+              <p id="multas-error" class="text-red-500 text-xs mt-2 hidden">Selecione uma opção.</p>
+            </div>
+          </div>
+          <div class="mt-8 flex gap-3 justify-between">
+            <button onclick="prevStep(8)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
+              <i class="fa-solid fa-arrow-left"></i> Voltar
+            </button>
+            <button onclick="nextStep(8)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+              Avançar <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 9: Câmeras Veiculares ===== -->
+        <div id="step-9" class="section-fade hidden">
+          <div class="grid grid-cols-1 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Qual será a política de uso e privacidade para as câmeras veiculares instaladas (cabine, via e baú)? <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-3">Defina os limites de captação de imagens, finalidade do monitoramento e proteção dos dados do motorista em conformidade com a LGPD.</p>
+              <div class="grid grid-cols-1 gap-3" id="cameras-group">
+                <div class="radio-option" onclick="selectRadio('cameras','As câmeras capturam imagens da via, da cabine e do baú com o objetivo exclusivo de garantir a segurança do motorista e da carga, auditar sinistros e prevenir acidentes (alertas de fadiga/distração). O CONDUTOR DO VEÍCULO declara ciência de que o tratamento das imagens é confidencial e restrito aos profissionais autorizados.',this)">
+                  <input type="radio" name="cameras" value="segurança" />
+                  <label>As câmeras capturam imagens da via, da cabine e do baú com o objetivo exclusivo de <strong>garantir a segurança</strong> do motorista e da carga, auditar sinistros e prevenir acidentes (alertas de fadiga/distração). O CONDUTOR DO VEÍCULO declara ciência de que o tratamento das imagens é confidencial e restrito aos profissionais autorizados.</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('cameras','As câmeras realizarão a gravação contínua de áudio e vídeo da cabine, via e baú durante todo o período de operação do veículo para fins de auditoria em tempo real. Os dados gravados do CONDUTOR DO VEÍCULO serão armazenados em ambiente seguro pelo prazo legal.',this)">
+                  <input type="radio" name="cameras" value="continua" />
+                  <label>As câmeras realizarão a <strong>gravação contínua</strong> de áudio e vídeo da cabine, via e baú durante todo o período de operação do veículo para fins de auditoria em tempo real. Os dados gravados do CONDUTOR DO VEÍCULO serão armazenados em ambiente seguro pelo prazo legal.</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('cameras','As câmeras internas (cabine) funcionarão apenas sob o modelo de captura por evento (alertas de direção perigosa, uso de celular ou fadiga), preservando a privacidade do CONDUTOR DO VEÍCULO em condições normais de direção. As câmeras externas (via) e de carga (baú) gravam continuamente.',this)">
+                  <input type="radio" name="cameras" value="evento" />
+                  <label>As câmeras internas (cabine) funcionarão apenas sob o modelo de <strong>captura por evento</strong> (alertas de direção perigosa, uso de celular ou fadiga), preservando a privacidade do CONDUTOR DO VEÍCULO em condições normais de direção. As câmeras externas (via) e de carga (baú) gravam continuamente.</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('cameras','outro-cameras',this)">
+                  <input type="radio" name="cameras" value="outro-cameras" />
+                  <label>Outro: <input id="cameras-outro" type="text" onclick="event.stopPropagation()" placeholder="Especifique..." class="ml-2 border-b border-gray-300 focus:border-purple-500 outline-none text-sm w-40" /></label>
+                </div>
+              </div>
+              <p id="cameras-error" class="text-red-500 text-xs mt-2 hidden">Selecione uma opção.</p>
+            </div>
+          </div>
+          <div class="mt-8 flex gap-3 justify-between">
+            <button onclick="prevStep(9)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
+              <i class="fa-solid fa-arrow-left"></i> Voltar
+            </button>
             <button onclick="generatePolicy()" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
               <i class="fa-solid fa-file-circle-check"></i> Gerar Minha Política
             </button>
@@ -448,9 +522,29 @@
           class="inline-flex items-center gap-2 gradient-purple btn-glow text-white font-bold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg">
           <i class="fa-solid fa-file-pdf"></i> Baixar PDF
         </button>
+        <button onclick="downloadDOCX()" id="btn-docx"
+          class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg">
+          <i class="fa-solid fa-file-word"></i> Baixar Word (.doc)
+        </button>
+        <button onclick="downloadGoogleDocs()" id="btn-gdocs"
+          class="inline-flex items-center gap-2 bg-white border-2 border-gray-200 hover:border-blue-400 text-gray-700 hover:text-blue-600 font-bold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-sm">
+          <i class="fa-brands fa-google text-blue-500"></i> Google Docs
+        </button>
         <button onclick="resetForm()"
           class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 font-semibold px-6 py-3 rounded-xl border border-gray-200 hover:border-gray-300 transition-all duration-300">
           <i class="fa-solid fa-rotate-left"></i> Gerar Nova Política
+        </button>
+      </div>
+
+      <!-- Toast Google Docs -->
+      <div id="gdocs-toast" class="hidden mb-4 mx-auto max-w-lg bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm text-blue-800 flex items-start gap-3 section-fade">
+        <i class="fa-brands fa-google text-blue-500 mt-0.5 flex-shrink-0 text-lg"></i>
+        <div>
+          <p class="font-semibold mb-1">Arquivo .doc baixado!</p>
+          <p>Para editar no Google Docs: acesse <strong>drive.google.com</strong> → clique em <strong>+ Novo → Fazer upload de arquivo</strong> → selecione o arquivo baixado. O Google Drive converterá automaticamente para Google Docs.</p>
+        </div>
+        <button onclick="document.getElementById('gdocs-toast').classList.add('hidden')" class="ml-auto text-blue-400 hover:text-blue-600 flex-shrink-0">
+          <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
@@ -474,9 +568,7 @@
           <p class="text-gray-600 text-xs mt-0.5">Rua Euclides da Cunha, nº 11 — Cj 601 — Santos/SP</p>
         </div>
         <div class="flex gap-6 text-sm text-gray-500">
-          <a href="#" class="hover:text-purple-light transition-colors duration-200">Política de Privacidade</a>
-          <a href="#" class="hover:text-purple-light transition-colors duration-200">Termos de Uso</a>
-          <a href="https://contelerotas.com.br" target="_blank" rel="noopener noreferrer" class="hover:text-purple-light transition-colors duration-200">Contele Fleet</a>
+          <a href="https://contelefleet.com.br/" target="_blank" rel="noopener noreferrer" class="hover:text-purple-light transition-colors duration-200">Contele Fleet</a>
         </div>
       </div>
       <div class="border-t border-white/5 mt-8 pt-6 text-center">
@@ -492,19 +584,21 @@
     // CONFIG DOS STEPS
     // ============================================
     const STEPS_CONFIG = {
-      1: { label: 'Passo 1 de 7 — Dados da Empresa',           percent: '14%',  width: '14%'  },
-      2: { label: 'Passo 2 de 7 — Responsável pela Frota',     percent: '29%',  width: '29%'  },
-      3: { label: 'Passo 3 de 7 — Velocidade e Horários',      percent: '43%',  width: '43%'  },
-      4: { label: 'Passo 4 de 7 — Nível do Tanque',            percent: '57%',  width: '57%'  },
-      5: { label: 'Passo 5 de 7 — Registro de Abastecimentos', percent: '71%',  width: '71%'  },
-      6: { label: 'Passo 6 de 7 — Localização e Data',         percent: '86%',  width: '86%'  },
-      7: { label: 'Passo 7 de 7 — Quantidade e Contato',       percent: '100%', width: '100%' },
+      1: { label: 'Passo 1 de 9 — Dados da Empresa',              percent: '11%',  width: '11%'  },
+      2: { label: 'Passo 2 de 9 — Responsável pela Frota',        percent: '22%',  width: '22%'  },
+      3: { label: 'Passo 3 de 9 — Velocidade e Horários',         percent: '33%',  width: '33%'  },
+      4: { label: 'Passo 4 de 9 — Nível do Tanque',               percent: '44%',  width: '44%'  },
+      5: { label: 'Passo 5 de 9 — Registro de Abastecimentos',    percent: '56%',  width: '56%'  },
+      6: { label: 'Passo 6 de 9 — Localização e Data',            percent: '67%',  width: '67%'  },
+      7: { label: 'Passo 7 de 9 — Quantidade e Contato',          percent: '78%',  width: '78%'  },
+      8: { label: 'Passo 8 de 9 — Identificação de Multas',       percent: '89%',  width: '89%'  },
+      9: { label: 'Passo 9 de 9 — Câmeras Veiculares',            percent: '100%', width: '100%' },
     };
 
     let currentStep = 1;
 
     function showStep(n) {
-      for (let i = 1; i <= 7; i++) {
+      for (let i = 1; i <= 9; i++) {
         document.getElementById(`step-${i}`).classList.add('hidden');
       }
       const el = document.getElementById(`step-${n}`);
@@ -607,6 +701,22 @@
         }
       }
 
+      if (step === 8) {
+        const val = getRadioValue('multas');
+        if (!val) {
+          document.getElementById('multas-error').classList.remove('hidden');
+          valid = false;
+        }
+      }
+
+      if (step === 9) {
+        const val = getRadioValue('cameras');
+        if (!val) {
+          document.getElementById('cameras-error').classList.remove('hidden');
+          valid = false;
+        }
+      }
+
       return valid;
     }
 
@@ -614,7 +724,7 @@
     // GERAÇÃO DO DOCUMENTO
     // ============================================
     function generatePolicy() {
-      if (!validateStep(7)) return;
+      if (!validateStep(9)) return;
 
       const empresa       = document.getElementById('razao-social').value.trim();
       const email         = document.getElementById('email').value.trim();
@@ -633,7 +743,10 @@
 
       const hoje = new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'});
 
-      const d = { empresa, email, nomePolitica, responsavel, cpf, rg, velocidade, horario, tanque, abastecimento, localizacao, localData, qtd, whatsapp, hoje };
+      const multasIdentificacao = getRadioValue('multas');
+      const camerasPolitica     = getRadioValue('cameras');
+
+      const d = { empresa, email, nomePolitica, responsavel, cpf, rg, velocidade, horario, tanque, abastecimento, localizacao, localData, qtd, whatsapp, hoje, multasIdentificacao, camerasPolitica };
       window._formData = d;
 
       // Enviar lead para o servidor proxy (fire-and-forget)
@@ -663,9 +776,15 @@
 
     function buildPdfHtml(d, baseUrl) {
       baseUrl = baseUrl || window.location.origin;
-      const logoHtml = window._clientLogo
-        ? `<img src="${window._clientLogo}" style="max-width:160pt; max-height:52pt; object-fit:contain;" />`
+      const clientLogoSrc = window._clientLogo || null;
+      const clientW = window._clientLogoW || 160;
+      const clientH = window._clientLogoH || 52;
+      const logoHtml = clientLogoSrc
+        ? `<img src="${clientLogoSrc}" width="${clientW}" height="${clientH}" />`
         : '[SEU LOGO AQUI]';
+      const conteleLogoSrc = window._conteleLogo || `${baseUrl}/logo-contele-fleet.png`;
+      const conteleW = window._conteleLogoW || 173;
+      const conteleH = window._conteleLogoH || 73;
       return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -708,14 +827,14 @@
   <tr>
     <td class="cell-logo">${logoHtml}</td>
     <td class="cell-brand">
-      <img src="${baseUrl}/logo-contele-fleet.png" style="max-width:130pt; max-height:55pt; object-fit:contain;" />
+      <img src="${conteleLogoSrc}" width="${conteleW}" height="${conteleH}" style="width:${conteleW}px;height:${conteleH}px;" />
     </td>
   </tr>
   <tr>
     <td colspan="2" class="cell-title">POLÍTICA DE FROTA</td>
   </tr>
   <tr>
-    <td class="cell-info"><strong>Responsável pela Frota:</strong> ${d.responsavel}</td>
+    <td class="cell-info"><strong style="display:block;margin-bottom:2pt;">Responsável pela Frota:</strong>${d.responsavel}</td>
     <td class="cell-info"><strong>CONDUTOR DO VEÍCULO:</strong><br/><br/>Data de criação: ${d.localData}<br/>Data da última revisão: ${d.hoje}</td>
   </tr>
 </table>
@@ -811,6 +930,12 @@
   <li>Colaboradores reincidentes de multa são passíveis de advertência por escrito.</li>
 </ol>
 
+<div class="sec-title">5.4 IDENTIFICAÇÃO DO CONDUTOR INFRATOR</div>
+<div class="sec-body">${d.multasIdentificacao}</div>
+
+<div class="sec-title">5.5 CÂMERAS VEICULARES — POLÍTICA DE USO E PRIVACIDADE</div>
+<div class="sec-body">${d.camerasPolitica}</div>
+
 <div class="sec-title">5.6 SINISTROS</div>
 <ol class="alpha" type="a">
   <li>Ao ocorrer avaria, acidente, furto ou roubo, é de responsabilidade do CONDUTOR DO VEÍCULO registrar Boletim de Ocorrência, acionando o RESPONSÁVEL PELA FROTA da empresa e, se solicitado pela empresa, a seguradora ou locadora do veículo.</li>
@@ -842,6 +967,43 @@
 </div>
 
 </body></html>`;
+    }
+
+    // ============================================
+    // EXPORTAÇÃO WORD (.doc — Word HTML format)
+    // Usa o mesmo HTML do PDF com namespaces do Word.
+    // O Word e LibreOffice renderizam o CSS preservando
+    // a formatação idêntica ao PDF.
+    // ============================================
+    function downloadDOCX() {
+      if (!window._pdfHtml) return;
+
+      const empresa = (window._formData?.empresa || 'empresa').normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9\s]/g, '')
+        .replace(/\s+/g, '-').toLowerCase();
+
+      const wordHtml = window._pdfHtml
+        .replace('<html lang="pt-BR">',
+          '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40" lang="pt-BR">')
+        .replace('</head>',
+          `<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->
+</head>`);
+
+      const blob = new Blob(['\ufeff', wordHtml], { type: 'application/msword' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `politica-de-frota-${empresa}.doc`;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+
+    function downloadGoogleDocs() {
+      if (!window._pdfHtml) return;
+      downloadDOCX();
+      const toast = document.getElementById('gdocs-toast');
+      toast.classList.remove('hidden');
+      toast.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function downloadPDF() {
@@ -882,6 +1044,31 @@
     }
 
     // ============================================
+    // PRÉ-CARREGAMENTO DO LOGO CONTELE (base64 + dimensões)
+    // ============================================
+    (function preloadConteleLogo() {
+      const img = new Image();
+      img.onload = function() {
+        // Calcular dimensões que cabem em 130pt × 55pt mantendo proporção
+        // 1pt ≈ 1.333px @ 96dpi
+        const maxW = 130 * 1.333;
+        const maxH = 55 * 1.333;
+        const ratio = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight);
+        window._conteleLogoW = Math.round(img.naturalWidth  * ratio);
+        window._conteleLogoH = Math.round(img.naturalHeight * ratio);
+        // Converter para base64
+        const canvas = document.createElement('canvas');
+        canvas.width  = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+        try { window._conteleLogo = canvas.toDataURL('image/png'); }
+        catch(e) { window._conteleLogo = img.src; }
+      };
+      img.onerror = () => {};
+      img.src = '/logo-contele-fleet.png';
+    })();
+
+    // ============================================
     // LOGO DO CLIENTE
     // ============================================
     document.getElementById('logo-upload').addEventListener('change', function(e) {
@@ -889,9 +1076,32 @@
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(event) {
-        window._clientLogo = event.target.result;
-        document.getElementById('logo-preview-img').src = event.target.result;
+        const original = event.target.result;
+        document.getElementById('logo-preview-img').src = original;
         document.getElementById('logo-preview').classList.remove('hidden');
+
+        // Redimensionar via Canvas para 160pt × 52pt (213 × 69px @ 96dpi)
+        // Assim o Word/LibreOffice renderiza no tamanho correto sem precisar de CSS
+        const img = new Image();
+        img.onload = function() {
+          const maxW = 213, maxH = 69;
+          const ratio = Math.min(maxW / img.naturalWidth, maxH / img.naturalHeight);
+          const w = Math.round(img.naturalWidth  * ratio);
+          const h = Math.round(img.naturalHeight * ratio);
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          try {
+            window._clientLogo = canvas.toDataURL('image/png');
+            window._clientLogoW = w;
+            window._clientLogoH = h;
+          } catch(err) {
+            window._clientLogo = original;
+            window._clientLogoW = 160;
+            window._clientLogoH = 52;
+          }
+        };
+        img.src = original;
       };
       reader.readAsDataURL(file);
     });
@@ -907,7 +1117,8 @@
       // Limpar campos de texto
       ['razao-social','email','nome-politica','nome-responsavel','cpf-responsavel',
        'rg-responsavel','velocidade','horario','localizacao','local-data',
-       'qtd-veiculos','whatsapp','tanque-outro','abastecimento-outro'].forEach(id => {
+       'qtd-veiculos','whatsapp','tanque-outro','abastecimento-outro',
+       'multas-outro','cameras-outro'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.value = ''; el.classList.remove('field-error'); }
       });
@@ -915,9 +1126,10 @@
       document.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = false; });
       document.querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
       // Limpar erros
-      ['tanque-error','abastecimento-error'].forEach(id => {
+      ['tanque-error','abastecimento-error','multas-error','cameras-error'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
       });
+      document.getElementById('gdocs-toast').classList.add('hidden');
       // Reset
       removeLogo();
       window._pdfHtml = null;
