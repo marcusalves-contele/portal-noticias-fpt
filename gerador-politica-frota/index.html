@@ -251,6 +251,10 @@
               <input id="rg-responsavel" type="text" placeholder="Sua resposta"
                 class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
             </div>
+            <div class="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
+              <i class="fa-solid fa-shield-halved text-blue-500 mt-0.5 flex-shrink-0"></i>
+              <p class="text-xs text-blue-700 leading-relaxed"><strong>Aviso de privacidade:</strong> Os dados de CPF e RG informados aqui <strong>não são armazenados</strong> em nosso banco de dados. Eles são utilizados exclusivamente para preencher o documento gerado, que fica apenas no seu dispositivo.</p>
+            </div>
           </div>
           <div class="mt-8 flex gap-3 justify-between">
             <button onclick="prevStep(2)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
@@ -359,74 +363,8 @@
           </div>
         </div>
 
-        <!-- ===== STEP 6: Localização e data ===== -->
+        <!-- ===== STEP 6: Identificação de Multas ===== -->
         <div id="step-6" class="section-fade hidden">
-          <div class="grid grid-cols-1 gap-5">
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Complete a frase "Só é permitida a utilização do veículo..." <span class="text-red-500">*</span></label>
-              <p class="text-xs text-gray-500 mb-1.5">Descreva as cidades ou estados em que são permitidos o uso do veículo. Ex: "...nos Estados de São Paulo e Rio de Janeiro" ou "...na Baixada Santista".</p>
-              <input id="localizacao" type="text" placeholder="Sua resposta"
-                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Local e Data de Criação</label>
-              <p class="text-xs text-gray-500 mb-1.5">Coloque o Local, Dia, Mês e Ano de criação, que ficará no final da Política de Frota. Preencha no formato (São Paulo, 20 de Novembro de 2019)</p>
-              <input id="local-data" type="text" placeholder="Ex: São Paulo, 20 de Novembro de 2019"
-                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
-            </div>
-          </div>
-          <div class="mt-8 flex gap-3 justify-between">
-            <button onclick="prevStep(6)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
-              <i class="fa-solid fa-arrow-left"></i> Voltar
-            </button>
-            <button onclick="nextStep(6)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
-              Avançar <i class="fa-solid fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- ===== STEP 7: Quantidade e WhatsApp ===== -->
-        <div id="step-7" class="section-fade hidden">
-          <div class="grid grid-cols-1 gap-5">
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Qual a quantidade de veículos na sua empresa? <span class="text-red-500">*</span></label>
-              <p class="text-xs text-gray-500 mb-1.5">Informe a quantidade de veículos que tem na frota da sua empresa. Digite apenas números.</p>
-              <input id="qtd-veiculos" type="number" placeholder="Sua resposta" min="1"
-                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Número do seu WhatsApp <span class="text-red-500">*</span></label>
-              <p class="text-xs text-gray-500 mb-1.5">Informe o número do seu WhatsApp, com o DDD. Ex: 013981659501</p>
-              <input id="whatsapp" type="tel" placeholder="Sua resposta"
-                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-gray-700 mb-1">Logo da sua empresa <span class="text-gray-400 font-normal">(opcional)</span></label>
-              <p class="text-xs text-gray-500 mb-2">Será exibida no cabeçalho da Política de Frota. PNG ou JPG.</p>
-              <label for="logo-upload" class="cursor-pointer inline-flex items-center gap-2 border-2 border-dashed border-gray-300 hover:border-purple-500 text-gray-500 hover:text-purple-500 font-semibold px-5 py-3 rounded-xl transition-all duration-200">
-                <i class="fa-solid fa-image"></i> Adicionar logo
-              </label>
-              <input id="logo-upload" type="file" accept="image/png,image/jpeg,image/jpg" class="hidden" />
-              <div id="logo-preview" class="hidden mt-3 flex items-center gap-3">
-                <img id="logo-preview-img" src="" class="max-h-12 object-contain rounded border border-gray-200 p-1" />
-                <button type="button" onclick="removeLogo()" class="text-xs text-red-400 hover:text-red-600 font-semibold flex items-center gap-1">
-                  <i class="fa-solid fa-trash"></i> Remover
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="mt-8 flex gap-3 justify-between">
-            <button onclick="prevStep(7)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
-              <i class="fa-solid fa-arrow-left"></i> Voltar
-            </button>
-            <button onclick="nextStep(7)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
-              Avançar <i class="fa-solid fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- ===== STEP 8: Identificação de Multas ===== -->
-        <div id="step-8" class="section-fade hidden">
           <div class="grid grid-cols-1 gap-4">
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Como será feita a identificação e a responsabilização pelas infrações de trânsito (multas)? <span class="text-red-500">*</span></label>
@@ -453,17 +391,17 @@
             </div>
           </div>
           <div class="mt-8 flex gap-3 justify-between">
-            <button onclick="prevStep(8)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
+            <button onclick="prevStep(6)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
               <i class="fa-solid fa-arrow-left"></i> Voltar
             </button>
-            <button onclick="nextStep(8)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+            <button onclick="nextStep(6)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
               Avançar <i class="fa-solid fa-arrow-right"></i>
             </button>
           </div>
         </div>
 
-        <!-- ===== STEP 9: Câmeras Veiculares ===== -->
-        <div id="step-9" class="section-fade hidden">
+        <!-- ===== STEP 7: Câmeras Veiculares ===== -->
+        <div id="step-7" class="section-fade hidden">
           <div class="grid grid-cols-1 gap-4">
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">Qual será a política de uso e privacidade para as câmeras veiculares instaladas (cabine, via e baú)? <span class="text-red-500">*</span></label>
@@ -487,6 +425,72 @@
                 </div>
               </div>
               <p id="cameras-error" class="text-red-500 text-xs mt-2 hidden">Selecione uma opção.</p>
+            </div>
+          </div>
+          <div class="mt-8 flex gap-3 justify-between">
+            <button onclick="prevStep(7)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
+              <i class="fa-solid fa-arrow-left"></i> Voltar
+            </button>
+            <button onclick="nextStep(7)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+              Avançar <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 8: Localização e data ===== -->
+        <div id="step-8" class="section-fade hidden">
+          <div class="grid grid-cols-1 gap-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Complete a frase "Só é permitida a utilização do veículo..." <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-1.5">Descreva as cidades ou estados em que são permitidos o uso do veículo. Ex: "...nos Estados de São Paulo e Rio de Janeiro" ou "...na Baixada Santista".</p>
+              <input id="localizacao" type="text" placeholder="Sua resposta"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Local e Data de Criação</label>
+              <p class="text-xs text-gray-500 mb-1.5">Coloque o Local, Dia, Mês e Ano de criação, que ficará no final da Política de Frota. Preencha no formato (São Paulo, 20 de Novembro de 2019)</p>
+              <input id="local-data" type="text" placeholder="Ex: São Paulo, 20 de Novembro de 2019"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+          </div>
+          <div class="mt-8 flex gap-3 justify-between">
+            <button onclick="prevStep(8)" class="border-2 border-purple-500 text-purple-500 font-bold py-3 px-8 rounded-2xl transition-all duration-300 hover:bg-purple-50 flex items-center gap-2">
+              <i class="fa-solid fa-arrow-left"></i> Voltar
+            </button>
+            <button onclick="nextStep(8)" class="gradient-purple btn-glow text-white font-bold py-3 px-10 rounded-2xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+              Avançar <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== STEP 9: Quantidade e WhatsApp ===== -->
+        <div id="step-9" class="section-fade hidden">
+          <div class="grid grid-cols-1 gap-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Qual a quantidade de veículos na sua empresa? <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-1.5">Informe a quantidade de veículos que tem na frota da sua empresa. Digite apenas números.</p>
+              <input id="qtd-veiculos" type="number" placeholder="Sua resposta" min="1"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Número do seu WhatsApp <span class="text-red-500">*</span></label>
+              <p class="text-xs text-gray-500 mb-1.5">Informe o número do seu WhatsApp, com o DDD. Ex: 013981659501</p>
+              <input id="whatsapp" type="tel" placeholder="Sua resposta"
+                class="field-input w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none transition-all duration-200" />
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Logo da sua empresa <span class="text-gray-400 font-normal">(opcional)</span></label>
+              <p class="text-xs text-gray-500 mb-2">Será exibida no cabeçalho da Política de Frota. PNG ou JPG.</p>
+              <label for="logo-upload" class="cursor-pointer inline-flex items-center gap-2 border-2 border-dashed border-gray-300 hover:border-purple-500 text-gray-500 hover:text-purple-500 font-semibold px-5 py-3 rounded-xl transition-all duration-200">
+                <i class="fa-solid fa-image"></i> Adicionar logo
+              </label>
+              <input id="logo-upload" type="file" accept="image/png,image/jpeg,image/jpg" class="hidden" />
+              <div id="logo-preview" class="hidden mt-3 flex items-center gap-3">
+                <img id="logo-preview-img" src="" class="max-h-12 object-contain rounded border border-gray-200 p-1" />
+                <button type="button" onclick="removeLogo()" class="text-xs text-red-400 hover:text-red-600 font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-trash"></i> Remover
+                </button>
+              </div>
             </div>
           </div>
           <div class="mt-8 flex gap-3 justify-between">
@@ -578,10 +582,10 @@
       3: { label: 'Passo 3 de 9 — Velocidade e Horários',         percent: '33%',  width: '33%'  },
       4: { label: 'Passo 4 de 9 — Nível do Tanque',               percent: '44%',  width: '44%'  },
       5: { label: 'Passo 5 de 9 — Registro de Abastecimentos',    percent: '56%',  width: '56%'  },
-      6: { label: 'Passo 6 de 9 — Localização e Data',            percent: '67%',  width: '67%'  },
-      7: { label: 'Passo 7 de 9 — Quantidade e Contato',          percent: '78%',  width: '78%'  },
-      8: { label: 'Passo 8 de 9 — Identificação de Multas',       percent: '89%',  width: '89%'  },
-      9: { label: 'Passo 9 de 9 — Câmeras Veiculares',            percent: '100%', width: '100%' },
+      6: { label: 'Passo 6 de 9 — Identificação de Multas',        percent: '67%',  width: '67%'  },
+      7: { label: 'Passo 7 de 9 — Câmeras Veiculares',            percent: '78%',  width: '78%'  },
+      8: { label: 'Passo 8 de 9 — Localização e Data',            percent: '89%',  width: '89%'  },
+      9: { label: 'Passo 9 de 9 — Quantidade e Contato',          percent: '100%', width: '100%' },
     };
 
     let currentStep = 1;
@@ -650,8 +654,7 @@
         1: ['razao-social', 'email', 'nome-politica'],
         2: ['nome-responsavel', 'cpf-responsavel', 'rg-responsavel'],
         3: ['velocidade', 'horario'],
-        6: ['localizacao'],
-        7: ['qtd-veiculos', 'whatsapp'],
+        9: ['qtd-veiculos', 'whatsapp'],
       };
 
       if (textFields[step]) {
@@ -690,7 +693,7 @@
         }
       }
 
-      if (step === 8) {
+      if (step === 6) {
         const val = getRadioValue('multas');
         if (!val) {
           document.getElementById('multas-error').classList.remove('hidden');
@@ -698,11 +701,20 @@
         }
       }
 
-      if (step === 9) {
+      if (step === 7) {
         const val = getRadioValue('cameras');
         if (!val) {
           document.getElementById('cameras-error').classList.remove('hidden');
           valid = false;
+        }
+      }
+
+      if (step === 8) {
+        const locEl = document.getElementById('localizacao');
+        if (!locEl.value.trim()) {
+          locEl.classList.add('field-error');
+          valid = false;
+          locEl.addEventListener('input', () => locEl.classList.remove('field-error'), { once: true });
         }
       }
 
@@ -944,20 +956,22 @@
 
 <div class="sec-title">8. ASSINATURAS E DATAS</div>
 <div class="date-line" style="margin-top:8pt;">${d.localData}</div>
-<div class="sig-wrap">
-  <div class="sig-block">
-    <div class="sig-line"></div>
-    <div class="sig-name">RESPONSÁVEL PELA FROTA</div>
-    <div class="sig-info">CPF: ${d.cpf}</div>
-    <div class="sig-info">RG: ${d.rg}</div>
-  </div>
-  <div class="sig-block">
-    <div class="sig-line"></div>
-    <div class="sig-name">CONDUTOR DO VEÍCULO</div>
-    <div class="sig-info">CPF:</div>
-    <div class="sig-info">RG:</div>
-  </div>
-</div>
+<table class="sig-wrap" style="width:100%; border-collapse:collapse; margin-top:22pt; table-layout:fixed;">
+  <tr>
+    <td style="width:240px; vertical-align:top; padding-right:30px;">
+      <div class="sig-line"></div>
+      <div class="sig-name">RESPONSÁVEL PELA FROTA</div>
+      <div class="sig-info">CPF: ${d.cpf}</div>
+      <div class="sig-info">RG: ${d.rg}</div>
+    </td>
+    <td style="width:240px; vertical-align:top;">
+      <div class="sig-line"></div>
+      <div class="sig-name">CONDUTOR DO VEÍCULO</div>
+      <div class="sig-info">CPF:</div>
+      <div class="sig-info">RG:</div>
+    </td>
+  </tr>
+</table>
 
 </body></html>`;
     }
