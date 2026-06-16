@@ -536,17 +536,6 @@
         </button>
       </div>
 
-      <!-- Toast Google Docs -->
-      <div id="gdocs-toast" class="hidden mb-4 mx-auto max-w-lg bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm text-blue-800 flex items-start gap-3 section-fade">
-        <i class="fa-brands fa-google text-blue-500 mt-0.5 flex-shrink-0 text-lg"></i>
-        <div>
-          <p class="font-semibold mb-1">Arquivo .doc baixado!</p>
-          <p>Para editar no Google Docs: acesse <strong>drive.google.com</strong> → clique em <strong>+ Novo → Fazer upload de arquivo</strong> → selecione o arquivo baixado. O Google Drive converterá automaticamente para Google Docs.</p>
-        </div>
-        <button onclick="document.getElementById('gdocs-toast').classList.add('hidden')" class="ml-auto text-blue-400 hover:text-blue-600 flex-shrink-0">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
 
       <!-- Preview do PDF -->
       <div class="rounded-3xl overflow-hidden section-fade" style="border:1px solid rgba(139,35,229,0.3); box-shadow:0 0 40px rgba(139,35,229,0.08);">
@@ -998,12 +987,34 @@
       document.body.removeChild(a); URL.revokeObjectURL(url);
     }
 
-    function downloadGoogleDocs() {
-      if (!window._pdfHtml) return;
-      downloadDOCX();
-      const toast = document.getElementById('gdocs-toast');
-      toast.classList.remove('hidden');
-      toast.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    async function downloadGoogleDocs() {
+      if (!window._pdfHtml || !window._formData) return;
+
+      const btn = document.getElementById('btn-gdocs');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Criando documento...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/gdoc/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            html:         window._pdfHtml,
+            empresa:      window._formData.empresa,
+            nomePolitica: window._formData.nomePolitica,
+          }),
+        });
+
+        const data = await res.json();
+        if (!data.docUrl) throw new Error('URL não retornada');
+        window.open(data.docUrl, '_blank');
+      } catch (e) {
+        alert('Erro ao criar documento no Google. Tente novamente.');
+      } finally {
+        btn.innerHTML = orig;
+        btn.disabled = false;
+      }
     }
 
     function downloadPDF() {
@@ -1129,7 +1140,6 @@
       ['tanque-error','abastecimento-error','multas-error','cameras-error'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
       });
-      document.getElementById('gdocs-toast').classList.add('hidden');
       // Reset
       removeLogo();
       window._pdfHtml = null;
