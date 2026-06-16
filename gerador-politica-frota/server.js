@@ -6,7 +6,8 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname));
 
-const N8N_WEBHOOK = 'https://primary-production-2349.up.railway.app/webhook/politica-frota-upload';
+const N8N_WEBHOOK = process.env.N8N_GDOC_WEBHOOK_URL;
+if (!N8N_WEBHOOK) throw new Error('N8N_GDOC_WEBHOOK_URL não configurada');
 
 // ── Converte HTML → DOCX → envia para n8n → retorna link do Google Doc ──
 app.post('/api/gdoc/create', async (req, res) => {

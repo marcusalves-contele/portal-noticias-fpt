@@ -763,6 +763,10 @@
     // AÇÕES DO DOCUMENTO
     // ============================================
 
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
     function buildPdfHtml(d, baseUrl) {
       baseUrl = baseUrl || window.location.origin;
       const clientLogoSrc = window._clientLogo || null;
@@ -920,10 +924,10 @@
 </ol>
 
 <div class="sec-title">5.4 IDENTIFICAÇÃO DO CONDUTOR INFRATOR</div>
-<div class="sec-body">${d.multasIdentificacao}</div>
+<div class="sec-body">${escapeHtml(d.multasIdentificacao)}</div>
 
 <div class="sec-title">5.5 CÂMERAS VEICULARES — POLÍTICA DE USO E PRIVACIDADE</div>
-<div class="sec-body">${d.camerasPolitica}</div>
+<div class="sec-body">${escapeHtml(d.camerasPolitica)}</div>
 
 <div class="sec-title">5.6 SINISTROS</div>
 <ol class="alpha" type="a">
