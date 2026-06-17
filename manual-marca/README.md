@@ -17,6 +17,9 @@ Material-fonte dos manuais de marca dos dois produtos Contele. Esta pasta é a *
 - `brand-fpt.md` : manual de marca completo do FPT (posicionamento, arquétipo Sage Pragmático + Hero, voz, pilares, identidade visual).
 - `brand-fpt-agent.md` : versão "bíblia da marca para IA". Tem os **design tokens exatos** (paleta `#8B23E5` etc., tipografia Montserrat) e os IDs das pastas de assets no Google Drive (logos, master). Carregar antes de produzir qualquer peça FPT.
 
+> **Versão visual (humana) já hospedada:** `../contele-io/public/brand-fpt/index.html`, servido em **https://contele.com.br/brand-fpt/** (rota no `contele-io/server.js`). É a representação visual deste conteúdo para time/parceiros. Antes ficava no site pessoal do Marco (marcofassa-cto.web.app); migrada pro growth em jun/2026.
+> Pendência de sync: o apêndice de agentes embutido no HTML ainda cita a URL antiga (marcofassa-cto). Atualizar via fluxo canônico (editar `brand-fpt-agent.md` → regenerar HTML), não direto no HTML.
+
 ### `teams/`
 - `brand-contele-teams-plano.md` : plano + entregável do brand book Teams, seguindo o mesmo framework do FPT. É o ponto de partida; a Rarissa (`5513996542205`) é dona do conteúdo e tem base coletada no Notion (09/04).
 
@@ -34,6 +37,8 @@ A decidir com o Marco: a partir de agora a cópia deste repo vira a fonte da ver
 ---
 
 ## Quando montar o site (convenção do monorepo growth)
+
+> **Status FPT (jun/2026):** a versão visual do FPT já está hospedada, servida pelo serviço `contele-io/` em `https://contele.com.br/brand-fpt/` (não exigiu serviço novo). O caminho abaixo vale para um hub dedicado das duas marcas, se/quando for montado.
 
 Este repo é um monorepo: cada serviço hospedado tem a própria pasta com `railway.json` + `watchPatterns` (deploy seletivo, ver README da raiz). **Esta pasta é só conteúdo (markdown): não tem `railway.json`, então não dispara deploy nenhum.**
 

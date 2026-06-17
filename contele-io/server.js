@@ -211,6 +211,12 @@ app.get('/atendimento', (req, res) => {
   res.redirect(301, 'https://api.whatsapp.com/send/?phone=5511971325108');
 });
 
+// Manual de marca FPT/Fleet (versao visual humana). express.static usa index:false,
+// entao a rota de diretorio precisa ser explicita. Assets em public/brand-fpt/.
+app.get('/brand-fpt', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'brand-fpt', 'index.html'));
+});
+
 app.listen(PORT, () => {
   console.log(`contele.io running on port ${PORT}`);
 });
