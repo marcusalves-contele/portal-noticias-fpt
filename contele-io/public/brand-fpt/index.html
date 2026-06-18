@@ -1,0 +1,2422 @@
+<!DOCTYPE html>
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  SYNC OBRIGATORIO: brand-fpt-agent.md ↔ este HTML           ║
+  ║                                                              ║
+  ║  AO EDITAR ESTA PAGINA:                                     ║
+  ║  1. Atualizar brand-fpt-agent.md PRIMEIRO                   ║
+  ║  2. Refletir mudanca aqui no HTML                           ║
+  ║  3. Atualizar o <pre id="agent-md-content"> com o .md novo  ║
+  ║  4. firebase deploy                                         ║
+  ║                                                              ║
+  ║  Path agent md: obsidian-marco/DOCS/brand-fpt-agent.md      ║
+  ║  Path brand md: obsidian-marco/DOCS/brand-fpt.md            ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brand FPT — Frota Para Todos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --purple-deep:  #4E0091;
+      --purple-mid:   #6C12B9;
+      --purple-main:  #8B23E5;
+      --white-soft:   #F7F7F7;
+      --bg:           #080010;
+      --bg-card:      #0D0A18;
+      --bg-card2:     #110E1F;
+      --text:         rgba(247,247,247,0.92);
+      --text-dim:     rgba(247,247,247,0.48);
+      --text-faint:   rgba(247,247,247,0.24);
+      --border:       rgba(139,35,229,0.18);
+      --border-hover: rgba(139,35,229,0.45);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ── GRID CYBERPUNK ─────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(139,35,229,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139,35,229,0.05) 1px, transparent 1px);
+      background-size: 64px 64px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── LAYOUT ─────────────────────────────────────────────── */
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section { padding: 72px 0; border-bottom: 1px solid var(--border); }
+    section:last-child { border-bottom: none; }
+
+    /* ── HERO ───────────────────────────────────────────────── */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 400px;
+      background: radial-gradient(ellipse at center, rgba(139,35,229,0.22) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--purple-main);
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--purple-main), #b56fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--text-dim);
+      max-width: 540px;
+      margin: 0 auto 40px;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-n {
+      display: block;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--white-soft);
+      letter-spacing: -0.5px;
+    }
+    .stat-l {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-dim);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* ── SECTION HEADER ─────────────────────────────────────── */
+    .sec-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: var(--purple-main);
+      margin-bottom: 8px;
+    }
+    .sec-title {
+      font-size: clamp(24px, 3vw, 34px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 40px;
+    }
+
+    /* ── POSICIONAMENTO ─────────────────────────────────────── */
+    .positioning-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 600px) { .positioning-grid { grid-template-columns: 1fr; } }
+    .pos-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+    .pos-card:hover { border-color: var(--border-hover); }
+    .pos-card h3 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--purple-main);
+      margin-bottom: 10px;
+    }
+    .pos-card p {
+      font-size: 15px;
+      color: var(--text-dim);
+      line-height: 1.65;
+    }
+    .pos-card p strong { color: var(--text); }
+    .quote-block {
+      background: var(--bg-card);
+      border-left: 3px solid var(--purple-main);
+      border-radius: 0 12px 12px 0;
+      padding: 20px 24px;
+      margin-top: 16px;
+      font-size: 16px;
+      font-style: italic;
+      color: var(--text-dim);
+    }
+
+    /* ── PALETA ─────────────────────────────────────────────── */
+    .palette {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 500px) { .palette { grid-template-columns: repeat(2, 1fr); } }
+    .swatch {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .swatch-color { height: 80px; }
+    .swatch-info {
+      background: var(--bg-card);
+      padding: 14px;
+    }
+    .swatch-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      display: block;
+      margin-bottom: 4px;
+    }
+    .swatch-hex {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-dim);
+      font-family: 'Courier New', monospace;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── TIPOGRAFIA ─────────────────────────────────────────── */
+    .typo-specimen {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 36px;
+    }
+    .typo-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 16px;
+      display: block;
+    }
+    .typo-h1 { font-size: clamp(36px, 5vw, 56px); font-weight: 900; letter-spacing: -1px; line-height: 1.05; margin-bottom: 12px; }
+    .typo-h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 10px; color: var(--text-dim); }
+    .typo-body { font-size: 15px; font-weight: 400; color: var(--text-dim); max-width: 480px; margin-bottom: 10px; }
+    .typo-caption { font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--purple-main); }
+    .typo-meta {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .typo-meta-item { }
+    .typo-meta-item span:first-child {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 4px;
+    }
+    .typo-meta-item span:last-child {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+
+    /* ── LOGO ───────────────────────────────────────────────── */
+    .logo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 600px) { .logo-grid { grid-template-columns: 1fr; } }
+    .logo-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .logo-card:hover { border-color: var(--border-hover); }
+    .logo-card h3 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+    }
+    .logo-card .logo-preview {
+      background: #1a1020;
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 16px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-card .logo-preview.light { background: var(--white-soft); }
+    .logo-placeholder {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--purple-main), #b56fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .logo-placeholder.dark-text {
+      background: linear-gradient(135deg, var(--purple-deep), var(--purple-main));
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    .logo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--purple-main);
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: opacity 0.2s;
+    }
+    .logo-link:hover { opacity: 0.75; }
+    .logo-figma {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 28px;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .logo-figma-info { }
+    .logo-figma-info h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .logo-figma-info p { font-size: 13px; color: var(--text-dim); }
+
+    /* ── MOTION + SOM ───────────────────────────────────────── */
+    .motion-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .motion-video {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+    }
+    .motion-video iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .motion-info {
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 600px) { .motion-info { grid-template-columns: 1fr; } }
+    .motion-block h4 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--purple-main);
+      margin-bottom: 10px;
+    }
+    .motion-block p {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.65;
+    }
+    .sound-pending {
+      display: inline-block;
+      background: rgba(139,35,229,0.12);
+      border: 1px solid rgba(139,35,229,0.3);
+      color: var(--purple-main);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-top: 8px;
+    }
+
+    /* ── TOM DE VOZ ─────────────────────────────────────────── */
+    .voice-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 600px) { .voice-grid { grid-template-columns: 1fr; } }
+    .voice-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+    }
+    .voice-card h3 {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .voice-card p { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+    .voice-focus {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 28px;
+    }
+    .voice-focus h4 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--purple-main);
+      margin-bottom: 12px;
+    }
+    .voice-tags { display: flex; gap: 10px; flex-wrap: wrap; }
+    .tag {
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+    .tag.yes { border-color: rgba(74,222,128,0.3); color: rgba(74,222,128,0.8); }
+    .tag.no  { border-color: rgba(248,113,113,0.3); color: rgba(248,113,113,0.7); }
+
+    /* ── PLANO / O QUE FALTA ────────────────────────────────── */
+    .plan-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 600px) { .plan-cols { grid-template-columns: 1fr; } }
+    .plan-col {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+    }
+    .plan-col h3 {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .plan-col h3.urgent { color: #f87171; }
+    .plan-col h3.medium { color: #fbbf24; }
+    .plan-col h3.later  { color: #60a5fa; }
+    .plan-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+    .plan-item:last-child { margin-bottom: 0; }
+    .plan-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 7px;
+    }
+    .plan-dot.urgent { background: #f87171; }
+    .plan-dot.medium { background: #fbbf24; }
+    .plan-dot.later  { background: #60a5fa; }
+
+    /* ── FOOTER ─────────────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 48px 0;
+      font-size: 12px;
+      color: var(--text-faint);
+    }
+    .footer strong { color: var(--text-dim); }
+
+    /* ── NAV ────────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(8,0,16,0.82);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+    }
+    .nav-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .nav-brand {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: var(--white-soft);
+    }
+    .nav-brand span { color: var(--purple-main); }
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white-soft); }
+    @media (max-width: 600px) { .nav-links { display: none; } }
+
+    /* ── SOUND CHOSEN ───────────────────────────────────────── */
+    .sound-chosen {
+      display: inline-block;
+      background: rgba(74,222,128,0.12);
+      border: 1px solid rgba(74,222,128,0.3);
+      color: rgba(74,222,128,0.85);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-top: 8px;
+    }
+
+    /* ── CARTÃO ─────────────────────────────────────────────── */
+    .cartao-quote {
+      background: var(--bg-card);
+      border-left: 3px solid var(--purple-main);
+      border-radius: 0 12px 12px 0;
+      padding: 24px 28px;
+      font-size: 18px;
+      font-style: italic;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .creds-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 24px 0;
+    }
+    @media (max-width: 600px) { .creds-grid { grid-template-columns: repeat(2, 1fr); } }
+    .cred-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 16px;
+      text-align: center;
+    }
+    .cred-n {
+      display: block;
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--purple-main);
+      letter-spacing: -0.5px;
+      margin-bottom: 4px;
+    }
+    .cred-l {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── THUMB GALLERY ──────────────────────────────────────── */
+    .thumb-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) { .thumb-gallery { grid-template-columns: 1fr; } }
+    .thumb-item {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+    .thumb-item:hover { border-color: var(--border-hover); }
+    .thumb-item img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      display: block;
+    }
+    .thumb-caption {
+      background: var(--bg-card);
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+
+    /* ── NUTELLA TYPES ──────────────────────────────────────── */
+    .nutella-types {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+    @media (max-width: 700px) { .nutella-types { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 450px) { .nutella-types { grid-template-columns: repeat(2, 1fr); } }
+    .nutella-type {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .nutella-type-name {
+      display: block;
+      font-weight: 700;
+      color: var(--purple-main);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .nutella-type p { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+    /* ── PERSONAS ───────────────────────────────────────────── */
+    .persona-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 700px) { .persona-grid { grid-template-columns: 1fr; } }
+    .persona-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+    .persona-card:hover { border-color: var(--border-hover); }
+    .persona-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-deep), var(--purple-main));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 14px;
+    }
+    .persona-name { font-size: 15px; font-weight: 800; margin-bottom: 2px; }
+    .persona-role {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--purple-main); margin-bottom: 12px;
+    }
+    .persona-desc { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+    .persona-pain {
+      margin-top: 14px; padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 12px; color: var(--text-faint); line-height: 1.5;
+    }
+    .persona-pain strong { color: rgba(247,247,247,0.55); }
+
+    /* ── ARQUÉTIPO ──────────────────────────────────────────── */
+    .arch-narrative {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .arch-narrative p { font-size: 16px; color: var(--text-dim); line-height: 1.7; }
+    .arch-narrative p strong { color: var(--white-soft); }
+
+    .arch-duo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 640px) { .arch-duo { grid-template-columns: 1fr; } }
+    .arch-duo-card {
+      border-radius: 14px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .arch-duo-card.primary {
+      background: rgba(139,35,229,0.07);
+      border: 1px solid rgba(139,35,229,0.28);
+    }
+    .arch-duo-card.secondary {
+      background: rgba(59,130,246,0.06);
+      border: 1px solid rgba(59,130,246,0.22);
+    }
+    .arch-duo-header { margin-bottom: 4px; }
+    .arch-duo-tag {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+    .arch-duo-card.primary .arch-duo-tag {
+      background: rgba(139,35,229,0.18);
+      color: var(--purple-main);
+    }
+    .arch-duo-card.secondary .arch-duo-tag {
+      background: rgba(59,130,246,0.14);
+      color: #93c5fd;
+    }
+    .arch-duo-card h3 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin: 0;
+    }
+    .arch-duo-card.primary h3 { color: var(--white-soft); }
+    .arch-duo-card.secondary h3 { color: var(--white-soft); }
+    .arch-duo-card p { font-size: 14px; color: var(--text-dim); line-height: 1.68; }
+    .arch-duo-card p strong { color: var(--white-soft); }
+    .arch-duo-card p em { color: rgba(247,247,247,0.65); font-style: italic; }
+
+    .arch-villain-header {
+      margin-bottom: 18px;
+    }
+    .arch-villain-label {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #f87171;
+      margin-bottom: 8px;
+    }
+    .arch-villain-sub {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    .arch-block-header {
+      margin: 36px 0 18px;
+    }
+    .arch-block-label {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--purple-main);
+      margin-bottom: 8px;
+    }
+    .arch-block-sub {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.65;
+      max-width: 640px;
+    }
+
+    .arch-legacy {
+      margin-top: 36px;
+      background: linear-gradient(135deg, rgba(139,35,229,0.10), rgba(78,0,145,0.18));
+      border: 1px solid rgba(139,35,229,0.32);
+      border-radius: 16px;
+      padding: 32px 36px;
+    }
+    .arch-legacy-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--purple-main);
+      margin-bottom: 14px;
+    }
+    .arch-legacy-text {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--white-soft);
+      line-height: 1.35;
+      letter-spacing: -0.3px;
+      margin-bottom: 16px;
+    }
+    .arch-legacy-sub {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+    .arch-legacy-sub:last-child { margin-bottom: 0; }
+
+    /* ── ARQUÉTIPO ──────────────────────────────────────────── */
+    .archetype-badges {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .arch-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 20px;
+      flex: 1;
+      min-width: 200px;
+      transition: border-color 0.2s;
+    }
+    .arch-badge:hover { border-color: var(--border-hover); }
+    .arch-badge-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .arch-badge-icon.primary { background: rgba(139,35,229,0.18); }
+    .arch-badge-icon.secondary { background: rgba(59,130,246,0.14); }
+    .arch-badge-body {}
+    .arch-badge-type {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      display: block;
+      margin-bottom: 3px;
+    }
+    .arch-badge-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .arch-badge-name.primary { color: var(--purple-main); }
+    .arch-badge-name.secondary { color: #93c5fd; }
+
+    .villain-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 600px) { .villain-grid { grid-template-columns: 1fr; } }
+    .villain-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(248,113,113,0.18);
+      border-radius: 14px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+    .villain-card:hover { border-color: rgba(248,113,113,0.38); }
+    .villain-card h3 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #f87171;
+      margin-bottom: 10px;
+    }
+    .villain-card p { font-size: 14px; color: var(--text-dim); line-height: 1.65; }
+    .villain-card p strong { color: var(--text); }
+
+    .frases-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) { .frases-grid { grid-template-columns: 1fr; } }
+    .frase-card {
+      background: var(--bg-card);
+      border-left: 2px solid var(--purple-main);
+      border-radius: 0 12px 12px 0;
+      padding: 16px 20px;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+    .frase-card strong { color: var(--white-soft); font-style: normal; }
+
+    .pattern-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 600px) { .pattern-list { grid-template-columns: 1fr; } }
+    .pattern-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .pattern-num {
+      font-size: 24px;
+      font-weight: 900;
+      color: rgba(139,35,229,0.35);
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .pattern-text h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .pattern-text p { font-size: 12px; color: var(--text-dim); line-height: 1.55; }
+
+    /* ── DIVIDER ────────────────────────────────────────────── */
+    .divider {
+      width: 40px;
+      height: 3px;
+      background: var(--purple-main);
+      border-radius: 2px;
+      margin-bottom: 28px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <span class="nav-brand">Brand <span>FPT</span></span>
+      <ul class="nav-links">
+        <li><a href="#arquetipo">Arquétipo</a></li>
+        <li><a href="#visual">Visual</a></li>
+        <li><a href="#tipografia">Tipografia</a></li>
+        <li><a href="#logo">Logo</a></li>
+        <li><a href="#motion">Motion</a></li>
+        <li><a href="#voz">Tom de Voz</a></li>
+        <li><a href="#conteudo">Conteúdo</a></li>
+        <li><a href="#personas">Personas</a></li>
+        <li><a href="#plano">Plano</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ── HERO ─────────────────────────────────────────── -->
+  <div class="wrap">
+    <div class="hero">
+      <span class="hero-label">Documento de Marca · 2026</span>
+      <h1>Frota Para<br/><span>Todos</span></h1>
+      <p class="hero-sub">O maior canal de gestão de frotas do Brasil. Este documento centraliza a identidade visual, sonora e de comunicação da marca FPT.</p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-n">33K+</span>
+          <span class="stat-l">Inscritos</span>
+        </div>
+        <div class="stat">
+          <span class="stat-n">2.6M</span>
+          <span class="stat-l">Visualizacoes</span>
+        </div>
+        <div class="stat">
+          <span class="stat-n">1.500+</span>
+          <span class="stat-l">Empresas</span>
+        </div>
+        <div class="stat">
+          <span class="stat-n">20+</span>
+          <span class="stat-l">Anos de experiência</span>
+        </div>
+      </div>
+      <a href="https://drive.google.com/drive/folders/1JNQXGzCyGcT-tOBRVDQN1D_WX1BxvLfl" target="_blank" style="
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 32px;
+        padding: 14px 28px;
+        background: linear-gradient(135deg, var(--purple-main), #b56fff);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: opacity 0.2s, transform 0.2s;
+      " onmouseover="this.style.opacity='0.85';this.style.transform='translateY(-1px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Abrir Assets no Drive
+      </a>
+      <p style="margin-top:16px; font-size:11px; color:var(--text-faint); letter-spacing:1px;">Atualizado em março de 2026</p>
+    </div>
+
+    <!-- ── POSICIONAMENTO ─────────────────────────────── -->
+    <section>
+      <p class="sec-label">01 — Posicionamento</p>
+      <h2 class="sec-title">Quem somos</h2>
+      <div class="positioning-grid">
+        <div class="pos-card">
+          <h3>O canal</h3>
+          <p>Conteúdo prático e gratuito para gestores, empresas e profissionais do setor. <strong>Não vende produto. Vende resultado.</strong></p>
+        </div>
+        <div class="pos-card">
+          <h3>Julio César</h3>
+          <p>Engenheiro Eletrônico, CEO da Contele Fleet, <strong>20+ anos</strong> de experiência em gestão de frotas.</p>
+        </div>
+        <div class="pos-card">
+          <h3>FPT e Contele</h3>
+          <p>FPT é a <strong>marca de conteúdo</strong>. Contele Fleet é o produto. O canal é o topo de funil — quem assiste vira cliente.</p>
+        </div>
+        <div class="pos-card">
+          <h3>Proposta</h3>
+          <p>Descomplica a gestão de frotas para empresas de qualquer tamanho com autoridade, didática e <strong>foco em redução de custos</strong>.</p>
+        </div>
+      </div>
+      <div class="quote-block">
+        "Gestão de frotas não precisa ser complicada. Precisa ser prática, acessível e feita por quem vive isso todo dia."
+      </div>
+    </section>
+
+    <!-- ── ARQUÉTIPO ──────────────────────────────────── -->
+    <section id="arquetipo">
+      <p class="sec-label">02 — Arquétipo da Marca</p>
+      <h2 class="sec-title">Quem é o Julio César</h2>
+
+      <!-- Narrativa central -->
+      <div class="arch-narrative">
+        <p>O Julio não aprendeu gestão de frotas na faculdade. Ele aprendeu em campo — 20 anos de conversa diária com gestores reais, dentro de empresas reais, com problemas reais de custo, motorista e operação. Esse é o ativo mais valioso que ele tem: <strong>ele sabe o que funciona porque viu funcionar.</strong></p>
+        <p>O canal não existe para vender produto. Existe para transferir esse conhecimento acumulado para qualquer gestor do Brasil — de graça, de forma prática, sem enrolação. A Contele Fleet é o produto. O FPT é a missão.</p>
+      </div>
+
+      <!-- Badges arquétipo -->
+      <div class="archetype-badges">
+        <div class="arch-badge">
+          <div class="arch-badge-icon primary">🧠</div>
+          <div class="arch-badge-body">
+            <span class="arch-badge-type">Arquétipo primário</span>
+            <span class="arch-badge-name primary">Sage Pragmático</span>
+          </div>
+        </div>
+        <div class="arch-badge">
+          <div class="arch-badge-icon secondary">⚔️</div>
+          <div class="arch-badge-body">
+            <span class="arch-badge-type">Arquétipo secundário</span>
+            <span class="arch-badge-name secondary">Hero</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Explicação dos dois arquétipos -->
+      <div class="arch-duo">
+        <div class="arch-duo-card primary">
+          <div class="arch-duo-header">
+            <span class="arch-duo-tag">Primário</span>
+            <h3>O Sage Pragmático</h3>
+          </div>
+          <p>O Sage clássico transmite sabedoria. O Sage do Julio faz isso, mas com uma diferença fundamental: <strong>ele não teoriza</strong>. Cada insight vem de uma conversa real com um gestor, de um problema que ele viu acontecer, de uma solução que ele testou na prática.</p>
+          <p>O loop que define quem ele é: <strong>ensinar → coletar feedback → aprender → ensinar de novo.</strong> Não é um professor que dá aula. É um mestre que está sempre aprendendo junto.</p>
+          <p>Referências declaradas pelo próprio Julio: "Cerveja Fácil" e "Primo Rico" — canais que explicam coisas complexas de forma que qualquer pessoa entende e aplica no dia seguinte.</p>
+        </div>
+        <div class="arch-duo-card secondary">
+          <div class="arch-duo-header">
+            <span class="arch-duo-tag secondary">Secundário</span>
+            <h3>O Hero</h3>
+          </div>
+          <p>O Hero luta contra algo. O Julio luta contra dois comportamentos que prejudicam gestores e empresas no Brasil inteiro — o <strong>conteúdo inútil</strong> que não resolve nada e o <strong>gestor preso no operacional</strong> que nunca consegue sair do ciclo de apagar incêndios.</p>
+          <p>A escolha estratégica de ser o <em>maior</em> canal de frotas do Brasil — não apenas o mais impactante — é postura de Herói. <strong>Credibilidade como arma.</strong> "Ser o maior me dá autoridade para orientar."</p>
+        </div>
+      </div>
+
+      <!-- Vilão -->
+      <div class="arch-villain-header">
+        <span class="arch-villain-label">O que a marca combate</span>
+        <p class="arch-villain-sub">O vilão da marca FPT não é uma empresa nem uma pessoa. São dois comportamentos que se retroalimentam.</p>
+      </div>
+      <div class="villain-grid">
+        <div class="villain-card">
+          <h3>Vilão 1 — O Conteúdo de Vitrine</h3>
+          <p>Blogs escritos por agências, textos cheios de filosofia e termos difíceis que <strong>soam bem mas não entregam nenhuma ação</strong>. É o que o gestor consumiria se o FPT não existisse — e sairia igualmente perdido.</p>
+          <p style="margin-top:12px; font-size:12px; color:rgba(248,113,113,0.6);">Antiexemplos reais: Prolog App, Coble — "filosofia em vez de prática"</p>
+        </div>
+        <div class="villain-card">
+          <h3>Vilão 2 — O Gestor Que Apaga Fogo</h3>
+          <p>O gestor que <strong>não sai do operacional</strong>, impõe regras sem envolver o motorista, não tem metas nem premiações — e vai "cortar unhas" para sempre sem mudar o comportamento da equipe.</p>
+          <p style="margin-top:12px; font-size:12px; color:rgba(248,113,113,0.6);">O FPT existe para tirar esse gestor desse ciclo.</p>
+        </div>
+      </div>
+
+      <!-- Frases reais -->
+      <div class="arch-block-header">
+        <span class="arch-block-label">A voz real do Julio</span>
+        <p class="arch-block-sub">Frases extraídas diretamente da entrevista de arquétipo. Estas são as expressões que ele usa com frequência — fazem parte do seu jeito de falar e devem guiar qualquer conteúdo criado em seu nome.</p>
+      </div>
+      <div class="frases-grid">
+        <div class="frase-card"><strong>"Quem quer faz, quem não quer uma desculpa."</strong></div>
+        <div class="frase-card"><strong>"Km por litro é a taxa Selic da gestão de frota."</strong></div>
+        <div class="frase-card"><strong>"Premiação não é custo. É valor pago com a economia gerada."</strong></div>
+        <div class="frase-card"><strong>"Gestor de frotas é gestor de pessoas."</strong></div>
+        <div class="frase-card"><strong>"Tem que envolver o motorista na frota."</strong></div>
+        <div class="frase-card"><strong>"O motorista precisa ser o dono do veículo."</strong></div>
+      </div>
+
+      <!-- Padrão de construção -->
+      <div class="arch-block-header">
+        <span class="arch-block-label">Como ele constrói o raciocínio</span>
+        <p class="arch-block-sub">O Julio tem um padrão consistente de comunicação — identificado na entrevista e presente em todas as suas lives. Qualquer roteiro, post ou copy criado para a marca deve seguir essa estrutura.</p>
+      </div>
+      <div class="pattern-list">
+        <div class="pattern-item">
+          <span class="pattern-num">1</span>
+          <div class="pattern-text">
+            <h4>Começa pela história</h4>
+            <p>Não apresenta a solução direto. Constrói o contexto até a ideia fazer sentido por si mesma. A venda acontece quando o ouvinte chega à conclusão sozinho.</p>
+          </div>
+        </div>
+        <div class="pattern-item">
+          <span class="pattern-num">2</span>
+          <div class="pattern-text">
+            <h4>Define antes de usar</h4>
+            <p>Toda sigla e termo técnico é explicado antes de aparecer no argumento. Ninguém fica para trás. Ex: "CPK — Custo por Quilômetro".</p>
+          </div>
+        </div>
+        <div class="pattern-item">
+          <span class="pattern-num">3</span>
+          <div class="pattern-text">
+            <h4>Fecha com ação</h4>
+            <p>Toda comunicação termina com algo implementável no dia seguinte. Sem teoria sem aplicação — regra absoluta do canal.</p>
+          </div>
+        </div>
+        <div class="pattern-item">
+          <span class="pattern-num">4</span>
+          <div class="pattern-text">
+            <h4>Inclui o motorista</h4>
+            <p>Não fala só para o gestor. O motorista sempre entra no raciocínio. Ele é parte da solução, não o problema.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Propósito / Legado -->
+      <div class="arch-legacy">
+        <span class="arch-legacy-label">O propósito por trás do canal</span>
+        <p class="arch-legacy-text">"Que o canal mudou a vida ou a carreira das pessoas."</p>
+        <p class="arch-legacy-sub">Não é sobre rastreador. Não é sobre tecnologia. É sobre mobilidade: motoristas que viram gestores, gestores que montaram empresas, negócios salvos da falência porque alguém aprendeu a controlar a frota. O FPT é um instrumento de transformação — disfarçado de conteúdo técnico sobre frotas.</p>
+        <p class="arch-legacy-sub">O sonho ainda não realizado: um tour pelo Brasil — documentário com donos, gestores e motoristas nas empresas reais.</p>
+      </div>
+    </section>
+
+    <!-- ── IDENTIDADE VISUAL ───────────────────────────── -->
+    <section id="visual">
+      <p class="sec-label">03 — Identidade Visual</p>
+      <h2 class="sec-title">Paleta de cores</h2>
+      <div class="palette">
+        <div class="swatch">
+          <div class="swatch-color" style="background:#4E0091;"></div>
+          <div class="swatch-info">
+            <span class="swatch-name">Roxo Profundo</span>
+            <span class="swatch-hex">#4E0091</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#6C12B9;"></div>
+          <div class="swatch-info">
+            <span class="swatch-name">Roxo Médio</span>
+            <span class="swatch-hex">#6C12B9</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#8B23E5;"></div>
+          <div class="swatch-info">
+            <span class="swatch-name">Roxo Principal</span>
+            <span class="swatch-hex">#8B23E5</span>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background:#F7F7F7; border-top: 1px solid rgba(0,0,0,0.08)"></div>
+          <div class="swatch-info">
+            <span class="swatch-name">Branco Suave</span>
+            <span class="swatch-hex">#F7F7F7</span>
+          </div>
+        </div>
+      </div>
+      <!-- Cores funcionais -->
+      <div style="margin-top:32px;">
+        <h3 style="font-size:14px; font-weight:700; color:var(--purple-main); margin-bottom:16px; letter-spacing:1px; text-transform:uppercase;">Cores funcionais</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px;">
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:12px;">
+            <div style="width:100%; height:32px; border-radius:4px; background:#22C55E; margin-bottom:8px;"></div>
+            <span style="font-size:11px; font-weight:600; display:block;">Positivo</span>
+            <span style="font-size:11px; color:var(--text-dim);">#22C55E</span>
+          </div>
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:12px;">
+            <div style="width:100%; height:32px; border-radius:4px; background:#EF4444; margin-bottom:8px;"></div>
+            <span style="font-size:11px; font-weight:600; display:block;">Alerta / AO VIVO</span>
+            <span style="font-size:11px; color:var(--text-dim);">#EF4444</span>
+          </div>
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:12px;">
+            <div style="width:100%; height:32px; border-radius:4px; background:#94A3B8; margin-bottom:8px;"></div>
+            <span style="font-size:11px; font-weight:600; display:block;">Texto secundario</span>
+            <span style="font-size:11px; color:var(--text-dim);">#94A3B8</span>
+          </div>
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:12px;">
+            <div style="width:100%; height:32px; border-radius:4px; background:#1E1035; margin-bottom:8px;"></div>
+            <span style="font-size:11px; font-weight:600; display:block;">Texto em fundo claro</span>
+            <span style="font-size:11px; color:var(--text-dim);">#1E1035</span>
+          </div>
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:12px;">
+            <div style="width:100%; height:32px; border-radius:4px; background:linear-gradient(135deg, #8B23E5, #b56fff); margin-bottom:8px;"></div>
+            <span style="font-size:11px; font-weight:600; display:block;">CTA / Destaque</span>
+            <span style="font-size:11px; color:var(--text-dim);">Gradiente principal</span>
+          </div>
+        </div>
+        <p style="margin-top:12px; font-size:12px; color:var(--text-dim);">Cores proibidas: <span style="color:#EF4444;">#7C3AED</span>, <span style="color:#EF4444;">#6D28D9</span>, <span style="color:#EF4444;">#000000</span> (preto puro), laranja, amarelo, rosa, gradientes multicoloridos.</p>
+      </div>
+    </section>
+
+    <!-- ── TIPOGRAFIA ─────────────────────────────────── -->
+    <section id="tipografia">
+      <p class="sec-label">04 — Tipografia</p>
+      <h2 class="sec-title">Montserrat</h2>
+      <div class="typo-specimen">
+        <span class="typo-label">Specimen</span>
+        <div class="typo-h1">Frota Para Todos</div>
+        <div class="typo-h2">Gestão de frotas que gera resultado</div>
+        <p class="typo-body">Conteúdo prático, acessível e feito por quem vive a gestão de frotas no dia a dia. Redução de custos, fim de desperdícios, profissionalização do setor.</p>
+        <span class="typo-caption">Maior canal de gestão de frotas do Brasil</span>
+        <div class="typo-meta">
+          <div class="typo-meta-item">
+            <span>Fonte</span>
+            <span>Montserrat</span>
+          </div>
+          <div class="typo-meta-item">
+            <span>Pesos</span>
+            <span>300 · 400 · 500 · 600 · 700 · 800 · 900</span>
+          </div>
+          <div class="typo-meta-item">
+            <span>Razão</span>
+            <span>Força institucional + clareza técnica</span>
+          </div>
+          <div class="typo-meta-item">
+            <span>Origem</span>
+            <span>Google Fonts (gratuita)</span>
+          </div>
+        </div>
+        <div style="margin-top:32px;">
+          <span class="typo-label">Hierarquia oficial (manual de marca Figma)</span>
+          <table style="width:100%; border-collapse:collapse; margin-top:12px; font-size:14px;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border); text-align:left;">
+                <th style="padding:8px 12px; color:var(--purple-main); font-weight:600;">Nivel</th>
+                <th style="padding:8px 12px; color:var(--purple-main); font-weight:600;">Tamanho</th>
+                <th style="padding:8px 12px; color:var(--purple-main); font-weight:600;">Peso</th>
+                <th style="padding:8px 12px; color:var(--purple-main); font-weight:600;">Uso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px 12px; font-weight:700;">H1</td>
+                <td style="padding:8px 12px;">48px</td>
+                <td style="padding:8px 12px;">Bold</td>
+                <td style="padding:8px 12px; color:var(--text-dim);">Titulos principais, headlines</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px 12px; font-weight:600;">H2</td>
+                <td style="padding:8px 12px;">36px</td>
+                <td style="padding:8px 12px;">Semi-bold</td>
+                <td style="padding:8px 12px; color:var(--text-dim);">Subtitulos, secoes</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px 12px; font-weight:500;">H3</td>
+                <td style="padding:8px 12px;">28px</td>
+                <td style="padding:8px 12px;">Medium</td>
+                <td style="padding:8px 12px; color:var(--text-dim);">Subsecoes, destaques</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:8px 12px;">Body</td>
+                <td style="padding:8px 12px;">18px</td>
+                <td style="padding:8px 12px;">Regular</td>
+                <td style="padding:8px 12px; color:var(--text-dim);">Texto corrido, paragrafos</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 12px; font-style:italic;">Legenda</td>
+                <td style="padding:8px 12px;">14px</td>
+                <td style="padding:8px 12px;">Regular Italico</td>
+                <td style="padding:8px 12px; color:var(--text-dim);">Notas, creditos, fontes</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top:10px; font-size:11px; color:var(--text-faint);">Fonte: manual de marca Figma (Rarissa, mar/2026)</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── LOGO ───────────────────────────────────────── -->
+    <section id="logo">
+      <p class="sec-label">05 — Logo</p>
+      <h2 class="sec-title">Arquivos e aplicações</h2>
+      <div class="logo-grid">
+        <div class="logo-card">
+          <h3>Fundo escuro</h3>
+          <div class="logo-preview">
+            <span class="logo-placeholder">FROTA PARA TODOS</span>
+          </div>
+          <a href="https://drive.google.com/drive/folders/1345X5PBzS3rGdQ_VKV0Fvr31WeKA4JZW" target="_blank" class="logo-link">
+            ↗ Acessar logos no Drive
+          </a>
+        </div>
+        <div class="logo-card">
+          <h3>Headers (YouTube · LinkedIn · Facebook)</h3>
+          <div class="logo-preview" style="background: linear-gradient(135deg, #4E0091, #8B23E5);">
+            <span class="logo-placeholder" style="-webkit-text-fill-color: white; background: none;">HEADER</span>
+          </div>
+          <a href="https://drive.google.com/drive/folders/194mpbEZXef8LTd-7qLYnDQdX2lMSqC70" target="_blank" class="logo-link">
+            ↗ Acessar headers no Drive
+          </a>
+        </div>
+      </div>
+      <!-- Regras do logo -->
+      <div style="margin-top:24px; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:20px;">
+        <h3 style="font-size:14px; font-weight:700; color:var(--purple-main); margin-bottom:12px;">Regras de uso</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; font-size:13px;">
+          <div>
+            <h4 style="font-size:12px; font-weight:600; color:var(--text); margin-bottom:8px;">Area de protecao</h4>
+            <p style="color:var(--text-dim); line-height:1.6;">Unidade <strong>"O"</strong> (pneu do volante). Distanciamento minimo = proporcao da unidade "O" em todos os lados, qualquer escala.</p>
+          </div>
+          <div>
+            <h4 style="font-size:12px; font-weight:600; color:var(--text); margin-bottom:8px;">6 versoes oficiais</h4>
+            <p style="color:var(--text-dim); line-height:1.6;">Horizontal + Vertical + Isotipo, cada um em branco (fundo escuro) e preto (fundo claro). Nenhuma outra variacao.</p>
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <h4 style="font-size:12px; font-weight:600; color:#EF4444; margin-bottom:8px;">Nunca fazer</h4>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; font-size:11px;">
+            <span style="padding:4px 10px; border-radius:12px; background:rgba(239,68,68,0.1); color:#EF4444;">Logo em roxo</span>
+            <span style="padding:4px 10px; border-radius:12px; background:rgba(239,68,68,0.1); color:#EF4444;">Isotipo cortado</span>
+            <span style="padding:4px 10px; border-radius:12px; background:rgba(239,68,68,0.1); color:#EF4444;">Sem contraste</span>
+            <span style="padding:4px 10px; border-radius:12px; background:rgba(239,68,68,0.1); color:#EF4444;">Sem "Julio Cesar"</span>
+            <span style="padding:4px 10px; border-radius:12px; background:rgba(239,68,68,0.1); color:#EF4444;">Esticar/comprimir</span>
+            <span style="padding:4px 10px; border-radius:12px; background:rgba(239,68,68,0.1); color:#EF4444;">Rotacionar</span>
+            <span style="padding:4px 10px; border-radius:12px; background:rgba(239,68,68,0.1); color:#EF4444;">Drop shadow/glow</span>
+            <span style="padding:4px 10px; border-radius:12px; background:rgba(239,68,68,0.1); color:#EF4444;">Versao antiga</span>
+          </div>
+        </div>
+      </div>
+      <div class="logo-figma" style="margin-top:14px;">
+        <div class="logo-figma-info">
+          <h4>Manual de marca (Figma)</h4>
+          <p>Logo geometrizado, grid construtivo, area de protecao, uso incorreto, aplicacoes. Rarissa Souza, mar/2026.</p>
+        </div>
+        <a href="https://www.figma.com/design/TGpySsgfBiG8LyjI8Q2u2Q/IDV---Julio-C%C3%A9sar-%7C-Frota-Para-Todos--Copy-?node-id=0-1" target="_blank" class="logo-link">
+          ↗ Abrir no Figma
+        </a>
+      </div>
+    </section>
+
+    <!-- ── MOTION + SOM ───────────────────────────────── -->
+    <section id="motion">
+      <p class="sec-label">06 — Identidade em Movimento</p>
+      <h2 class="sec-title">Motion logo + Assinatura sonora</h2>
+      <div class="motion-wrap">
+        <div class="motion-video">
+          <iframe
+            src="https://drive.google.com/file/d/1GSkD51QHZe52lD97lLbIeSruRWTek_zL/preview"
+            allow="autoplay"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <div class="motion-info">
+          <div class="motion-block">
+            <h4>Motion Logo</h4>
+            <p>3.5 segundos. Impacto cinético com spring overshoot, flash de entrada, partículas e wobble de assento. Fundo dark com grid roxo sutil.</p>
+          </div>
+          <div class="motion-block">
+            <h4>Assinatura Sonora</h4>
+            <p>Opção A — escolha do Julio César. Diesel potente desde a abertura, transmitindo autoridade e tradição. A voz que representa o canal.</p>
+            <span class="sound-chosen">Opção A — Escolhida</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TOM DE VOZ ─────────────────────────────────── -->
+    <section id="voz">
+      <p class="sec-label">07 — Tom de Voz</p>
+      <h2 class="sec-title">Como o Julio fala</h2>
+      <div class="voice-grid">
+        <div class="voice-card">
+          <h3>Mentor acessível</h3>
+          <p>Fala com quem vive o problema. Diálogo próximo, entende a rotina estressante do gestor.</p>
+        </div>
+        <div class="voice-card">
+          <h3>Autoridade pragmática</h3>
+          <p>Profissional experiente. Entrega ferramentas reais, não teoria. Focado em resultados financeiros.</p>
+        </div>
+        <div class="voice-card">
+          <h3>Didático e comunitário</h3>
+          <p>Descomplica a gestão para empresas de qualquer tamanho. Conteúdo prático e gratuito.</p>
+        </div>
+      </div>
+      <div class="voice-focus">
+        <h4>Foco principal</h4>
+        <div class="voice-tags">
+          <span class="tag yes">Redução de custos</span>
+          <span class="tag yes">Fim de desperdícios</span>
+          <span class="tag yes">Ferramentas reais</span>
+          <span class="tag yes">Resultado financeiro</span>
+          <span class="tag no">Não vende produto</span>
+          <span class="tag no">Sem teoria sem aplicação</span>
+          <span class="tag no">Sem formalidade excessiva</span>
+        </div>
+      </div>
+      <!-- Faz / Nao Faz -->
+      <div style="margin-top:40px;">
+        <h3 style="font-size:14px; font-weight:700; color:var(--purple-main); margin-bottom:20px; letter-spacing:1px; text-transform:uppercase;">Faz / Nao faz</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.25); border-radius:8px; padding:16px;">
+            <span style="font-size:11px; font-weight:700; color:#22C55E; letter-spacing:1px; text-transform:uppercase;">Correto</span>
+            <p style="font-size:13px; margin-top:8px; line-height:1.6; font-style:italic;">Seu motorista roda 200 km por dia. Se o consumo cai de 8 km/l pra 6 km/l, voce esta jogando fora R$1.200 por mes. Por veiculo. Multiplica pela frota inteira.</p>
+            <p style="font-size:11px; color:var(--text-dim); margin-top:8px;">Dado concreto, cenario real, impacto financeiro.</p>
+          </div>
+          <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:8px; padding:16px;">
+            <span style="font-size:11px; font-weight:700; color:#EF4444; letter-spacing:1px; text-transform:uppercase;">Errado</span>
+            <p style="font-size:13px; margin-top:8px; line-height:1.6; font-style:italic;">A Contele Fleet oferece uma solucao inovadora e disruptiva para a gestao integrada de frotas...</p>
+            <p style="font-size:11px; color:var(--text-dim); margin-top:8px;">Corporativo, vendedor, zero dado concreto.</p>
+          </div>
+          <div style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.25); border-radius:8px; padding:16px;">
+            <span style="font-size:11px; font-weight:700; color:#22C55E; letter-spacing:1px; text-transform:uppercase;">Correto</span>
+            <p style="font-size:13px; margin-top:8px; line-height:1.6; font-style:italic;">Comeca pelo km/l. E um numero so. Quando voce domina esse, os outros vem naturalmente.</p>
+            <p style="font-size:11px; color:var(--text-dim); margin-top:8px;">Didatico, acao concreta, empoderamento.</p>
+          </div>
+          <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:8px; padding:16px;">
+            <span style="font-size:11px; font-weight:700; color:#EF4444; letter-spacing:1px; text-transform:uppercase;">Errado</span>
+            <p style="font-size:13px; margin-top:8px; line-height:1.6; font-style:italic;">DESCUBRA o SEGREDO que as grandes transportadoras escondem! 5 HACKS que vao REVOLUCIONAR sua frota!</p>
+            <p style="font-size:11px; color:var(--text-dim); margin-top:8px;">Clickbait, tom de guru. Julio e engenheiro, nao influencer.</p>
+          </div>
+          <div style="background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.25); border-radius:8px; padding:16px;">
+            <span style="font-size:11px; font-weight:700; color:#22C55E; letter-spacing:1px; text-transform:uppercase;">Correto</span>
+            <p style="font-size:13px; margin-top:8px; line-height:1.6; font-style:italic;">Gestao de frotas nao precisa de planilha de 47 abas. Precisa de 3 numeros: CPK, km/l e indice de ociosidade.</p>
+            <p style="font-size:11px; color:var(--text-dim); margin-top:8px;">Direto, pratico, entrega ferramenta.</p>
+          </div>
+          <div style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); border-radius:8px; padding:16px;">
+            <span style="font-size:11px; font-weight:700; color:#EF4444; letter-spacing:1px; text-transform:uppercase;">Errado</span>
+            <p style="font-size:13px; margin-top:8px; line-height:1.6; font-style:italic;">A gestao de frotas e um desafio para muitas empresas brasileiras. Neste contexto, torna-se fundamental...</p>
+            <p style="font-size:11px; color:var(--text-dim); margin-top:8px;">Generico, blog de agencia. Zero utilidade pratica.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CONTEÚDO ─────────────────────────────────────── -->
+    <section id="conteudo">
+      <p class="sec-label">08 — Conteudo e Aplicacoes</p>
+      <h2 class="sec-title">A marca em uso</h2>
+
+      <!-- Pilares de conteudo -->
+      <div style="margin-bottom:40px;">
+        <h3 style="font-size:14px; font-weight:700; color:var(--purple-main); margin-bottom:16px; letter-spacing:1px; text-transform:uppercase;">Pilares de conteudo</h3>
+        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-bottom:16px;">
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:16px; text-align:center;">
+            <span style="font-size:14px; font-weight:700;">Gestao de Frotas</span>
+          </div>
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:16px; text-align:center;">
+            <span style="font-size:14px; font-weight:700;">Direcao Segura e Economica</span>
+          </div>
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:16px; text-align:center;">
+            <span style="font-size:14px; font-weight:700;">Dicas Praticas</span>
+          </div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <span style="font-size:11px; padding:4px 12px; border-radius:12px; background:rgba(139,35,229,0.1); color:var(--text-dim);">Manutencao</span>
+          <span style="font-size:11px; padding:4px 12px; border-radius:12px; background:rgba(139,35,229,0.1); color:var(--text-dim);">Combustivel</span>
+          <span style="font-size:11px; padding:4px 12px; border-radius:12px; background:rgba(139,35,229,0.1); color:var(--text-dim);">Pneus</span>
+          <span style="font-size:11px; padding:4px 12px; border-radius:12px; background:rgba(139,35,229,0.1); color:var(--text-dim);">Multas</span>
+          <span style="font-size:11px; padding:4px 12px; border-radius:12px; background:rgba(139,35,229,0.1); color:var(--text-dim);">Rastreamento</span>
+          <span style="font-size:11px; padding:4px 12px; border-radius:12px; background:rgba(139,35,229,0.1); color:var(--text-dim);">Motoristas</span>
+          <span style="font-size:11px; padding:4px 12px; border-radius:12px; background:rgba(139,35,229,0.1); color:var(--text-dim);">I.A na Gestao</span>
+          <span style="font-size:11px; padding:4px 12px; border-radius:12px; background:rgba(139,35,229,0.1); color:var(--text-dim);">Sistemas</span>
+        </div>
+        <p style="font-size:11px; color:var(--text-faint); margin-top:10px;">Fonte: mapeamento Rarissa (mar/2026) baseado em performance dos videos.</p>
+      </div>
+
+      <!-- Aplicacoes visuais da marca -->
+      <div style="margin-bottom:40px;">
+        <h3 style="font-size:14px; font-weight:700; color:var(--purple-main); margin-bottom:16px; letter-spacing:1px; text-transform:uppercase;">Aplicacoes da marca</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:16px;">
+            <span style="font-size:24px; display:block; margin-bottom:8px;">🎬</span>
+            <span style="font-size:13px; font-weight:600;">Thumbnails YouTube</span>
+            <p style="font-size:11px; color:var(--text-dim); margin-top:4px;">Lives com convidados, badge "LIVE", logo no canto. Fundo roxo/magenta cinematografico + bokeh.</p>
+          </div>
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:16px;">
+            <span style="font-size:24px; display:block; margin-bottom:8px;">🧢</span>
+            <span style="font-size:13px; font-weight:600;">Bone e garrafa</span>
+            <p style="font-size:11px; color:var(--text-dim); margin-top:4px;">Roxo com logo vertical branco. Material de eventos e brindes.</p>
+          </div>
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:16px;">
+            <span style="font-size:24px; display:block; margin-bottom:8px;">👕</span>
+            <span style="font-size:13px; font-weight:600;">Camisetas</span>
+            <p style="font-size:11px; color:var(--text-dim); margin-top:4px;">Branca e roxa com logo + ilustracao line art de veiculos.</p>
+          </div>
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:16px;">
+            <span style="font-size:24px; display:block; margin-bottom:8px;">🖥️</span>
+            <span style="font-size:13px; font-weight:600;">Ambiente corporativo</span>
+            <p style="font-size:11px; color:var(--text-dim); margin-top:4px;">Escritorio com tela mostrando a marca. Mockup profissional.</p>
+          </div>
+        </div>
+        <p style="font-size:11px; color:var(--text-faint); margin-top:10px;">Mockups extraidos do manual de marca Figma (Rarissa, mar/2026).</p>
+      </div>
+
+      <!-- Thumbnails (exemplos visuais, nao SOP) -->
+      <h3 style="font-size:14px; font-weight:700; color:var(--purple-main); margin-bottom:16px; letter-spacing:1px; text-transform:uppercase;">Exemplos de thumbnail</h3>
+      <p class="sec-label" style="margin-bottom:16px; font-size:9px;">Identidade visual aplicada</p>
+      <div class="thumb-gallery">
+        <div class="thumb-item">
+          <img src="/brand-fpt/thumbs/fpt-hero.png" alt="FPT Hero" loading="lazy" />
+          <div class="thumb-caption">Hero — Marca e canal</div>
+        </div>
+        <div class="thumb-item">
+          <img src="/brand-fpt/thumbs/thumb-solo.png" alt="Thumb Solo" loading="lazy" />
+          <div class="thumb-caption">Solo — Julio expressivo, live educacional</div>
+        </div>
+        <div class="thumb-item">
+          <img src="/brand-fpt/thumbs/thumb-convidado.png" alt="Thumb com Convidado" loading="lazy" />
+          <div class="thumb-caption">Convidado — Composição dual</div>
+        </div>
+        <div class="thumb-item">
+          <img src="/brand-fpt/thumbs/thumb-multi.png" alt="Thumb Multi-convidado" loading="lazy" />
+          <div class="thumb-caption">Multi — Face-lock com 2 convidados</div>
+        </div>
+      </div>
+      <div class="pos-card">
+        <h3>Conceito de geração</h3>
+        <p>Gemini Pro Image com <strong>face-lock em 2 etapas</strong>. Julio: polo navy lisa (sem logos), barba sal e pimenta, pele firme 40-42 anos, sem óculos. Fundo: roxo/magenta cinematográfico com bokeh. A/B por live — ângulo "dor" vs "solução". Texto integrado no prompt (não sobreposto). Para 2+ convidados: gerar Julio solo primeiro (etapa 1), usar aprovado como âncora + refs dos convidados (etapa 2).</p>
+      </div>
+
+      <div class="divider" style="margin-top:52px;"></div>
+
+      <p class="sec-label" style="margin: 28px 0 16px; font-size:9px;">Nutellas — Clipes Virais</p>
+      <div class="quote-block" style="margin-bottom:20px;">
+        Clipes virais educativos extraídos de lives longas. 90s–4min no formato 16:9, versão Shorts 30–60s. Cada live gera 3–5 Nutellas rankeadas por potencial viral.
+      </div>
+      <div class="nutella-types">
+        <div class="nutella-type">
+          <span class="nutella-type-name">Autoridade</span>
+          <p>Referência técnica. Julio como especialista de mercado.</p>
+        </div>
+        <div class="nutella-type">
+          <span class="nutella-type-name">Viralização</span>
+          <p>Alto compartilhamento. Dado ou insight surpreendente.</p>
+        </div>
+        <div class="nutella-type">
+          <span class="nutella-type-name">Inscrição</span>
+          <p>Prova de comunidade. Motivo para seguir o canal.</p>
+        </div>
+        <div class="nutella-type">
+          <span class="nutella-type-name">Educacional</span>
+          <p>Resolve 1 dúvida específica. "Como fazer X na sua frota."</p>
+        </div>
+        <div class="nutella-type">
+          <span class="nutella-type-name">Wow Factor</span>
+          <p>Demo ao vivo, ferramenta, resultado impressionante.</p>
+        </div>
+      </div>
+      <div class="pos-card">
+        <h3>Scheduling validado</h3>
+        <p><strong>Quinta 15h + Sexta 17h</strong> = maior CTR (validado em 6+ meses de dados). Shorts: performance consistente qualquer dia.</p>
+      </div>
+    </section>
+
+    <!-- ── PERSONAS ───────────────────────────────────────── -->
+    <section id="personas">
+      <p class="sec-label">09 — Personas</p>
+      <h2 class="sec-title">Quem e o publico do FPT</h2>
+      <p style="font-size:13px; color:var(--text-dim); margin-bottom:24px;">Construidas a partir de dados reais do YouTube Analytics, analise de comentarios e padroes de comportamento. Jan 2023 a Mar 2025. Levantamento Rarissa (mar/2026).</p>
+      <div class="persona-grid" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="persona-card" style="border-left:3px solid var(--purple-main);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="persona-avatar">🪂</div>
+            <span style="font-size:11px; font-weight:700; color:var(--purple-main); background:rgba(139,35,229,0.12); padding:3px 10px; border-radius:12px;">~50% da audiencia</span>
+          </div>
+          <div class="persona-name">Marcos</div>
+          <div class="persona-role">O Iniciante Involuntario (principal)</div>
+          <p class="persona-desc">32 anos, gestor designado, interior/cidade media, 30 veiculos. Caiu de paraquedas na area. Acessa pelo celular (intervalo, patio, noite). Urgencia altissima: cada erro aumenta risco de perder a funcao.</p>
+          <div class="persona-pain"><strong>Dor:</strong> Multas sem processo, veiculo parado sem historico, medo de ser incompetente. <strong>Quer:</strong> planilhas prontas, rotina basica, vocabulario tecnico.</div>
+        </div>
+        <div class="persona-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="persona-avatar">📊</div>
+            <span style="font-size:11px; font-weight:600; color:var(--text-dim); background:rgba(247,247,247,0.06); padding:3px 10px; border-radius:12px;">~25%</span>
+          </div>
+          <div class="persona-name">Ricardo</div>
+          <div class="persona-role">O Profissional em Evolucao</div>
+          <p class="persona-desc">30 anos, gestor ha 2 anos, Sul/Sudeste, 80 veiculos. Nao esta apagando incendio, quer metodo. Celular + PC. Chega por indicacao e algoritmo.</p>
+          <div class="persona-pain"><strong>Dor:</strong> Construiu na intuicao, falta dado pra justificar gastos. <strong>Quer:</strong> benchmarks (CPK, km/l), impressionar a diretoria com dados.</div>
+        </div>
+        <div class="persona-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="persona-avatar">🎓</div>
+            <span style="font-size:11px; font-weight:600; color:var(--text-dim); background:rgba(247,247,247,0.06); padding:3px 10px; border-radius:12px;">~15%</span>
+          </div>
+          <div class="persona-name">Lucas</div>
+          <div class="persona-role">O Estudante Estrategico</div>
+          <p class="persona-desc">22 anos, estudante de logistica (3o ano). Celular (entre aulas, transporte). Quer vantagem sobre colegas formandos. Assiste videos antigos sem problema.</p>
+          <div class="persona-pain"><strong>Dor:</strong> Faculdade ensina teoria desconectada, sem pratica. <strong>Quer:</strong> vocabulario tecnico, exemplos pra entrevistas, certificacao.</div>
+        </div>
+        <div class="persona-card" style="border-left:3px solid #22C55E;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="persona-avatar">🚛</div>
+            <span style="font-size:11px; font-weight:600; color:#22C55E; background:rgba(34,197,94,0.12); padding:3px 10px; border-radius:12px;">Parte da solucao</span>
+          </div>
+          <div class="persona-name">Sergio</div>
+          <div class="persona-role">O Motorista Profissional</div>
+          <p class="persona-desc">38 anos, motorista de frota ha 10+ anos, ensino medio. Celular e sua unica tela. Assiste no intervalo, no pernoite, esperando carga. Quer ser valorizado, nao fiscalizado.</p>
+          <div class="persona-pain"><strong>Dor:</strong> Se sente vigiado pelo rastreador, nao entende os indicadores, acha que tecnologia e pra punir. <strong>Quer:</strong> premiacao por desempenho, reconhecimento, ser parte da solucao.</div>
+        </div>
+        <div class="persona-card" style="opacity:0.6;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="persona-avatar">🔍</div>
+            <span style="font-size:11px; font-weight:600; color:var(--text-faint); background:rgba(247,247,247,0.04); padding:3px 10px; border-radius:12px;">~10% ruido</span>
+          </div>
+          <div class="persona-name">Jose</div>
+          <div class="persona-role">O Visitante Pontual (ruido)</div>
+          <p class="persona-desc">40 anos, motorista ou pessoa fisica com problema pontual. Pesquisa no momento exato do problema. Resolveu, some, nao volta. NAO e audiencia-alvo.</p>
+          <div class="persona-pain"><strong>Dor:</strong> Multa no radar, duvida de CNH. <strong>Acao:</strong> card para conteudo de gestao durante o video. Baixissimo potencial de conversao.</div>
+        </div>
+      </div>
+      <div class="logo-figma" style="margin-top: 14px;">
+        <div class="logo-figma-info">
+          <h4>Personas validadas com analytics</h4>
+          <p>Baseado em YouTube Analytics (Jan 2023 a Mar 2025), 33K+ inscritos, 84% masculino, 72% mobile. Levantamento Rarissa.</p>
+        </div>
+        <a href="https://www.youtube.com/@JulioCesarFrotaParaTodos" target="_blank" class="logo-link">
+          ↗ Ver canal
+        </a>
+      </div>
+    </section>
+
+    <!-- ── PLANO ───────────────────────────────────────── -->
+    <!-- Nota: roadmap removido do brand book (recomendacao de auditoria externa).
+         Pendencias operacionais estao em: obsidian-marco/DOCS/brand-fpt.md secao 11. -->
+    <section id="plano" style="padding:40px 0;">
+      <p style="font-size:11px; color:var(--text-faint); text-align:center; letter-spacing:1px;">Decisoes de marca concluidas: assinatura sonora, arquetipo, personas, pilares, tipografia, paleta, logo, tom de voz, vocabulario. Pendencias operacionais gerenciadas fora deste documento.</p>
+    </section>
+
+  </div>
+
+  <div class="footer">
+    <strong>Brand FPT</strong> · Frota Para Todos · 2026<br/>
+    Documento vivo. Ultima atualizacao: 10 de marco de 2026<br/><br/>
+    <span style="font-size:11px; opacity:0.6;">
+      Fonte da verdade para agentes: <code style="font-family:monospace; background:rgba(139,35,229,0.12); padding:2px 6px; border-radius:4px;">obsidian-marco/DOCS/brand-fpt-agent.md</code>
+    </span>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       PROTOCOLO DE SINCRONIZACAO (LEIA ANTES DE EDITAR)
+
+       Este HTML e o brand-fpt-agent.md DEVEM estar sempre em sincronia.
+       Regra: SEMPRE atualizar brand-fpt-agent.md PRIMEIRO, depois refletir aqui.
+
+       Checklist obrigatorio ao editar esta pagina:
+       1. [ ] brand-fpt-agent.md atualizado com a mesma mudanca
+       2. [ ] Data de atualizacao corrigida em ambos
+       3. [ ] firebase deploy executado
+       4. [ ] Conteudo do modal abaixo (#agent-md-content) atualizado
+
+       Mapeamento de secoes (HTML → agent md):
+       - 01 Posicionamento  → bloco 1. IDENTIDADE CENTRAL
+       - 02 Arquetipo       → bloco 2. ARQUETIPO DA MARCA
+       - 03 Identidade Visual → bloco 3. DESIGN TOKENS (paleta)
+       - 04 Tipografia       → bloco 3. DESIGN TOKENS (tipografia)
+       - 05 Logo             → bloco 3. DESIGN TOKENS (logo)
+       - 06 Motion           → blocos 4 + 5. IDENTIDADE SONORA + MOTION
+       - 07 Tom de Voz       → bloco 6. TOM DE VOZ
+       - 08 Conteudo         → blocos 8 + 9. THUMBNAILS + NUTELLAS
+       - 09 Personas         → bloco 7. PERSONAS
+       - 10 Roadmap          → bloco 14. PENDENTES
+  ══════════════════════════════════════════════════════════════ -->
+
+  <!-- Botao flutuante: Ver Agent MD -->
+  <button id="btn-agent-md" onclick="document.getElementById('modal-agent-md').style.display='flex'" style="
+    position:fixed; bottom:24px; right:24px; z-index:9999;
+    background:var(--purple-main); color:#fff; border:none; border-radius:8px;
+    padding:12px 20px; font-family:'Montserrat',sans-serif; font-size:13px; font-weight:600;
+    cursor:pointer; box-shadow:0 4px 20px rgba(139,35,229,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+  " onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 28px rgba(139,35,229,0.55)'"
+     onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(139,35,229,0.4)'">
+    &#128203; Agent MD
+  </button>
+
+  <!-- Modal: Conteudo do brand-fpt-agent.md -->
+  <div id="modal-agent-md" style="
+    display:none; position:fixed; inset:0; z-index:10000;
+    background:rgba(0,0,0,0.85); align-items:center; justify-content:center;
+    backdrop-filter:blur(4px);
+  " onclick="if(event.target===this)this.style.display='none'">
+    <div style="
+      background:#0D0A18; border:1px solid var(--border); border-radius:12px;
+      width:90%; max-width:900px; max-height:85vh; overflow:auto;
+      padding:32px; position:relative;
+    ">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h3 style="font-size:18px; font-weight:700; color:var(--purple-main);">brand-fpt-agent.md</h3>
+        <div>
+          <button onclick="navigator.clipboard.writeText(document.getElementById('agent-md-content').textContent).then(()=>this.textContent='Copiado!')" style="
+            background:var(--purple-deep); color:#fff; border:none; border-radius:6px;
+            padding:8px 16px; font-size:12px; font-weight:600; cursor:pointer; margin-right:8px;
+            font-family:'Montserrat',sans-serif;
+          ">Copiar .md</button>
+          <button onclick="document.getElementById('modal-agent-md').style.display='none'" style="
+            background:transparent; color:var(--text-dim); border:1px solid var(--border); border-radius:6px;
+            padding:8px 16px; font-size:12px; cursor:pointer;
+            font-family:'Montserrat',sans-serif;
+          ">Fechar</button>
+        </div>
+      </div>
+      <p style="font-size:11px; color:var(--text-faint); margin-bottom:16px;">
+        Path: obsidian-marco/DOCS/brand-fpt-agent.md · Ultima sync: 10/03/2026
+        <br/>Este conteudo e embutido na pagina. Ao atualizar o .md, atualizar aqui tambem.
+      </p>
+      <pre id="agent-md-content" style="
+        font-family:'JetBrains Mono','Fira Code',monospace; font-size:12px; line-height:1.6;
+        color:var(--text); white-space:pre-wrap; word-break:break-word;
+        background:var(--bg); border-radius:8px; padding:20px;
+        max-height:60vh; overflow:auto;
+      "># brand-fpt-agent.md
+## Bíblia da Marca FPT — Versão para Agentes de IA
+
+&gt; **Como usar este documento**
+&gt; Carregue este arquivo antes de qualquer operação que envolva a marca Frota Para Todos: criar thumbnail, escrever copy, gerar imagem, montar roteiro, criar post, definir tom de resposta, construir persona, editar qualquer material do canal.
+&gt; Este documento é a fonte da verdade operacional para agentes. A versão humana está em: https://marcofassa-cto.web.app/brand-fpt/
+&gt;
+&gt; Última atualização: 2026-03-10
+
+---
+
+## 0. PROTOCOLO DE SINCRONIZAÇÃO
+
+&gt; Este bloco define como manter os dois documentos de marca em sincronia.
+
+### Dois documentos, uma fonte da verdade
+
+| Documento | Tipo | Para quem | Onde |
+|---|---|---|---|
+| `brand-fpt-agent.md` | Fonte da verdade | Agentes de IA, sistemas, Prism OS | Vault Obsidian |
+| `brand-fpt/index.html` | Representação visual | Humanos (time, parceiros) | Firebase: marcofassa-cto.web.app/brand-fpt/ |
+
+**Regra de ouro:** sempre atualizar `brand-fpt-agent.md` primeiro. O HTML é reflexo do agent md — nunca o contrário.
+
+### O que sincronizar (agent md → HTML)
+
+| Bloco agent md | Seção HTML | Seção brand-fpt.md |
+|---|---|---|
+| 1. Identidade Central | 01 Posicionamento | 1. Posicionamento |
+| 2. Arquétipo | 02 Arquétipo | 2. Arquetipo da Marca |
+| 3. Design Tokens (paleta) | 03 Identidade Visual | 3. Identidade Visual |
+| 3. Design Tokens (tipografia) | 04 Tipografia | 3. Identidade Visual |
+| 3. Design Tokens (logo) | 05 Logo | 3. Identidade Visual |
+| 4. Identidade Sonora + 5. Motion | 06 Motion | 6. Identidade Sonora |
+| 6. Tom de Voz | 07 Tom de Voz | 4. Tom de Voz |
+| 6.5. Pilares de Conteúdo | (em Tom de Voz) | 5. Pilares de Conteudo |
+| 7. Personas | 09 Personas | 11. Personas de Audiencia |
+| 8+9. Thumbnails + Nutellas | 08 Conteúdo | 9. Thumbnails / 10. Nutellas |
+| 14. Pendentes | 10 Roadmap | 12. Backlog |
+
+### O que NÃO vai para o HTML (agent-only)
+- Prompts de geração de imagem
+- Caminhos de arquivo (paths locais e Drive IDs)
+- Contatos do time com telefone/email
+- Detalhes técnicos do motion logo (frames, springs)
+- Instruções operacionais para agentes
+
+### Fluxo de atualização
+
+```
+1. Decidir algo sobre a marca
+2. Atualizar brand-fpt-agent.md (bloco correspondente)
+3. Atualizar data &quot;Última atualização&quot;
+4. Refletir mudança no HTML (seção correspondente)
+5. firebase deploy --only hosting
+6. Se impactar Prism OS ou outros agentes → atualizar contexto dos agentes afetados
+```
+
+### Checklist de deploy
+- [ ] `brand-fpt-agent.md` atualizado
+- [ ] Data de atualização corrigida
+- [ ] HTML reflete a mudança
+- [ ] Bloco 14 (pendentes) atualizado se item foi concluído
+- [ ] `firebase deploy` executado
+
+---
+
+## 1. IDENTIDADE CENTRAL
+
+### O que é o FPT
+**Nome completo:** Frota Para Todos
+**Canal YouTube:** https://www.youtube.com/@JulioCesarFrotaParaTodos
+**Site:** https://frotaparatodos.com.br/
+**Categoria:** Educação em gestão de frotas — maior canal do Brasil no segmento
+
+### Quem é o Julio César
+- Engenheiro Eletrônico
+- CEO da Contele Fleet
+- 20+ anos de experiência em campo (gestão de frotas real, não teórica)
+- Face e voz do canal — ele É a marca
+
+### Relação FPT / Contele Fleet
+- FPT = marca de conteúdo (topo de funil)
+- Contele Fleet = produto (conversão)
+- Fluxo: YouTube → frotaparatodos.com.br → Cartão Fleet 2026 → Contele Fleet
+
+### Frase de posicionamento
+&gt; &quot;Gestão de frotas não precisa ser complicada. Precisa ser prática, acessível e feita por quem vive isso todo dia.&quot;
+
+### Tagline comercial
+&gt; &quot;Toda empresa de frotas vende rastreador. A Contele vende resultado.&quot;
+
+---
+
+## 2. ARQUÉTIPO DA MARCA
+
+&gt; Definido em 2026-03-05 — entrevista com Julio César realizada.
+&gt; Processamento completo: `DOCS/entrevista-arquetipo-julio-PROCESSADO.md`
+
+**Arquétipo primário:** Sage Pragmático
+**Arquétipo secundário:** Hero
+
+### Sage Pragmático — o que significa
+Não é o professor acadêmico. É o mestre que aprendeu no campo — visão estratégica acumulada em anos de conversa diária com gestores reais. Destila a prática de milhares de operações em conteúdo aplicável amanhã.
+
+Loop central: **ensinar → coletar feedback → aprender → ensinar de novo.**
+
+Inspirações declaradas: &quot;Cerveja Fácil&quot; (Leandro) e &quot;Primo Rico&quot; (Tiago Negro) — canais que explicam coisas complexas de forma que qualquer pessoa entende e aplica.
+
+### Hero — traços secundários
+Luta contra comportamentos concretos (veja Vilão abaixo). A escolha estratégica de ser o MAIOR canal — não apenas o mais impactante — é postura de Herói: credibilidade como arma para ter autoridade de orientar.
+
+### Vilão da Marca (dois comportamentos, não pessoas)
+
+**Vilão 1 — O Conteúdo de Vitrine:**
+Blogs de agências de marketing, conteúdo formal e filosófico cheio de termos difíceis que não entregam nenhuma ação concreta. É o que o gestor consumiria se o FPT não existisse.
+&gt; Antiexemplos reais citados pelo Julio: Prolog App, Coble.
+
+**Vilão 2 — O Gestor Que Apaga Fogo:**
+O gestor que não sai do operacional, impõe regras sem envolver o motorista, não tem metas nem premiações — e vai &quot;cortar unhas&quot; eternas sem mudar comportamento da equipe.
+&gt; Frase do Julio: &quot;O problema do gestor é passar os dias apagando fogo, sem conseguir se organizar, planejar ou obter apoio da diretoria.&quot;
+
+### Propósito além do posicionamento
+O canal é um instrumento de transformação de carreira: motorista que vira gestor, gestor que monta empresa, empresa que não fecha porque aprendeu a controlar a frota.
+&gt; &quot;Que o canal mudou a vida ou a carreira das pessoas.&quot; — Julio César
+
+---
+
+## 3. DESIGN TOKENS
+
+### Paleta de Cores — EXATA
+
+| Nome | Hex | Uso |
+|---|---|---|
+| Roxo Profundo | `#4E0091` | Fundos densos, pesos visuais |
+| Roxo Médio | `#6C12B9` | Transições, gradientes |
+| Roxo Principal | `#8B23E5` | Cor primária da marca, CTAs, destaques |
+| Branco Suave | `#F7F7F7` | Texto sobre fundo escuro, backgrounds claros |
+| Background Dark | `#080010` | Fundo padrão motion/digital |
+
+**Regra crítica:** Nunca usar roxo fora da paleta acima. Proibido: `#7C3AED`, `#6D28D9`, qualquer roxo que não seja `#8B23E5` como principal.
+
+**Gradiente padrão:** `linear-gradient(135deg, #8B23E5, #b56fff)`
+**Glow padrão (motion):** `rgba(139,35,229,0.70)` + `rgba(37,99,235,0.45)`
+
+### Tipografia
+
+**Fonte única:** Montserrat (Google Fonts — gratuita)
+**Pesos em uso:** 300 · 400 · 500 · 600 · 700 · 800 · 900
+
+**Hierarquia oficial (manual de marca Figma, mar/2026):**
+
+| Nível | Tamanho | Peso | Uso |
+|---|---|---|---|
+| H1 | 48px | Bold | Títulos principais, headlines |
+| H2 | 36px | Semi-bold | Subtítulos, seções |
+| H3 | 28px | Medium | Subseções, destaques |
+| Body | 18px | Regular | Texto corrido, parágrafos |
+| Legenda | 14px | Regular Itálico | Notas, créditos, fontes |
+
+Para thumbnails e social: escalar proporcionalmente acima. Manter progressão Bold &gt; Semi-bold &gt; Medium &gt; Regular.
+
+**Razão da escolha:** Força institucional + clareza técnica + autoridade. Transmite organização e domínio técnico, adequado para engenheiro falando de frotas.
+
+### Logo
+
+**6 variações oficiais (Drive Contele — pasta Logos):**
+- `logo-fpt-horizontal-branco.png` — uso preferencial em fundos escuros
+- `logo-fpt-vertical-branco.png`
+- `logo-fpt-isotipo-branco.png` — ícone isolado
+- `logo-fpt-horizontal-preto.png` — fundos claros
+- `logo-fpt-vertical-preto.png`
+- `logo-fpt-isotipo-preto.png`
+
+**Drive Contele Logos:** `1345X5PBzS3rGdQ_VKV0Fvr31WeKA4JZW`
+
+**Nota:** Logo foi geometrizado vetorialmente (grid construtivo aplicado). Versões acima são a fonte da verdade. Não usar versões antigas.
+
+**Área de proteção (clear space)**
+Unidade de medida: **&quot;O&quot;** (derivada do pneu no ícone do volante).
+Distanciamento mínimo ao redor do logotipo deve corresponder à proporção da unidade &quot;O&quot;, em qualquer escala (digital ou impressa).
+
+**Uso incorreto (exemplos do manual Figma)**
+- Logo em roxo sobre fundo branco (apenas branco ou preto)
+- Isotipo sozinho cortado (sem wordmark completo)
+- Logo sobre fundo roxo sem contraste suficiente
+- Logo sem &quot;Julio César&quot; (descaracteriza)
+- Logo sem isotipo (texto sem ícone do volante)
+
+**Aplicações da marca**
+- Thumbnails YouTube (lives, badge &quot;LIVE&quot;, logo no canto)
+- Boné roxo com logo vertical branco
+- Garrafa térmica roxa com logo vertical branco
+- Camisetas (branca e roxa) com logo e ilustração de veículos
+
+**Elemento gráfico auxiliar**
+Ilustração line art de veículos (caminhão, van, carro) em roxo #4E0091. Uso decorativo.
+
+**Manual de marca (Figma)**
+- Original (Rarissa): https://www.figma.com/design/DZ8Aq7DBEP2L2pFujVgPax/IDV---Julio-C%C3%A9sar-%7C-Frota-Para-Todos?node-id=0-1
+- Cópia workspace Contele: https://www.figma.com/design/TGpySsgfBiG8LyjI8Q2u2Q/IDV---Julio-C%C3%A9sar-%7C-Frota-Para-Todos--Copy-?node-id=0-1
+
+---
+
+## 4. IDENTIDADE SONORA
+
+**Assinatura escolhida:** Opção A — &quot;Diesel Épico&quot;
+**Decisão:** Julio César (04/03/2026)
+**Arquivo master:** `fpt-option-a.wav` (Drive Contele — pasta Identidade Sonora)
+
+**Conceito Opção A:** Diesel potente desde a abertura. Transmite autoridade, tradição e força. A voz sonora do canal.
+
+**Conceito Opção K (Marco — segunda opção):** Motor elétrico suave na entrada, diesel acorda no impacto, ressonância cresce. Representa a frota real do Brasil: 90% combustão, olhos no elétrico.
+
+**Uso:** Motion logo (`FPTLogoImpact.tsx`). Decisão tomada em 04/03/2026 — usar `fpt-option-a.wav`. Código já atualizado para option-a.wav.
+
+**Drive Contele Identidade Sonora:** `1nChc6T_j2sPBzINt0rEmWrsAnwhLXxOu`
+
+---
+
+## 5. MOTION LOGO
+
+**Arquivo:** `remotion-video/src/fpt/FPTLogoImpact.tsx`
+**Duração:** 3.5s (105 frames @ 30fps)
+**Resolução:** 1920x1080
+
+**Sequência de animação:**
+1. **Frames 5-35:** Logo vem de longe com spring overshoot (scale 0.02 → 1), blur 20px → 0
+2. **Frames 28-35:** Flash branco (blend overlay — não vira branco sólido)
+3. **Frames 32-65:** 8 partículas em direções cardeais (azul `#2563eb` + verde `#4CAF50`)
+4. **Frames 28-58:** Onda de choque radial roxo+azul expande no fundo
+5. **Frames 38-90:** Wobble de assento em 3 camadas (stiffness 420/380/360, damping 5)
+6. **Frame 50+:** Tagline spring: &quot;MAIOR CANAL DE GESTÃO / DE FROTAS DO YOUTUBE&quot;
+
+**Fundo:** `#080010` + grid roxo sutil `rgba(139,35,229,0.08)` 60x60px
+**Vignette:** radial roxa profunda nos cantos
+**Glow residual:** roxo + azul cyberpunk pós-impacto
+
+---
+
+## 6. TOM DE VOZ
+
+### Identidade
+**Persona:** Mentor acessível e &quot;mão na massa&quot; que descomplica a gestão de frotas.
+
+### Três eixos de equilíbrio
+
+| Eixo | O que significa na prática |
+|---|---|
+| **Autoridade pragmática** | Fala como quem viveu o problema. Dado concreto &gt; opinião |
+| **Didático** | Entrega ferramenta real. Nunca teoria sem aplicação |
+| **Comunitário** | Próximo, entende a rotina estressante do gestor |
+
+### Foco principal
+- Redução de custos com frota
+- Fim de desperdícios operacionais
+- Resultado financeiro mensurável
+
+### O que o Julio É
+- Prático
+- Direto
+- Técnico mas acessível
+- Focado em resultado
+- Próximo do gestor
+
+### O que o Julio NÃO É
+- Corporativo
+- Formal em excesso
+- Vendedor de produto
+- Teórico sem aplicação
+- Inflado de promessas
+
+### Frases Reais do Julio (voz autêntica — extraídas da entrevista 2026-03-05)
+
+1. **&quot;Quem quer faz, quem não quer uma desculpa.&quot;**
+2. **&quot;Tem que envolver o motorista na frota.&quot;**
+3. **&quot;Km por litro é a taxa Selic da gestão de frota.&quot;**
+4. **&quot;Premiação não é custo. É valor pago com a economia gerada.&quot;**
+5. **&quot;Gestor de frotas é gestor de pessoas.&quot;**
+6. **&quot;O motorista precisa ser o dono do veículo.&quot;**
+
+### Bordões do canal (uso frequente em vídeos)
+1. **&quot;Dica de ouro&quot;**
+2. **&quot;O que você falaria para quem está assistindo esse conteúdo fazer amanhã?&quot;**
+3. **&quot;Feito é melhor do que perfeito.&quot;**
+4. **&quot;Pareto 80/20&quot;**
+5. **&quot;Gestão é compartilhada (Motorista + Gestor)&quot;**
+6. **&quot;Conhecimento vale muito!&quot;**
+7. **&quot;Esse conteúdo poderia ser pago mas a gente está disponibilizando de graça pra ajudar você a ter mais conhecimento.&quot;**
+8. **&quot;Fala meus amigos gestores&quot;**
+
+### Vocabulário: palavras PARA USAR
+
+| Termo | Por quê |
+|---|---|
+| Gestão de frotas | Termo do mercado, claro |
+| Resultado | Foco da marca: financeiro, mensurável |
+| Prático / Na prática | Marca registrada do tom FPT |
+| Economia | Benefício tangível que o gestor busca |
+| Custo por quilômetro (CPK) | Métrica central |
+| Km por litro | &quot;A taxa Selic da gestão de frota&quot; |
+| Ferramenta | Concreto, tangível, aplicável |
+| Gestor | Respeita quem assiste |
+| Motorista | Parte da solução, não o problema |
+| Premiação | Não é custo, é investimento |
+| Mão na massa | Tom acessível e prático |
+| Na ponta do lápis | Linguagem financeira acessível |
+| Vamos resolver | Convite à ação conjunta |
+| Direto ao ponto | Promessa de objetividade |
+
+### Vocabulário: palavras para EVITAR
+
+| Termo | Alternativa |
+|---|---|
+| Solução inovadora | &quot;Ferramenta que funciona&quot; |
+| Líder de mercado | &quot;20+ anos no campo&quot; |
+| Disruptivo | &quot;Prático&quot; |
+| Ecossistema | &quot;Conjunto de ferramentas&quot; |
+| Sinergia | Remover |
+| Stakeholder | &quot;Gestor&quot;, &quot;diretor&quot;, &quot;dono&quot; |
+| Case de sucesso | &quot;Resultado real&quot;, &quot;exemplo prático&quot; |
+| Agregamos valor | Dizer o valor concreto |
+| Tecnologia de ponta | Nome da tecnologia específica |
+| Exclusivo / Premium | &quot;Completo&quot;, &quot;detalhado&quot; |
+| Otimizar | &quot;Reduzir custo&quot;, &quot;cortar desperdício&quot; |
+| Venha conhecer | &quot;Assista&quot;, &quot;teste&quot;, &quot;aplique amanhã&quot; |
+
+### Padrão de construção de raciocínio
+- **Começa pela história**: não apresenta a solução primeiro — constrói contexto até a ideia fazer sentido
+- **Define antes de usar**: qualquer sigla ou termo técnico é explicado antes de aparecer no argumento (ex: &quot;CPK — Custo por Quilômetro&quot;)
+- **Fecha com ação**: toda comunicação termina com algo implementável no dia seguinte
+- **Inclui o motorista**: não fala só para o gestor — o motorista sempre entra no raciocínio
+
+---
+
+## 6.5. PILARES DE CONTEÚDO
+
+### Temas principais
+1. Gestão de Frotas
+2. Direção Segura e Econômica
+3. Dicas de Gestão de Frotas
+
+### Temas de apoio
+- Manutenção
+- Sistema para Gestão de Frotas
+- I.A na Gestão de Frotas
+- Gestão de Combustível
+- Gestão de Pneus
+- Gestão de Multas
+- Rastreamento Veicular
+- Gestão de Motoristas
+
+&gt; Fonte: mapeamento Rarissa (mar/2026) baseado em performance dos vídeos.
+
+---
+
+## 7. PERSONAS DO PÚBLICO
+
+&gt; Construídas a partir de dados reais do YouTube Analytics, análise de comentários e padrões de comportamento. Jan 2023 - Mar 2025. Levantamento Rarissa (mar/2026).
+
+### Persona 1: O Iniciante Involuntário (principal, maior volume de comentários)
+
+**Marcos**, 32 anos, gestor de frota designado, interior ou cidade média, frota de 30 veículos.
+
+&gt; &quot;Acabei caindo de paraquedas nessa área, e agora preciso estudar e aprender pra dar o meu melhor.&quot;
+
+- Acessa pelo celular (intervalo, pátio, noite em casa)
+- Urgência de aprendizado muito alta: assumiu o cargo há pouco tempo, cada erro aumenta risco de perder a função
+- Chega ao canal por busca ativa: &quot;gestão de frotas iniciantes&quot;, &quot;como controlar multas frota&quot;
+- Ação mais desejada: baixar material (planilhas, checklists, modelos prontos)
+- Maratona vídeos em sequência, clica em &quot;passo a passo&quot;, &quot;do zero&quot;, &quot;iniciantes&quot;
+- Motivação emocional: não ser visto como incompetente pelo chefe. Assiste pra sobreviver no cargo.
+
+**Dores:** multas sem processo, veículo parado sem histórico, não sabe quais indicadores acompanhar, combustível sem controle, medo de ser visto como incompetente.
+
+**Objetivos:** rotina de gestão básica desde a primeira semana, planilhas prontas, vocabulário técnico, manutenção preventiva, provar ao chefe que está evoluindo.
+
+### Persona 2: O Profissional em Evolução (alto engajamento técnico)
+
+**Ricardo**, 30 anos, gestor de frota, Sul/Sudeste, frota de 80 veículos, 2 anos na área.
+
+&gt; &quot;Trabalho com gestão de frota há 2 anos. Estou buscando novas fontes de conhecimento para tentar colocar em prática na empresa que estou.&quot;
+
+- Celular e PC (celular no dia a dia, PC para planilhas)
+- Urgência moderada: não está apagando incêndio, quer método
+- Chega por indicação e algoritmo (WhatsApp do setor, vídeos sugeridos)
+- Ação mais desejada: trocar experiência, validar o que já faz, benchmarks
+- Valoriza profundidade técnica acessível: &quot;não quer MBA, quer aplicar na segunda-feira&quot;
+
+**Dores:** construindo na intuição sem saber se está certo, falta dado pra justificar gastos, custo de manutenção imprevisível, combustível sem controle real, sente que outros gestores estão mais avançados.
+
+**Objetivos:** substituir intuição por método, benchmarks (CPK, km/l), impressionar a diretoria com dados, networking no setor, virar referência interna.
+
+### Persona 3: O Estudante Estratégico (alta intenção de carreira)
+
+**Lucas**, 22 anos, estudante de logística (3o ano), todo o Brasil, 0 veículos sob gestão.
+
+&gt; &quot;Sou estudante de logística e estava procurando justamente vídeos que me ajudassem a melhorar o conhecimento na área.&quot;
+
+- Celular (entre aulas, transporte, noite)
+- Urgência alta mas intencional: quer vantagem sobre colegas formandos
+- Chega por busca no YouTube (termos técnicos, complementar a faculdade)
+- Ação mais desejada: encontrar curso com certificado pro currículo
+- Assiste vídeos antigos sem problema: não liga pra data de publicação
+- Em 2 anos se torna o Marcos (persona 1): renova o ciclo do canal
+
+**Dores:** faculdade ensina teoria desconectada, sem experiência prática, medo de chegar ao primeiro emprego sem saber o básico.
+
+**Objetivos:** dominar vocabulário técnico antes do mercado, exemplos práticos pra entrevistas, certificação reconhecida, contatos no setor.
+
+### Persona 4: O Motorista Profissional (parte da solução)
+
+**Sergio**, 38 anos, motorista de frota há 10+ anos, ensino médio, todo o Brasil.
+
+&gt; &quot;O rastreador é pra me vigiar ou pra me ajudar?&quot;
+
+- Celular é sua única tela. Assiste no intervalo, no pernoite, esperando carga
+- Não é audiência direta do canal, mas é central no discurso: &quot;o motorista é parte da solução&quot;
+- Chega por recomendação do gestor ou por acidente (algoritmo)
+- Quer: premiação por desempenho, reconhecimento, ser tratado como profissional
+- O Julio sempre inclui o motorista no raciocínio: &quot;gestão é compartilhada&quot;
+
+**Dores:** se sente vigiado pelo rastreador, não entende os indicadores, acha que tecnologia é pra punir, não recebe feedback positivo.
+
+**Objetivos:** premiação por km/l, reconhecimento, entender como a tecnologia ajuda (não fiscaliza), ser parte da solução.
+
+&gt; Persona adicionada após auditoria de marca (mar/2026): o documento insistia que o motorista é central, mas não o definia como persona.
+
+### Persona 5: O Visitante Pontual (ruído, baixíssimo potencial de conversão)
+
+**José**, 40 anos, motorista ou pessoa física com problema específico, todo o Brasil.
+
+&gt; &quot;Tenho categoria A, mas tem um carro em meu nome e ele tem multa de radar. Isso prejudica minha CNH?&quot;
+
+- Pesquisa no momento exato do problema (parado no trânsito, na oficina, recebendo multa)
+- Urgência pontual e imediata: resolveu, some, não volta
+- Chega por palavra-chave acidental (&quot;multa radar CNH&quot;, &quot;rastreador barato&quot;)
+- NÃO é audiência-alvo. É o perfil que inflou o dado de 70,1% de não inscritos no Analytics.
+- Única ação possível: card para conteúdo de gestão durante o vídeo
+
+---
+
+## 8. SISTEMA DE THUMBNAILS
+
+### Modelo de geração
+- **IA:** Gemini Pro Image Preview (`gemini-3-pro-image-preview`)
+- **Técnica:** Face-lock em 2 etapas para consistência facial
+- **Sistema:** `growth-contele/prism-os/thumbnail-ai-creator/`
+
+### Identidade visual do Julio nas thumbs
+```
+- Polo navy lisa escura (SEM logos, SEM texto na camisa)
+- Barba sal e pimenta (curta, bem cuidada)
+- Cabelo castanho curto, levemente ondulado
+- Olhos castanhos/avelã, SEM óculos
+- Idade aparente: 40-42 anos, pele firme e natural
+- Expressão: autêntica, não forçada
+- Posição: médio-plano (peito para cima)
+```
+
+### Paleta das thumbs
+- Fundo: roxo/magenta cinematográfico com bokeh
+- Overlay: gradiente purple/magenta
+- Texto: branco bold com sombra preta forte
+- Badge LIVE: vermelho (canto superior esquerdo)
+
+### Estratégia A/B
+Cada live gera 2 conceitos distintos:
+- **Ângulo &quot;dor&quot;:** problema do gestor, urgência, o que ele está perdendo
+- **Ângulo &quot;solução&quot;:** resultado, transformação, o que ele vai ganhar
+
+### Face-lock multi-convidado
+```
+Etapa 1: Gerar Julio solo (2 refs: ref1 + ref2) → 2-3 variações → aprovar melhor
+Etapa 2: Usar aprovado como Image 3 + refs convidado como Image 4+ → 2-3 variações
+```
+
+### Referências Julio (polo preta)
+`thumbnail-ai-creator/referencias/julio/` — 10 poses validadas (fev/2026)
+Primary ref: `julio-ref-primary-1.jpg`
+
+### Prompt base
+```
+Identidade Julio: gray/white stubble beard, short brown hair slightly wavy, brown/hazel eyes NO glasses, age 40-42 YOUTHFUL, PLAIN dark navy blue polo shirt NO logos, natural relaxed posture.
+Skin: SMOOTH like a fit 40 year old, NO wrinkles, NO age spots, natural skin tone.
+Background: purple/magenta color grade, bokeh blur, dramatic lighting.
+Style: professional YouTube thumbnail, photorealistic, slightly stylized background, high contrast for mobile viewing.
+```
+
+---
+
+## 9. NUTELLAS — SISTEMA DE CLIPES VIRAIS
+
+### O que é uma Nutella
+Clipe viral educativo extraído de live longa. Envolto com intro + CTA. Publicado como conteúdo autônomo.
+
+**Formatos:**
+- 16:9 — mínimo 90s (+ ~2min de wrapper)
+- 9:16 Shorts — mínimo 30-60s
+
+**Sistema:** `growth-contele/nutella-creator/`
+
+### Tipos de Nutella (rankeados por potencial)
+
+| Tipo | Objetivo | Quando usar |
+|---|---|---|
+| **Autoridade** | Julio como referência de mercado | Momentos de expertise única |
+| **Viralização** | Alto compartilhamento | Dado surpreendente, insight contra-intuitivo |
+| **Inscrição** | Motivo para seguir | Prova de comunidade, resultados da audiência |
+| **Educacional** | Resolve 1 dúvida específica | &quot;Como fazer X em frotas&quot; |
+| **Wow Factor** | Demo ao vivo, ferramenta, resultado visível | Demonstrações práticas |
+
+### Scheduling validado
+- **Quinta 15h** — maior CTR (validado 6+ meses)
+- **Sexta 17h** — segundo melhor
+- Shorts: performance consistente qualquer dia (baixa variância)
+
+### Pipeline
+```
+URL da live → Gemini analisa transcript → sugere N Nutellas rankeadas →
+selecionar → download → face detection → compose 16:9 + 9:16 →
+review no player → aprovar/rejeitar → gerar thumbnail → upload YouTube
+```
+
+---
+
+## 10. CARTÃO FLEET 2026
+
+**URL:** https://marcofassa-cto.web.app/cartao-fleet-2026/
+**Formato:** A5 landscape (210×148mm), offset print
+
+**Frente (carta do CEO):**
+- Foto grande do Julio (~40% da frente)
+- Credenciais: 23 anos campo, 33K+ inscritos, 1.500+ empresas, R$3.367 em cursos
+- QR WhatsApp direto
+
+**Verso (método + manifesto):**
+- Metodologia &quot;Frota Para Todos&quot; — 5 passos estruturados
+- Manifesto: resultado &gt; produto
+
+**Posicionamento:**
+&gt; &quot;Não vendemos rastreadores, câmeras ou sistemas. Entregamos resultado em gestão de frotas com metodologia e solução.&quot;
+
+**Uso:** Onboarding de clientes Contele Fleet. Conecta autoridade do Julio com o produto.
+
+---
+
+## 11. JORNADA DO LEAD
+
+```
+YouTube (conteúdo gratuito, autoridade)
+        ↓
+frotaparatodos.com.br (hub: curso, planilhas, lives)
+        ↓
+Cartão Fleet 2026 (conversão: lead vira cliente)
+        ↓
+Contele Fleet (produto)
+```
+
+---
+
+## 12. ATIVOS E REFERÊNCIAS
+
+### Drive Contele — Pasta Master Brand FPT
+`1VMLHN8V9Pf9MCVSkxhdn-nLVtipq5575`
+
+| Subpasta | ID | Conteúdo |
+|---|---|---|
+| Logos | `1345X5PBzS3rGdQ_VKV0Fvr31WeKA4JZW` | 6 PNGs (horizontal, vertical, isotipo) |
+| Identidade Sonora | `1nChc6T_j2sPBzINt0rEmWrsAnwhLXxOu` | fpt-option-a.mp4, fpt-impact-final.mp4, WAVs |
+| Headers e Banners | `1pNtpQ7v1hGuI-PJWHzPSpkTv6gO2E6aL` | Capas YouTube/LinkedIn/Facebook + foto perfil |
+
+### Código e Sistemas
+| Item | Caminho |
+|---|---|
+| Motion logo | `remotion-video/src/fpt/FPTLogoImpact.tsx` |
+| Audio K (Marco) | `remotion-video/public/fpt/audio/fpt-option-k.wav` |
+| Audio A (Julio) | `remotion-video/public/fpt/audio/fpt-option-a.wav` |
+| Sistema thumbnails | `growth-contele/prism-os/thumbnail-ai-creator/` |
+| Sistema Nutellas | `growth-contele/nutella-creator/` |
+| Site FPT | `/Users/marcofassa/Documents/frotaparatodos` |
+
+### Contatos do Time FPT
+| Pessoa | Papel | Contato |
+|---|---|---|
+| Julio César | Dono da marca, host | `juliocesar@contele.com.br` / `5513997000902` |
+| Eng. Marco Antonio | Brand design, Figma manual | Marketing Fleet grupo |
+| Rarissa | Marketing FPT, ponto focal | `5513996542205` |
+| Cris (Christopher Ronaldo) | Marketing Contele | `5513996544450` |
+| Marco | CTO, estratégia, sistemas | `5513997818442` |
+
+### Canais
+| Canal | Views (90d) | Seguidores | Melhor formato | Status |
+|---|---|---|---|---|
+| YouTube | 2,6M total | 33,4K | Lives + Nutellas | Ativo (restrição pendente) |
+| Instagram | 163K | 7.718 | Reels | Ativo |
+| TikTok | 54K | 1.986 | Cortes curtos | Ativo (25,3% tráfego de buscas) |
+| LinkedIn | 54K | 5.855 | Comunidade | Ativo |
+| Podcast | 210 views (3m) | - | - | Praticamente parado |
+| Site | - | - | Hub central | frotaparatodos.com.br |
+
+Perfil demográfico: Homens (83%), 25-54 anos. Público maduro com poder de compra.
+&gt; Fonte métricas: levantamento Rarissa (mar/2026)
+
+---
+
+## 13. REGRAS ABSOLUTAS PARA AGENTES
+
+### SEMPRE
+- Usar paleta exata (`#8B23E5` como principal — nunca aproximações)
+- Usar Montserrat como fonte em qualquer material FPT
+- Referenciar o Julio como autoridade técnica, nunca como celebridade
+- Focar em resultado financeiro concreto (redução de custo, número, percentual)
+- Linguagem: direta, prática, acessível — sem jargão desnecessário
+- Polo navy lisa nas gerações de imagem do Julio (sem logos)
+
+### NUNCA
+- Usar fundo claro como principal em materiais digitais
+- Tom corporativo, formal, inflado
+- Prometer produto — o FPT vende conhecimento, não rastreador
+- Criar thumbnail sem face-lock (resultado inconsistente)
+- Usar roxo fora da paleta definida
+- Adicionar logos em camisas do Julio nas gerações IA
+- Criar conteúdo que promova concorrentes da Contele Fleet
+
+### ANTES DE CRIAR QUALQUER COISA
+1. Aplicar arquétipo (bloco 2) — Sage Pragmático + Hero. Vilão = Conteúdo de Vitrine e Gestor que Apaga Fogo
+2. Verificar paleta e tipografia (bloco 3)
+3. Verificar tom de voz e frases reais (bloco 6)
+4. Verificar persona do público que o conteúdo atinge (bloco 7)
+5. Checar se há pendências no bloco 14 que afetam o que está sendo criado
+
+---
+
+## 14. O QUE ESTÁ PENDENTE (a expandir neste doc)
+
+| Item | Status | Impacto |
+|---|---|---|
+| Arquétipo do Julio | ✅ Concluído (2026-03-05) | Blocos 2 e 6 atualizados |
+| Frases reais do Julio (voz) | ✅ Concluído (2026-03-05) | 6 frases extraídas da entrevista |
+| Pilares de conteúdo do canal | ✅ Concluído (mar/2026: Rarissa) | Estratégia de conteúdo |
+| Personas validadas com analytics | ✅ Concluído (mar/2026: Rarissa, 5 personas incluindo Sergio motorista) | Precisão do público |
+| Imagens realistas das personas | ✅ Concluído (10/03/2026: 5 imagens Gemini em output/) | Brand book completo |
+| Benchmark de canais similares | Pesquisar | Diferenciação |
+| Regras de uso do logo (clear space) | ✅ Concluído (10/03/2026: extraído do Figma) | Manual completo |
+| Photography style guide | Eng. Marco Antonio | Consistência visual |
+| Canais ativos confirmados | ✅ Concluído (mar/2026: Rarissa) | Estratégia multicanal |
+| Migrar arquivo Figma pro workspace CONTELE | Rarissa notificada 10/03 | Centralização |
+| Sincronizar página web brand board | ✅ Concluído (10/03/2026) | HTML refletir agent md |
+
+---
+
+*Este documento é vivo. Sempre que uma decisão de marca for tomada, atualizar aqui.*
+*Versão humana: https://marcofassa-cto.web.app/brand-fpt/*
+*Vault doc de referência: obsidian-marco/DOCS/brand-fpt.md*
+</pre>
+    </div>
+  </div>
+
+</body>
+</html>
