@@ -296,9 +296,9 @@ def download_video(video_id: str) -> Path:
 
     cmd = [
         "yt-dlp",
-        "-f", "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4][height<=1080]/best",
+        "-f", "bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/bestvideo[height<=1080]+bestaudio/best",
         "--merge-output-format", "mp4",
-        "--remote-components", "ejs:github",
+        "--extractor-args", "youtube:player_client=web",
         "--socket-timeout", "30",
         "--retries", "2",
         *cookies_arg,
