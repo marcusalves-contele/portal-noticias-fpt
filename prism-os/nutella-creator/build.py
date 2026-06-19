@@ -164,8 +164,9 @@ def run(cmd: list, desc: str = "", check: bool = True) -> subprocess.CompletedPr
     print(f"  {'[ffmpeg]' if 'ffmpeg' in cmd[0] else '[cmd]'} {desc}")
     result = subprocess.run(cmd, capture_output=True, text=True)
     if check and result.returncode != 0:
-        print(f"  ERRO: {result.stderr[-600:]}")
-        raise RuntimeError(f"Falhou: {desc}")
+        stderr_tail = result.stderr[-600:].strip()
+        print(f"  ERRO: {stderr_tail}")
+        raise RuntimeError(f"Falhou: {desc}\n{stderr_tail}")
     return result
 
 
@@ -273,8 +274,12 @@ def download_video(video_id: str) -> Path:
     import time
 
     DOWNLOADS_DIR.mkdir(exist_ok=True)
-    # Procura arquivo já baixado
-    existing = list(DOWNLOADS_DIR.glob(f"{video_id}.*"))
+    # Procura arquivo já baixado — ignora .part (incompletos) e .m4a/.webm (áudio puro)
+    _AUDIO_ONLY = {".m4a", ".webm", ".opus", ".mp3", ".ogg"}
+    existing = [
+        f for f in DOWNLOADS_DIR.glob(f"{video_id}.*")
+        if not f.name.endswith(".part") and f.suffix.lower() not in _AUDIO_ONLY
+    ]
     if existing:
         print(f"  Vídeo já baixado: {existing[0].name}")
         return existing[0]
