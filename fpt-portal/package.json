@@ -1,0 +1,15 @@
+{
+  "name": "fpt-portal",
+  "version": "1.0.0",
+  "description": "Portal de Notícias Frota Para Todos",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.7",
+    "dotenv": "^16.4.5"
+  }
+}

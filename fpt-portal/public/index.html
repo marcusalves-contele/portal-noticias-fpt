@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frota Para Todos — Portal de Notícias</title>
+  <meta name="description" content="Referência editorial em gestão de frotas. Notícias, análises, entrevistas e cases do setor.">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="header-logo">Frota Para <span>Todos</span></a>
+  <nav class="header-nav">
+    <a href="/">Início</a>
+    <a href="/?category=noticias">Notícias</a>
+    <a href="/?category=analises">Análises</a>
+    <a href="/?category=entrevistas">Entrevistas</a>
+    <a href="/?category=videos">Vídeos</a>
+  </nav>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <h1>Referência em Gestão de Frotas</h1>
+    <p>Notícias, análises e conteúdo prático para gestores de frota do Brasil.</p>
+  </section>
+
+  <div class="filters">
+    <button class="filter-btn active" data-category="">Todos</button>
+    <button class="filter-btn" data-category="noticias">Notícias</button>
+    <button class="filter-btn" data-category="analises">Análises</button>
+    <button class="filter-btn" data-category="entrevistas">Entrevistas</button>
+    <button class="filter-btn" data-category="casos">Casos</button>
+    <button class="filter-btn" data-category="videos">Vídeos</button>
+  </div>
+
+  <div id="posts-grid" class="posts-grid">
+    <div class="loading">Carregando artigos...</div>
+  </div>
+</main>
+
+<footer class="footer">
+  <p>© 2026 Frota Para Todos · Julio César · Conteúdo prático para gestores de frota</p>
+</footer>
+
+<script>
+  const CATEGORY_LABELS = {
+    noticias: 'Notícias', analises: 'Análises',
+    entrevistas: 'Entrevistas', casos: 'Casos', videos: 'Vídeos'
+  };
+
+  let currentCategory = new URLSearchParams(location.search).get('category') || '';
+
+  function formatDate(iso) {
+    return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  function renderCard(post) {
+    const imageEl = post.image_url
+      ? `<img class="card-image" src="${post.image_url}" alt="${post.title}" loading="lazy">`
+      : `<div class="card-image-placeholder">🚛</div>`;
+    return `
+      <article class="card" onclick="location.href='/post/${post.slug}'">
+        ${imageEl}
+        <div class="card-body">
+          <span class="badge">${CATEGORY_LABELS[post.category] || post.category}</span>
+          <h2 class="card-title">${post.title}</h2>
+          <p class="card-excerpt">${post.excerpt || ''}</p>
+          <time class="card-date">${formatDate(post.published_at)}</time>
+        </div>
+      </article>`;
+  }
+
+  async function loadPosts(category = '') {
+    const grid = document.getElementById('posts-grid');
+    grid.innerHTML = '<div class="loading">Carregando artigos...</div>';
+    try {
+      const url = category ? `/api/posts?category=${category}&limit=24` : '/api/posts?limit=24';
+      const posts = await fetch(url).then(r => r.json());
+      if (!posts.length) {
+        grid.innerHTML = '<div class="empty-state">Nenhum artigo publicado ainda.</div>';
+        return;
+      }
+      grid.innerHTML = posts.map(renderCard).join('');
+    } catch (e) {
+      grid.innerHTML = '<div class="empty-state">Erro ao carregar artigos.</div>';
+    }
+  }
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    if (btn.dataset.category === currentCategory) btn.classList.add('active');
+    else btn.classList.remove('active');
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCategory = btn.dataset.category;
+      const url = currentCategory ? `/?category=${currentCategory}` : '/';
+      history.pushState({}, '', url);
+      loadPosts(currentCategory);
+    });
+  });
+
+  loadPosts(currentCategory);
+</script>
+</body>
+</html>

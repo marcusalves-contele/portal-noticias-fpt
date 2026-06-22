@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artigo — Frota Para Todos</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="header-logo">Frota Para <span>Todos</span></a>
+  <nav class="header-nav">
+    <a href="/">Início</a>
+    <a href="/?category=noticias">Notícias</a>
+    <a href="/?category=videos">Vídeos</a>
+  </nav>
+</header>
+
+<main>
+  <article id="article" class="article">
+    <div class="loading">Carregando artigo...</div>
+  </article>
+</main>
+
+<footer class="footer">
+  <p>© 2026 Frota Para Todos · Julio César</p>
+</footer>
+
+<script>
+  const CATEGORY_LABELS = {
+    noticias: 'Notícias', analises: 'Análises',
+    entrevistas: 'Entrevistas', casos: 'Casos', videos: 'Vídeos'
+  };
+
+  function formatDate(iso) {
+    return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  async function loadPost() {
+    const slug = location.pathname.replace('/post/', '');
+    const article = document.getElementById('article');
+    try {
+      const post = await fetch(`/api/posts/${slug}`).then(r => {
+        if (!r.ok) throw new Error('not found');
+        return r.json();
+      });
+      document.title = `${post.title} — Frota Para Todos`;
+      const videoEmbed = post.video_id
+        ? `<div class="video-embed">
+             <iframe src="https://www.youtube.com/embed/${post.video_id}"
+               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+               allowfullscreen></iframe>
+           </div>`
+        : '';
+      article.innerHTML = `
+        <a href="/" class="back-link">← Voltar para o portal</a>
+        <div class="article-header">
+          <span class="badge">${CATEGORY_LABELS[post.category] || post.category}</span>
+          <h1 class="article-title">${post.title}</h1>
+          <div class="article-meta">
+            <time>${formatDate(post.published_at)}</time> · Julio César | Frota Para Todos
+          </div>
+        </div>
+        ${videoEmbed}
+        <div class="article-content">${post.content_html}</div>`;
+    } catch (e) {
+      article.innerHTML = `
+        <a href="/" class="back-link">← Voltar para o portal</a>
+        <div class="empty-state">Artigo não encontrado.</div>`;
+    }
+  }
+
+  loadPost();
+</script>
+</body>
+</html>
