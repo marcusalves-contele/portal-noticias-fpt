@@ -63,6 +63,10 @@
 </footer>
 
 <script>
+  function esc(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
   const CATEGORY_LABELS = {
     noticias: 'Notícias', analises: 'Análises',
     entrevistas: 'Entrevistas', casos: 'Casos', videos: 'Vídeos'
@@ -86,12 +90,12 @@
     }
     heroSection.innerHTML = `
       <div class="hero" onclick="location.href='/post/${post.slug}'">
-        ${post.image_url ? `<img class="hero-bg" src="${post.image_url}" alt="${post.title}">` : ''}
+        ${post.image_url ? `<img class="hero-bg" src="${esc(post.image_url)}" alt="${esc(post.title)}">` : ''}
         <div class="hero-overlay"></div>
         <div class="hero-content">
-          <span class="badge">${CATEGORY_LABELS[post.category] || post.category}</span>
-          <h1>${post.title}</h1>
-          <p class="hero-excerpt">${post.excerpt || ''}</p>
+          <span class="badge">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
+          <h1>${esc(post.title)}</h1>
+          <p class="hero-excerpt">${esc(post.excerpt)}</p>
           <span class="hero-meta">${formatDate(post.published_at)} · Julio César</span>
         </div>
       </div>`;
@@ -100,15 +104,15 @@
   function renderCard(post, index = 0) {
     const featuredClass = index === 0 ? ' featured' : '';
     const imageEl = post.image_url
-      ? `<img class="card-image" src="${post.image_url}" alt="${post.title}" loading="lazy">`
+      ? `<img class="card-image" src="${post.image_url}" alt="${esc(post.title)}" loading="lazy">`
       : `<div class="card-image-placeholder">🚛</div>`;
     return `
       <article class="card${featuredClass} reveal" onclick="location.href='/post/${post.slug}'">
         ${imageEl}
         <div class="card-body">
-          <span class="badge">${CATEGORY_LABELS[post.category] || post.category}</span>
-          <h2 class="card-title">${post.title}</h2>
-          <p class="card-excerpt">${post.excerpt || ''}</p>
+          <span class="badge">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
+          <h2 class="card-title">${esc(post.title)}</h2>
+          <p class="card-excerpt">${esc(post.excerpt)}</p>
           <time class="card-date">${formatDate(post.published_at)}</time>
         </div>
       </article>`;
@@ -153,7 +157,6 @@
         renderHero(posts[0] || null);
       }
       if (!posts.length) {
-        if (!category) renderHero(null);
         grid.innerHTML = '<div class="empty-state">Nenhum artigo publicado ainda.</div>';
         return;
       }
@@ -172,7 +175,7 @@
         document.getElementById('sponsor-bar').innerHTML = `
           <div class="sponsor-bar">
             <span class="sponsor-label">Patrocinador</span>
-            <a href="${s.master.url}" target="_blank" class="sponsor-master">
+            <a href="${s.master.url.startsWith('https://') ? s.master.url : '#'}" target="_blank" class="sponsor-master">
               <strong>${s.master.name}</strong> — ${s.master.tagline}
               <span class="sponsor-cta">${s.master.cta} →</span>
             </a>
@@ -181,7 +184,7 @@
         document.getElementById('footer-sponsors').innerHTML = `
           <div class="footer-sponsor">
             <p style="margin-bottom:8px;font-size:12px;color:#4a4a6a;text-transform:uppercase;letter-spacing:1px;">Realização</p>
-            <a href="${s.master.url}" target="_blank" style="color:#8B23E5;font-weight:700;">${s.master.name}</a>
+            <a href="${s.master.url.startsWith('https://') ? s.master.url : '#'}" target="_blank" style="color:#8B23E5;font-weight:700;">${s.master.name}</a>
             <p style="font-size:13px;color:#94A3B8;margin-top:4px;">${s.master.highlight}</p>
           </div>`;
       }
