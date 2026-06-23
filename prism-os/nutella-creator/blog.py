@@ -55,6 +55,14 @@ WP_CONFIG = {
         "logo_url": "https://images.contelege.com.br/logo-contele-teams-branco-250x150px.png",
         "categories": [175],
     },
+    "fpt_portal": {
+        "url": "https://noticias.frotaparatodos.com.br",
+        "user": "admin",
+        "password": _load_key("WP_FPT_APP_PASSWORD"),
+        "logo_url": "https://images.contelege.com.br/Conteudos/FPT/frota-para-todos-2025.png",
+        "categories": [],  # preencher com IDs reais após criar categorias no WP admin
+        "status": "pending",  # curadoria humana obrigatória antes de publicar
+    },
 }
 
 # Evolution API (WhatsApp)
@@ -71,6 +79,9 @@ WHATSAPP_GROUPS = {
     "teams": [
         "120363304219016321@g.us",   # Teams Vendas CEO
         "120363298722268756@g.us",   # Teams | CS | Produto
+    ],
+    "fpt_portal": [
+        "120363040705704064@g.us",   # VIP | Frota Para Todos
     ],
 }
 
@@ -183,7 +194,7 @@ def upload_image_wordpress(image_bytes: bytes, filename: str, wp_url: str, wp_us
 
 def create_wordpress_post(content: dict, media_id: int, wp_url: str, wp_user: str,
                           wp_password: str, categories: list, video_id: str,
-                          blog: str, content_type: dict = None) -> dict:
+                          blog: str, content_type: dict = None, status: str = "publish") -> dict:
     html_content = content["content_html"]
     video_url = f"https://www.youtube.com/watch?v={video_id}"
     thumbnail_url = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
@@ -207,7 +218,7 @@ def create_wordpress_post(content: dict, media_id: int, wp_url: str, wp_user: st
         "content": html_content,
         "excerpt": content.get("excerpt", ""),
         "slug": content["slug"],
-        "status": "publish",
+        "status": status,
         "categories": categories,
         "featured_media": media_id,
     }
@@ -310,7 +321,12 @@ def get_blog_prompt(blog: str, titulo: str, duracao: str, transcricao: str) -> s
         contexto = "gestao de equipes externas (vendedores, tecnicos, promotores)"
         canal = "Eng. Leonardo Gazolli - Equipes Externas"
         cta_base = "https://conteleteams.com.br/?utm_source=blog&utm_medium=post&utm_campaign=youtube-live&utm_term="
-    else:
+    elif blog == "fpt_portal":
+        autor = "Julio Cesar, especialista em gestao de frotas"
+        contexto = "gestao de frotas (rastreamento, combustivel, manutencao, motoristas)"
+        canal = "Julio Cesar | Frota Para Todos"
+        cta_base = "https://frotaparatodos.com.br/?utm_source=portal&utm_medium=post&utm_campaign=youtube&utm_term="
+    else:  # fleet (default)
         autor = "Julio Cesar, especialista em gestao de frotas"
         contexto = "gestao de frotas (rastreamento, combustivel, manutencao, motoristas)"
         canal = "Julio Cesar | Frota Para Todos"
@@ -441,6 +457,7 @@ def generate_blog_post(video_id: str, blog: str, transcript: str = None,
     post_result = create_wordpress_post(
         content, media_id, wp["url"], wp["user"], wp["password"],
         wp["categories"], video_id, blog, content_type,
+        status=wp.get("status", "publish"),
     )
     emit("post", f"OK: {post_result['post_url']}")
 
