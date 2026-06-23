@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Frota Para Todos — Portal de Notícias</title>
   <meta name="description" content="Referência editorial em gestão de frotas. Notícias, análises, entrevistas e cases do setor.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -20,11 +21,12 @@
   </nav>
 </header>
 
+<!-- Patrocinador Master -->
+<div id="sponsor-bar"></div>
+
 <main class="container">
-  <section class="hero">
-    <h1>Referência em Gestão de Frotas</h1>
-    <p>Notícias, análises e conteúdo prático para gestores de frota do Brasil.</p>
-  </section>
+  <!-- Hero: preenchido via JS com o primeiro post, ou estático se vazio -->
+  <section id="hero-section"></section>
 
   <div class="filters">
     <button class="filter-btn active" data-category="">Todos</button>
@@ -38,9 +40,25 @@
   <div id="posts-grid" class="posts-grid">
     <div class="loading">Carregando artigos...</div>
   </div>
+
+  <!-- Newsletter -->
+  <section class="newsletter-section">
+    <div class="newsletter-inner">
+      <div class="newsletter-text">
+        <h2>Curadoria semanal na sua caixa de entrada</h2>
+        <p>Os melhores artigos sobre gestão de frotas, toda segunda-feira. Gratuito.</p>
+      </div>
+      <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+        <input type="email" id="nl-email" placeholder="seu@email.com.br" required>
+        <button type="submit" class="btn">Quero receber</button>
+      </form>
+      <p id="nl-msg" style="display:none;margin-top:12px;font-size:14px;"></p>
+    </div>
+  </section>
 </main>
 
 <footer class="footer">
+  <div id="footer-sponsors"></div>
   <p>© 2026 Frota Para Todos · Julio César · Conteúdo prático para gestores de frota</p>
 </footer>
 
@@ -56,12 +74,36 @@
     return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   }
 
-  function renderCard(post) {
+  function renderHero(post) {
+    const heroSection = document.getElementById('hero-section');
+    if (!post) {
+      heroSection.innerHTML = `
+        <div class="hero-static">
+          <h1>Referência em Gestão de Frotas</h1>
+          <p>Notícias, análises e conteúdo prático para gestores de frota do Brasil.</p>
+        </div>`;
+      return;
+    }
+    heroSection.innerHTML = `
+      <div class="hero" onclick="location.href='/post/${post.slug}'">
+        ${post.image_url ? `<img class="hero-bg" src="${post.image_url}" alt="${post.title}">` : ''}
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <span class="badge">${CATEGORY_LABELS[post.category] || post.category}</span>
+          <h1>${post.title}</h1>
+          <p class="hero-excerpt">${post.excerpt || ''}</p>
+          <span class="hero-meta">${formatDate(post.published_at)} · Julio César</span>
+        </div>
+      </div>`;
+  }
+
+  function renderCard(post, index = 0) {
+    const featuredClass = index === 0 ? ' featured' : '';
     const imageEl = post.image_url
       ? `<img class="card-image" src="${post.image_url}" alt="${post.title}" loading="lazy">`
       : `<div class="card-image-placeholder">🚛</div>`;
     return `
-      <article class="card" onclick="location.href='/post/${post.slug}'">
+      <article class="card${featuredClass} reveal" onclick="location.href='/post/${post.slug}'">
         ${imageEl}
         <div class="card-body">
           <span class="badge">${CATEGORY_LABELS[post.category] || post.category}</span>
@@ -72,19 +114,104 @@
       </article>`;
   }
 
+  function renderSkeleton() {
+    return Array(6).fill(0).map(() => `
+      <div class="skeleton-card">
+        <div class="skeleton-img"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line medium" style="margin-top:12px"></div>
+          <div class="skeleton-line long" style="margin-top:6px"></div>
+        </div>
+      </div>`).join('');
+  }
+
+  function setupScrollReveal() {
+    const cards = document.querySelectorAll('.reveal');
+    cards.forEach((el, i) => {
+      el.style.transitionDelay = `${Math.min(i * 60, 300)}ms`;
+    });
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    cards.forEach(el => observer.observe(el));
+  }
+
   async function loadPosts(category = '') {
     const grid = document.getElementById('posts-grid');
-    grid.innerHTML = '<div class="loading">Carregando artigos...</div>';
+    grid.innerHTML = renderSkeleton();
     try {
       const url = category ? `/api/posts?category=${category}&limit=24` : '/api/posts?limit=24';
       const posts = await fetch(url).then(r => r.json());
+      // Renderiza hero com primeiro post (só na view "Todos", sem filtro de categoria)
+      if (!category) {
+        renderHero(posts[0] || null);
+      }
       if (!posts.length) {
+        if (!category) renderHero(null);
         grid.innerHTML = '<div class="empty-state">Nenhum artigo publicado ainda.</div>';
         return;
       }
-      grid.innerHTML = posts.map(renderCard).join('');
+      const gridPosts = (!category && posts.length > 0) ? posts.slice(1) : posts;
+      grid.innerHTML = gridPosts.map((post, i) => renderCard(post, i)).join('');
+      setupScrollReveal();
     } catch (e) {
       grid.innerHTML = '<div class="empty-state">Erro ao carregar artigos.</div>';
+    }
+  }
+
+  async function loadSponsors() {
+    try {
+      const s = await fetch('/api/sponsors').then(r => r.json());
+      if (s.master) {
+        document.getElementById('sponsor-bar').innerHTML = `
+          <div class="sponsor-bar">
+            <span class="sponsor-label">Patrocinador</span>
+            <a href="${s.master.url}" target="_blank" class="sponsor-master">
+              <strong>${s.master.name}</strong> — ${s.master.tagline}
+              <span class="sponsor-cta">${s.master.cta} →</span>
+            </a>
+          </div>`;
+
+        document.getElementById('footer-sponsors').innerHTML = `
+          <div class="footer-sponsor">
+            <p style="margin-bottom:8px;font-size:12px;color:#4a4a6a;text-transform:uppercase;letter-spacing:1px;">Realização</p>
+            <a href="${s.master.url}" target="_blank" style="color:#8B23E5;font-weight:700;">${s.master.name}</a>
+            <p style="font-size:13px;color:#94A3B8;margin-top:4px;">${s.master.highlight}</p>
+          </div>`;
+      }
+    } catch (e) {}
+  }
+
+  async function subscribeNewsletter(e) {
+    e.preventDefault();
+    const email = document.getElementById('nl-email').value;
+    const msg = document.getElementById('nl-msg');
+    try {
+      const r = await fetch('/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await r.json();
+      msg.style.display = 'block';
+      if (r.ok) {
+        msg.style.color = '#22C55E';
+        msg.textContent = '✓ Inscrito! Você receberá a curadoria toda segunda-feira.';
+        document.getElementById('nl-email').value = '';
+      } else {
+        msg.style.color = '#ef4444';
+        msg.textContent = data.error === 'Email já cadastrado' ? 'Você já está inscrito!' : data.error;
+      }
+    } catch (e) {
+      msg.style.display = 'block';
+      msg.style.color = '#ef4444';
+      msg.textContent = 'Erro ao inscrever. Tente novamente.';
     }
   }
 
@@ -95,12 +222,16 @@
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentCategory = btn.dataset.category;
-      const url = currentCategory ? `/?category=${currentCategory}` : '/';
-      history.pushState({}, '', url);
+      history.pushState({}, '', currentCategory ? `/?category=${currentCategory}` : '/');
       loadPosts(currentCategory);
     });
   });
 
+  window.addEventListener('scroll', () => {
+    document.querySelector('.header').classList.toggle('header--scrolled', window.scrollY > 10);
+  }, { passive: true });
+
+  loadSponsors();
   loadPosts(currentCategory);
 </script>
 </body>

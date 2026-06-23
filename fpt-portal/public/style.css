@@ -67,23 +67,99 @@ a:hover { color: #b56fff; }
 /* Container */
 .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
-/* Hero */
+/* Hero Editorial */
 .hero {
-  padding: 48px 0 32px;
-  border-bottom: 1px solid rgba(139,35,229,0.2);
-  margin-bottom: 40px;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 48px;
+  min-height: 420px;
+  display: flex;
+  align-items: flex-end;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--fpt-purple-deep), #1a0040);
 }
 
-.hero h1 {
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.45;
+  transition: opacity 0.4s ease-out;
+}
+
+.hero:hover .hero-bg { opacity: 0.55; }
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(8, 0, 16, 0.95) 0%,
+    rgba(8, 0, 16, 0.5) 50%,
+    rgba(8, 0, 16, 0.1) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 40px;
+  width: 100%;
+  max-width: 760px;
+}
+
+.hero-content .badge { margin-bottom: 16px; }
+
+.hero-content h1 {
+  font-family: var(--fpt-font-display);
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.hero-content .hero-excerpt {
+  font-size: 15px;
+  color: rgba(247, 247, 247, 0.8);
+  line-height: 1.6;
+  margin-bottom: 20px;
+  max-width: 560px;
+}
+
+.hero-meta {
+  font-size: 13px;
+  color: rgba(247, 247, 247, 0.6);
+}
+
+/* Hero fallback (sem posts) */
+.hero-static {
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 40px;
+  border-bottom: 1px solid rgba(139,35,229,0.2);
+  margin-bottom: 40px;
+  background: linear-gradient(135deg, rgba(139,35,229,0.06), transparent);
+  border-radius: 16px;
+}
+
+.hero-static h1 {
   font-family: var(--fpt-font-display);
   font-size: 48px;
   font-weight: 800;
   line-height: 1.15;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   letter-spacing: -0.5px;
 }
 
-.hero p { color: var(--fpt-text-muted); font-size: 16px; }
+.hero-static p { color: var(--fpt-text-muted); font-size: 16px; }
 
 /* Filtros */
 .filters {
@@ -625,7 +701,8 @@ a:hover { color: #b56fff; }
 }
 
 @media (max-width: 640px) {
-  .hero h1 { font-size: 26px; }
+  .hero-static h1 { font-size: 26px; }
+  .hero-content h1 { font-size: 26px; }
   .posts-grid { grid-template-columns: 1fr; }
   .article-title { font-size: 24px; }
   .post-item { flex-direction: column; }
