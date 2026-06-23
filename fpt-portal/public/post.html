@@ -16,7 +16,17 @@
     <a href="/?category=noticias">Notícias</a>
     <a href="/?category=videos">Vídeos</a>
   </nav>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMobileNav()">
+    <span></span><span></span><span></span>
+  </button>
 </header>
+
+<div class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav-close" onclick="toggleMobileNav()">✕</button>
+  <a href="/">Início</a>
+  <a href="/?category=noticias">Notícias</a>
+  <a href="/?category=videos">Vídeos</a>
+</div>
 
 <div id="article-hero"></div>
 
@@ -187,6 +197,14 @@
     document.getElementById('back-to-top').classList.toggle('visible', window.scrollY > 400);
     document.querySelector('.header').classList.toggle('header--scrolled', window.scrollY > 10);
   }, { passive: true });
+
+  function toggleMobileNav() {
+    const nav = document.getElementById('mobile-nav');
+    const btn = document.getElementById('hamburger');
+    nav.classList.toggle('open');
+    btn.classList.toggle('open');
+    document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+  }
 
   loadPost();
 </script>

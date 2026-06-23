@@ -19,7 +19,19 @@
     <a href="/?category=entrevistas">Entrevistas</a>
     <a href="/?category=videos">Vídeos</a>
   </nav>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMobileNav()">
+    <span></span><span></span><span></span>
+  </button>
 </header>
+
+<div class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav-close" onclick="toggleMobileNav()">✕</button>
+  <a href="/" onclick="toggleMobileNav()">Início</a>
+  <a href="/?category=noticias" onclick="toggleMobileNav()">Notícias</a>
+  <a href="/?category=analises" onclick="toggleMobileNav()">Análises</a>
+  <a href="/?category=entrevistas" onclick="toggleMobileNav()">Entrevistas</a>
+  <a href="/?category=videos" onclick="toggleMobileNav()">Vídeos</a>
+</div>
 
 <!-- Patrocinador Master -->
 <div id="sponsor-bar"></div>
@@ -233,6 +245,14 @@
   window.addEventListener('scroll', () => {
     document.querySelector('.header').classList.toggle('header--scrolled', window.scrollY > 10);
   }, { passive: true });
+
+  function toggleMobileNav() {
+    const nav = document.getElementById('mobile-nav');
+    const btn = document.getElementById('hamburger');
+    nav.classList.toggle('open');
+    btn.classList.toggle('open');
+    document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+  }
 
   loadSponsors();
   loadPosts(currentCategory);
