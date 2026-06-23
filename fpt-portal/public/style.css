@@ -22,7 +22,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--fpt-font-body);
   background: var(--fpt-dark);
   color: var(--fpt-text-light);
   line-height: 1.6;
@@ -99,7 +99,7 @@ a:hover { color: #b56fff; }
   color: var(--fpt-text-muted);
   padding: 6px 16px;
   border-radius: 20px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--fpt-font-body);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -237,7 +237,7 @@ a:hover { color: #b56fff; }
   border: 1px solid rgba(139,35,229,0.3);
   border-radius: 8px;
   color: var(--fpt-text-light);
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--fpt-font-body);
   font-size: 14px;
 }
 
@@ -247,7 +247,7 @@ a:hover { color: #b56fff; }
   border: none;
   border-radius: 8px;
   padding: 10px 20px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--fpt-font-body);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -397,7 +397,7 @@ a:hover { color: #b56fff; }
   border: 1px solid rgba(139,35,229,0.3);
   border-radius: 8px;
   color: var(--fpt-text-light);
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--fpt-font-body);
   font-size: 14px;
   outline: none;
   transition: border-color 0.25s ease-out;
@@ -453,7 +453,7 @@ a:hover { color: #b56fff; }
   border: 1px solid rgba(139,35,229,0.25);
   border-radius: 8px;
   color: var(--fpt-text-light);
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--fpt-font-body);
   font-size: 14px;
   outline: none;
   margin-bottom: 12px;
