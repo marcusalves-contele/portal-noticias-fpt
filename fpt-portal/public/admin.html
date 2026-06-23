@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin — Portal FPT</title>
   <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -22,47 +23,92 @@
     <div class="admin-key-bar">
       <input type="password" id="api-key-input" placeholder="API Key" />
       <button class="btn" onclick="loadAdmin()">Entrar</button>
+      <button class="btn" id="sync-btn" onclick="syncYouTube()" style="display:none;background:rgba(139,35,229,0.2);border:1px solid rgba(139,35,229,0.4);">↻ Sincronizar YouTube</button>
     </div>
+    <p id="sync-msg" style="display:none;font-size:13px;margin-bottom:16px;"></p>
 
-    <div id="pending-section" style="display:none">
-      <div class="section-title">Aguardando revisão</div>
-      <div id="pending-list"></div>
-    </div>
+    <div id="admin-content" style="display:none">
+      <!-- Tabs -->
+      <div style="display:flex;gap:4px;margin-bottom:32px;border-bottom:1px solid rgba(139,35,229,0.2);padding-bottom:0;">
+        <button class="tab-btn active" onclick="switchTab('posts')" id="tab-posts"
+          style="padding:10px 20px;background:transparent;border:none;border-bottom:2px solid #8B23E5;color:#F7F7F7;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:-1px;">
+          Posts
+        </button>
+        <button class="tab-btn" onclick="switchTab('comments')" id="tab-comments"
+          style="padding:10px 20px;background:transparent;border:none;border-bottom:2px solid transparent;color:#94A3B8;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:-1px;">
+          Comentários <span id="pending-comments-badge" style="display:none;background:#8B23E5;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px;"></span>
+        </button>
+      </div>
 
-    <div id="published-section" style="display:none;margin-top:40px">
-      <div class="section-title">Publicados</div>
-      <div id="published-list"></div>
+      <!-- Posts Tab -->
+      <div id="posts-tab">
+        <div id="pending-section">
+          <div class="section-title">Aguardando revisão</div>
+          <div id="pending-list"></div>
+        </div>
+
+        <div id="published-section" style="margin-top:40px">
+          <div class="section-title">Publicados</div>
+          <div id="published-list"></div>
+        </div>
+      </div>
+
+      <!-- Comments Tab -->
+      <div id="comments-tab" style="display:none">
+        <div id="pending-comments-section">
+          <div class="section-title">Comentários aguardando moderação</div>
+          <div id="pending-comments-list"></div>
+        </div>
+
+        <div id="approved-comments-section" style="margin-top:40px">
+          <div class="section-title">Comentários aprovados</div>
+          <div id="approved-comments-list"></div>
+        </div>
+      </div>
     </div>
   </div>
 </main>
 
 <script>
+  let currentKey = '';
+
   function getKey() { return document.getElementById('api-key-input').value; }
 
   function formatDate(iso) {
     return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  function switchTab(tab) {
+    document.getElementById('posts-tab').style.display = tab === 'posts' ? 'block' : 'none';
+    document.getElementById('comments-tab').style.display = tab === 'comments' ? 'block' : 'none';
+    document.getElementById('tab-posts').style.borderBottomColor = tab === 'posts' ? '#8B23E5' : 'transparent';
+    document.getElementById('tab-posts').style.color = tab === 'posts' ? '#F7F7F7' : '#94A3B8';
+    document.getElementById('tab-comments').style.borderBottomColor = tab === 'comments' ? '#8B23E5' : 'transparent';
+    document.getElementById('tab-comments').style.color = tab === 'comments' ? '#F7F7F7' : '#94A3B8';
+  }
+
   async function loadAdmin() {
     const key = getKey();
     if (!key) return alert('Digite a API Key');
+    currentKey = key;
     try {
-      const posts = await fetch('/api/admin/posts', {
-        headers: { 'x-api-key': key }
-      }).then(r => {
-        if (r.status === 401) throw new Error('API Key inválida');
-        return r.json();
-      });
-      renderAdmin(posts, key);
+      const [posts, comments] = await Promise.all([
+        fetch('/api/admin/posts', { headers: { 'x-api-key': key } }).then(r => {
+          if (r.status === 401) throw new Error('API Key inválida');
+          return r.json();
+        }),
+        fetch('/api/admin/comments', { headers: { 'x-api-key': key } }).then(r => r.json())
+      ]);
+      document.getElementById('admin-content').style.display = 'block';
+      document.getElementById('sync-btn').style.display = 'inline-flex';
+      renderPosts(posts, key);
+      renderComments(comments, key);
     } catch (e) {
       alert(e.message);
     }
   }
 
-  function renderAdmin(posts, key) {
-    document.getElementById('pending-section').style.display = 'block';
-    document.getElementById('published-section').style.display = 'block';
-
+  function renderPosts(posts, key) {
     const pending = posts.filter(p => p.status === 'pending');
     const published = posts.filter(p => p.status === 'published');
 
@@ -75,11 +121,30 @@
       : '<div class="empty-state">Nenhum post publicado ainda.</div>';
   }
 
+  function renderComments(comments, key) {
+    const pending = comments.filter(c => c.status === 'pending');
+    const approved = comments.filter(c => c.status === 'approved');
+
+    const badge = document.getElementById('pending-comments-badge');
+    if (pending.length) {
+      badge.style.display = 'inline';
+      badge.textContent = pending.length;
+    }
+
+    document.getElementById('pending-comments-list').innerHTML = pending.length
+      ? pending.map(c => renderCommentItem(c, key, true)).join('')
+      : '<div class="empty-state">Nenhum comentário aguardando moderação.</div>';
+
+    document.getElementById('approved-comments-list').innerHTML = approved.length
+      ? approved.map(c => renderCommentItem(c, key, false)).join('')
+      : '<div class="empty-state">Nenhum comentário aprovado ainda.</div>';
+  }
+
   function renderPostItem(post, key, showActions) {
     const actions = showActions ? `
       <div class="post-item-actions">
-        <button class="btn btn-approve" onclick="approve(${post.id}, '${key}')">✓ Aprovar</button>
-        <button class="btn btn-reject" onclick="reject(${post.id}, '${key}')">✕ Rejeitar</button>
+        <button class="btn btn-approve" onclick="approvePost(${post.id})">✓ Aprovar</button>
+        <button class="btn btn-reject" onclick="rejectPost(${post.id})">✕ Rejeitar</button>
       </div>` : `
       <div class="post-item-actions">
         <a href="/post/${post.slug}" target="_blank" class="btn" style="font-size:12px;padding:6px 12px">Ver →</a>
@@ -96,20 +161,85 @@
       </div>`;
   }
 
-  async function approve(id, key) {
-    await fetch(`/api/admin/posts/${id}/publish`, { method: 'PUT', headers: { 'x-api-key': key } });
+  function renderCommentItem(comment, key, showActions) {
+    const actions = showActions ? `
+      <div class="post-item-actions">
+        <button class="btn btn-approve" onclick="approveComment(${comment.id})">✓ Aprovar</button>
+        <button class="btn btn-reject" onclick="rejectComment(${comment.id})">✕ Rejeitar</button>
+      </div>` : `
+      <div class="post-item-actions">
+        <a href="/post/${comment.post_slug}" target="_blank" class="btn" style="font-size:12px;padding:6px 12px">Ver post →</a>
+      </div>`;
+
+    return `
+      <div class="post-item" id="comment-${comment.id}">
+        <div class="post-item-info">
+          <div class="post-item-title">${comment.author} <span style="font-weight:400;color:#94A3B8;font-size:13px;">em /${comment.post_slug}</span></div>
+          <div class="post-item-meta">${formatDate(comment.created_at)}</div>
+          <div style="font-size:13px;color:#d4c8e8;margin-top:6px">${comment.content.substring(0, 200)}${comment.content.length > 200 ? '...' : ''}</div>
+        </div>
+        ${actions}
+      </div>`;
+  }
+
+  async function approvePost(id) {
+    await fetch(`/api/admin/posts/${id}/publish`, { method: 'PUT', headers: { 'x-api-key': currentKey } });
     loadAdmin();
   }
 
-  async function reject(id, key) {
+  async function rejectPost(id) {
     if (!confirm('Rejeitar este post?')) return;
-    await fetch(`/api/admin/posts/${id}/reject`, { method: 'PUT', headers: { 'x-api-key': key } });
+    await fetch(`/api/admin/posts/${id}/reject`, { method: 'PUT', headers: { 'x-api-key': currentKey } });
+    loadAdmin();
+  }
+
+  async function approveComment(id) {
+    await fetch(`/api/admin/comments/${id}/approve`, { method: 'PUT', headers: { 'x-api-key': currentKey } });
+    loadAdmin();
+  }
+
+  async function rejectComment(id) {
+    if (!confirm('Rejeitar este comentário?')) return;
+    await fetch(`/api/admin/comments/${id}/reject`, { method: 'PUT', headers: { 'x-api-key': currentKey } });
     loadAdmin();
   }
 
   document.getElementById('api-key-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') loadAdmin();
   });
+
+  async function syncYouTube() {
+    const btn = document.getElementById('sync-btn');
+    const msg = document.getElementById('sync-msg');
+    btn.disabled = true;
+    btn.textContent = '↻ Sincronizando...';
+    msg.style.display = 'none';
+    try {
+      const r = await fetch('/api/admin/sync-youtube', { method: 'POST', headers: { 'x-api-key': currentKey } });
+      const data = await r.json();
+      msg.style.display = 'block';
+      if (data.erro) {
+        msg.style.color = '#ef4444';
+        msg.textContent = 'Erro: ' + data.erro;
+      } else {
+        msg.style.color = '#22C55E';
+        msg.textContent = data.criados > 0
+          ? `✓ ${data.criados} novo(s) vídeo(s) importado(s) — aprove abaixo`
+          : '✓ Nenhum vídeo novo no canal';
+        if (data.criados > 0) loadAdmin();
+      }
+    } catch (e) {
+      msg.style.display = 'block';
+      msg.style.color = '#ef4444';
+      msg.textContent = 'Erro ao sincronizar';
+    }
+    btn.disabled = false;
+    btn.textContent = '↻ Sincronizar YouTube';
+  }
+
+  window.addEventListener('scroll', () => {
+    document.querySelector('.header').classList.toggle('header--scrolled', window.scrollY > 10);
+  }, { passive: true });
 </script>
 </body>
 </html>

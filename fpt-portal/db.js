@@ -26,6 +26,28 @@ db.serialize(() => {
       published_at DATETIME
     )
   `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS subscribers (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      email      TEXT UNIQUE NOT NULL,
+      active     INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS comments (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      post_id    INTEGER NOT NULL,
+      post_slug  TEXT NOT NULL,
+      author     TEXT NOT NULL,
+      content    TEXT NOT NULL,
+      status     TEXT DEFAULT 'pending',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (post_id) REFERENCES posts(id)
+    )
+  `);
 });
 
 // Helpers promisificados
@@ -45,6 +67,7 @@ const get = (sql, params = []) => new Promise((resolve, reject) => {
 });
 
 module.exports = {
+  // --- Posts ---
   getPublished: (limit = 20, offset = 0, category = null) => {
     if (category) {
       return all("SELECT * FROM posts WHERE status = 'published' AND category = ? ORDER BY published_at DESC LIMIT ? OFFSET ?", [category, limit, offset]);
@@ -52,8 +75,14 @@ module.exports = {
     return all("SELECT * FROM posts WHERE status = 'published' ORDER BY published_at DESC LIMIT ? OFFSET ?", [limit, offset]);
   },
 
+  getRecentPublished: (limit = 5) =>
+    all("SELECT * FROM posts WHERE status = 'published' ORDER BY published_at DESC LIMIT ?", [limit]),
+
   getBySlug: (slug) =>
     get("SELECT * FROM posts WHERE slug = ? AND status = 'published'", [slug]),
+
+  getByVideoId: (video_id) =>
+    get("SELECT id FROM posts WHERE video_id = ?", [video_id]),
 
   getAll: () =>
     all("SELECT * FROM posts ORDER BY created_at DESC"),
@@ -70,4 +99,36 @@ module.exports = {
 
   reject: (id) =>
     run("UPDATE posts SET status = 'rejected' WHERE id = ?", [id]),
+
+  // --- Newsletter ---
+  subscribe: (email) =>
+    run("INSERT INTO subscribers (email) VALUES (?)", [email]),
+
+  unsubscribe: (email) =>
+    run("UPDATE subscribers SET active = 0 WHERE email = ?", [email]),
+
+  getActiveSubscribers: () =>
+    all("SELECT * FROM subscribers WHERE active = 1"),
+
+  // --- Comentários ---
+  createComment: (data) =>
+    run(
+      "INSERT INTO comments (post_id, post_slug, author, content, status) VALUES (?, ?, ?, ?, 'pending')",
+      [data.post_id, data.post_slug, data.author, data.content]
+    ),
+
+  getApprovedComments: (post_slug) =>
+    all("SELECT * FROM comments WHERE post_slug = ? AND status = 'approved' ORDER BY created_at ASC", [post_slug]),
+
+  getPendingComments: () =>
+    all("SELECT * FROM comments WHERE status = 'pending' ORDER BY created_at DESC"),
+
+  getAllComments: () =>
+    all("SELECT * FROM comments ORDER BY created_at DESC"),
+
+  approveComment: (id) =>
+    run("UPDATE comments SET status = 'approved' WHERE id = ?", [id]),
+
+  rejectComment: (id) =>
+    run("UPDATE comments SET status = 'rejected' WHERE id = ?", [id]),
 };

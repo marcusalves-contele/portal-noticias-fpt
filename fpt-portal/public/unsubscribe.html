@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cancelar Inscrição — Frota Para Todos</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="header-logo">Frota Para <span>Todos</span></a>
+</header>
+
+<main class="container">
+  <div style="max-width:480px;margin:80px auto;text-align:center;">
+    <div style="font-size:48px;margin-bottom:24px;">✉️</div>
+    <h1 style="font-size:24px;font-weight:800;margin-bottom:12px;">Cancelar Inscrição</h1>
+    <p id="msg-initial" style="color:#94A3B8;font-size:15px;margin-bottom:32px;">
+      Você quer cancelar o recebimento da curadoria semanal do portal Frota Para Todos?
+    </p>
+    <div id="email-display" style="background:#0f0520;border:1px solid rgba(139,35,229,0.2);border-radius:8px;padding:12px 20px;margin-bottom:24px;font-size:14px;color:#F7F7F7;display:none;"></div>
+    <button id="btn-confirm" class="btn" onclick="confirmUnsubscribe()"
+      style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);">
+      Cancelar minha inscrição
+    </button>
+    <div id="msg-result" style="display:none;margin-top:24px;font-size:15px;"></div>
+    <p style="margin-top:32px;">
+      <a href="/" style="color:#94A3B8;font-size:14px;">← Voltar para o portal</a>
+    </p>
+  </div>
+</main>
+
+<footer class="footer">
+  <p>© 2026 Frota Para Todos · Julio César</p>
+</footer>
+
+<script>
+  const email = new URLSearchParams(location.search).get('email');
+
+  if (email) {
+    document.getElementById('email-display').style.display = 'block';
+    document.getElementById('email-display').textContent = email;
+  } else {
+    document.getElementById('btn-confirm').disabled = true;
+    document.getElementById('msg-initial').textContent = 'Link inválido. Nenhum e-mail informado.';
+    document.getElementById('btn-confirm').style.display = 'none';
+  }
+
+  async function confirmUnsubscribe() {
+    const btn = document.getElementById('btn-confirm');
+    const result = document.getElementById('msg-result');
+    btn.disabled = true;
+    btn.textContent = 'Processando...';
+    try {
+      const r = await fetch('/api/newsletter/unsubscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      btn.style.display = 'none';
+      result.style.display = 'block';
+      if (r.ok) {
+        result.style.color = '#22C55E';
+        result.innerHTML = '✓ Inscrição cancelada com sucesso.<br><span style="font-size:13px;color:#94A3B8;">Você não receberá mais e-mails da curadoria FPT.</span>';
+      } else {
+        result.style.color = '#ef4444';
+        result.textContent = 'Erro ao processar. Tente novamente.';
+        btn.style.display = 'inline-block';
+        btn.disabled = false;
+        btn.textContent = 'Cancelar minha inscrição';
+      }
+    } catch (e) {
+      result.style.display = 'block';
+      result.style.color = '#ef4444';
+      result.textContent = 'Erro ao processar. Tente novamente.';
+      btn.disabled = false;
+      btn.textContent = 'Cancelar minha inscrição';
+    }
+  }
+</script>
+</body>
+</html>
