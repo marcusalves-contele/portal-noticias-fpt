@@ -277,8 +277,15 @@ a:hover { color: #b56fff; }
   margin-top: auto;
 }
 
-/* Artigo */
-.article { max-width: 780px; margin: 48px auto; padding: 0 24px; }
+/* Artigo sem imagem (mantém layout atual) */
+.article {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.article-header { margin-bottom: 32px; }
+
 .article-title {
   font-family: var(--fpt-font-display);
   font-size: 40px;
@@ -707,13 +714,60 @@ a:hover { color: #b56fff; }
 .article-content { font-size: 18px; line-height: 1.9; }
 .article-content p { margin-bottom: 24px; }
 
-/* Imagem de capa */
-.article-cover {
+/* Hero do artigo */
+.article-hero {
+  position: relative;
   width: 100%;
-  max-height: 420px;
+  height: 480px;
+  overflow: hidden;
+  margin-bottom: 0;
+}
+
+.article-hero img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 32px;
+  opacity: 0.6;
+}
+
+.article-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(8,0,16,1) 0%,
+    rgba(8,0,16,0.6) 45%,
+    rgba(8,0,16,0.1) 100%
+  );
+}
+
+.article-hero-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 40px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.article-hero-content .badge { margin-bottom: 16px; }
+
+.article-hero-content h1 {
+  font-family: var(--fpt-font-display);
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  margin-bottom: 16px;
+}
+
+.article-hero-content .article-meta {
+  color: rgba(247,247,247,0.7);
+  font-size: 14px;
+  margin-bottom: 0;
 }
 
 @media (max-width: 640px) {
@@ -729,6 +783,9 @@ a:hover { color: #b56fff; }
   .card.featured { grid-column: span 1; }
   .card.featured .card-image { height: 200px; }
   .card.featured .card-title { font-size: 18px; }
+  .article-hero { height: 320px; }
+  .article-hero-content { padding: 24px; }
+  .article-hero-content h1 { font-size: 28px; }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {

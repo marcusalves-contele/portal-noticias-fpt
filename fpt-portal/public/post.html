@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Artigo — Frota Para Todos</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -17,10 +18,29 @@
   </nav>
 </header>
 
+<div id="article-hero"></div>
+
 <main>
   <article id="article" class="article">
     <div class="loading">Carregando artigo...</div>
   </article>
+
+  <div id="comments-section" class="article" style="display:none">
+    <div class="comments-section">
+      <h2>Comentários</h2>
+      <div id="comments-list"></div>
+
+      <div class="comment-form">
+        <h3>Deixe seu comentário</h3>
+        <form id="comment-form" onsubmit="submitComment(event)">
+          <input type="text" id="c-author" placeholder="Seu nome" required maxlength="100">
+          <textarea id="c-content" placeholder="Escreva seu comentário..." rows="4" required maxlength="2000"></textarea>
+          <button type="submit" id="c-btn" class="btn">Enviar comentário</button>
+        </form>
+        <p id="c-msg" style="display:none;margin-top:12px;font-size:14px;"></p>
+      </div>
+    </div>
+  </div>
 </main>
 
 <footer class="footer">
@@ -28,6 +48,10 @@
 </footer>
 
 <script>
+  function esc(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
   const CATEGORY_LABELS = {
     noticias: 'Notícias', analises: 'Análises',
     entrevistas: 'Entrevistas', casos: 'Casos', videos: 'Vídeos'
@@ -35,6 +59,12 @@
 
   function formatDate(iso) {
     return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  function readingTime(html) {
+    const text = html.replace(/<[^>]+>/g, ' ');
+    const words = text.trim().split(/\s+/).length;
+    return Math.max(1, Math.ceil(words / 200));
   }
 
   async function loadPost() {
@@ -46,6 +76,7 @@
         return r.json();
       });
       document.title = `${post.title} — Frota Para Todos`;
+
       const videoEmbed = post.video_id
         ? `<div class="video-embed">
              <iframe src="https://www.youtube.com/embed/${post.video_id}"
@@ -53,17 +84,41 @@
                allowfullscreen></iframe>
            </div>`
         : '';
-      article.innerHTML = `
-        <a href="/" class="back-link">← Voltar para o portal</a>
-        <div class="article-header">
-          <span class="badge">${CATEGORY_LABELS[post.category] || post.category}</span>
-          <h1 class="article-title">${post.title}</h1>
-          <div class="article-meta">
-            <time>${formatDate(post.published_at)}</time> · Julio César | Frota Para Todos
+
+      if (post.image_url && !post.video_id) {
+        document.getElementById('article-hero').innerHTML = `
+          <div class="article-hero">
+            <img src="${esc(post.image_url)}" alt="${esc(post.title)}">
+            <div class="article-hero-overlay"></div>
+            <div class="article-hero-content">
+              <span class="badge">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
+              <h1>${esc(post.title)}</h1>
+              <div class="article-meta">
+                <time>${formatDate(post.published_at)}</time> · ${readingTime(post.content_html)} min de leitura · Julio César | Frota Para Todos
+              </div>
+            </div>
+          </div>`;
+
+        article.innerHTML = `
+          <a href="/" class="back-link">← Voltar para o portal</a>
+          ${videoEmbed}
+          <div class="article-content">${post.content_html}</div>`;
+      } else {
+        document.getElementById('article-hero').innerHTML = '';
+        article.innerHTML = `
+          <a href="/" class="back-link">← Voltar para o portal</a>
+          <div class="article-header">
+            <span class="badge">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
+            <h1 class="article-title">${esc(post.title)}</h1>
+            <div class="article-meta">
+              <time>${formatDate(post.published_at)}</time> · ${readingTime(post.content_html)} min de leitura · Julio César | Frota Para Todos
+            </div>
           </div>
-        </div>
-        ${videoEmbed}
-        <div class="article-content">${post.content_html}</div>`;
+          ${videoEmbed}
+          <div class="article-content">${post.content_html}</div>`;
+      }
+
+      await loadComments(slug);
     } catch (e) {
       article.innerHTML = `
         <a href="/" class="back-link">← Voltar para o portal</a>
@@ -71,7 +126,72 @@
     }
   }
 
+  async function loadComments(slug) {
+    const section = document.getElementById('comments-section');
+    try {
+      const comments = await fetch(`/api/comments/${slug}`).then(r => r.json());
+      const list = document.getElementById('comments-list');
+      list.innerHTML = comments.length
+        ? comments.map(c => `
+            <div class="comment">
+              <div class="comment-header">
+                <div class="comment-avatar">${c.author.charAt(0).toUpperCase()}</div>
+                <span class="comment-author">${c.author}</span>
+                <span class="comment-date">${formatDate(c.created_at)}</span>
+              </div>
+              <div class="comment-content">${c.content.replace(/</g, '&lt;')}</div>
+            </div>`).join('')
+        : '<p style="color:#94A3B8;font-size:14px;">Seja o primeiro a comentar!</p>';
+    } catch (e) {}
+    section.style.display = 'block';
+  }
+
+  async function submitComment(e) {
+    e.preventDefault();
+    const slug = location.pathname.replace('/post/', '');
+    const author = document.getElementById('c-author').value.trim();
+    const content = document.getElementById('c-content').value.trim();
+    const msg = document.getElementById('c-msg');
+    const btn = document.getElementById('c-btn');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    try {
+      const r = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_slug: slug, author, content })
+      });
+      msg.style.display = 'block';
+      if (r.ok) {
+        msg.style.color = '#22C55E';
+        msg.textContent = '✓ Comentário enviado! Aguarda aprovação antes de aparecer.';
+        document.getElementById('comment-form').reset();
+      } else {
+        const data = await r.json();
+        msg.style.color = '#ef4444';
+        msg.textContent = data.error || 'Erro ao enviar.';
+      }
+    } catch (e) {
+      msg.style.display = 'block';
+      msg.style.color = '#ef4444';
+      msg.textContent = 'Erro ao enviar. Tente novamente.';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Enviar comentário';
+  }
+
+  window.addEventListener('scroll', () => {
+    const doc = document.documentElement;
+    const scrolled = doc.scrollTop / (doc.scrollHeight - doc.clientHeight);
+    document.getElementById('reading-progress').style.width = (scrolled * 100) + '%';
+    document.getElementById('back-to-top').classList.toggle('visible', window.scrollY > 400);
+    document.querySelector('.header').classList.toggle('header--scrolled', window.scrollY > 10);
+  }, { passive: true });
+
   loadPost();
 </script>
+
+<div id="reading-progress"></div>
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 </body>
 </html>
