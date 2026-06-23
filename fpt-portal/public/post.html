@@ -101,7 +101,7 @@
             <img src="${esc(post.image_url)}" alt="${esc(post.title)}">
             <div class="article-hero-overlay"></div>
             <div class="article-hero-content">
-              <span class="badge">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
+              <span class="badge" data-cat="${esc(post.category)}">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
               <h1>${esc(post.title)}</h1>
               <div class="article-meta">
                 <time>${formatDate(post.published_at)}</time> · ${readingTime(post.content_html)} min de leitura · Julio César | Frota Para Todos
@@ -118,7 +118,7 @@
         article.innerHTML = `
           <a href="/" class="back-link">← Voltar para o portal</a>
           <div class="article-header">
-            <span class="badge">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
+            <span class="badge" data-cat="${esc(post.category)}">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
             <h1 class="article-title">${esc(post.title)}</h1>
             <div class="article-meta">
               <time>${formatDate(post.published_at)}</time> · ${readingTime(post.content_html)} min de leitura · Julio César | Frota Para Todos
