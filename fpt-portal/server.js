@@ -14,6 +14,7 @@ const JULIO_CHANNEL_ID = process.env.JULIO_CHANNEL_ID || 'UCz31CtOANqSFuLEdFTi1i
 const YOUTUBE_RSS = `https://www.youtube.com/feeds/videos.xml?channel_id=${JULIO_CHANNEL_ID}`;
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.FPT_PORTAL_API_KEY || 'dev-key';
 
@@ -334,6 +335,14 @@ function checkCommentRateLimit(ip) {
   return true; // OK
 }
 
+// Cleanup expired rate limit entries every 2 hours
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, entry] of commentRateLimit.entries()) {
+    if (now > entry.resetAt) commentRateLimit.delete(ip);
+  }
+}, 2 * 60 * 60 * 1000);
+
 // --- Comentários ---
 app.get('/api/comments/:slug', async (req, res) => {
   const comments = await db.getApprovedComments(req.params.slug);
@@ -343,6 +352,7 @@ app.get('/api/comments/:slug', async (req, res) => {
 app.post('/api/comments', async (req, res) => {
   const ip = req.ip || req.connection.remoteAddress || 'unknown';
   if (!checkCommentRateLimit(ip)) {
+    console.warn(`[RateLimit] IP ${ip} excedeu 5 comentários/hora`);
     return res.status(429).json({ error: 'Muitos comentários. Aguarde 1 hora.' });
   }
   const { post_id, post_slug, author, content } = req.body;
