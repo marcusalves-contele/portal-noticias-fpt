@@ -1128,6 +1128,60 @@ a:hover { color: #b56fff; }
   color: var(--fpt-text-light);
 }
 
+/* Share Bar */
+.share-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 32px 0;
+  padding: 20px 0;
+  border-top: 1px solid rgba(139,35,229,0.15);
+  border-bottom: 1px solid rgba(139,35,229,0.15);
+}
+
+.share-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fpt-text-muted);
+  margin-right: 4px;
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-family: var(--fpt-font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease-out;
+  border: 1px solid transparent;
+}
+
+.share-whatsapp {
+  background: rgba(37, 211, 102, 0.1);
+  border-color: rgba(37, 211, 102, 0.3);
+  color: #25D366;
+}
+.share-whatsapp:hover {
+  background: rgba(37, 211, 102, 0.2);
+  color: #25D366;
+}
+
+.share-copy {
+  background: transparent;
+  border-color: rgba(139,35,229,0.3);
+  color: var(--fpt-text-muted);
+}
+.share-copy:hover {
+  border-color: var(--fpt-purple);
+  color: var(--fpt-text-light);
+}
+
 @media (max-width: 640px) {
   .hero-wrapper { margin: 0 -24px 32px; }
   .hero { min-height: 380px; }
