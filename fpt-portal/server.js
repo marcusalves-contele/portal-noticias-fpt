@@ -344,6 +344,28 @@ app.get('/post/:slug', (req, res) => res.sendFile(path.join(__dirname, 'public',
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 app.get('/unsubscribe', (req, res) => res.sendFile(path.join(__dirname, 'public', 'unsubscribe.html')));
 
+app.get('/sitemap.xml', async (req, res) => {
+  const base = process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br';
+  try {
+    const posts = await db.getPublished(1000, 0, null);
+    const staticUrls = [
+      `<url><loc>${base}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`,
+      `<url><loc>${base}/about</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>`,
+    ];
+    const postUrls = posts.map(p => {
+      const lastmod = p.published_at ? p.published_at.substring(0, 10) : '';
+      return `<url><loc>${base}/post/${p.slug}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}<changefreq>monthly</changefreq><priority>0.8</priority></url>`;
+    });
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  ${[...staticUrls, ...postUrls].join('\n  ')}
+</urlset>`);
+  } catch (e) {
+    res.status(500).send('Erro ao gerar sitemap');
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Portal FPT rodando em http://localhost:${PORT}`);
 });

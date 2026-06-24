@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="Frota Para Todos" id="og-title">
+  <meta property="og:description" content="Referência editorial em gestão de frotas." id="og-description">
+  <meta property="og:image" content="" id="og-image">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Frota Para Todos">
+  <meta name="description" content="" id="meta-description">
+  <script type="application/ld+json" id="article-jsonld"></script>
   <title>Artigo — Frota Para Todos</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/style.css">
@@ -86,6 +93,22 @@
         return r.json();
       });
       document.title = `${post.title} — Frota Para Todos`;
+      const heroImgFull = post.image_url || (post.video_id ? `https://img.youtube.com/vi/${post.video_id}/maxresdefault.jpg` : '');
+      document.getElementById('og-title').setAttribute('content', post.title + ' — Frota Para Todos');
+      document.getElementById('og-description').setAttribute('content', post.excerpt || 'Referência editorial em gestão de frotas.');
+      if (heroImgFull) document.getElementById('og-image').setAttribute('content', heroImgFull);
+      document.getElementById('meta-description').setAttribute('content', post.excerpt || '');
+      document.getElementById('article-jsonld').textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": post.title,
+        "description": post.excerpt || '',
+        "image": heroImgFull || '',
+        "datePublished": post.published_at,
+        "author": { "@type": "Person", "name": "Julio César" },
+        "publisher": { "@type": "Organization", "name": "Frota Para Todos", "url": location.origin },
+        "mainEntityOfPage": { "@type": "WebPage", "@id": location.href }
+      });
 
       const videoEmbed = post.video_id
         ? `<div class="video-embed">
@@ -95,10 +118,12 @@
            </div>`
         : '';
 
-      if (post.image_url && !post.video_id) {
+      const heroImg = post.image_url || (post.video_id ? `https://img.youtube.com/vi/${post.video_id}/maxresdefault.jpg` : '');
+
+      if (heroImg) {
         document.getElementById('article-hero').innerHTML = `
           <div class="article-hero">
-            <img src="${esc(post.image_url)}" alt="${esc(post.title)}">
+            <img src="${esc(heroImg)}" alt="${esc(post.title)}">
             <div class="article-hero-overlay"></div>
             <div class="article-hero-content">
               <span class="badge" data-cat="${esc(post.category)}">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
