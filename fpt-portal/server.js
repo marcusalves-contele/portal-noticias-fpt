@@ -17,7 +17,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.FPT_PORTAL_API_KEY || 'dev-key';
 
-app.use(compression());
+app.use(compression({ threshold: 1024 }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
