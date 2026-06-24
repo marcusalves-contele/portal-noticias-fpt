@@ -48,6 +48,18 @@ db.serialize(() => {
       FOREIGN KEY (post_id) REFERENCES posts(id)
     )
   `);
+
+  db.run(`
+    CREATE INDEX IF NOT EXISTS idx_posts_published
+    ON posts (published_at DESC)
+    WHERE status = 'published'
+  `);
+
+  db.run(`
+    CREATE INDEX IF NOT EXISTS idx_posts_category_published
+    ON posts (category, published_at DESC)
+    WHERE status = 'published'
+  `);
 });
 
 // Helpers promisificados
