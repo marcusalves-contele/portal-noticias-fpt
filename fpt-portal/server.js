@@ -354,6 +354,7 @@ app.put('/api/admin/comments/:id/reject', requireApiKey, async (req, res) => {
 app.get('/post/:slug', (req, res) => res.sendFile(path.join(__dirname, 'public', 'post.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 app.get('/unsubscribe', (req, res) => res.sendFile(path.join(__dirname, 'public', 'unsubscribe.html')));
+app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'public', 'about.html')));
 
 app.get('/sitemap.xml', async (req, res) => {
   const base = process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br';
