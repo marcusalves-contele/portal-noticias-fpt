@@ -69,6 +69,17 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
+app.get('/api/posts/related/:slug', async (req, res) => {
+  try {
+    const post = await db.getBySlug(req.params.slug);
+    if (!post) return res.json([]);
+    const related = await db.getRelated(post.slug, post.category);
+    res.json(related);
+  } catch (e) {
+    res.json([]);
+  }
+});
+
 // --- API PRISM OS (cria post pendente) ---
 app.post('/api/posts', requireApiKey, async (req, res) => {
   const { title, slug, content_html, excerpt, image_url, video_id, category } = req.body;

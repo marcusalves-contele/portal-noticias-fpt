@@ -139,4 +139,10 @@ module.exports = {
       [term, term, limit]
     );
   },
+
+  getRelated: (slug, category, limit = 3) =>
+    all(
+      "SELECT * FROM posts WHERE status = 'published' AND category = ? AND slug != ? ORDER BY published_at DESC LIMIT ?",
+      [category, slug, limit]
+    ),
 };

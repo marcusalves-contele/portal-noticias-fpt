@@ -58,6 +58,13 @@
       </div>
     </div>
   </div>
+
+  <div id="related-section" class="article" style="display:none">
+    <div class="related-wrap">
+      <h3 class="related-title">Continue lendo</h3>
+      <div id="related-grid" class="related-grid"></div>
+    </div>
+  </div>
 </main>
 
 <footer class="footer">
@@ -154,6 +161,7 @@
       }
 
       await loadComments(slug);
+      await loadRelated(slug);
     } catch (e) {
       article.innerHTML = `
         <a href="/" class="back-link">← Voltar para o portal</a>
@@ -179,6 +187,29 @@
         : '<p style="color:#94A3B8;font-size:14px;">Seja o primeiro a comentar!</p>';
     } catch (e) {}
     section.style.display = 'block';
+  }
+
+  async function loadRelated(slug) {
+    try {
+      const posts = await fetch(`/api/posts/related/${slug}`).then(r => r.json());
+      if (!posts.length) return;
+      const grid = document.getElementById('related-grid');
+      const CATS = { noticias: 'Notícias', analises: 'Análises', entrevistas: 'Entrevistas', casos: 'Casos', videos: 'Vídeos' };
+      grid.innerHTML = posts.map(p => {
+        const img = p.image_url || (p.video_id ? `https://img.youtube.com/vi/${p.video_id}/maxresdefault.jpg` : '');
+        const date = new Date(p.published_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+        return `
+        <article class="related-card" onclick="location.href='/post/${p.slug}'">
+          ${img ? `<img class="related-card-img" src="${esc(img)}" alt="${esc(p.title)}" loading="lazy">` : '<div class="related-card-img related-card-placeholder"></div>'}
+          <div class="related-card-body">
+            <span class="badge" data-cat="${esc(p.category)}">${CATS[p.category] || esc(p.category)}</span>
+            <h4 class="related-card-title">${esc(p.title)}</h4>
+            <time class="card-date">${date}</time>
+          </div>
+        </article>`;
+      }).join('');
+      document.getElementById('related-section').style.display = 'block';
+    } catch (e) {}
   }
 
   async function submitComment(e) {
