@@ -320,6 +320,20 @@ app.post('/api/admin/newsletter/send', requireApiKey, async (req, res) => {
   res.json(result);
 });
 
+// --- Rate limiting (in-memory) ---
+const commentRateLimit = new Map(); // ip -> { count, resetAt }
+function checkCommentRateLimit(ip) {
+  const now = Date.now();
+  const entry = commentRateLimit.get(ip);
+  if (!entry || now > entry.resetAt) {
+    commentRateLimit.set(ip, { count: 1, resetAt: now + 60 * 60 * 1000 });
+    return true; // OK
+  }
+  if (entry.count >= 5) return false; // bloqueado
+  entry.count++;
+  return true; // OK
+}
+
 // --- Comentários ---
 app.get('/api/comments/:slug', async (req, res) => {
   const comments = await db.getApprovedComments(req.params.slug);
@@ -327,6 +341,10 @@ app.get('/api/comments/:slug', async (req, res) => {
 });
 
 app.post('/api/comments', async (req, res) => {
+  const ip = req.ip || req.connection.remoteAddress || 'unknown';
+  if (!checkCommentRateLimit(ip)) {
+    return res.status(429).json({ error: 'Muitos comentários. Aguarde 1 hora.' });
+  }
   const { post_id, post_slug, author, content } = req.body;
   if (!post_slug || !author || !content) {
     return res.status(400).json({ error: 'post_slug, author e content são obrigatórios' });
