@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Frota Para Todos — Portal de Notícias</title>
   <meta name="description" content="Referência editorial em gestão de frotas. Notícias, análises, entrevistas e cases do setor.">
+  <meta property="og:title" content="Frota Para Todos — Portal de Notícias">
+  <meta property="og:description" content="Referência editorial em gestão de frotas. Notícias, análises e conteúdo prático para gestores do Brasil.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Frota Para Todos">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/style.css">
 </head>
@@ -19,10 +23,26 @@
     <a href="/?category=entrevistas">Entrevistas</a>
     <a href="/?category=videos">Vídeos</a>
   </nav>
+  <div class="search-wrap" id="search-wrap">
+    <button class="search-toggle" id="search-toggle" aria-label="Buscar" onclick="toggleSearch()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    </button>
+    <div class="search-box" id="search-box" style="display:none">
+      <input type="search" id="search-input" placeholder="Buscar artigos..." autocomplete="off">
+      <button class="search-close" onclick="closeSearch()">✕</button>
+    </div>
+  </div>
   <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMobileNav()">
     <span></span><span></span><span></span>
   </button>
 </header>
+
+<div class="search-results-overlay" id="search-results-overlay" style="display:none">
+  <div class="container">
+    <div id="search-results-grid" class="posts-grid"></div>
+    <p id="search-empty" style="display:none;color:#94A3B8;padding:32px;text-align:center;">Nenhum resultado encontrado.</p>
+  </div>
+</div>
 
 <div class="mobile-nav" id="mobile-nav">
   <button class="mobile-nav-close" onclick="toggleMobileNav()">✕</button>
@@ -38,19 +58,25 @@
 
 <main class="container">
   <!-- Hero: preenchido via JS com o primeiro post, ou estático se vazio -->
-  <section id="hero-section"></section>
-
-  <div class="filters">
-    <button class="filter-btn active" data-category="">Todos</button>
-    <button class="filter-btn" data-category="noticias">Notícias</button>
-    <button class="filter-btn" data-category="analises">Análises</button>
-    <button class="filter-btn" data-category="entrevistas">Entrevistas</button>
-    <button class="filter-btn" data-category="casos">Casos</button>
-    <button class="filter-btn" data-category="videos">Vídeos</button>
+  <div class="hero-wrapper">
+    <section id="hero-section"></section>
   </div>
 
-  <div id="posts-grid" class="posts-grid">
-    <div class="loading">Carregando artigos...</div>
+  <div class="filters-wrap">
+    <div class="filters">
+      <button class="filter-btn active" data-category="">Todos</button>
+      <button class="filter-btn" data-category="noticias">Notícias</button>
+      <button class="filter-btn" data-category="analises">Análises</button>
+      <button class="filter-btn" data-category="entrevistas">Entrevistas</button>
+      <button class="filter-btn" data-category="casos">Casos</button>
+      <button class="filter-btn" data-category="videos">Vídeos</button>
+    </div>
+  </div>
+
+  <div id="posts-grid" class="posts-grid"></div>
+
+  <div id="load-more-wrap" style="text-align:center;margin-bottom:48px;display:none;">
+    <button class="btn-load-more" id="load-more-btn" onclick="loadMore()">Carregar mais artigos</button>
   </div>
 
   <!-- Newsletter -->
@@ -71,7 +97,32 @@
 
 <footer class="footer">
   <div id="footer-sponsors"></div>
-  <p>© 2026 Frota Para Todos · Julio César · Conteúdo prático para gestores de frota</p>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="footer-logo">Frota Para <span>Todos</span></span>
+      <p>Conteúdo prático e independente para gestores de frota do Brasil.</p>
+      <a href="https://www.youtube.com/channel/UCz31CtOANqSFuLEdFTi1iCQ" target="_blank" class="footer-yt">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+        Canal YouTube
+      </a>
+    </div>
+    <div class="footer-links">
+      <h4>Categorias</h4>
+      <a href="/?category=noticias">Notícias</a>
+      <a href="/?category=analises">Análises</a>
+      <a href="/?category=entrevistas">Entrevistas</a>
+      <a href="/?category=casos">Casos de Sucesso</a>
+      <a href="/?category=videos">Vídeos</a>
+    </div>
+    <div class="footer-links">
+      <h4>Portal</h4>
+      <a href="/">Início</a>
+      <a href="/admin">Admin</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Frota Para Todos · Julio César · Patrocinado por <a href="https://contelerastreador.com.br" target="_blank">Contele Fleet</a></p>
+  </div>
 </footer>
 
 <script>
@@ -85,9 +136,17 @@
   };
 
   let currentCategory = new URLSearchParams(location.search).get('category') || '';
+  let currentOffset = 0;
+  const PAGE_SIZE = 12;
 
   function formatDate(iso) {
     return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  function getPostImage(post) {
+    if (post.image_url) return post.image_url;
+    if (post.video_id) return `https://img.youtube.com/vi/${post.video_id}/maxresdefault.jpg`;
+    return '';
   }
 
   function renderHero(post) {
@@ -100,38 +159,47 @@
         </div>`;
       return;
     }
+    const img = getPostImage(post);
+    const excerpt = post.excerpt || (post.video_id ? 'Assista ao episódio completo no canal Frota Para Todos.' : '');
     heroSection.innerHTML = `
       <div class="hero" onclick="location.href='/post/${post.slug}'">
-        ${post.image_url ? `<img class="hero-bg" src="${esc(post.image_url)}" alt="${esc(post.title)}">` : ''}
+        ${img ? `<img class="hero-bg" src="${esc(img)}" alt="${esc(post.title)}">` : ''}
         <div class="hero-overlay"></div>
         <div class="hero-content">
           <span class="badge" data-cat="${esc(post.category)}">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
           <h1>${esc(post.title)}</h1>
-          <p class="hero-excerpt">${esc(post.excerpt)}</p>
+          ${excerpt ? `<p class="hero-excerpt">${esc(excerpt)}</p>` : ''}
           <span class="hero-meta">${formatDate(post.published_at)} · Julio César</span>
+          <span class="hero-cta">Ler artigo completo →</span>
         </div>
       </div>`;
   }
 
   function renderCard(post, index = 0) {
     const featuredClass = index === 0 ? ' featured' : '';
-    const imageEl = post.image_url
-      ? `<img class="card-image" src="${post.image_url}" alt="${esc(post.title)}" loading="lazy">`
-      : `<div class="card-image-placeholder">🚛</div>`;
+    const img = getPostImage(post);
+    const imageEl = img
+      ? `<img class="card-image" src="${esc(img)}" alt="${esc(post.title)}" loading="lazy">`
+      : `<div class="card-image-placeholder"><div class="card-placeholder-inner"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="12" rx="1"/><path d="M16 8l5 3v2l-5 3V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/><path d="M8 18.5h8"/></svg></div></div>`;
     return `
       <article class="card${featuredClass} reveal" onclick="location.href='/post/${post.slug}'">
-        ${imageEl}
+        <div class="card-image-wrap">
+          ${imageEl}
+        </div>
         <div class="card-body">
           <span class="badge" data-cat="${esc(post.category)}">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
           <h2 class="card-title">${esc(post.title)}</h2>
-          <p class="card-excerpt">${esc(post.excerpt)}</p>
-          <time class="card-date">${formatDate(post.published_at)}</time>
+          <p class="card-excerpt">${esc(post.excerpt || '')}</p>
+          <div class="card-footer">
+            <time class="card-date">${formatDate(post.published_at)}</time>
+            <span class="card-cta">Ler →</span>
+          </div>
         </div>
       </article>`;
   }
 
-  function renderSkeleton() {
-    return Array(6).fill(0).map(() => `
+  function renderSkeleton(count = 6) {
+    return Array(count).fill(0).map(() => `
       <div class="skeleton-card">
         <div class="skeleton-img"></div>
         <div class="skeleton-body">
@@ -143,9 +211,9 @@
   }
 
   function setupScrollReveal() {
-    const cards = document.querySelectorAll('.reveal');
+    const cards = document.querySelectorAll('.reveal:not(.visible)');
     cards.forEach((el, i) => {
-      el.style.transitionDelay = `${Math.min(i * 60, 300)}ms`;
+      el.style.transitionDelay = `${Math.min(i * 50, 250)}ms`;
     });
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(e => {
@@ -154,30 +222,55 @@
           observer.unobserve(e.target);
         }
       });
-    }, { threshold: 0.1 });
+    }, { threshold: 0.08 });
     cards.forEach(el => observer.observe(el));
   }
 
-  async function loadPosts(category = '') {
+  async function loadPosts(category = '', reset = true) {
     const grid = document.getElementById('posts-grid');
-    grid.innerHTML = renderSkeleton();
+    const loadMoreWrap = document.getElementById('load-more-wrap');
+
+    if (reset) {
+      currentOffset = 0;
+      grid.innerHTML = renderSkeleton();
+      loadMoreWrap.style.display = 'none';
+    }
+
     try {
-      const url = category ? `/api/posts?category=${category}&limit=24` : '/api/posts?limit=24';
+      const url = `/api/posts?limit=${PAGE_SIZE}&offset=${currentOffset}${category ? `&category=${category}` : ''}`;
       const posts = await fetch(url).then(r => r.json());
-      // Renderiza hero com primeiro post (só na view "Todos", sem filtro de categoria)
-      if (!category) {
-        renderHero(posts[0] || null);
-      }
-      if (!posts.length) {
+
+      if (reset && !category) renderHero(posts[0] || null);
+
+      if (!posts.length && reset) {
         grid.innerHTML = '<div class="empty-state">Nenhum artigo publicado ainda.</div>';
         return;
       }
-      const gridPosts = (!category && posts.length > 0) ? posts.slice(1) : posts;
-      grid.innerHTML = gridPosts.map((post, i) => renderCard(post, i)).join('');
+
+      const gridPosts = (reset && !category && posts.length > 0) ? posts.slice(1) : posts;
+
+      if (reset) {
+        grid.innerHTML = gridPosts.map((post, i) => renderCard(post, i)).join('');
+      } else {
+        grid.insertAdjacentHTML('beforeend', gridPosts.map((post, i) => renderCard(post, i)).join(''));
+      }
+
       setupScrollReveal();
+      currentOffset += posts.length;
+      loadMoreWrap.style.display = posts.length === PAGE_SIZE ? 'block' : 'none';
+
     } catch (e) {
-      grid.innerHTML = '<div class="empty-state">Erro ao carregar artigos.</div>';
+      if (reset) grid.innerHTML = '<div class="empty-state">Erro ao carregar artigos.</div>';
     }
+  }
+
+  async function loadMore() {
+    const btn = document.getElementById('load-more-btn');
+    btn.textContent = 'Carregando...';
+    btn.disabled = true;
+    await loadPosts(currentCategory, false);
+    btn.textContent = 'Carregar mais artigos';
+    btn.disabled = false;
   }
 
   async function loadSponsors() {
@@ -192,10 +285,9 @@
               <span class="sponsor-cta">${s.master.cta} →</span>
             </a>
           </div>`;
-
         document.getElementById('footer-sponsors').innerHTML = `
           <div class="footer-sponsor">
-            <p style="margin-bottom:8px;font-size:12px;color:#4a4a6a;text-transform:uppercase;letter-spacing:1px;">Realização</p>
+            <p style="margin-bottom:8px;font-size:11px;color:#4a4a6a;text-transform:uppercase;letter-spacing:1px;">Realização</p>
             <a href="${s.master.url.startsWith('https://') ? s.master.url : '#'}" target="_blank" style="color:#8B23E5;font-weight:700;">${s.master.name}</a>
             <p style="font-size:13px;color:#94A3B8;margin-top:4px;">${s.master.highlight}</p>
           </div>`;
@@ -252,6 +344,72 @@
     nav.classList.toggle('open');
     btn.classList.toggle('open');
     document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+  }
+
+  let searchDebounce = null;
+
+  function toggleSearch() {
+    const box = document.getElementById('search-box');
+    const toggle = document.getElementById('search-toggle');
+    const isOpen = box.style.display !== 'none';
+    if (isOpen) {
+      closeSearch();
+    } else {
+      box.style.display = 'flex';
+      toggle.style.display = 'none';
+      document.getElementById('search-input').focus();
+    }
+  }
+
+  function closeSearch() {
+    document.getElementById('search-box').style.display = 'none';
+    document.getElementById('search-toggle').style.display = 'flex';
+    document.getElementById('search-input').value = '';
+    document.getElementById('search-results-overlay').style.display = 'none';
+    document.querySelector('.hero-wrapper').style.display = '';
+    document.getElementById('posts-grid').style.display = '';
+    document.getElementById('load-more-wrap').style.display = currentOffset >= PAGE_SIZE ? 'block' : 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('search-input');
+    if (input) {
+      input.addEventListener('input', () => {
+        clearTimeout(searchDebounce);
+        const q = input.value.trim();
+        if (q.length < 2) {
+          document.getElementById('search-results-overlay').style.display = 'none';
+          document.querySelector('.hero-wrapper').style.display = '';
+          document.getElementById('posts-grid').style.display = '';
+          return;
+        }
+        searchDebounce = setTimeout(() => runSearch(q), 300);
+      });
+    }
+  });
+
+  async function runSearch(q) {
+    const overlay = document.getElementById('search-results-overlay');
+    const grid = document.getElementById('search-results-grid');
+    const empty = document.getElementById('search-empty');
+    document.querySelector('.hero-wrapper').style.display = 'none';
+    document.getElementById('posts-grid').style.display = 'none';
+    document.getElementById('load-more-wrap').style.display = 'none';
+    overlay.style.display = 'block';
+    grid.innerHTML = renderSkeleton(3);
+    try {
+      const results = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=12`).then(r => r.json());
+      if (!results.length) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+      } else {
+        empty.style.display = 'none';
+        grid.innerHTML = results.map((post, i) => renderCard(post, i)).join('');
+        setupScrollReveal();
+      }
+    } catch (e) {
+      grid.innerHTML = '<div class="empty-state">Erro ao buscar.</div>';
+    }
   }
 
   loadSponsors();
