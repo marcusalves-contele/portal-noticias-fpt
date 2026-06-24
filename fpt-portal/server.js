@@ -248,7 +248,7 @@ function parseYouTubeRSS(xml) {
         title: title.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#39;/g, "'").replace(/&quot;/g, '"'),
         published_at: published,
         excerpt: description.replace(/<[^>]+>/g, '').substring(0, 300).trim(),
-        image_url: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+        image_url: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
       });
     }
   }
