@@ -299,6 +299,19 @@
             <p style="font-size:13px;color:#94A3B8;margin-top:4px;">${s.master.highlight}</p>
           </div>`;
       }
+      if (s.slots && s.slots.length > 0) {
+        const slotsHtml = s.slots.map(slot => `
+          <a href="${slot.url && slot.url.startsWith('https://') ? slot.url : '#'}" target="_blank" class="sponsor-slot">
+            <strong>${esc(slot.name)}</strong>
+            <span>${esc(slot.tagline)}</span>
+          </a>`).join('');
+        const existing = document.getElementById('footer-sponsors').innerHTML;
+        document.getElementById('footer-sponsors').innerHTML = existing + `
+          <div class="footer-slots">
+            <p style="font-size:11px;color:#4a4a6a;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Apoiadores</p>
+            <div class="sponsor-slots-grid">${slotsHtml}</div>
+          </div>`;
+      }
     } catch (e) {}
   }
 
