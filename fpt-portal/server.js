@@ -61,7 +61,8 @@ app.get('/api/search', async (req, res) => {
   const { q, limit = 10 } = req.query;
   if (!q || q.trim().length < 2) return res.json([]);
   try {
-    const results = await db.search(q.trim(), Number(limit));
+    const maxLimit = Math.min(Number(limit) || 10, 100);
+    const results = await db.search(q.trim(), maxLimit);
     res.json(results);
   } catch (e) {
     res.status(500).json({ error: e.message });
