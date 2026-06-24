@@ -1,6 +1,7 @@
 // server.js — Express server do Portal FPT
 require('dotenv').config({ path: '.env' });
 const express = require('express');
+const compression = require('compression');
 const path = require('path');
 const https = require('https');
 const nodemailer = require('nodemailer');
@@ -16,6 +17,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.FPT_PORTAL_API_KEY || 'dev-key';
 
+app.use(compression());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
