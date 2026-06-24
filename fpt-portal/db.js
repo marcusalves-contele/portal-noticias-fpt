@@ -131,4 +131,12 @@ module.exports = {
 
   rejectComment: (id) =>
     run("UPDATE comments SET status = 'rejected' WHERE id = ?", [id]),
+
+  search: (q, limit = 10) => {
+    const term = `%${q}%`;
+    return all(
+      "SELECT * FROM posts WHERE status = 'published' AND (title LIKE ? OR excerpt LIKE ?) ORDER BY published_at DESC LIMIT ?",
+      [term, term, limit]
+    );
+  },
 };

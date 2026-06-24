@@ -56,6 +56,18 @@ app.get('/api/posts/:slug', async (req, res) => {
   res.json(post);
 });
 
+// --- Busca ---
+app.get('/api/search', async (req, res) => {
+  const { q, limit = 10 } = req.query;
+  if (!q || q.trim().length < 2) return res.json([]);
+  try {
+    const results = await db.search(q.trim(), Number(limit));
+    res.json(results);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // --- API PRISM OS (cria post pendente) ---
 app.post('/api/posts', requireApiKey, async (req, res) => {
   const { title, slug, content_html, excerpt, image_url, video_id, category } = req.body;
