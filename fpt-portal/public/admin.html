@@ -7,6 +7,37 @@
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/style.css">
+  <style>
+/* Busca e filtros */
+.admin-filters { display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.admin-filters input, .admin-filters select {
+  padding:8px 12px; border-radius:6px; border:1px solid #2d2044;
+  background:#1a0d2e; color:#F7F7F7; font-size:14px; flex:1; min-width:160px;
+}
+/* Modal de edição */
+.edit-modal-overlay {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,.7);
+  z-index:1000; align-items:center; justify-content:center;
+}
+.edit-modal-overlay.open { display:flex; }
+.edit-modal {
+  background:#1a0d2e; border:1px solid #2d2044; border-radius:12px;
+  padding:28px; width:90%; max-width:700px; max-height:85vh; overflow-y:auto;
+}
+.edit-modal h3 { margin:0 0 20px; color:#F7F7F7; font-size:18px; }
+.edit-modal label { display:block; color:#94A3B8; font-size:13px; margin-bottom:4px; }
+.edit-modal input, .edit-modal select, .edit-modal textarea {
+  width:100%; box-sizing:border-box; padding:9px 12px; border-radius:6px;
+  border:1px solid #2d2044; background:#0d0020; color:#F7F7F7;
+  font-size:14px; margin-bottom:14px;
+}
+.edit-modal textarea { min-height:120px; font-family:monospace; resize:vertical; }
+.edit-modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:6px; }
+.btn-edit { background:#2d2044; color:#F7F7F7; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:13px; }
+.btn-edit:hover { background:#8B23E5; }
+.btn-save { background:#8B23E5; color:#fff; border:none; padding:9px 20px; border-radius:6px; cursor:pointer; font-weight:600; }
+.btn-cancel-edit { background:transparent; color:#94A3B8; border:1px solid #2d2044; padding:9px 20px; border-radius:6px; cursor:pointer; }
+  </style>
 </head>
 <body>
 
@@ -42,6 +73,23 @@
 
       <!-- Posts Tab -->
       <div id="posts-tab">
+        <div class="admin-filters">
+          <input type="text" id="searchFilter" placeholder="Buscar por título..." oninput="filterPosts()" />
+          <select id="categoryFilter" onchange="filterPosts()">
+            <option value="">Todas as categorias</option>
+            <option value="videos">Vídeos</option>
+            <option value="entrevistas">Entrevistas</option>
+            <option value="artigos">Artigos</option>
+            <option value="noticias">Notícias</option>
+          </select>
+          <select id="statusFilter" onchange="filterPosts()">
+            <option value="">Todos os status</option>
+            <option value="pending">Pendente</option>
+            <option value="published">Publicado</option>
+            <option value="rejected">Rejeitado</option>
+          </select>
+        </div>
+
         <div id="pending-section">
           <div class="section-title">Aguardando revisão</div>
           <div id="pending-list"></div>
@@ -68,6 +116,30 @@
     </div>
   </div>
 </main>
+
+<!-- Modal de edição -->
+<div class="edit-modal-overlay" id="editModalOverlay">
+  <div class="edit-modal">
+    <h3>Editar Post</h3>
+    <label>Título</label>
+    <input type="text" id="editTitle" placeholder="Título do post" />
+    <label>Categoria</label>
+    <select id="editCategory">
+      <option value="videos">Vídeos</option>
+      <option value="entrevistas">Entrevistas</option>
+      <option value="artigos">Artigos</option>
+      <option value="noticias">Notícias</option>
+    </select>
+    <label>Excerpt (resumo)</label>
+    <input type="text" id="editExcerpt" placeholder="Resumo curto..." />
+    <label>Conteúdo HTML</label>
+    <textarea id="editContentHtml" placeholder="<p>Conteúdo...</p>"></textarea>
+    <div class="edit-modal-actions">
+      <button class="btn-cancel-edit" onclick="closeEditModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveEdit()">Salvar</button>
+    </div>
+  </div>
+</div>
 
 <script>
   let currentKey = '';
@@ -101,6 +173,7 @@
       ]);
       document.getElementById('admin-content').style.display = 'block';
       document.getElementById('sync-btn').style.display = 'inline-flex';
+      window.allPosts = posts;
       renderPosts(posts, key);
       renderComments(comments, key);
     } catch (e) {
@@ -109,15 +182,16 @@
   }
 
   function renderPosts(posts, key) {
+    const _key = key || currentKey;
     const pending = posts.filter(p => p.status === 'pending');
-    const published = posts.filter(p => p.status === 'published');
+    const published = posts.filter(p => p.status !== 'pending');
 
     document.getElementById('pending-list').innerHTML = pending.length
-      ? pending.map(p => renderPostItem(p, key, true)).join('')
+      ? pending.map(p => renderPostItem(p, _key, true)).join('')
       : '<div class="empty-state">Nenhum post aguardando revisão.</div>';
 
     document.getElementById('published-list').innerHTML = published.length
-      ? published.map(p => renderPostItem(p, key, false)).join('')
+      ? published.map(p => renderPostItem(p, _key, false)).join('')
       : '<div class="empty-state">Nenhum post publicado ainda.</div>';
   }
 
@@ -141,12 +215,15 @@
   }
 
   function renderPostItem(post, key, showActions) {
+    const postJson = JSON.stringify(post).replace(/'/g, "&#39;");
     const actions = showActions ? `
       <div class="post-item-actions">
+        <button class="btn-edit" onclick='openEditModal(${postJson})'>Editar</button>
         <button class="btn btn-approve" onclick="approvePost(${post.id})">✓ Aprovar</button>
         <button class="btn btn-reject" onclick="rejectPost(${post.id})">✕ Rejeitar</button>
       </div>` : `
       <div class="post-item-actions">
+        <button class="btn-edit" onclick='openEditModal(${postJson})'>Editar</button>
         <a href="/post/${post.slug}" target="_blank" class="btn" style="font-size:12px;padding:6px 12px">Ver →</a>
       </div>`;
 
@@ -240,6 +317,52 @@
   window.addEventListener('scroll', () => {
     document.querySelector('.header').classList.toggle('header--scrolled', window.scrollY > 10);
   }, { passive: true });
+
+  // --- Edição de posts ---
+  let editingPostId = null;
+
+  function openEditModal(post) {
+    editingPostId = post.id;
+    document.getElementById('editTitle').value = post.title || '';
+    document.getElementById('editCategory').value = post.category || 'videos';
+    document.getElementById('editExcerpt').value = post.excerpt || '';
+    document.getElementById('editContentHtml').value = post.content_html || '';
+    document.getElementById('editModalOverlay').classList.add('open');
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModalOverlay').classList.remove('open');
+    editingPostId = null;
+  }
+
+  async function saveEdit() {
+    const title = document.getElementById('editTitle').value.trim();
+    const category = document.getElementById('editCategory').value;
+    const excerpt = document.getElementById('editExcerpt').value.trim();
+    const content_html = document.getElementById('editContentHtml').value.trim();
+    if (!title || !content_html) return alert('Título e conteúdo são obrigatórios');
+    const r = await fetch(`/api/admin/posts/${editingPostId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': currentKey },
+      body: JSON.stringify({ title, excerpt, content_html, category })
+    });
+    if (r.ok) { closeEditModal(); loadAdmin(); }
+    else alert('Erro ao salvar');
+  }
+
+  // --- Filtro de posts ---
+  function filterPosts() {
+    const search = (document.getElementById('searchFilter').value || '').toLowerCase();
+    const category = document.getElementById('categoryFilter').value;
+    const status = document.getElementById('statusFilter').value;
+    const filtered = (window.allPosts || []).filter(p => {
+      const matchSearch = !search || p.title.toLowerCase().includes(search);
+      const matchCat = !category || p.category === category;
+      const matchStatus = !status || p.status === status;
+      return matchSearch && matchCat && matchStatus;
+    });
+    renderPosts(filtered);
+  }
 </script>
 </body>
 </html>
