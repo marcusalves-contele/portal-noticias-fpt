@@ -133,19 +133,75 @@ app.put('/api/admin/posts/:id', requireApiKey, async (req, res) => {
 });
 
 // --- Newsletter ---
+async function sendConfirmationEmail(email, token) {
+  if (!process.env.SMTP_USER) return;
+  const portalUrl = process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br';
+  const confirmUrl = `${portalUrl}/api/newsletter/confirm?token=${token}`;
+  await transporter.sendMail({
+    from: `"Frota Para Todos" <${process.env.SMTP_USER}>`,
+    to: email,
+    subject: 'Confirme sua inscrição na newsletter — Frota Para Todos',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="background:#080010;color:#F7F7F7;font-family:Arial,sans-serif;margin:0;padding:0;">
+        <table width="600" align="center" style="padding:32px 24px;">
+          <tr>
+            <td style="padding-bottom:24px;border-bottom:2px solid #8B23E5;">
+              <span style="font-size:22px;font-weight:800;color:#F7F7F7;">Frota Para <span style="color:#8B23E5;">Todos</span></span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:24px 0;">
+              <p style="font-size:16px;color:#F7F7F7;margin:0 0 16px;">Obrigado por se inscrever!</p>
+              <p style="font-size:14px;color:#94A3B8;margin:0 0 24px;">Clique no botão abaixo para confirmar sua inscrição e começar a receber a curadoria semanal para gestores de frota.</p>
+              <a href="${confirmUrl}"
+                 style="background:linear-gradient(135deg,#8B23E5,#b56fff);color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">
+                Confirmar inscrição →
+              </a>
+              <p style="font-size:12px;color:#4a4a6a;margin-top:24px;">Se você não solicitou essa inscrição, ignore este email.</p>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>`,
+  });
+}
+
 app.post('/api/newsletter/subscribe', async (req, res) => {
   const { email } = req.body;
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ error: 'Email inválido' });
   }
+  const normalizedEmail = email.toLowerCase().trim();
   try {
-    await db.subscribe(email.toLowerCase().trim());
-    res.status(201).json({ ok: true, message: 'Inscrito com sucesso!' });
+    await db.subscribe(normalizedEmail);
+    const token = crypto.randomBytes(32).toString('hex');
+    await db.setConfirmToken(normalizedEmail, token);
+    sendConfirmationEmail(normalizedEmail, token).catch(e =>
+      console.error('[Newsletter] Erro ao enviar email de confirmação:', e.message)
+    );
+    res.status(201).json({ ok: true, message: 'Quase lá! Verifique seu email para confirmar a inscrição.' });
   } catch (e) {
     if (e.message.includes('UNIQUE constraint')) {
       return res.status(409).json({ error: 'Email já cadastrado' });
     }
     res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/newsletter/confirm', async (req, res) => {
+  const { token } = req.query;
+  if (!token) return res.status(400).send('Token inválido.');
+  try {
+    const result = await db.confirmSubscriber(token);
+    if (result.changes === 0) {
+      return res.status(400).send('Link expirado ou já utilizado.');
+    }
+    const portalUrl = process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br';
+    res.redirect(`${portalUrl}/?confirmed=1`);
+  } catch (e) {
+    res.status(500).send('Erro ao confirmar inscrição.');
   }
 });
 
@@ -170,7 +226,7 @@ async function sendWeeklyNewsletter() {
   }
 
   const posts = await db.getRecentPublished(5);
-  const subscribers = await db.getActiveSubscribers();
+  const subscribers = await db.getConfirmedSubscribers();
 
   if (!posts.length || !subscribers.length) {
     console.log('[Newsletter] Sem posts ou inscritos — pulando');
