@@ -66,6 +66,9 @@ db.serialize(() => {
     ON posts (category, published_at DESC)
     WHERE status = 'published'
   `);
+
+  // Migração: adicionar coluna views em bancos existentes
+  db.run(`ALTER TABLE posts ADD COLUMN views INTEGER DEFAULT 0`, () => {});
 });
 
 // Helpers promisificados
@@ -181,4 +184,16 @@ module.exports = {
       "SELECT * FROM posts WHERE status = 'published' AND category = ? AND slug != ? ORDER BY published_at DESC LIMIT ?",
       [category, slug, limit]
     ),
+
+  incrementView: (slug) =>
+    run("UPDATE posts SET views = views + 1 WHERE slug = ? AND status = 'published'", [slug]),
+
+  getPopular: (limit = 5) =>
+    all("SELECT * FROM posts WHERE status = 'published' ORDER BY views DESC LIMIT ?", [limit]),
+
+  reactivateSubscriber: (email) =>
+    run("UPDATE subscribers SET active = 1, confirmed = 0 WHERE email = ? AND active = 0", [email]),
+
+  getSubscriberByEmail: (email) =>
+    get("SELECT * FROM subscribers WHERE email = ?", [email]),
 };
