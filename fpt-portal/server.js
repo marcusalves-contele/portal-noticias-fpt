@@ -123,8 +123,13 @@ app.put('/api/admin/posts/:id', requireApiKey, async (req, res) => {
   if (!title || !content_html) {
     return res.status(400).json({ error: 'title e content_html são obrigatórios' });
   }
-  await db.updatePost(Number(req.params.id), { title, excerpt, content_html, category });
-  res.json({ ok: true });
+  try {
+    const result = await db.updatePost(Number(req.params.id), { title, excerpt, content_html, category });
+    if (result.changes === 0) return res.status(404).json({ error: 'Post não encontrado' });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // --- Newsletter ---
