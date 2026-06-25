@@ -29,12 +29,18 @@ db.serialize(() => {
 
   db.run(`
     CREATE TABLE IF NOT EXISTS subscribers (
-      id         INTEGER PRIMARY KEY AUTOINCREMENT,
-      email      TEXT UNIQUE NOT NULL,
-      active     INTEGER DEFAULT 1,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      email        TEXT UNIQUE NOT NULL,
+      active       INTEGER DEFAULT 1,
+      confirmed    INTEGER DEFAULT 0,
+      confirm_token TEXT,
+      created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Migração: adicionar colunas em bancos existentes
+  db.run(`ALTER TABLE subscribers ADD COLUMN confirmed INTEGER DEFAULT 0`, () => {});
+  db.run(`ALTER TABLE subscribers ADD COLUMN confirm_token TEXT`, () => {});
 
   db.run(`
     CREATE TABLE IF NOT EXISTS comments (
@@ -124,6 +130,15 @@ module.exports = {
 
   unsubscribe: (email) =>
     run("UPDATE subscribers SET active = 0 WHERE email = ?", [email]),
+
+  confirmSubscriber: (token) =>
+    run("UPDATE subscribers SET confirmed = 1, confirm_token = NULL WHERE confirm_token = ?", [token]),
+
+  getConfirmedSubscribers: () =>
+    all("SELECT * FROM subscribers WHERE active = 1 AND confirmed = 1"),
+
+  setConfirmToken: (email, token) =>
+    run("UPDATE subscribers SET confirm_token = ? WHERE email = ?", [token, email]),
 
   getActiveSubscribers: () =>
     all("SELECT * FROM subscribers WHERE active = 1"),
