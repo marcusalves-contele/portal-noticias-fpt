@@ -256,7 +256,7 @@
     return `
       <div class="post-item" id="comment-${comment.id}">
         <div class="post-item-info">
-          <div class="post-item-title">${escapeHtml(comment.author)} <span style="font-weight:400;color:#94A3B8;font-size:13px;">em /${escapeHtml(comment.post_slug)}</span></div>
+          <div class="post-item-title">${escapeHtml(comment.author)} <span style="font-weight:400;color:#94A3B8;font-size:13px;">em /${comment.post_slug}</span></div>
           <div class="post-item-meta">${formatDate(comment.created_at)}</div>
           <div style="font-size:13px;color:#d4c8e8;margin-top:6px">${escapeHtml((comment.content || '').substring(0, 200))}${comment.content.length > 200 ? '...' : ''}</div>
         </div>
