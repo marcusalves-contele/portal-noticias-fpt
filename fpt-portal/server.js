@@ -17,6 +17,11 @@ const app = express();
 app.set('trust proxy', 1);
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.FPT_PORTAL_API_KEY || 'dev-key';
+const HMAC_SECRET = process.env.HMAC_SECRET || 'fpt-portal-hmac-secret-dev';
+const crypto = require('crypto');
+function unsubscribeToken(email) {
+  return crypto.createHmac('sha256', HMAC_SECRET).update(email.toLowerCase()).digest('hex');
+}
 
 app.use(compression({ threshold: 1024 }));
 app.use(express.json());
@@ -131,8 +136,11 @@ app.post('/api/newsletter/subscribe', async (req, res) => {
 });
 
 app.post('/api/newsletter/unsubscribe', async (req, res) => {
-  const { email } = req.body;
-  await db.unsubscribe(email);
+  const { email, token } = req.body;
+  if (!email || !token) return res.status(400).json({ error: 'email e token obrigatórios' });
+  const expected = unsubscribeToken(email);
+  if (token !== expected) return res.status(403).json({ error: 'Token inválido' });
+  await db.unsubscribe(email.toLowerCase().trim());
   res.json({ ok: true });
 });
 
@@ -204,8 +212,9 @@ async function sendWeeklyNewsletter() {
   let sent = 0;
   for (const sub of subscribers) {
     try {
+      const token = unsubscribeToken(sub.email);
       const personalizedHtml = html.replace('{{unsubscribe_url}}',
-        `${process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br'}/unsubscribe?email=${encodeURIComponent(sub.email)}`);
+        `${process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br'}/unsubscribe?email=${encodeURIComponent(sub.email)}&token=${token}`);
       await transporter.sendMail({
         from: `"Frota Para Todos" <${process.env.SMTP_USER}>`,
         to: sub.email,
