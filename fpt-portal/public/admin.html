@@ -215,15 +215,14 @@
   }
 
   function renderPostItem(post, key, showActions) {
-    const postJson = JSON.stringify(post).replace(/'/g, "&#39;");
     const actions = showActions ? `
       <div class="post-item-actions">
-        <button class="btn-edit" onclick='openEditModal(${postJson})'>Editar</button>
+        <button class="btn-edit" data-post-id="${post.id}" onclick="openEditModalById(this.dataset.postId)">Editar</button>
         <button class="btn btn-approve" onclick="approvePost(${post.id})">✓ Aprovar</button>
         <button class="btn btn-reject" onclick="rejectPost(${post.id})">✕ Rejeitar</button>
       </div>` : `
       <div class="post-item-actions">
-        <button class="btn-edit" onclick='openEditModal(${postJson})'>Editar</button>
+        <button class="btn-edit" data-post-id="${post.id}" onclick="openEditModalById(this.dataset.postId)">Editar</button>
         <a href="/post/${post.slug}" target="_blank" class="btn" style="font-size:12px;padding:6px 12px">Ver →</a>
       </div>`;
 
@@ -330,6 +329,11 @@
     document.getElementById('editModalOverlay').classList.add('open');
   }
 
+  function openEditModalById(postId) {
+    const post = (window.allPosts || []).find(p => p.id == postId);
+    if (post) openEditModal(post);
+  }
+
   function closeEditModal() {
     document.getElementById('editModalOverlay').classList.remove('open');
     editingPostId = null;
@@ -356,7 +360,7 @@
     const category = document.getElementById('categoryFilter').value;
     const status = document.getElementById('statusFilter').value;
     const filtered = (window.allPosts || []).filter(p => {
-      const matchSearch = !search || p.title.toLowerCase().includes(search);
+      const matchSearch = !search || (p.title || '').toLowerCase().includes(search);
       const matchCat = !category || p.category === category;
       const matchStatus = !status || p.status === status;
       return matchSearch && matchCat && matchStatus;
