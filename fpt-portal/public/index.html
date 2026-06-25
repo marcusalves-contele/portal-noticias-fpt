@@ -189,7 +189,7 @@
       ? `<img class="card-image" src="${esc(img)}" alt="${esc(post.title)}" loading="lazy">`
       : `<div class="card-image-placeholder"><div class="card-placeholder-inner"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="12" rx="1"/><path d="M16 8l5 3v2l-5 3V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/><path d="M8 18.5h8"/></svg></div></div>`;
     return `
-      <article class="card${featuredClass} reveal" onclick="location.href='/post/${post.slug}'">
+      <article class="card${featuredClass} reveal" onclick="trackAndOpen('${post.slug}')"style="cursor:pointer">
         <div class="card-image-wrap">
           ${imageEl}
         </div>
@@ -264,7 +264,7 @@
 
       setupScrollReveal();
       currentOffset += posts.length;
-      loadMoreWrap.style.display = posts.length === PAGE_SIZE ? 'block' : 'none';
+      loadMoreWrap.style.display = posts.length >= PAGE_SIZE ? 'block' : 'none';
 
     } catch (e) {
       if (reset) grid.innerHTML = '<div class="empty-state">Erro ao carregar artigos.</div>';
@@ -440,6 +440,11 @@
     } catch (e) {
       grid.innerHTML = '<div class="empty-state">Erro ao buscar.</div>';
     }
+  }
+
+  function trackAndOpen(slug) {
+    fetch(`/api/posts/${encodeURIComponent(slug)}/view`, { method: 'POST' }).catch(() => {});
+    location.href = `/post/${slug}`;
   }
 
   loadSponsors();
