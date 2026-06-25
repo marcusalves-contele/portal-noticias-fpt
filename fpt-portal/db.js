@@ -112,6 +112,12 @@ module.exports = {
   reject: (id) =>
     run("UPDATE posts SET status = 'rejected' WHERE id = ?", [id]),
 
+  updatePost: (id, data) =>
+    run(
+      `UPDATE posts SET title = ?, excerpt = ?, content_html = ?, category = ? WHERE id = ?`,
+      [data.title, data.excerpt || '', data.content_html, data.category || 'videos', id]
+    ),
+
   // --- Newsletter ---
   subscribe: (email) =>
     run("INSERT INTO subscribers (email) VALUES (?)", [email]),

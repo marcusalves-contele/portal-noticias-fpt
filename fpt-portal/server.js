@@ -118,6 +118,15 @@ app.put('/api/admin/posts/:id/reject', requireApiKey, async (req, res) => {
   res.json({ ok: true });
 });
 
+app.put('/api/admin/posts/:id', requireApiKey, async (req, res) => {
+  const { title, excerpt, content_html, category } = req.body;
+  if (!title || !content_html) {
+    return res.status(400).json({ error: 'title e content_html são obrigatórios' });
+  }
+  await db.updatePost(Number(req.params.id), { title, excerpt, content_html, category });
+  res.json({ ok: true });
+});
+
 // --- Newsletter ---
 app.post('/api/newsletter/subscribe', async (req, res) => {
   const { email } = req.body;
