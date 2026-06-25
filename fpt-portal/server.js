@@ -321,6 +321,11 @@ app.post('/api/admin/newsletter/send', requireApiKey, async (req, res) => {
   res.json(result);
 });
 
+// --- Helpers de segurança ---
+function stripHtml(str) {
+  return String(str).replace(/<[^>]*>/g, '').trim();
+}
+
 // --- Rate limiting (in-memory) ---
 const commentRateLimit = new Map(); // ip -> { count, resetAt }
 function checkCommentRateLimit(ip) {
@@ -362,7 +367,7 @@ app.post('/api/comments', async (req, res) => {
   if (content.length > 2000) {
     return res.status(400).json({ error: 'Comentário muito longo (máx 2000 chars)' });
   }
-  const result = await db.createComment({ post_id: post_id || 0, post_slug, author: author.trim(), content: content.trim() });
+  const result = await db.createComment({ post_id: post_id || 0, post_slug, author: stripHtml(author), content: stripHtml(content) });
   res.status(201).json({ id: result.lastID, status: 'pending', message: 'Comentário enviado para moderação' });
 });
 
