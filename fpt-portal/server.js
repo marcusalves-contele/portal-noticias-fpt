@@ -118,6 +118,16 @@ app.put('/api/admin/posts/:id/reject', requireApiKey, async (req, res) => {
   res.json({ ok: true });
 });
 
+app.delete('/api/admin/posts/:id', requireApiKey, async (req, res) => {
+  try {
+    const result = await db.deletePost(Number(req.params.id));
+    if (result.changes === 0) return res.status(404).json({ error: 'Post não encontrado' });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.put('/api/admin/posts/:id', requireApiKey, async (req, res) => {
   const { title, excerpt, content_html, category } = req.body;
   if (!title || !content_html) {
@@ -215,7 +225,11 @@ app.post('/api/newsletter/unsubscribe', async (req, res) => {
 });
 
 app.get('/api/admin/subscribers', requireApiKey, async (req, res) => {
-  res.json(await db.getActiveSubscribers());
+  const [all, confirmed] = await Promise.all([
+    db.getActiveSubscribers(),
+    db.getConfirmedSubscribers(),
+  ]);
+  res.json({ total: all.length, confirmed: confirmed.length, pending: all.length - confirmed.length, subscribers: all });
 });
 
 // Envio manual da newsletter (ou chamado pelo cron)

@@ -329,7 +329,7 @@
       msg.style.display = 'block';
       if (r.ok) {
         msg.style.color = '#22C55E';
-        msg.textContent = '✓ Inscrito! Você receberá a curadoria toda segunda-feira.';
+        msg.textContent = '✓ ' + (data.message || 'Verifique seu email para confirmar a inscrição.');
         document.getElementById('nl-email').value = '';
       } else {
         msg.style.color = '#ef4444';
@@ -340,6 +340,16 @@
       msg.style.color = '#ef4444';
       msg.textContent = 'Erro ao inscrever. Tente novamente.';
     }
+  }
+
+  // Toast de confirmação de email (redirect de /api/newsletter/confirm)
+  if (new URLSearchParams(location.search).get('confirmed') === '1') {
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#22C55E;color:#fff;padding:14px 24px;border-radius:8px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.4);';
+    toast.textContent = '✓ Email confirmado! Bem-vindo à curadoria semanal.';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+    history.replaceState({}, '', '/');
   }
 
   document.querySelectorAll('.filter-btn').forEach(btn => {

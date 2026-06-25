@@ -69,6 +69,10 @@
           style="padding:10px 20px;background:transparent;border:none;border-bottom:2px solid transparent;color:#94A3B8;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:-1px;">
           Comentários <span id="pending-comments-badge" style="display:none;background:#8B23E5;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px;"></span>
         </button>
+        <button class="tab-btn" onclick="switchTab('newsletter')" id="tab-newsletter"
+          style="padding:10px 20px;background:transparent;border:none;border-bottom:2px solid transparent;color:#94A3B8;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:-1px;">
+          Newsletter
+        </button>
       </div>
 
       <!-- Posts Tab -->
@@ -99,6 +103,13 @@
           <div class="section-title">Publicados</div>
           <div id="published-list"></div>
         </div>
+      </div>
+
+      <!-- Newsletter Tab -->
+      <div id="newsletter-tab" style="display:none">
+        <div id="newsletter-stats" style="display:flex;gap:16px;margin-bottom:32px;flex-wrap:wrap;"></div>
+        <div class="section-title">Inscritos ativos</div>
+        <div id="subscribers-list"></div>
       </div>
 
       <!-- Comments Tab -->
@@ -157,12 +168,12 @@
   }
 
   function switchTab(tab) {
-    document.getElementById('posts-tab').style.display = tab === 'posts' ? 'block' : 'none';
-    document.getElementById('comments-tab').style.display = tab === 'comments' ? 'block' : 'none';
-    document.getElementById('tab-posts').style.borderBottomColor = tab === 'posts' ? '#8B23E5' : 'transparent';
-    document.getElementById('tab-posts').style.color = tab === 'posts' ? '#F7F7F7' : '#94A3B8';
-    document.getElementById('tab-comments').style.borderBottomColor = tab === 'comments' ? '#8B23E5' : 'transparent';
-    document.getElementById('tab-comments').style.color = tab === 'comments' ? '#F7F7F7' : '#94A3B8';
+    ['posts', 'comments', 'newsletter'].forEach(t => {
+      document.getElementById(`${t}-tab`).style.display = t === tab ? 'block' : 'none';
+      document.getElementById(`tab-${t}`).style.borderBottomColor = t === tab ? '#8B23E5' : 'transparent';
+      document.getElementById(`tab-${t}`).style.color = t === tab ? '#F7F7F7' : '#94A3B8';
+    });
+    if (tab === 'newsletter') loadNewsletter();
   }
 
   async function loadAdmin() {
@@ -226,10 +237,12 @@
         <button class="btn-edit" data-post-id="${post.id}" onclick="openEditModalById(this.dataset.postId)">Editar</button>
         <button class="btn btn-approve" onclick="approvePost(${post.id})">✓ Aprovar</button>
         <button class="btn btn-reject" onclick="rejectPost(${post.id})">✕ Rejeitar</button>
+        <button class="btn btn-reject" onclick="deletePost(${post.id})" title="Excluir permanentemente" style="background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);">🗑</button>
       </div>` : `
       <div class="post-item-actions">
         <button class="btn-edit" data-post-id="${post.id}" onclick="openEditModalById(this.dataset.postId)">Editar</button>
         <a href="/post/${post.slug}" target="_blank" class="btn" style="font-size:12px;padding:6px 12px">Ver →</a>
+        <button class="btn btn-reject" onclick="deletePost(${post.id})" title="Excluir permanentemente" style="background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);">🗑</button>
       </div>`;
 
     return `
@@ -273,6 +286,51 @@
     if (!confirm('Rejeitar este post?')) return;
     await fetch(`/api/admin/posts/${id}/reject`, { method: 'PUT', headers: { 'x-api-key': currentKey } });
     loadAdmin();
+  }
+
+  async function deletePost(id) {
+    if (!confirm('Excluir permanentemente este post? Essa ação não pode ser desfeita.')) return;
+    const r = await fetch(`/api/admin/posts/${id}`, { method: 'DELETE', headers: { 'x-api-key': currentKey } });
+    if (r.ok) loadAdmin();
+    else alert('Erro ao excluir post');
+  }
+
+  async function loadNewsletter() {
+    const statsEl = document.getElementById('newsletter-stats');
+    const listEl = document.getElementById('subscribers-list');
+    statsEl.innerHTML = '<div style="color:#94A3B8;font-size:13px;">Carregando...</div>';
+    try {
+      const data = await fetch('/api/admin/subscribers', { headers: { 'x-api-key': currentKey } }).then(r => r.json());
+      statsEl.innerHTML = `
+        <div style="background:#1a0d2e;border:1px solid #2d2044;border-radius:10px;padding:16px 24px;flex:1;min-width:140px;">
+          <div style="font-size:28px;font-weight:800;color:#F7F7F7;">${data.total}</div>
+          <div style="font-size:12px;color:#94A3B8;margin-top:4px;">Total inscritos</div>
+        </div>
+        <div style="background:#1a0d2e;border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:16px 24px;flex:1;min-width:140px;">
+          <div style="font-size:28px;font-weight:800;color:#22C55E;">${data.confirmed}</div>
+          <div style="font-size:12px;color:#94A3B8;margin-top:4px;">Confirmados (recebem newsletter)</div>
+        </div>
+        <div style="background:#1a0d2e;border:1px solid rgba(250,204,21,.3);border-radius:10px;padding:16px 24px;flex:1;min-width:140px;">
+          <div style="font-size:28px;font-weight:800;color:#FACC15;">${data.pending}</div>
+          <div style="font-size:12px;color:#94A3B8;margin-top:4px;">Aguardando confirmação</div>
+        </div>`;
+      listEl.innerHTML = data.subscribers.length
+        ? data.subscribers.map(s => `
+            <div class="post-item">
+              <div class="post-item-info">
+                <div class="post-item-title">${escapeHtml(s.email)}</div>
+                <div class="post-item-meta">
+                  Inscrito em ${formatDate(s.created_at)} ·
+                  <span style="color:${s.confirmed ? '#22C55E' : '#FACC15'}">
+                    ${s.confirmed ? '✓ Confirmado' : '⏳ Aguardando confirmação'}
+                  </span>
+                </div>
+              </div>
+            </div>`).join('')
+        : '<div class="empty-state">Nenhum inscrito ainda.</div>';
+    } catch (e) {
+      statsEl.innerHTML = '<div style="color:#ef4444;">Erro ao carregar inscritos.</div>';
+    }
   }
 
   async function approveComment(id) {

@@ -124,6 +124,9 @@ module.exports = {
       [data.title, data.excerpt || '', data.content_html, data.category || 'videos', id]
     ),
 
+  deletePost: (id) =>
+    run("DELETE FROM posts WHERE id = ?", [id]),
+
   // --- Newsletter ---
   subscribe: (email) =>
     run("INSERT INTO subscribers (email) VALUES (?)", [email]),
