@@ -88,6 +88,16 @@ app.get('/api/posts/related/:slug', async (req, res) => {
   }
 });
 
+// --- Tracking de views ---
+app.post('/api/posts/:slug/view', async (req, res) => {
+  try {
+    await db.incrementView(req.params.slug);
+    res.json({ ok: true });
+  } catch (e) {
+    res.json({ ok: false });
+  }
+});
+
 // --- API PRISM OS (cria post pendente) ---
 app.post('/api/posts', requireApiKey, async (req, res) => {
   const { title, slug, content_html, excerpt, image_url, video_id, category } = req.body;
@@ -185,7 +195,15 @@ app.post('/api/newsletter/subscribe', async (req, res) => {
   }
   const normalizedEmail = email.toLowerCase().trim();
   try {
-    await db.subscribe(normalizedEmail);
+    const existing = await db.getSubscriberByEmail(normalizedEmail);
+    if (existing) {
+      if (existing.active === 1) {
+        return res.status(409).json({ error: 'Email já cadastrado' });
+      }
+      await db.reactivateSubscriber(normalizedEmail);
+    } else {
+      await db.subscribe(normalizedEmail);
+    }
     const token = crypto.randomBytes(32).toString('hex');
     await db.setConfirmToken(normalizedEmail, token);
     sendConfirmationEmail(normalizedEmail, token).catch(e =>
@@ -375,17 +393,35 @@ async function syncYouTubeVideos() {
       const existing = await db.getByVideoId(video.video_id);
       if (existing) continue;
 
-      await db.createPost({
-        title: video.title,
-        slug,
-        content_html: `<p>${video.excerpt || 'Assista ao vídeo completo acima.'}</p>`,
-        excerpt: video.excerpt ? video.excerpt.substring(0, 200) : '',
-        image_url: video.image_url,
-        video_id: video.video_id,
-        category: 'videos',
-      });
-      criados++;
-      console.log(`[YouTube Sync] Novo post criado: "${video.title}" (${video.video_id})`);
+      try {
+        let finalSlug = slug || `video-${video.video_id}`;
+        let attempt = 0;
+        while (attempt < 5) {
+          try {
+            await db.createPost({
+              title: video.title,
+              slug: finalSlug,
+              content_html: `<p>${video.excerpt || 'Assista ao vídeo completo acima.'}</p>`,
+              excerpt: video.excerpt ? video.excerpt.substring(0, 200) : '',
+              image_url: video.image_url,
+              video_id: video.video_id,
+              category: 'videos',
+            });
+            criados++;
+            console.log(`[YouTube Sync] Novo post criado: "${video.title}" (${video.video_id})`);
+            break;
+          } catch (innerErr) {
+            if (innerErr.message.includes('UNIQUE constraint') && attempt < 4) {
+              attempt++;
+              finalSlug = `${slug}-${attempt}`;
+            } else {
+              throw innerErr;
+            }
+          }
+        }
+      } catch (e) {
+        console.error(`[YouTube Sync] Erro ao criar post "${video.title}":`, e.message);
+      }
     }
 
     if (criados > 0) {
