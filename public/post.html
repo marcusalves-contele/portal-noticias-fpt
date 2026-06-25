@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:title" content="Frota Para Todos" id="og-title">
+  <meta property="og:description" content="Referência editorial em gestão de frotas." id="og-description">
+  <meta property="og:image" content="" id="og-image">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Frota Para Todos">
+  <meta name="description" content="" id="meta-description">
+  <script type="application/ld+json" id="article-jsonld"></script>
+  <title>Artigo — Frota Para Todos</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="header-logo">Frota Para <span>Todos</span></a>
+  <nav class="header-nav">
+    <a href="/">Início</a>
+    <a href="/?category=noticias">Notícias</a>
+    <a href="/?category=videos">Vídeos</a>
+  </nav>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMobileNav()">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<div class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav-close" onclick="toggleMobileNav()">✕</button>
+  <a href="/">Início</a>
+  <a href="/?category=noticias">Notícias</a>
+  <a href="/?category=videos">Vídeos</a>
+</div>
+
+<div id="article-hero"></div>
+
+<main>
+  <article id="article" class="article">
+    <div class="loading">Carregando artigo...</div>
+  </article>
+
+  <div id="comments-section" class="article" style="display:none">
+    <div class="comments-section">
+      <h2>Comentários</h2>
+      <div id="comments-list"></div>
+
+      <div class="comment-form">
+        <h3>Deixe seu comentário</h3>
+        <form id="comment-form" onsubmit="submitComment(event)">
+          <input type="text" id="c-author" placeholder="Seu nome" required maxlength="100">
+          <textarea id="c-content" placeholder="Escreva seu comentário..." rows="4" required maxlength="2000"></textarea>
+          <button type="submit" id="c-btn" class="btn">Enviar comentário</button>
+        </form>
+        <p id="c-msg" style="display:none;margin-top:12px;font-size:14px;"></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="related-section" class="article" style="display:none">
+    <div class="related-wrap">
+      <h3 class="related-title">Continue lendo</h3>
+      <div id="related-grid" class="related-grid"></div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="footer-logo">Frota Para <span>Todos</span></span>
+      <p>Conteúdo prático e independente para gestores de frota do Brasil.</p>
+      <a href="https://www.youtube.com/channel/UCz31CtOANqSFuLEdFTi1iCQ" target="_blank" class="footer-yt">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>
+        Canal YouTube
+      </a>
+      <a href="https://www.instagram.com/frotaparatodos" target="_blank" class="footer-yt">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        Instagram
+      </a>
+    </div>
+    <div class="footer-links">
+      <h4>Categorias</h4>
+      <a href="/?category=noticias">Notícias</a>
+      <a href="/?category=analises">Análises</a>
+      <a href="/?category=entrevistas">Entrevistas</a>
+      <a href="/?category=casos">Casos de Sucesso</a>
+      <a href="/?category=videos">Vídeos</a>
+    </div>
+    <div class="footer-links">
+      <h4>Portal</h4>
+      <a href="/">Início</a>
+      <a href="/about">Sobre</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Frota Para Todos · Julio César · Patrocinado por <a href="https://contelerastreador.com.br" target="_blank">Contele Fleet</a></p>
+  </div>
+</footer>
+
+<script>
+  function esc(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  const CATEGORY_LABELS = {
+    noticias: 'Notícias', analises: 'Análises',
+    entrevistas: 'Entrevistas', casos: 'Casos', videos: 'Vídeos'
+  };
+
+  function formatDate(iso) {
+    return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  function readingTime(html) {
+    const text = html.replace(/<[^>]+>/g, ' ');
+    const words = text.trim().split(/\s+/).length;
+    return Math.max(1, Math.ceil(words / 200));
+  }
+
+  async function loadPost() {
+    const slug = location.pathname.replace('/post/', '');
+    const article = document.getElementById('article');
+    try {
+      const post = await fetch(`/api/posts/${slug}`).then(r => {
+        if (!r.ok) throw new Error('not found');
+        return r.json();
+      });
+      document.title = `${post.title} — Frota Para Todos`;
+      const heroImgFull = post.image_url || (post.video_id ? `https://img.youtube.com/vi/${post.video_id}/maxresdefault.jpg` : '');
+      document.getElementById('og-title').setAttribute('content', post.title + ' — Frota Para Todos');
+      document.getElementById('og-description').setAttribute('content', post.excerpt || 'Referência editorial em gestão de frotas.');
+      if (heroImgFull) document.getElementById('og-image').setAttribute('content', heroImgFull);
+      document.getElementById('meta-description').setAttribute('content', post.excerpt || '');
+      document.getElementById('article-jsonld').textContent = JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": post.title,
+        "description": post.excerpt || '',
+        "image": heroImgFull || '',
+        "datePublished": post.published_at,
+        "author": { "@type": "Person", "name": "Julio César" },
+        "publisher": { "@type": "Organization", "name": "Frota Para Todos", "url": location.origin },
+        "mainEntityOfPage": { "@type": "WebPage", "@id": location.href }
+      });
+
+      const videoEmbed = post.video_id
+        ? `<div class="video-embed">
+             <iframe src="https://www.youtube.com/embed/${post.video_id}"
+               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+               allowfullscreen></iframe>
+           </div>`
+        : '';
+
+      const heroImg = post.image_url || (post.video_id ? `https://img.youtube.com/vi/${post.video_id}/maxresdefault.jpg` : '');
+
+      if (heroImg) {
+        document.getElementById('article-hero').innerHTML = `
+          <div class="article-hero">
+            <img src="${esc(heroImg)}" alt="${esc(post.title)}">
+            <div class="article-hero-overlay"></div>
+            <div class="article-hero-content">
+              <span class="badge" data-cat="${esc(post.category)}">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
+              <h1>${esc(post.title)}</h1>
+              <div class="article-meta">
+                <time>${formatDate(post.published_at)}</time> · ${readingTime(post.content_html)} min de leitura · Julio César | Frota Para Todos
+              </div>
+            </div>
+          </div>`;
+
+        article.innerHTML = `
+          <a href="/" class="back-link">← Voltar para o portal</a>
+          ${videoEmbed}
+          <div class="article-content">${post.content_html}</div>
+          <div class="share-bar">
+            <span class="share-label">Compartilhar:</span>
+            <a id="share-wa" class="share-btn share-whatsapp" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.557 4.122 1.526 5.855L0 24l6.294-1.503A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.374l-.36-.213-3.731.891.934-3.629-.234-.373A9.796 9.796 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/></svg>
+              WhatsApp
+            </a>
+            <button class="share-btn share-copy" onclick="copyPostLink()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copiar link
+            </button>
+          </div>`;
+
+        const shareWaEl = document.getElementById('share-wa');
+        if (shareWaEl) shareWaEl.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(post.title + ' — ' + location.href)}`;
+      } else {
+        document.getElementById('article-hero').innerHTML = '';
+        article.innerHTML = `
+          <a href="/" class="back-link">← Voltar para o portal</a>
+          <div class="article-header">
+            <span class="badge" data-cat="${esc(post.category)}">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
+            <h1 class="article-title">${esc(post.title)}</h1>
+            <div class="article-meta">
+              <time>${formatDate(post.published_at)}</time> · ${readingTime(post.content_html)} min de leitura · Julio César | Frota Para Todos
+            </div>
+          </div>
+          ${videoEmbed}
+          <div class="article-content">${post.content_html}</div>
+          <div class="share-bar">
+            <span class="share-label">Compartilhar:</span>
+            <a id="share-wa" class="share-btn share-whatsapp" target="_blank" rel="noopener">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.557 4.122 1.526 5.855L0 24l6.294-1.503A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.374l-.36-.213-3.731.891.934-3.629-.234-.373A9.796 9.796 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/></svg>
+              WhatsApp
+            </a>
+            <button class="share-btn share-copy" onclick="copyPostLink()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copiar link
+            </button>
+          </div>`;
+
+        const shareWaEl = document.getElementById('share-wa');
+        if (shareWaEl) shareWaEl.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(post.title + ' — ' + location.href)}`;
+      }
+
+      await loadComments(slug);
+      await loadRelated(slug);
+    } catch (e) {
+      article.innerHTML = `
+        <a href="/" class="back-link">← Voltar para o portal</a>
+        <div class="empty-state">Artigo não encontrado.</div>`;
+    }
+  }
+
+  async function loadComments(slug) {
+    const section = document.getElementById('comments-section');
+    try {
+      const comments = await fetch(`/api/comments/${slug}`).then(r => r.json());
+      const list = document.getElementById('comments-list');
+      list.innerHTML = comments.length
+        ? comments.map(c => `
+            <div class="comment">
+              <div class="comment-header">
+                <div class="comment-avatar">${c.author.charAt(0).toUpperCase()}</div>
+                <span class="comment-author">${c.author}</span>
+                <span class="comment-date">${formatDate(c.created_at)}</span>
+              </div>
+              <div class="comment-content">${c.content.replace(/</g, '&lt;')}</div>
+            </div>`).join('')
+        : '<p style="color:#94A3B8;font-size:14px;">Seja o primeiro a comentar!</p>';
+    } catch (e) {}
+    section.style.display = 'block';
+  }
+
+  async function loadRelated(slug) {
+    try {
+      const posts = await fetch(`/api/posts/related/${slug}`).then(r => r.json());
+      if (!posts.length) return;
+      const grid = document.getElementById('related-grid');
+      const CATS = { noticias: 'Notícias', analises: 'Análises', entrevistas: 'Entrevistas', casos: 'Casos', videos: 'Vídeos' };
+      grid.innerHTML = posts.map(p => {
+        const img = p.image_url || (p.video_id ? `https://img.youtube.com/vi/${p.video_id}/maxresdefault.jpg` : '');
+        const date = new Date(p.published_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+        return `
+        <article class="related-card" onclick="location.href='/post/${p.slug}'">
+          ${img ? `<img class="related-card-img" src="${esc(img)}" alt="${esc(p.title)}" loading="lazy">` : '<div class="related-card-img related-card-placeholder"></div>'}
+          <div class="related-card-body">
+            <span class="badge" data-cat="${esc(p.category)}">${CATS[p.category] || esc(p.category)}</span>
+            <h4 class="related-card-title">${esc(p.title)}</h4>
+            <time class="card-date">${date}</time>
+          </div>
+        </article>`;
+      }).join('');
+      document.getElementById('related-section').style.display = 'block';
+    } catch (e) {}
+  }
+
+  async function submitComment(e) {
+    e.preventDefault();
+    const slug = location.pathname.replace('/post/', '');
+    const author = document.getElementById('c-author').value.trim();
+    const content = document.getElementById('c-content').value.trim();
+    const msg = document.getElementById('c-msg');
+    const btn = document.getElementById('c-btn');
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+    try {
+      const r = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_slug: slug, author, content })
+      });
+      msg.style.display = 'block';
+      if (r.ok) {
+        msg.style.color = '#22C55E';
+        msg.textContent = '✓ Comentário enviado! Aguarda aprovação antes de aparecer.';
+        document.getElementById('comment-form').reset();
+      } else {
+        const data = await r.json();
+        msg.style.color = '#ef4444';
+        msg.textContent = data.error || 'Erro ao enviar.';
+      }
+    } catch (e) {
+      msg.style.display = 'block';
+      msg.style.color = '#ef4444';
+      msg.textContent = 'Erro ao enviar. Tente novamente.';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Enviar comentário';
+  }
+
+  window.addEventListener('scroll', () => {
+    const doc = document.documentElement;
+    const scrolled = doc.scrollTop / (doc.scrollHeight - doc.clientHeight);
+    document.getElementById('reading-progress').style.width = (scrolled * 100) + '%';
+    document.getElementById('back-to-top').classList.toggle('visible', window.scrollY > 400);
+    document.querySelector('.header').classList.toggle('header--scrolled', window.scrollY > 10);
+  }, { passive: true });
+
+  function toggleMobileNav() {
+    const nav = document.getElementById('mobile-nav');
+    const btn = document.getElementById('hamburger');
+    nav.classList.toggle('open');
+    btn.classList.toggle('open');
+    document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : '';
+  }
+
+  function copyPostLink() {
+    navigator.clipboard.writeText(location.href).then(() => {
+      const btn = document.querySelector('.share-copy');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '✓ Copiado!';
+      btn.style.borderColor = '#22C55E';
+      btn.style.color = '#22C55E';
+      setTimeout(() => {
+        btn.innerHTML = orig;
+        btn.style.borderColor = '';
+        btn.style.color = '';
+      }, 2000);
+    });
+  }
+
+  loadPost();
+</script>
+
+<div id="reading-progress"></div>
+<button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+</body>
+</html>
