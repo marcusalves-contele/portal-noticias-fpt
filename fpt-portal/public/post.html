@@ -21,8 +21,20 @@
   <nav class="header-nav">
     <a href="/">Início</a>
     <a href="/?category=noticias">Notícias</a>
+    <a href="/?category=analises">Análises</a>
+    <a href="/?category=entrevistas">Entrevistas</a>
     <a href="/?category=videos">Vídeos</a>
+    <a href="/about">Sobre</a>
   </nav>
+  <div class="search-wrap" id="search-wrap">
+    <button class="search-toggle" id="search-toggle" aria-label="Buscar" onclick="toggleSearch()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    </button>
+    <div class="search-box" id="search-box" style="display:none">
+      <input type="search" id="search-input" placeholder="Buscar artigos..." autocomplete="off">
+      <button class="search-close" onclick="closeSearch()">✕</button>
+    </div>
+  </div>
   <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMobileNav()">
     <span></span><span></span><span></span>
   </button>
@@ -33,6 +45,13 @@
   <a href="/">Início</a>
   <a href="/?category=noticias">Notícias</a>
   <a href="/?category=videos">Vídeos</a>
+</div>
+
+<div class="search-results-overlay" id="search-results-overlay" style="display:none">
+  <div class="container">
+    <div id="search-results-grid" class="posts-grid"></div>
+    <p id="search-empty" style="display:none;color:#94A3B8;padding:32px;text-align:center;">Nenhum resultado encontrado.</p>
+  </div>
 </div>
 
 <div id="article-hero"></div>
@@ -64,6 +83,22 @@
       <h3 class="related-title">Continue lendo</h3>
       <div id="related-grid" class="related-grid"></div>
     </div>
+  </div>
+
+  <div class="article">
+    <section class="newsletter-section" style="margin:0 0 48px;">
+      <div class="newsletter-inner">
+        <div class="newsletter-text">
+          <h2>Curadoria semanal na sua caixa de entrada</h2>
+          <p>Os melhores artigos sobre gestão de frotas, toda segunda-feira. Gratuito.</p>
+        </div>
+        <form class="newsletter-form" onsubmit="subscribeNewsletterPost(event)">
+          <input type="email" id="nl-post-email" placeholder="seu@email.com.br" required>
+          <button type="submit" class="btn">Quero receber</button>
+        </form>
+        <p id="nl-post-msg" style="display:none;margin-top:12px;font-size:14px;"></p>
+      </div>
+    </section>
   </div>
 </main>
 
@@ -118,6 +153,96 @@
     const text = html.replace(/<[^>]+>/g, ' ');
     const words = text.trim().split(/\s+/).length;
     return Math.max(1, Math.ceil(words / 200));
+  }
+
+  // --- Search ---
+  let searchDebounce = null;
+
+  function toggleSearch() {
+    const box = document.getElementById('search-box');
+    const toggle = document.getElementById('search-toggle');
+    if (box.style.display !== 'none') { closeSearch(); return; }
+    box.style.display = 'flex';
+    toggle.style.display = 'none';
+    document.getElementById('search-input').focus();
+  }
+
+  function closeSearch() {
+    document.getElementById('search-box').style.display = 'none';
+    document.getElementById('search-toggle').style.display = 'flex';
+    document.getElementById('search-input').value = '';
+    document.getElementById('search-results-overlay').style.display = 'none';
+  }
+
+  function renderSearchCard(post) {
+    const img = post.image_url || (post.video_id ? `https://img.youtube.com/vi/${post.video_id}/hqdefault.jpg` : '');
+    return `
+      <article class="card" onclick="location.href='/post/${post.slug}'" style="cursor:pointer">
+        <div class="card-image-wrap">
+          ${img ? `<img class="card-image" src="${esc(img)}" alt="${esc(post.title)}" loading="lazy">` : '<div class="card-image-placeholder"></div>'}
+        </div>
+        <div class="card-body">
+          <span class="badge" data-cat="${esc(post.category)}">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
+          <h2 class="card-title">${esc(post.title)}</h2>
+          <p class="card-excerpt">${esc(post.excerpt || '')}</p>
+          <div class="card-footer">
+            <time class="card-date">${new Date(post.published_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</time>
+            <span class="card-cta">Ler →</span>
+          </div>
+        </div>
+      </article>`;
+  }
+
+  async function runSearch(q) {
+    const overlay = document.getElementById('search-results-overlay');
+    const grid = document.getElementById('search-results-grid');
+    const empty = document.getElementById('search-empty');
+    overlay.style.display = 'block';
+    grid.innerHTML = '<div style="padding:32px;color:#94A3B8;">Buscando...</div>';
+    try {
+      const results = await fetch(`/api/search?q=${encodeURIComponent(q)}&limit=12`).then(r => r.json());
+      if (!results.length) { grid.innerHTML = ''; empty.style.display = 'block'; }
+      else { empty.style.display = 'none'; grid.innerHTML = results.map(renderSearchCard).join(''); }
+    } catch (e) { grid.innerHTML = '<div style="padding:32px;color:#ef4444;">Erro ao buscar.</div>'; }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('search-input');
+    if (input) {
+      input.addEventListener('input', () => {
+        clearTimeout(searchDebounce);
+        const q = input.value.trim();
+        if (q.length < 2) { document.getElementById('search-results-overlay').style.display = 'none'; return; }
+        searchDebounce = setTimeout(() => runSearch(q), 300);
+      });
+    }
+  });
+
+  // --- Newsletter inline ---
+  async function subscribeNewsletterPost(e) {
+    e.preventDefault();
+    const email = document.getElementById('nl-post-email').value;
+    const msg = document.getElementById('nl-post-msg');
+    try {
+      const r = await fetch('/api/newsletter/subscribe', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await r.json();
+      msg.style.display = 'block';
+      if (r.ok) {
+        msg.style.color = '#22C55E';
+        msg.textContent = '✓ ' + (data.message || 'Verifique seu email para confirmar.');
+        document.getElementById('nl-post-email').value = '';
+      } else {
+        msg.style.color = '#ef4444';
+        msg.textContent = data.error === 'Email já cadastrado' ? 'Você já está inscrito!' : data.error;
+      }
+    } catch (e) {
+      msg.style.display = 'block';
+      msg.style.color = '#ef4444';
+      msg.textContent = 'Erro ao inscrever. Tente novamente.';
+    }
   }
 
   async function loadPost() {
@@ -216,6 +341,9 @@
         const shareWaEl = document.getElementById('share-wa');
         if (shareWaEl) shareWaEl.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(post.title + ' — ' + location.href)}`;
       }
+
+      // Registrar visualização
+      fetch(`/api/posts/${slug}/view`, { method: 'POST' }).catch(() => {});
 
       await loadComments(slug);
       await loadRelated(slug);
