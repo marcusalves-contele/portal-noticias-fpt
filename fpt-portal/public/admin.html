@@ -249,7 +249,7 @@
       <div class="post-item" id="post-${post.id}">
         <div class="post-item-info">
           <div class="post-item-title">${escapeHtml(post.title)}</div>
-          <div class="post-item-meta">${formatDate(post.created_at)} · ${escapeHtml(post.category)}${post.video_id ? ' · ▶ com vídeo' : ''}</div>
+          <div class="post-item-meta">${formatDate(post.created_at)} · ${escapeHtml(post.category)}${post.video_id ? ' · ▶ com vídeo' : ''}${post.views > 0 ? ` · 👁 ${post.views} views` : ''}</div>
           ${post.excerpt ? `<div style="font-size:13px;color:#94A3B8;margin-top:6px">${escapeHtml((post.excerpt || '').substring(0, 120))}...</div>` : ''}
         </div>
         ${actions}

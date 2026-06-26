@@ -290,7 +290,7 @@
               <span class="badge" data-cat="${esc(post.category)}">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
               <h1>${esc(post.title)}</h1>
               <div class="article-meta">
-                <time>${formatDate(post.published_at)}</time> · ${readingTime(post.content_html)} min de leitura · Julio César | Frota Para Todos
+                <time>${formatDate(post.published_at)}</time> · ${readingTime(post.content_html)} min de leitura · Julio César | Frota Para Todos${post.views > 0 ? ` · <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:3px"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>${post.views} visualizações` : ''}
               </div>
             </div>
           </div>`;
@@ -321,7 +321,7 @@
             <span class="badge" data-cat="${esc(post.category)}">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
             <h1 class="article-title">${esc(post.title)}</h1>
             <div class="article-meta">
-              <time>${formatDate(post.published_at)}</time> · ${readingTime(post.content_html)} min de leitura · Julio César | Frota Para Todos
+              <time>${formatDate(post.published_at)}</time> · ${readingTime(post.content_html)} min de leitura · Julio César | Frota Para Todos${post.views > 0 ? ` · <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:3px"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>${post.views} visualizações` : ''}
             </div>
           </div>
           ${videoEmbed}

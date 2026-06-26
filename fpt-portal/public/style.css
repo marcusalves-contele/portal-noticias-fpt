@@ -402,6 +402,14 @@ a:hover { color: #b56fff; }
   color: var(--fpt-text-muted);
 }
 
+.card-views {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--fpt-text-muted);
+}
+
 .card-cta {
   display: inline-flex;
   align-items: center;
