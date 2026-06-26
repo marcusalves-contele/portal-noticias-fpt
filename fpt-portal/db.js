@@ -129,9 +129,9 @@ module.exports = {
 
   updatePost: (id, data) =>
     run(
-      `UPDATE posts SET title = ?, excerpt = ?, content_html = ?, category = ?, featured = ?, difficulty = ?, summary_points = ? WHERE id = ?`,
+      `UPDATE posts SET title = ?, excerpt = ?, content_html = ?, category = ?, featured = ?, difficulty = ?, summary_points = ?, image_url = ? WHERE id = ?`,
       [data.title, data.excerpt || '', data.content_html, data.category || 'videos',
-       data.featured ? 1 : 0, data.difficulty || '', data.summary_points || '', id]
+       data.featured ? 1 : 0, data.difficulty || '', data.summary_points || '', data.image_url || '', id]
     ),
 
   deletePost: (id) =>

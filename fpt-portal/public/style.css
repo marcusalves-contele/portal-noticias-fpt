@@ -1430,6 +1430,42 @@ a:hover { color: #b56fff; }
   color: rgba(255,255,255,0.6);
 }
 
+/* Pagination */
+.pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--fpt-card);
+  border: 1px solid rgba(139,35,229,0.2);
+  border-radius: 10px;
+  padding: 8px 16px;
+}
+
+.page-btn {
+  background: transparent;
+  border: none;
+  color: var(--fpt-text-muted);
+  font-family: var(--fpt-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+.page-btn:not(:disabled):hover {
+  color: var(--fpt-text-light);
+  background: rgba(139,35,229,0.15);
+}
+.page-btn:disabled { cursor: default; }
+
+.page-info {
+  font-size: 13px;
+  color: var(--fpt-text-muted);
+  min-width: 70px;
+  text-align: center;
+}
+
 @media (max-width: 640px) {
   .featured-hero { min-height: 260px; }
   .featured-hero-title { font-size: 18px; }

@@ -156,6 +156,8 @@
     </select>
     <label>Excerpt (resumo)</label>
     <input type="text" id="editExcerpt" placeholder="Resumo curto..." />
+    <label>URL da imagem <span style="font-size:11px;color:#94A3B8;">(opcional — deixe vazio para usar thumbnail do YouTube)</span></label>
+    <input type="url" id="editImageUrl" placeholder="https://..." />
     <label>Conteúdo HTML</label>
     <textarea id="editContentHtml" placeholder="<p>Conteúdo...</p>"></textarea>
     <label>Nível</label>
@@ -271,6 +273,7 @@
       <div class="post-item-actions">
         <button class="btn-edit" data-post-id="${post.id}" onclick="openEditModalById(this.dataset.postId)">Editar</button>
         <a href="/post/${post.slug}" target="_blank" class="btn" style="font-size:12px;padding:6px 12px">Ver →</a>
+        <button class="btn" onclick="notifyPost(${post.id}, this)" title="Notificar inscritos sobre este post" style="font-size:12px;padding:6px 12px;background:rgba(139,35,229,0.15);border-color:rgba(139,35,229,0.4);">📧 Notificar</button>
         <button class="btn btn-reject" onclick="deletePost(${post.id})" title="Excluir permanentemente" style="background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);">🗑</button>
       </div>`;
 
@@ -418,6 +421,7 @@
     document.getElementById('editTitle').value = post.title || '';
     document.getElementById('editCategory').value = post.category || 'videos';
     document.getElementById('editExcerpt').value = post.excerpt || '';
+    document.getElementById('editImageUrl').value = post.image_url || '';
     document.getElementById('editContentHtml').value = post.content_html || '';
     document.getElementById('editDifficulty').value = post.difficulty || '';
     document.getElementById('editSummary').value = (post.summary_points || '').split('|').filter(Boolean).join('\n');
@@ -445,11 +449,12 @@
     const summary_points = document.getElementById('editSummary').value.trim().split('\n').filter(l => l.trim()).slice(0, 3).join('|');
     const featured = document.getElementById('editFeatured').checked;
     const scheduled_at = document.getElementById('editScheduled').value;
+    const image_url = document.getElementById('editImageUrl').value.trim();
     if (!title || !content_html) return alert('Título e conteúdo são obrigatórios');
     const r = await fetch(`/api/admin/posts/${editingPostId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'x-api-key': currentKey },
-      body: JSON.stringify({ title, excerpt, content_html, category, difficulty, summary_points, featured })
+      body: JSON.stringify({ title, excerpt, content_html, category, difficulty, summary_points, featured, image_url })
     });
     if (!r.ok) return alert('Erro ao salvar');
     if (scheduled_at) {
@@ -491,6 +496,30 @@
     } catch(e) {
       el.innerHTML = '<div style="color:#ef4444;">Erro ao carregar analytics.</div>';
     }
+  }
+
+  async function notifyPost(id, btn) {
+    if (!confirm('Enviar email deste artigo para todos os inscritos confirmados?')) return;
+    const orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳ Enviando...';
+    try {
+      const r = await fetch(`/api/admin/posts/${id}/notify`, { method: 'POST', headers: { 'x-api-key': currentKey } });
+      const data = await r.json();
+      if (data.skipped) {
+        alert('SMTP não configurado — configure as variáveis de ambiente para enviar emails.');
+      } else if (data.sent === 0) {
+        alert(data.reason || 'Nenhum inscrito confirmado encontrado.');
+      } else {
+        btn.textContent = `✓ Enviado (${data.sent})`;
+        setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
+        return;
+      }
+    } catch (e) {
+      alert('Erro ao notificar inscritos.');
+    }
+    btn.textContent = orig;
+    btn.disabled = false;
   }
 
   // --- Filtro de posts ---

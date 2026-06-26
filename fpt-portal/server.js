@@ -150,14 +150,68 @@ app.delete('/api/admin/posts/:id', requireApiKey, async (req, res) => {
 });
 
 app.put('/api/admin/posts/:id', requireApiKey, async (req, res) => {
-  const { title, excerpt, content_html, category, featured, difficulty, summary_points } = req.body;
+  const { title, excerpt, content_html, category, featured, difficulty, summary_points, image_url } = req.body;
   if (!title || !content_html) {
     return res.status(400).json({ error: 'title e content_html são obrigatórios' });
   }
   try {
-    const result = await db.updatePost(Number(req.params.id), { title, excerpt, content_html, category, featured, difficulty, summary_points });
+    const result = await db.updatePost(Number(req.params.id), { title, excerpt, content_html, category, featured, difficulty, summary_points, image_url });
     if (result.changes === 0) return res.status(404).json({ error: 'Post não encontrado' });
     res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Notificar inscritos sobre um post específico
+app.post('/api/admin/posts/:id/notify', requireApiKey, async (req, res) => {
+  if (!process.env.SMTP_USER) return res.json({ sent: 0, skipped: true, reason: 'SMTP não configurado' });
+  try {
+    const post = await db.getBySlug(
+      await (async () => {
+        const rows = await db.getAll();
+        const found = rows.find(p => p.id === Number(req.params.id));
+        return found ? found.slug : null;
+      })()
+    );
+    if (!post) return res.status(404).json({ error: 'Post não encontrado ou não publicado' });
+    const subscribers = await db.getConfirmedSubscribers();
+    if (!subscribers.length) return res.json({ sent: 0, reason: 'Sem inscritos confirmados' });
+    const base = process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br';
+    const img = post.image_url || (post.video_id ? `https://img.youtube.com/vi/${post.video_id}/hqdefault.jpg` : '');
+    let sent = 0;
+    for (const sub of subscribers) {
+      try {
+        const token = unsubscribeToken(sub.email);
+        await transporter.sendMail({
+          from: `"Frota Para Todos" <${process.env.SMTP_USER}>`,
+          to: sub.email,
+          subject: `📰 ${post.title} — Frota Para Todos`,
+          html: `<!DOCTYPE html><html><body style="background:#080010;color:#F7F7F7;font-family:Arial,sans-serif;margin:0;padding:0;">
+            <table width="600" align="center" style="padding:32px 24px;">
+              <tr><td style="padding-bottom:24px;border-bottom:2px solid #8B23E5;">
+                <span style="font-size:22px;font-weight:800;color:#F7F7F7;">Frota Para <span style="color:#8B23E5;">Todos</span></span>
+              </td></tr>
+              <tr><td style="padding:24px 0;">
+                ${img ? `<img src="${img}" style="width:100%;border-radius:8px;margin-bottom:16px;" alt="${post.title}">` : ''}
+                <p style="font-size:13px;color:#8B23E5;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">Novo artigo</p>
+                <h2 style="font-size:22px;font-weight:800;margin:0 0 12px;color:#F7F7F7;">${post.title}</h2>
+                ${post.excerpt ? `<p style="font-size:14px;color:#94A3B8;margin:0 0 20px;">${post.excerpt}</p>` : ''}
+                <a href="${base}/post/${post.slug}" style="background:linear-gradient(135deg,#8B23E5,#b56fff);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">Ler artigo completo →</a>
+              </td></tr>
+              <tr><td style="padding-top:24px;"><p style="font-size:12px;color:#4a4a6a;">
+                Patrocinado por <a href="https://contelerastreador.com.br" style="color:#8B23E5;">Contele Fleet</a> ·
+                <a href="${base}/unsubscribe?email=${encodeURIComponent(sub.email)}&token=${token}" style="color:#4a4a6a;">Cancelar inscrição</a>
+              </p></td></tr>
+            </table></body></html>`,
+        });
+        sent++;
+      } catch (e) {
+        console.error(`[Notify] Erro ao enviar para ${sub.email}:`, e.message);
+      }
+    }
+    console.log(`[Notify] Post "${post.title}" notificado para ${sent}/${subscribers.length} inscritos`);
+    res.json({ sent, total: subscribers.length });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -585,6 +639,11 @@ app.get('/sitemap.xml', async (req, res) => {
 app.get('/robots.txt', (req, res) => {
   res.setHeader('Content-Type', 'text/plain');
   res.send(`User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: ${process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br'}/sitemap.xml`);
+});
+
+// 404 catch-all (deve ser o último middleware)
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
 app.listen(PORT, () => {

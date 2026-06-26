@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página não encontrada — Frota Para Todos</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .not-found {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      text-align: center;
+      padding: 48px 24px;
+    }
+    .not-found-code {
+      font-family: var(--fpt-font-display);
+      font-size: 120px;
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, #8B23E5, #b56fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .not-found-title {
+      font-family: var(--fpt-font-display);
+      font-size: 28px;
+      font-weight: 800;
+      margin: 16px 0 12px;
+    }
+    .not-found-desc {
+      font-size: 15px;
+      color: var(--fpt-text-muted);
+      max-width: 420px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+    .not-found-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn-home {
+      background: linear-gradient(135deg, #8B23E5, #b56fff);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .btn-home:hover { opacity: 0.85; color: #fff; }
+    .btn-back {
+      background: transparent;
+      color: var(--fpt-text-muted);
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: 1px solid rgba(139,35,229,0.3);
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+      cursor: pointer;
+    }
+    .btn-back:hover { border-color: var(--fpt-purple); color: var(--fpt-text-light); }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="header-logo">Frota Para <span>Todos</span></a>
+  <nav class="header-nav">
+    <a href="/">Início</a>
+    <a href="/?category=noticias">Notícias</a>
+    <a href="/?category=analises">Análises</a>
+    <a href="/about">Sobre</a>
+  </nav>
+</header>
+
+<main class="container">
+  <div class="not-found">
+    <div class="not-found-code">404</div>
+    <h1 class="not-found-title">Página não encontrada</h1>
+    <p class="not-found-desc">
+      O artigo ou página que você procura pode ter sido removido, renomeado ou ainda não existe.
+      Volte para a homepage e explore o conteúdo disponível.
+    </p>
+    <div class="not-found-actions">
+      <a href="/" class="btn-home">Ir para a homepage →</a>
+      <button class="btn-back" onclick="history.back()">← Voltar</button>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-bottom">
+    <p>© 2026 Frota Para Todos · Julio César · Patrocinado por <a href="https://contelerastreador.com.br" target="_blank">Contele Fleet</a></p>
+  </div>
+</footer>
+
+<script>
+  window.addEventListener('scroll', () => {
+    document.querySelector('.header').classList.toggle('header--scrolled', window.scrollY > 10);
+  }, { passive: true });
+</script>
+</body>
+</html>

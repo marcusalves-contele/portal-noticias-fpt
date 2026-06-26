@@ -79,8 +79,12 @@
 
   <div id="posts-grid" class="posts-grid"></div>
 
-  <div id="load-more-wrap" style="text-align:center;margin-bottom:48px;display:none;">
-    <button class="btn-load-more" id="load-more-btn" onclick="loadMore()">Carregar mais artigos</button>
+  <div id="pagination-wrap" style="display:none;text-align:center;margin-bottom:48px;">
+    <div class="pagination">
+      <button class="page-btn" id="page-prev" onclick="goPage(currentPage - 1)">← Anterior</button>
+      <span class="page-info" id="page-info"></span>
+      <button class="page-btn" id="page-next" onclick="goPage(currentPage + 1)">Próxima →</button>
+    </div>
   </div>
 
   <!-- Newsletter -->
@@ -151,8 +155,10 @@
     entrevistas: 'Entrevistas', casos: 'Casos', videos: 'Vídeos'
   };
 
-  let currentCategory = new URLSearchParams(location.search).get('category') || '';
-  let currentOffset = 0;
+  const params = new URLSearchParams(location.search);
+  let currentCategory = params.get('category') || '';
+  let currentPage = Math.max(1, parseInt(params.get('page') || '1', 10));
+  let totalPages = 1;
   const PAGE_SIZE = 12;
 
   function formatDate(iso) {
@@ -259,51 +265,71 @@
     cards.forEach(el => observer.observe(el));
   }
 
-  async function loadPosts(category = '', reset = true) {
-    const grid = document.getElementById('posts-grid');
-    const loadMoreWrap = document.getElementById('load-more-wrap');
+  function updateUrl() {
+    const p = new URLSearchParams();
+    if (currentCategory) p.set('category', currentCategory);
+    if (currentPage > 1) p.set('page', currentPage);
+    const qs = p.toString();
+    history.pushState({}, '', qs ? `/?${qs}` : '/');
+  }
 
-    if (reset) {
-      currentOffset = 0;
-      grid.innerHTML = renderSkeleton();
-      loadMoreWrap.style.display = 'none';
-    }
+  function renderPagination(postCount) {
+    const wrap = document.getElementById('pagination-wrap');
+    const prev = document.getElementById('page-prev');
+    const next = document.getElementById('page-next');
+    const info = document.getElementById('page-info');
+    if (postCount === 0 && currentPage === 1) { wrap.style.display = 'none'; return; }
+    const hasMore = postCount >= PAGE_SIZE;
+    if (currentPage === 1 && !hasMore) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'block';
+    prev.disabled = currentPage <= 1;
+    prev.style.opacity = currentPage <= 1 ? '0.3' : '1';
+    next.disabled = !hasMore;
+    next.style.opacity = !hasMore ? '0.3' : '1';
+    info.textContent = `Página ${currentPage}`;
+  }
+
+  function goPage(page) {
+    if (page < 1) return;
+    currentPage = page;
+    updateUrl();
+    loadPosts(currentCategory);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function loadPosts(category = '') {
+    const grid = document.getElementById('posts-grid');
+    grid.innerHTML = renderSkeleton();
+    document.getElementById('pagination-wrap').style.display = 'none';
 
     try {
-      const url = `/api/posts?limit=${PAGE_SIZE}&offset=${currentOffset}${category ? `&category=${category}` : ''}`;
+      const offset = (currentPage - 1) * PAGE_SIZE;
+      const url = `/api/posts?limit=${PAGE_SIZE}&offset=${offset}${category ? `&category=${category}` : ''}`;
       const posts = await fetch(url).then(r => r.json());
 
-      if (reset && !category) renderHero(posts[0] || null);
+      if (currentPage === 1 && !category) renderHero(posts[0] || null);
 
-      if (!posts.length && reset) {
+      if (!posts.length && currentPage === 1) {
         grid.innerHTML = '<div class="empty-state">Nenhum artigo publicado ainda.</div>';
         return;
       }
 
-      const gridPosts = (reset && !category && posts.length > 0) ? posts.slice(1) : posts;
-
-      if (reset) {
-        grid.innerHTML = gridPosts.map((post, i) => renderCard(post, i)).join('');
-      } else {
-        grid.insertAdjacentHTML('beforeend', gridPosts.map((post, i) => renderCard(post, i)).join(''));
+      if (!posts.length && currentPage > 1) {
+        currentPage = 1;
+        updateUrl();
+        loadPosts(category);
+        return;
       }
 
+      const gridPosts = (currentPage === 1 && !category && posts.length > 0) ? posts.slice(1) : posts;
+      grid.innerHTML = gridPosts.map((post, i) => renderCard(post, i)).join('');
+
       setupScrollReveal();
-      currentOffset += posts.length;
-      loadMoreWrap.style.display = posts.length >= PAGE_SIZE ? 'block' : 'none';
+      renderPagination(posts.length);
 
     } catch (e) {
-      if (reset) grid.innerHTML = '<div class="empty-state">Erro ao carregar artigos.</div>';
+      grid.innerHTML = '<div class="empty-state">Erro ao carregar artigos.</div>';
     }
-  }
-
-  async function loadMore() {
-    const btn = document.getElementById('load-more-btn');
-    btn.textContent = 'Carregando...';
-    btn.disabled = true;
-    await loadPosts(currentCategory, false);
-    btn.textContent = 'Carregar mais artigos';
-    btn.disabled = false;
   }
 
   async function loadSponsors() {
@@ -385,7 +411,8 @@
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentCategory = btn.dataset.category;
-      history.pushState({}, '', currentCategory ? `/?category=${currentCategory}` : '/');
+      currentPage = 1;
+      updateUrl();
       loadPosts(currentCategory);
     });
   });
@@ -424,7 +451,7 @@
     document.getElementById('search-results-overlay').style.display = 'none';
     document.querySelector('.hero-wrapper').style.display = '';
     document.getElementById('posts-grid').style.display = '';
-    document.getElementById('load-more-wrap').style.display = currentOffset >= PAGE_SIZE ? 'block' : 'none';
+    renderPagination(PAGE_SIZE);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -520,6 +547,16 @@
   loadPopular();
   loadFeatured();
   loadPosts(currentCategory);
+
+  window.addEventListener('popstate', () => {
+    const p = new URLSearchParams(location.search);
+    currentCategory = p.get('category') || '';
+    currentPage = Math.max(1, parseInt(p.get('page') || '1', 10));
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.category === currentCategory);
+    });
+    loadPosts(currentCategory);
+  });
 </script>
 </body>
 </html>
