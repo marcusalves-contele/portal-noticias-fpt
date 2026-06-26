@@ -69,6 +69,10 @@ db.serialize(() => {
 
   // Migração: adicionar coluna views em bancos existentes
   db.run(`ALTER TABLE posts ADD COLUMN views INTEGER DEFAULT 0`, () => {});
+  db.run(`ALTER TABLE posts ADD COLUMN featured INTEGER DEFAULT 0`, () => {});
+  db.run(`ALTER TABLE posts ADD COLUMN difficulty TEXT DEFAULT ''`, () => {});
+  db.run(`ALTER TABLE posts ADD COLUMN summary_points TEXT DEFAULT ''`, () => {});
+  db.run(`ALTER TABLE posts ADD COLUMN scheduled_at DATETIME`, () => {});
 });
 
 // Helpers promisificados
@@ -90,10 +94,11 @@ const get = (sql, params = []) => new Promise((resolve, reject) => {
 module.exports = {
   // --- Posts ---
   getPublished: (limit = 20, offset = 0, category = null) => {
+    const commentSub = `(SELECT COUNT(*) FROM comments c WHERE c.post_slug = p.slug AND c.status = 'approved') as comment_count`;
     if (category) {
-      return all("SELECT * FROM posts WHERE status = 'published' AND category = ? ORDER BY published_at DESC LIMIT ? OFFSET ?", [category, limit, offset]);
+      return all(`SELECT p.*, ${commentSub} FROM posts p WHERE p.status = 'published' AND p.category = ? ORDER BY p.published_at DESC LIMIT ? OFFSET ?`, [category, limit, offset]);
     }
-    return all("SELECT * FROM posts WHERE status = 'published' ORDER BY published_at DESC LIMIT ? OFFSET ?", [limit, offset]);
+    return all(`SELECT p.*, ${commentSub} FROM posts p WHERE p.status = 'published' ORDER BY p.published_at DESC LIMIT ? OFFSET ?`, [limit, offset]);
   },
 
   getRecentPublished: (limit = 5) =>
@@ -110,9 +115,10 @@ module.exports = {
 
   createPost: (data) =>
     run(
-      `INSERT INTO posts (title, slug, content_html, excerpt, image_url, video_id, category, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`,
-      [data.title, data.slug, data.content_html, data.excerpt || '', data.image_url || '', data.video_id || '', data.category || 'videos']
+      `INSERT INTO posts (title, slug, content_html, excerpt, image_url, video_id, category, status, featured, difficulty, summary_points)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`,
+      [data.title, data.slug, data.content_html, data.excerpt || '', data.image_url || '', data.video_id || '', data.category || 'videos',
+       data.featured ? 1 : 0, data.difficulty || '', data.summary_points || '']
     ),
 
   publish: (id) =>
@@ -123,8 +129,9 @@ module.exports = {
 
   updatePost: (id, data) =>
     run(
-      `UPDATE posts SET title = ?, excerpt = ?, content_html = ?, category = ? WHERE id = ?`,
-      [data.title, data.excerpt || '', data.content_html, data.category || 'videos', id]
+      `UPDATE posts SET title = ?, excerpt = ?, content_html = ?, category = ?, featured = ?, difficulty = ?, summary_points = ? WHERE id = ?`,
+      [data.title, data.excerpt || '', data.content_html, data.category || 'videos',
+       data.featured ? 1 : 0, data.difficulty || '', data.summary_points || '', id]
     ),
 
   deletePost: (id) =>
@@ -189,11 +196,23 @@ module.exports = {
     run("UPDATE posts SET views = views + 1 WHERE slug = ? AND status = 'published'", [slug]),
 
   getPopular: (limit = 5) =>
-    all("SELECT * FROM posts WHERE status = 'published' ORDER BY views DESC LIMIT ?", [limit]),
+    all(`SELECT p.*, (SELECT COUNT(*) FROM comments c WHERE c.post_slug = p.slug AND c.status = 'approved') as comment_count FROM posts p WHERE p.status = 'published' ORDER BY p.views DESC LIMIT ?`, [limit]),
 
   reactivateSubscriber: (email) =>
     run("UPDATE subscribers SET active = 1, confirmed = 0 WHERE email = ? AND active = 0", [email]),
 
   getSubscriberByEmail: (email) =>
     get("SELECT * FROM subscribers WHERE email = ?", [email]),
+
+  getFeatured: () =>
+    get(`SELECT p.*, (SELECT COUNT(*) FROM comments c WHERE c.post_slug = p.slug AND c.status = 'approved') as comment_count FROM posts p WHERE p.status = 'published' AND p.featured = 1 ORDER BY p.published_at DESC LIMIT 1`),
+
+  getScheduled: () =>
+    all("SELECT * FROM posts WHERE status = 'scheduled' AND scheduled_at <= datetime('now')", []),
+
+  setScheduled: (id, scheduled_at) =>
+    run("UPDATE posts SET status = 'scheduled', scheduled_at = ? WHERE id = ?", [scheduled_at, id]),
+
+  getViewsStats: () =>
+    all("SELECT substr(published_at, 1, 10) as date, SUM(views) as total_views, COUNT(*) as post_count FROM posts WHERE status = 'published' GROUP BY substr(published_at, 1, 10) ORDER BY date DESC LIMIT 30", []),
 };

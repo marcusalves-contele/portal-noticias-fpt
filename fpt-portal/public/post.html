@@ -13,6 +13,45 @@
   <title>Artigo — Frota Para Todos</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/style.css">
+  <style>
+    .badge-difficulty {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .difficulty-basico { background: #166534; color: #86efac; }
+    .difficulty-intermediario { background: #92400e; color: #fcd34d; }
+    .difficulty-avancado { background: #7f1d1d; color: #fca5a5; }
+    .summary-points {
+      background: rgba(139,35,229,0.08);
+      border-left: 3px solid #8B23E5;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin: 0 0 28px;
+    }
+    .summary-points-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #8B23E5;
+      margin-bottom: 10px;
+    }
+    .summary-points-list { margin: 0; padding-left: 20px; }
+    .summary-points-list li {
+      font-size: 14px;
+      color: #CBD5E1;
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .summary-points-list li:last-child { margin-bottom: 0; }
+  </style>
 </head>
 <body>
 
@@ -298,6 +337,7 @@
         article.innerHTML = `
           <a href="/" class="back-link">← Voltar para o portal</a>
           ${videoEmbed}
+          ${post.summary_points ? `<div class="summary-points"><div class="summary-points-title">Pontos principais</div><ul class="summary-points-list">${post.summary_points.split('|').filter(p=>p.trim()).map(p=>`<li>${esc(p.trim())}</li>`).join('')}</ul></div>` : ''}
           <div class="article-content">${post.content_html}</div>
           <div class="share-bar">
             <span class="share-label">Compartilhar:</span>
@@ -325,6 +365,7 @@
             </div>
           </div>
           ${videoEmbed}
+          ${post.summary_points ? `<div class="summary-points"><div class="summary-points-title">Pontos principais</div><ul class="summary-points-list">${post.summary_points.split('|').filter(p=>p.trim()).map(p=>`<li>${esc(p.trim())}</li>`).join('')}</ul></div>` : ''}
           <div class="article-content">${post.content_html}</div>
           <div class="share-bar">
             <span class="share-label">Compartilhar:</span>

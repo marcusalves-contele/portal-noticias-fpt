@@ -58,6 +58,17 @@ app.get('/api/posts', async (req, res) => {
   res.json(posts);
 });
 
+app.get('/api/posts/popular', async (req, res) => {
+  const { limit = 5 } = req.query;
+  const posts = await db.getPopular(Math.min(Number(limit) || 5, 20));
+  res.json(posts);
+});
+
+app.get('/api/posts/featured', async (req, res) => {
+  const post = await db.getFeatured();
+  res.json(post || null);
+});
+
 app.get('/api/posts/:slug', async (req, res) => {
   const post = await db.getBySlug(req.params.slug);
   if (!post) return res.status(404).json({ error: 'Post não encontrado' });
@@ -139,13 +150,24 @@ app.delete('/api/admin/posts/:id', requireApiKey, async (req, res) => {
 });
 
 app.put('/api/admin/posts/:id', requireApiKey, async (req, res) => {
-  const { title, excerpt, content_html, category } = req.body;
+  const { title, excerpt, content_html, category, featured, difficulty, summary_points } = req.body;
   if (!title || !content_html) {
     return res.status(400).json({ error: 'title e content_html são obrigatórios' });
   }
   try {
-    const result = await db.updatePost(Number(req.params.id), { title, excerpt, content_html, category });
+    const result = await db.updatePost(Number(req.params.id), { title, excerpt, content_html, category, featured, difficulty, summary_points });
     if (result.changes === 0) return res.status(404).json({ error: 'Post não encontrado' });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.put('/api/admin/posts/:id/schedule', requireApiKey, async (req, res) => {
+  const { scheduled_at } = req.body;
+  if (!scheduled_at) return res.status(400).json({ error: 'scheduled_at obrigatório' });
+  try {
+    await db.setScheduled(Number(req.params.id), scheduled_at);
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -439,10 +461,28 @@ async function syncYouTubeVideos() {
 // Cron: todo dia às 7h verifica novos vídeos no YouTube
 cron.schedule('0 7 * * *', syncYouTubeVideos, { timezone: 'America/Sao_Paulo' });
 
+// Cron: a cada 5 minutos, publica posts agendados
+cron.schedule('*/5 * * * *', async () => {
+  try {
+    const scheduled = await db.getScheduled();
+    for (const post of scheduled) {
+      await db.publish(post.id);
+      console.log(`[Scheduler] Post publicado: "${post.title}" (id=${post.id})`);
+    }
+  } catch (e) {
+    console.error('[Scheduler] Erro:', e.message);
+  }
+}, { timezone: 'America/Sao_Paulo' });
+
 // Endpoint manual para forçar sync
 app.post('/api/admin/sync-youtube', requireApiKey, async (req, res) => {
   const result = await syncYouTubeVideos();
   res.json(result);
+});
+
+app.get('/api/admin/analytics/views', requireApiKey, async (req, res) => {
+  const stats = await db.getViewsStats();
+  res.json(stats);
 });
 
 app.post('/api/admin/newsletter/send', requireApiKey, async (req, res) => {
@@ -540,6 +580,11 @@ app.get('/sitemap.xml', async (req, res) => {
   } catch (e) {
     res.status(500).send('Erro ao gerar sitemap');
   }
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain');
+  res.send(`User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: ${process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br'}/sitemap.xml`);
 });
 
 app.listen(PORT, () => {

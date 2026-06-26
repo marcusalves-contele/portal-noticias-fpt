@@ -37,6 +37,9 @@
 .btn-edit:hover { background:#8B23E5; }
 .btn-save { background:#8B23E5; color:#fff; border:none; padding:9px 20px; border-radius:6px; cursor:pointer; font-weight:600; }
 .btn-cancel-edit { background:transparent; color:#94A3B8; border:1px solid #2d2044; padding:9px 20px; border-radius:6px; cursor:pointer; }
+.stat-card { background:#120820; border:1px solid #2d2044; border-radius:12px; padding:20px; text-align:center; }
+.stat-number { font-size:32px; font-weight:800; color:#8B23E5; }
+.stat-label { font-size:13px; color:#94A3B8; margin-top:4px; }
   </style>
 </head>
 <body>
@@ -72,6 +75,10 @@
         <button class="tab-btn" onclick="switchTab('newsletter')" id="tab-newsletter"
           style="padding:10px 20px;background:transparent;border:none;border-bottom:2px solid transparent;color:#94A3B8;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:-1px;">
           Newsletter
+        </button>
+        <button class="tab-btn" onclick="switchTab('analytics')" id="tab-analytics"
+          style="padding:10px 20px;background:transparent;border:none;border-bottom:2px solid transparent;color:#94A3B8;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:-1px;">
+          📊 Analytics
         </button>
       </div>
 
@@ -112,6 +119,12 @@
         <div id="subscribers-list"></div>
       </div>
 
+      <!-- Analytics Tab -->
+      <div id="analytics-tab" style="display:none">
+        <h2 style="margin-bottom:24px;">Analytics</h2>
+        <div id="analytics-content"><div class="loading">Carregando...</div></div>
+      </div>
+
       <!-- Comments Tab -->
       <div id="comments-tab" style="display:none">
         <div id="pending-comments-section">
@@ -145,6 +158,21 @@
     <input type="text" id="editExcerpt" placeholder="Resumo curto..." />
     <label>Conteúdo HTML</label>
     <textarea id="editContentHtml" placeholder="<p>Conteúdo...</p>"></textarea>
+    <label>Nível</label>
+    <select id="editDifficulty">
+      <option value="">Sem nível</option>
+      <option value="basico">Básico</option>
+      <option value="intermediario">Intermediário</option>
+      <option value="avancado">Avançado</option>
+    </select>
+    <label>Resumo em 3 pontos <span style="font-size:11px;color:#94A3B8;">(um por linha, máx. 3)</span></label>
+    <textarea id="editSummary" rows="3" placeholder="Ponto 1&#10;Ponto 2&#10;Ponto 3" style="min-height:80px;"></textarea>
+    <label>Agendar publicação <span style="font-size:11px;color:#94A3B8;">(opcional)</span></label>
+    <input type="datetime-local" id="editScheduled" />
+    <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:14px;">
+      <input type="checkbox" id="editFeatured" style="width:16px;height:16px;">
+      Destacar na homepage (Featured)
+    </label>
     <div class="edit-modal-actions">
       <button class="btn-cancel-edit" onclick="closeEditModal()">Cancelar</button>
       <button class="btn-save" onclick="saveEdit()">Salvar</button>
@@ -168,12 +196,13 @@
   }
 
   function switchTab(tab) {
-    ['posts', 'comments', 'newsletter'].forEach(t => {
+    ['posts', 'comments', 'newsletter', 'analytics'].forEach(t => {
       document.getElementById(`${t}-tab`).style.display = t === tab ? 'block' : 'none';
       document.getElementById(`tab-${t}`).style.borderBottomColor = t === tab ? '#8B23E5' : 'transparent';
       document.getElementById(`tab-${t}`).style.color = t === tab ? '#F7F7F7' : '#94A3B8';
     });
     if (tab === 'newsletter') loadNewsletter();
+    if (tab === 'analytics') loadAnalytics();
   }
 
   async function loadAdmin() {
@@ -390,6 +419,10 @@
     document.getElementById('editCategory').value = post.category || 'videos';
     document.getElementById('editExcerpt').value = post.excerpt || '';
     document.getElementById('editContentHtml').value = post.content_html || '';
+    document.getElementById('editDifficulty').value = post.difficulty || '';
+    document.getElementById('editSummary').value = (post.summary_points || '').split('|').filter(Boolean).join('\n');
+    document.getElementById('editScheduled').value = post.scheduled_at ? post.scheduled_at.replace(' ', 'T').substring(0, 16) : '';
+    document.getElementById('editFeatured').checked = !!post.featured;
     document.getElementById('editModalOverlay').classList.add('open');
   }
 
@@ -408,14 +441,56 @@
     const category = document.getElementById('editCategory').value;
     const excerpt = document.getElementById('editExcerpt').value.trim();
     const content_html = document.getElementById('editContentHtml').value.trim();
+    const difficulty = document.getElementById('editDifficulty').value;
+    const summary_points = document.getElementById('editSummary').value.trim().split('\n').filter(l => l.trim()).slice(0, 3).join('|');
+    const featured = document.getElementById('editFeatured').checked;
+    const scheduled_at = document.getElementById('editScheduled').value;
     if (!title || !content_html) return alert('Título e conteúdo são obrigatórios');
     const r = await fetch(`/api/admin/posts/${editingPostId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'x-api-key': currentKey },
-      body: JSON.stringify({ title, excerpt, content_html, category })
+      body: JSON.stringify({ title, excerpt, content_html, category, difficulty, summary_points, featured })
     });
-    if (r.ok) { closeEditModal(); loadAdmin(); }
-    else alert('Erro ao salvar');
+    if (!r.ok) return alert('Erro ao salvar');
+    if (scheduled_at) {
+      await fetch(`/api/admin/posts/${editingPostId}/schedule`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': currentKey },
+        body: JSON.stringify({ scheduled_at: scheduled_at.replace('T', ' ') })
+      });
+    }
+    closeEditModal();
+    loadAdmin();
+  }
+
+  async function loadAnalytics() {
+    const el = document.getElementById('analytics-content');
+    try {
+      const [stats, popular] = await Promise.all([
+        fetch('/api/admin/analytics/views', { headers: { 'x-api-key': currentKey } }).then(r => r.json()),
+        fetch('/api/posts/popular?limit=10').then(r => r.json())
+      ]);
+      const totalViews = popular.reduce((s, p) => s + (p.views || 0), 0);
+      const topPosts = popular.map((p, i) => `
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #1e1035;">
+          <div style="font-size:22px;font-weight:900;color:#3a3a5a;min-width:28px;">${i+1}</div>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;">${escapeHtml(p.title)}</div>
+            <div style="font-size:12px;color:#94A3B8;margin-top:2px;">👁 ${p.views} views · ${escapeHtml(p.category)}</div>
+          </div>
+          <a href="/post/${p.slug}" target="_blank" style="font-size:12px;color:#8B23E5;">Ver →</a>
+        </div>`).join('');
+      el.innerHTML = `
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:32px;">
+          <div class="stat-card"><div class="stat-number">${totalViews.toLocaleString('pt-BR')}</div><div class="stat-label">Total de Views</div></div>
+          <div class="stat-card"><div class="stat-number">${popular.length}</div><div class="stat-label">Posts Publicados</div></div>
+          <div class="stat-card"><div class="stat-number">${popular.length ? Math.round(totalViews/popular.length) : 0}</div><div class="stat-label">Média por Post</div></div>
+        </div>
+        <h3 style="margin-bottom:16px;font-size:16px;">Top Posts por Views</h3>
+        <div>${topPosts || '<div class="empty-state">Nenhum post com views ainda.</div>'}</div>`;
+    } catch(e) {
+      el.innerHTML = '<div style="color:#ef4444;">Erro ao carregar analytics.</div>';
+    }
   }
 
   // --- Filtro de posts ---

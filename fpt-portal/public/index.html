@@ -75,6 +75,8 @@
     </div>
   </div>
 
+  <div id="featured-hero-section"></div>
+
   <div id="posts-grid" class="posts-grid"></div>
 
   <div id="load-more-wrap" style="text-align:center;margin-bottom:48px;display:none;">
@@ -93,6 +95,13 @@
         <button type="submit" class="btn">Quero receber</button>
       </form>
       <p id="nl-msg" style="display:none;margin-top:12px;font-size:14px;"></p>
+    </div>
+  </section>
+
+  <section class="popular-section" id="popular-section" style="display:none">
+    <div class="container">
+      <h2 class="section-title">🔥 Mais lidos</h2>
+      <div id="popular-list" class="popular-list"></div>
     </div>
   </section>
 </main>
@@ -150,6 +159,20 @@
     return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   }
 
+  function relativeDate(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const days = Math.floor(diff / 86400000);
+    if (days === 0) return 'hoje';
+    if (days === 1) return 'ontem';
+    if (days < 7) return `há ${days} dias`;
+    if (days < 30) return `há ${Math.floor(days/7)} sem.`;
+    return formatDate(iso);
+  }
+
+  function isNew(iso) {
+    return (Date.now() - new Date(iso).getTime()) < 7 * 86400000;
+  }
+
   function getPostImage(post) {
     if (post.image_url) return post.image_url;
     if (post.video_id) return `https://img.youtube.com/vi/${post.video_id}/maxresdefault.jpg`;
@@ -195,11 +218,13 @@
         </div>
         <div class="card-body">
           <span class="badge" data-cat="${esc(post.category)}">${CATEGORY_LABELS[post.category] || esc(post.category)}</span>
+          ${isNew(post.published_at) ? '<span class="badge-novo">Novo</span>' : ''}
           <h2 class="card-title">${esc(post.title)}</h2>
           <p class="card-excerpt">${esc(post.excerpt || '')}</p>
           <div class="card-footer">
-            <time class="card-date">${formatDate(post.published_at)}</time>
+            <time class="card-date">${relativeDate(post.published_at)}</time>
             ${post.views > 0 ? `<span class="card-views"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>${post.views}</span>` : ''}
+            ${post.comment_count > 0 ? `<span class="card-comment-count">💬 ${post.comment_count}</span>` : ''}
             <span class="card-cta">Ler →</span>
           </div>
         </div>
@@ -448,7 +473,52 @@
     location.href = `/post/${slug}`;
   }
 
+  async function loadPopular() {
+    try {
+      const posts = await fetch('/api/posts/popular?limit=5').then(r => r.json());
+      if (!posts.length) return;
+      const list = document.getElementById('popular-list');
+      list.innerHTML = posts.map(p => `
+        <div class="popular-item" onclick="trackAndOpen('${p.slug}')" style="cursor:pointer">
+          <div class="popular-rank">${posts.indexOf(p)+1}</div>
+          <div class="popular-info">
+            <span class="badge badge-sm" data-cat="${esc(p.category)}">${CATEGORY_LABELS[p.category]||esc(p.category)}</span>
+            <div class="popular-title">${esc(p.title)}</div>
+            <div class="popular-meta">${relativeDate(p.published_at)} · 👁 ${p.views} views</div>
+          </div>
+        </div>`).join('');
+      document.getElementById('popular-section').style.display = 'block';
+    } catch(e) {}
+  }
+
+  async function loadFeatured() {
+    try {
+      const post = await fetch('/api/posts/featured').then(r => r.json());
+      if (!post) return;
+      const img = post.image_url || (post.video_id ? `https://img.youtube.com/vi/${post.video_id}/maxresdefault.jpg` : '');
+      const section = document.getElementById('featured-hero-section');
+      section.innerHTML = `
+        <div class="featured-hero" onclick="trackAndOpen('${post.slug}')" style="cursor:pointer">
+          ${img ? `<img class="featured-hero-img" src="${esc(img)}" alt="${esc(post.title)}" loading="lazy">` : '<div class="featured-hero-img featured-hero-placeholder"></div>'}
+          <div class="featured-hero-overlay"></div>
+          <div class="featured-hero-content">
+            <span class="featured-label">Em Destaque</span>
+            <span class="badge" data-cat="${esc(post.category)}">${CATEGORY_LABELS[post.category]||esc(post.category)}</span>
+            <h2 class="featured-hero-title">${esc(post.title)}</h2>
+            <p class="featured-hero-excerpt">${esc(post.excerpt||'')}</p>
+            <div class="featured-hero-meta">
+              <time>${relativeDate(post.published_at)}</time>
+              ${post.views > 0 ? `· 👁 ${post.views} views` : ''}
+              ${post.comment_count > 0 ? `· 💬 ${post.comment_count}` : ''}
+            </div>
+          </div>
+        </div>`;
+    } catch(e) {}
+  }
+
   loadSponsors();
+  loadPopular();
+  loadFeatured();
   loadPosts(currentCategory);
 </script>
 </body>
