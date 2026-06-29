@@ -1010,13 +1010,14 @@ a:hover { color: #b56fff; }
 
 .article-hero-content h1 {
   font-family: var(--fpt-font-display);
-  font-size: 44px;
+  font-size: 30px;
   font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -0.5px;
+  line-height: 1.25;
+  letter-spacing: -0.3px;
   color: #fff;
   text-shadow: 0 2px 12px rgba(0,0,0,0.5);
   margin-bottom: 16px;
+  max-width: 720px;
 }
 
 .article-hero-content .article-meta {
@@ -1272,7 +1273,7 @@ a:hover { color: #b56fff; }
   .card.featured .card-title { font-size: 18px; }
   .article-hero { height: 320px; }
   .article-hero-content { padding: 24px; }
-  .article-hero-content h1 { font-size: 28px; }
+  .article-hero-content h1 { font-size: 22px; }
   .filters { flex-wrap: nowrap; }
   .footer-grid { grid-template-columns: 1fr; gap: 32px; }
   .footer-brand p { max-width: 100%; }
