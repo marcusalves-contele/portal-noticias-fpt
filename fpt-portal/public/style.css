@@ -351,6 +351,8 @@ a:hover { color: #b56fff; }
 
 .badge {
   display: inline-block;
+  align-self: flex-start;
+  width: fit-content;
   border-radius: 4px;
   padding: 3px 10px;
   font-size: 11px;
@@ -1289,6 +1291,8 @@ a:hover { color: #b56fff; }
 /* Badge Novo */
 .badge-novo {
   display: inline-block;
+  align-self: flex-start;
+  width: fit-content;
   background: #22C55E;
   color: #fff;
   font-size: 10px;
@@ -1297,7 +1301,7 @@ a:hover { color: #b56fff; }
   border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-left: 6px;
+  margin-left: 0;
   vertical-align: middle;
 }
 
