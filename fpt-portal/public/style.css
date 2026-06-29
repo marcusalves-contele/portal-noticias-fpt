@@ -394,36 +394,51 @@ a:hover { color: #b56fff; }
 .card-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
   margin-top: auto;
   padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.06);
 }
 
 .card-date {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--fpt-text-muted);
+  flex: 1;
 }
 
 .card-views {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   font-size: 11px;
-  color: var(--fpt-text-muted);
+  color: #4a5568;
+}
+
+.card-comment-count {
+  font-size: 11px;
+  color: #4a5568;
 }
 
 .card-cta {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--fpt-purple);
-  transition: gap 0.2s ease-out;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--fpt-purple);
+  padding: 5px 12px;
+  border-radius: 20px;
   white-space: nowrap;
+  transition: background 0.2s ease, transform 0.2s ease;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
-.card:hover .card-cta { gap: 10px; }
+.card:hover .card-cta {
+  background: #a040ff;
+  transform: scale(1.04);
+}
 
 /* Artigo sem imagem (mantém layout atual) */
 .article {
