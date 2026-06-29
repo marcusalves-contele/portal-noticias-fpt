@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Syne:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   --fpt-purple:     #8B23E5;
@@ -10,8 +10,8 @@
   --fpt-text-muted: #94A3B8;
   --fpt-text-dark:  #1E1035;
   --fpt-green:      #22C55E;
-  --fpt-font-display: 'Syne', system-ui, sans-serif;
-  --fpt-font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --fpt-font-display: 'Playfair Display', Georgia, serif;
+  --fpt-font-body: 'Inter', system-ui, sans-serif;
 }
 
 ::-webkit-scrollbar { width: 6px; }
