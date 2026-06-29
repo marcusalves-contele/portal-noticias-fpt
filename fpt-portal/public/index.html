@@ -265,6 +265,13 @@
     cards.forEach(el => observer.observe(el));
   }
 
+  function updatePageTitle(category) {
+    const label = CATEGORY_LABELS[category];
+    document.title = label
+      ? `${label} — Frota Para Todos`
+      : 'Frota Para Todos — Portal de Notícias';
+  }
+
   function updateUrl() {
     const p = new URLSearchParams();
     if (currentCategory) p.set('category', currentCategory);
@@ -413,6 +420,7 @@
       currentCategory = btn.dataset.category;
       currentPage = 1;
       updateUrl();
+      updatePageTitle(currentCategory);
       loadPosts(currentCategory);
     });
   });
@@ -548,6 +556,8 @@
   loadFeatured();
   loadPosts(currentCategory);
 
+  updatePageTitle(currentCategory);
+
   window.addEventListener('popstate', () => {
     const p = new URLSearchParams(location.search);
     currentCategory = p.get('category') || '';
@@ -555,6 +565,7 @@
     document.querySelectorAll('.filter-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.category === currentCategory);
     });
+    updatePageTitle(currentCategory);
     loadPosts(currentCategory);
   });
 </script>
