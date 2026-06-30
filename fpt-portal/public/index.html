@@ -8,6 +8,8 @@
   <meta property="og:title" content="Frota Para Todos — Portal de Notícias">
   <meta property="og:description" content="Referência editorial em gestão de frotas. Notícias, análises e conteúdo prático para gestores do Brasil.">
   <meta property="og:type" content="website">
+  <meta property="og:image" content="https://images.contelege.com.br/Conteudos/FPT/frota-para-todos-2025.png">
+  <link rel="alternate" type="application/rss+xml" title="Frota Para Todos — RSS" href="/feed.xml">
   <meta property="og:site_name" content="Frota Para Todos">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/style.css">
@@ -53,6 +55,9 @@
   <a href="/?category=entrevistas" onclick="toggleMobileNav()">Entrevistas</a>
   <a href="/?category=videos" onclick="toggleMobileNav()">Vídeos</a>
   <a href="/about" onclick="toggleMobileNav()">Sobre</a>
+  <a href="/comece-aqui" onclick="toggleMobileNav()">Comece Aqui</a>
+  <a href="/glossario" onclick="toggleMobileNav()">Glossário</a>
+  <a href="/calculadora-cpk" onclick="toggleMobileNav()">Calculadora CPK</a>
 </div>
 
 <!-- Ticker de últimas notícias -->
@@ -516,7 +521,8 @@
     const empty = document.getElementById('search-empty');
     document.querySelector('.hero-wrapper').style.display = 'none';
     document.getElementById('posts-grid').style.display = 'none';
-    document.getElementById('load-more-wrap').style.display = 'none';
+    const paginationWrap = document.getElementById('pagination-wrap');
+    if (paginationWrap) paginationWrap.style.display = 'none';
     overlay.style.display = 'block';
     grid.innerHTML = renderSkeleton(3);
     try {
