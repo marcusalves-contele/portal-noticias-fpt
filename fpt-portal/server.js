@@ -594,7 +594,7 @@ app.post('/api/admin/send-digest', requireApiKey, async (req, res) => {
         <div style="clear:both"></div>
       </td></tr>`;
     }).join('');
-    const html = `<!DOCTYPE html><html><body style="background:#080010;color:#F7F7F7;font-family:Arial,sans-serif;">
+    const htmlTemplate = `<!DOCTYPE html><html><body style="background:#080010;color:#F7F7F7;font-family:Arial,sans-serif;">
       <table width="600" align="center" style="padding:32px 24px;">
         <tr><td style="padding-bottom:24px;border-bottom:2px solid #8B23E5;">
           <span style="font-size:22px;font-weight:900;">Frota Para <span style="color:#8B23E5;">Todos</span></span>
@@ -603,7 +603,7 @@ app.post('/api/admin/send-digest', requireApiKey, async (req, res) => {
         ${postsHtml}
         <tr><td style="padding-top:24px;font-size:12px;color:#4a4a6a;text-align:center;">
           <a href="${baseUrl}" style="color:#8B23E5;">Ver todos os artigos</a> ·
-          <a href="${baseUrl}/unsubscribe" style="color:#4a4a6a;">Descadastrar</a>
+          <a href="{{unsubscribe_url}}" style="color:#4a4a6a;">Descadastrar</a>
         </td></tr>
       </table></body></html>`;
     const transporter = require('nodemailer').createTransport({
@@ -613,6 +613,9 @@ app.post('/api/admin/send-digest', requireApiKey, async (req, res) => {
     let sent = 0;
     for (const sub of subscribers) {
       try {
+        const token = unsubscribeToken(sub.email);
+        const html = htmlTemplate.replace('{{unsubscribe_url}}',
+          `${baseUrl}/unsubscribe?email=${encodeURIComponent(sub.email)}&token=${token}`);
         await transporter.sendMail({ from: `"Frota Para Todos" <${process.env.SMTP_USER}>`, to: sub.email, subject: '🚛 Frota Para Todos — Os mais lidos desta semana', html });
         sent++;
       } catch(e) {}
@@ -703,6 +706,9 @@ app.get('/sitemap.xml', async (req, res) => {
     const staticUrls = [
       `<url><loc>${base}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>`,
       `<url><loc>${base}/about</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>`,
+      `<url><loc>${base}/comece-aqui</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>`,
+      `<url><loc>${base}/glossario</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>`,
+      `<url><loc>${base}/calculadora-cpk</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>`,
     ];
     const postUrls = posts.map(p => {
       const lastmod = p.published_at ? p.published_at.substring(0, 10) : '';
@@ -720,7 +726,7 @@ app.get('/sitemap.xml', async (req, res) => {
 
 app.get('/robots.txt', (req, res) => {
   res.setHeader('Content-Type', 'text/plain');
-  res.send(`User-agent: *\nAllow: /\nDisallow: /admin\nSitemap: ${process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br'}/sitemap.xml`);
+  res.send(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nSitemap: ${process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br'}/sitemap.xml`);
 });
 
 // 404 catch-all (deve ser o último middleware)
