@@ -73,6 +73,17 @@ db.serialize(() => {
   db.run(`ALTER TABLE posts ADD COLUMN difficulty TEXT DEFAULT ''`, () => {});
   db.run(`ALTER TABLE posts ADD COLUMN summary_points TEXT DEFAULT ''`, () => {});
   db.run(`ALTER TABLE posts ADD COLUMN scheduled_at DATETIME`, () => {});
+  db.run(`ALTER TABLE posts ADD COLUMN tags TEXT DEFAULT ''`, () => {});
+
+  // Tabela de eventos de view (para gráfico por dia)
+  db.run(`
+    CREATE TABLE IF NOT EXISTS view_events (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      post_slug  TEXT NOT NULL,
+      viewed_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  db.run(`CREATE INDEX IF NOT EXISTS idx_view_events_date ON view_events (viewed_at)`);
 });
 
 // Helpers promisificados
@@ -93,13 +104,19 @@ const get = (sql, params = []) => new Promise((resolve, reject) => {
 
 module.exports = {
   // --- Posts ---
-  getPublished: (limit = 20, offset = 0, category = null) => {
+  getPublished: (limit = 20, offset = 0, category = null, tag = null) => {
     const commentSub = `(SELECT COUNT(*) FROM comments c WHERE c.post_slug = p.slug AND c.status = 'approved') as comment_count`;
     if (category) {
       return all(`SELECT p.*, ${commentSub} FROM posts p WHERE p.status = 'published' AND p.category = ? ORDER BY p.published_at DESC LIMIT ? OFFSET ?`, [category, limit, offset]);
     }
+    if (tag) {
+      return all(`SELECT p.*, ${commentSub} FROM posts p WHERE p.status = 'published' AND (',' || p.tags || ',') LIKE ? ORDER BY p.published_at DESC LIMIT ? OFFSET ?`, [`%,${tag},%`, limit, offset]);
+    }
     return all(`SELECT p.*, ${commentSub} FROM posts p WHERE p.status = 'published' ORDER BY p.published_at DESC LIMIT ? OFFSET ?`, [limit, offset]);
   },
+
+  getAllTags: () =>
+    all("SELECT tags FROM posts WHERE status = 'published' AND tags != ''"),
 
   getRecentPublished: (limit = 5) =>
     all("SELECT * FROM posts WHERE status = 'published' ORDER BY published_at DESC LIMIT ?", [limit]),
@@ -115,10 +132,10 @@ module.exports = {
 
   createPost: (data) =>
     run(
-      `INSERT INTO posts (title, slug, content_html, excerpt, image_url, video_id, category, status, featured, difficulty, summary_points)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`,
+      `INSERT INTO posts (title, slug, content_html, excerpt, image_url, video_id, category, status, featured, difficulty, summary_points, tags)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)`,
       [data.title, data.slug, data.content_html, data.excerpt || '', data.image_url || '', data.video_id || '', data.category || 'videos',
-       data.featured ? 1 : 0, data.difficulty || '', data.summary_points || '']
+       data.featured ? 1 : 0, data.difficulty || '', data.summary_points || '', data.tags || '']
     ),
 
   publish: (id) =>
@@ -129,9 +146,9 @@ module.exports = {
 
   updatePost: (id, data) =>
     run(
-      `UPDATE posts SET title = ?, excerpt = ?, content_html = ?, category = ?, featured = ?, difficulty = ?, summary_points = ?, image_url = ? WHERE id = ?`,
+      `UPDATE posts SET title = ?, excerpt = ?, content_html = ?, category = ?, featured = ?, difficulty = ?, summary_points = ?, image_url = ?, tags = ? WHERE id = ?`,
       [data.title, data.excerpt || '', data.content_html, data.category || 'videos',
-       data.featured ? 1 : 0, data.difficulty || '', data.summary_points || '', data.image_url || '', id]
+       data.featured ? 1 : 0, data.difficulty || '', data.summary_points || '', data.image_url || '', data.tags || '', id]
     ),
 
   deletePost: (id) =>
@@ -194,6 +211,29 @@ module.exports = {
 
   incrementView: (slug) =>
     run("UPDATE posts SET views = views + 1 WHERE slug = ? AND status = 'published'", [slug]),
+
+  addViewEvent: (slug) =>
+    run("INSERT INTO view_events (post_slug) VALUES (?)", [slug]),
+
+  getViewsDaily: () =>
+    all(`
+      SELECT date(viewed_at) as date, COUNT(*) as count
+      FROM view_events
+      WHERE viewed_at >= date('now', '-30 days')
+      GROUP BY date(viewed_at)
+      ORDER BY date ASC
+    `),
+
+  getTopViewedLastWeek: (limit = 3) =>
+    all(`
+      SELECT p.title, p.slug, p.excerpt, p.image_url, p.video_id, COUNT(v.id) as week_views
+      FROM view_events v
+      JOIN posts p ON p.slug = v.post_slug
+      WHERE v.viewed_at >= date('now', '-7 days') AND p.status = 'published'
+      GROUP BY p.slug
+      ORDER BY week_views DESC
+      LIMIT ?
+    `, [limit]),
 
   getPopular: (limit = 5) =>
     all(`SELECT p.*, (SELECT COUNT(*) FROM comments c WHERE c.post_slug = p.slug AND c.status = 'approved') as comment_count FROM posts p WHERE p.status = 'published' ORDER BY p.views DESC LIMIT ?`, [limit]),

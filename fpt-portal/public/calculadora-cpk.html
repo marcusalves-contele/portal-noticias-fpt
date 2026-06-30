@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de CPK — Frota Para Todos</title>
+  <meta name="description" content="Calcule o Custo por Quilômetro (CPK) da sua frota e descubra se está dentro do benchmark do setor.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .calc-wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px; }
+    .calc-title { font-family: 'Playfair Display', Georgia, serif; font-size: 36px; font-weight: 900; margin-bottom: 8px; }
+    .calc-sub { color: #94A3B8; font-size: 16px; margin-bottom: 40px; }
+    .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+    @media (max-width: 600px) { .calc-grid { grid-template-columns: 1fr; } }
+    .calc-field { display: flex; flex-direction: column; gap: 6px; }
+    .calc-field label { font-size: 13px; font-weight: 600; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; }
+    .calc-field input {
+      background: #0f0520; border: 1px solid rgba(139,35,229,0.25); border-radius: 8px;
+      color: #F7F7F7; font-size: 16px; padding: 12px 16px; outline: none; transition: border-color 0.2s;
+    }
+    .calc-field input:focus { border-color: #8B23E5; }
+    .calc-field input::placeholder { color: #4a4a6a; }
+    .result-box {
+      background: linear-gradient(135deg, rgba(139,35,229,0.12), rgba(139,35,229,0.04));
+      border: 1px solid rgba(139,35,229,0.3); border-radius: 16px; padding: 32px; margin-bottom: 24px;
+    }
+    .result-cpk { font-family: 'Playfair Display', Georgia, serif; font-size: 56px; font-weight: 900; color: #8B23E5; line-height: 1; }
+    .result-unit { font-size: 18px; color: #94A3B8; margin-top: 4px; }
+    .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-top: 24px; }
+    .result-item { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 16px; }
+    .result-item-label { font-size: 11px; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .result-item-val { font-size: 20px; font-weight: 700; color: #F7F7F7; }
+    .badge-result {
+      display: inline-block; padding: 6px 16px; border-radius: 20px; font-size: 13px;
+      font-weight: 700; margin-top: 16px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .badge-excelente { background: #166534; color: #86efac; }
+    .badge-bom { background: #1e3a5f; color: #93c5fd; }
+    .badge-atencao { background: #78350f; color: #fcd34d; }
+    .badge-critico { background: #7f1d1d; color: #fca5a5; }
+    .bench-table { width: 100%; border-collapse: collapse; margin-top: 32px; font-size: 13px; }
+    .bench-table th { color: #94A3B8; text-align: left; padding: 8px 12px; border-bottom: 1px solid rgba(139,35,229,0.15); font-weight: 600; }
+    .bench-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .btn-clear { background: transparent; border: 1px solid rgba(139,35,229,0.3); color: #94A3B8; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; margin-top: 8px; }
+    .btn-clear:hover { border-color: #8B23E5; color: #F7F7F7; }
+  </style>
+</head>
+<body>
+<header class="header">
+  <a href="/" class="header-logo">Frota Para <span>Todos</span></a>
+  <nav class="header-nav">
+    <a href="/">Início</a>
+    <a href="/?category=noticias">Notícias</a>
+    <a href="/?category=analises">Análises</a>
+    <a href="/glossario">Glossário</a>
+    <a href="/comece-aqui">Comece Aqui</a>
+  </nav>
+</header>
+
+<main>
+  <div class="calc-wrap">
+    <div style="margin-bottom: 8px;">
+      <a href="/" style="color:#94A3B8;font-size:13px;">← Portal</a>
+    </div>
+    <h1 class="calc-title">Calculadora de CPK</h1>
+    <p class="calc-sub">Descubra o Custo por Quilômetro da sua frota e compare com o benchmark do setor.</p>
+
+    <div class="calc-grid">
+      <div class="calc-field">
+        <label>Combustível (R$/mês)</label>
+        <input type="number" id="f-combustivel" placeholder="Ex: 8500" min="0" oninput="calcular()">
+      </div>
+      <div class="calc-field">
+        <label>Manutenção (R$/mês)</label>
+        <input type="number" id="f-manutencao" placeholder="Ex: 2000" min="0" oninput="calcular()">
+      </div>
+      <div class="calc-field">
+        <label>Pneus (R$/mês)</label>
+        <input type="number" id="f-pneus" placeholder="Ex: 800" min="0" oninput="calcular()">
+      </div>
+      <div class="calc-field">
+        <label>Outros custos (R$/mês)</label>
+        <input type="number" id="f-outros" placeholder="Ex: 500" min="0" oninput="calcular()">
+      </div>
+      <div class="calc-field" style="grid-column: 1 / -1;">
+        <label>Quilometragem mensal (km)</label>
+        <input type="number" id="f-km" placeholder="Ex: 12000" min="1" oninput="calcular()">
+      </div>
+    </div>
+
+    <button class="btn-clear" onclick="limpar()">Limpar campos</button>
+
+    <div class="result-box" id="result-box" style="display:none;margin-top:32px;">
+      <div style="font-size:13px;color:#94A3B8;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px;">CPK Total</div>
+      <div class="result-cpk" id="res-cpk">R$ 0,00</div>
+      <div class="result-unit">por quilômetro</div>
+      <div id="res-badge"></div>
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="result-item-label">CPK Combustível</div>
+          <div class="result-item-val" id="res-cpk-comb">—</div>
+        </div>
+        <div class="result-item">
+          <div class="result-item-label">Custo mensal total</div>
+          <div class="result-item-val" id="res-total">—</div>
+        </div>
+        <div class="result-item">
+          <div class="result-item-label">Projeção anual</div>
+          <div class="result-item-val" id="res-anual">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:48px;">
+      <h2 style="font-family:'Playfair Display',Georgia,serif;font-size:22px;margin-bottom:16px;">Benchmark do setor</h2>
+      <p style="font-size:14px;color:#94A3B8;margin-bottom:16px;">Valores de referência para frotas leves (utilitários e vans):</p>
+      <table class="bench-table">
+        <thead>
+          <tr>
+            <th>Classificação</th>
+            <th>CPK (R$/km)</th>
+            <th>O que significa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="badge-result badge-excelente">Excelente</span></td><td>Abaixo de R$ 0,45</td><td>Operação muito eficiente</td></tr>
+          <tr><td><span class="badge-result badge-bom">Bom</span></td><td>R$ 0,45 – R$ 0,75</td><td>Dentro do padrão do setor</td></tr>
+          <tr><td><span class="badge-result badge-atencao">Atenção</span></td><td>R$ 0,75 – R$ 1,20</td><td>Revisar processos</td></tr>
+          <tr><td><span class="badge-result badge-critico">Crítico</span></td><td>Acima de R$ 1,20</td><td>Ação imediata necessária</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px;color:#4a4a6a;margin-top:12px;">* Para caminhões semipesados, o benchmark é R$ 1,20 – R$ 1,80/km.</p>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="footer-logo">Frota Para <span>Todos</span></span>
+      <p>Conteúdo prático e independente para gestores de frota do Brasil.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Ferramentas</h4>
+      <a href="/calculadora-cpk">Calculadora CPK</a>
+      <a href="/glossario">Glossário</a>
+      <a href="/comece-aqui">Comece Aqui</a>
+    </div>
+    <div class="footer-links">
+      <h4>Portal</h4>
+      <a href="/">Início</a>
+      <a href="/about">Sobre</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Frota Para Todos · Julio César · Patrocinado por <a href="https://contelerastreador.com.br" target="_blank">Contele Fleet</a></p>
+  </div>
+</footer>
+
+<script>
+  function fmt(val) {
+    return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function calcular() {
+    const comb = parseFloat(document.getElementById('f-combustivel').value) || 0;
+    const manut = parseFloat(document.getElementById('f-manutencao').value) || 0;
+    const pneus = parseFloat(document.getElementById('f-pneus').value) || 0;
+    const outros = parseFloat(document.getElementById('f-outros').value) || 0;
+    const km = parseFloat(document.getElementById('f-km').value) || 0;
+
+    if (km <= 0) { document.getElementById('result-box').style.display = 'none'; return; }
+
+    const total = comb + manut + pneus + outros;
+    const cpk = total / km;
+    const cpkComb = comb / km;
+    const anual = total * 12;
+
+    document.getElementById('result-box').style.display = 'block';
+    document.getElementById('res-cpk').textContent = fmt(cpk);
+    document.getElementById('res-cpk-comb').textContent = fmt(cpkComb) + '/km';
+    document.getElementById('res-total').textContent = fmt(total);
+    document.getElementById('res-anual').textContent = fmt(anual);
+
+    let badge = '';
+    if (cpk < 0.45) badge = '<span class="badge-result badge-excelente">Excelente</span>';
+    else if (cpk < 0.75) badge = '<span class="badge-result badge-bom">Bom</span>';
+    else if (cpk < 1.20) badge = '<span class="badge-result badge-atencao">Atenção</span>';
+    else badge = '<span class="badge-result badge-critico">Crítico</span>';
+    document.getElementById('res-badge').innerHTML = badge;
+  }
+
+  function limpar() {
+    ['f-combustivel','f-manutencao','f-pneus','f-outros','f-km'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('result-box').style.display = 'none';
+  }
+
+  window.addEventListener('scroll', () => {
+    document.querySelector('.header').classList.toggle('header--scrolled', window.scrollY > 10);
+  }, { passive: true });
+</script>
+</body>
+</html>

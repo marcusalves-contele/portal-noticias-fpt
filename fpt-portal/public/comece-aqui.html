@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comece Aqui — Frota Para Todos</title>
+  <meta name="description" content="Guia de leitura para gestores de frota iniciantes. Trilhas de conteúdo organizadas por tema e nível de maturidade.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .comece-wrap { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+    .comece-title { font-family: 'Playfair Display', Georgia, serif; font-size: 36px; font-weight: 900; margin-bottom: 8px; }
+    .comece-sub { color: #94A3B8; font-size: 16px; margin-bottom: 48px; max-width: 600px; line-height: 1.7; }
+    .trilha { background: #0f0520; border: 1px solid rgba(139,35,229,0.2); border-radius: 16px; padding: 28px; margin-bottom: 24px; transition: border-color 0.2s; }
+    .trilha:hover { border-color: rgba(139,35,229,0.5); }
+    .trilha-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+    .trilha-num { font-family: 'Playfair Display', Georgia, serif; font-size: 48px; font-weight: 900; color: rgba(139,35,229,0.25); line-height: 1; min-width: 52px; }
+    .trilha-info h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+    .trilha-info p { font-size: 14px; color: #94A3B8; line-height: 1.6; }
+    .trilha-artigos { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .trilha-artigos li a { display: flex; align-items: center; gap: 10px; color: #CBD5E1; font-size: 14px; text-decoration: none; padding: 10px 14px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); transition: all 0.2s; }
+    .trilha-artigos li a:hover { background: rgba(139,35,229,0.08); border-color: rgba(139,35,229,0.2); color: #F7F7F7; }
+    .trilha-artigos li a::before { content: '→'; color: #8B23E5; font-weight: 700; flex-shrink: 0; }
+    .trilha-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 4px; margin-left: auto; flex-shrink: 0; }
+    .tag-basico { background: #166534; color: #86efac; }
+    .tag-inter { background: #78350f; color: #fcd34d; }
+    .tag-avancado { background: #7f1d1d; color: #fca5a5; }
+    .cta-box { background: linear-gradient(135deg, rgba(139,35,229,0.15), rgba(139,35,229,0.05)); border: 1px solid rgba(139,35,229,0.3); border-radius: 16px; padding: 32px; margin-top: 48px; text-align: center; }
+    .cta-box h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 24px; margin-bottom: 8px; }
+    .cta-box p { color: #94A3B8; font-size: 14px; margin-bottom: 20px; }
+    .cta-form { display: flex; gap: 8px; max-width: 400px; margin: 0 auto; }
+    .cta-form input { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(139,35,229,0.3); border-radius: 8px; color: #F7F7F7; font-size: 14px; padding: 10px 14px; outline: none; }
+    .cta-form input:focus { border-color: #8B23E5; }
+    @media (max-width: 500px) { .cta-form { flex-direction: column; } }
+  </style>
+</head>
+<body>
+<header class="header">
+  <a href="/" class="header-logo">Frota Para <span>Todos</span></a>
+  <nav class="header-nav">
+    <a href="/">Início</a>
+    <a href="/?category=analises">Análises</a>
+    <a href="/calculadora-cpk">Calculadora CPK</a>
+    <a href="/glossario">Glossário</a>
+  </nav>
+</header>
+
+<main>
+  <div class="comece-wrap">
+    <div style="margin-bottom:8px;"><a href="/" style="color:#94A3B8;font-size:13px;">← Portal</a></div>
+    <h1 class="comece-title">Por onde começar</h1>
+    <p class="comece-sub">Se você está chegando agora no mundo da gestão de frotas — ou quer organizar melhor o que já sabe — este guia de leitura te mostra o caminho. Escolha a trilha pelo seu momento atual.</p>
+
+    <div class="trilha">
+      <div class="trilha-header">
+        <div class="trilha-num">01</div>
+        <div class="trilha-info">
+          <h2>Fundamentos da Gestão de Frotas</h2>
+          <p>O ponto de partida. Entenda os conceitos básicos que todo gestor precisa dominar antes de qualquer tecnologia ou ferramenta.</p>
+        </div>
+      </div>
+      <ul class="trilha-artigos">
+        <li><a href="/?category=analises">O que é CPK e por que ele é o indicador mais importante <span class="trilha-tag tag-basico">Básico</span></a></li>
+        <li><a href="/?category=analises">Como criar uma política de frota do zero <span class="trilha-tag tag-basico">Básico</span></a></li>
+        <li><a href="/?category=analises">Checklist de vistoria diária: o que verificar antes de sair <span class="trilha-tag tag-basico">Básico</span></a></li>
+        <li><a href="/?category=analises">Frota própria vs terceirizada: como decidir <span class="trilha-tag tag-basico">Básico</span></a></li>
+      </ul>
+    </div>
+
+    <div class="trilha">
+      <div class="trilha-header">
+        <div class="trilha-num">02</div>
+        <div class="trilha-info">
+          <h2>Tecnologia e Rastreamento</h2>
+          <p>Como usar rastreamento, telemetria e apps para ter visibilidade total da sua operação em tempo real.</p>
+        </div>
+      </div>
+      <ul class="trilha-artigos">
+        <li><a href="/?category=analises">O que é telemetria e como ela diferencia a gestão de frotas <span class="trilha-tag tag-basico">Básico</span></a></li>
+        <li><a href="/?category=analises">Rastreamento veicular: GPS básico vs telemetria avançada <span class="trilha-tag tag-inter">Intermediário</span></a></li>
+        <li><a href="/?category=analises">Score do motorista: como usar dados para treinar sua equipe <span class="trilha-tag tag-inter">Intermediário</span></a></li>
+        <li><a href="/?category=analises">App do motorista: o que considerar antes de implementar <span class="trilha-tag tag-inter">Intermediário</span></a></li>
+      </ul>
+    </div>
+
+    <div class="trilha">
+      <div class="trilha-header">
+        <div class="trilha-num">03</div>
+        <div class="trilha-info">
+          <h2>Redução de Custos Operacionais</h2>
+          <p>Onde está o dinheiro escondido na sua frota — e como recuperá-lo com manutenção preditiva, controle de combustível e gestão de pneus.</p>
+        </div>
+      </div>
+      <ul class="trilha-artigos">
+        <li><a href="/?category=analises">Manutenção preventiva vs corretiva: o impacto no CPK <span class="trilha-tag tag-basico">Básico</span></a></li>
+        <li><a href="/?category=analises">Como reduzir o consumo de combustível em 15% sem trocar veículo <span class="trilha-tag tag-inter">Intermediário</span></a></li>
+        <li><a href="/?category=analises">Gestão de pneus: o custo invisível que come a margem da sua frota <span class="trilha-tag tag-inter">Intermediário</span></a></li>
+        <li><a href="/?category=analises">Manutenção preditiva com telemetria: como implementar <span class="trilha-tag tag-avancado">Avançado</span></a></li>
+      </ul>
+    </div>
+
+    <div class="trilha">
+      <div class="trilha-header">
+        <div class="trilha-num">04</div>
+        <div class="trilha-info">
+          <h2>Gestão de Motoristas</h2>
+          <p>Como engajar, monitorar e desenvolver motoristas — o ativo mais importante e mais negligenciado de qualquer frota.</p>
+        </div>
+      </div>
+      <ul class="trilha-artigos">
+        <li><a href="/?category=analises">Legislação de jornada do motorista: o que você precisa saber <span class="trilha-tag tag-basico">Básico</span></a></li>
+        <li><a href="/?category=analises">Como dar feedback de telemetria sem desmotivar o motorista <span class="trilha-tag tag-inter">Intermediário</span></a></li>
+        <li><a href="/?category=analises">Programa de bonificação por desempenho: exemplos que funcionam <span class="trilha-tag tag-inter">Intermediário</span></a></li>
+        <li><a href="/?category=analises">Fadiga ao volante: como monitorar e prevenir acidentes <span class="trilha-tag tag-avancado">Avançado</span></a></li>
+      </ul>
+    </div>
+
+    <div class="trilha">
+      <div class="trilha-header">
+        <div class="trilha-num">05</div>
+        <div class="trilha-info">
+          <h2>Casos de Sucesso</h2>
+          <p>Empresas reais que transformaram suas frotas. Números, estratégias e aprendizados aplicáveis ao seu contexto.</p>
+        </div>
+      </div>
+      <ul class="trilha-artigos">
+        <li><a href="/?category=casos">Como uma frota de 80 veículos reduziu 40% do custo com manutenção <span class="trilha-tag tag-basico">Básico</span></a></li>
+        <li><a href="/?category=casos">Frota de distribuição: do papel para o rastreamento em 90 dias <span class="trilha-tag tag-inter">Intermediário</span></a></li>
+        <li><a href="/?category=casos">Prevenção de acidentes com IA: resultado de 6 meses de piloto <span class="trilha-tag tag-inter">Intermediário</span></a></li>
+        <li><a href="/?category=casos">CPK de R$ 1,90 para R$ 1,10: a jornada de uma transportadora em 2 anos <span class="trilha-tag tag-avancado">Avançado</span></a></li>
+      </ul>
+    </div>
+
+    <div class="cta-box">
+      <h2>Receba a curadoria semanal</h2>
+      <p>Os melhores artigos do portal, toda segunda-feira. Gratuito.</p>
+      <form class="cta-form" onsubmit="subscribe(event)">
+        <input type="email" id="cta-email" placeholder="seu@email.com.br" required>
+        <button type="submit" class="btn">Quero receber</button>
+      </form>
+      <p id="cta-msg" style="margin-top:12px;font-size:13px;display:none;"></p>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="footer-logo">Frota Para <span>Todos</span></span>
+      <p>Conteúdo prático e independente para gestores de frota do Brasil.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Ferramentas</h4>
+      <a href="/calculadora-cpk">Calculadora CPK</a>
+      <a href="/glossario">Glossário</a>
+      <a href="/comece-aqui">Comece Aqui</a>
+    </div>
+    <div class="footer-links">
+      <h4>Portal</h4>
+      <a href="/">Início</a>
+      <a href="/about">Sobre</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Frota Para Todos · Julio César · Patrocinado por <a href="https://contelerastreador.com.br" target="_blank">Contele Fleet</a></p>
+  </div>
+</footer>
+
+<script>
+  async function subscribe(e) {
+    e.preventDefault();
+    const email = document.getElementById('cta-email').value;
+    const msg = document.getElementById('cta-msg');
+    try {
+      const r = await fetch('/api/newsletter/subscribe', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await r.json();
+      msg.style.display = 'block';
+      if (r.ok) { msg.style.color = '#22C55E'; msg.textContent = '✓ Verifique seu email para confirmar a inscrição.'; document.getElementById('cta-email').value = ''; }
+      else { msg.style.color = '#ef4444'; msg.textContent = data.error === 'Email já cadastrado' ? 'Você já está inscrito!' : (data.error || 'Erro ao inscrever.'); }
+    } catch(e) { msg.style.display = 'block'; msg.style.color = '#ef4444'; msg.textContent = 'Erro ao inscrever. Tente novamente.'; }
+  }
+
+  window.addEventListener('scroll', () => {
+    document.querySelector('.header').classList.toggle('header--scrolled', window.scrollY > 10);
+  }, { passive: true });
+</script>
+</body>
+</html>

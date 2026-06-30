@@ -53,9 +53,22 @@ app.get('/api/sponsors', (req, res) => res.json(sponsors));
 
 // --- API pública — Posts ---
 app.get('/api/posts', async (req, res) => {
-  const { category, limit = 20, offset = 0 } = req.query;
-  const posts = await db.getPublished(Number(limit), Number(offset), category || null);
+  const { category, tag, limit = 20, offset = 0 } = req.query;
+  const posts = await db.getPublished(Number(limit), Number(offset), category || null, tag || null);
   res.json(posts);
+});
+
+app.get('/api/tags', async (req, res) => {
+  try {
+    const rows = await db.getAllTags();
+    const tagSet = new Set();
+    rows.forEach(r => {
+      if (r.tags) r.tags.split(',').map(t => t.trim()).filter(Boolean).forEach(t => tagSet.add(t));
+    });
+    res.json([...tagSet].sort());
+  } catch (e) {
+    res.json([]);
+  }
 });
 
 app.get('/api/posts/popular', async (req, res) => {
@@ -103,6 +116,7 @@ app.get('/api/posts/related/:slug', async (req, res) => {
 app.post('/api/posts/:slug/view', async (req, res) => {
   try {
     await db.incrementView(req.params.slug);
+    await db.addViewEvent(req.params.slug).catch(() => {});
     res.json({ ok: true });
   } catch (e) {
     res.json({ ok: false });
@@ -539,9 +553,74 @@ app.get('/api/admin/analytics/views', requireApiKey, async (req, res) => {
   res.json(stats);
 });
 
+app.get('/api/admin/analytics/views-daily', requireApiKey, async (req, res) => {
+  try {
+    const rows = await db.getViewsDaily();
+    // Preenche dias sem views com 0 nos últimos 30 dias
+    const filled = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const found = rows.find(r => r.date === dateStr);
+      filled.push({ date: dateStr, count: found ? found.count : 0 });
+    }
+    res.json(filled);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.post('/api/admin/newsletter/send', requireApiKey, async (req, res) => {
   const result = await sendWeeklyNewsletter();
   res.json(result);
+});
+
+app.post('/api/admin/send-digest', requireApiKey, async (req, res) => {
+  try {
+    if (!process.env.SMTP_USER) return res.json({ sent: 0, skipped: true, reason: 'SMTP não configurado' });
+    const posts = await db.getTopViewedLastWeek(3);
+    const fallback = posts.length < 3 ? await db.getRecentPublished(3 - posts.length) : [];
+    const topPosts = [...posts, ...fallback].slice(0, 3);
+    const subscribers = await db.getConfirmedSubscribers();
+    if (!topPosts.length || !subscribers.length) return res.json({ sent: 0, reason: 'Sem posts ou inscritos' });
+    const baseUrl = process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br';
+    const postsHtml = topPosts.map(p => {
+      const img = p.image_url || (p.video_id ? `https://img.youtube.com/vi/${p.video_id}/maxresdefault.jpg` : '');
+      return `<tr><td style="padding:16px 0;border-bottom:1px solid #1e1035;">
+        ${img ? `<img src="${img}" width="120" height="80" style="object-fit:cover;border-radius:6px;float:left;margin-right:16px;">` : ''}
+        <a href="${baseUrl}/post/${p.slug}" style="font-size:16px;font-weight:700;color:#8B23E5;text-decoration:none;">${p.title}</a>
+        <p style="margin:8px 0 0;font-size:14px;color:#94A3B8;">${p.excerpt || ''}</p>
+        <div style="clear:both"></div>
+      </td></tr>`;
+    }).join('');
+    const html = `<!DOCTYPE html><html><body style="background:#080010;color:#F7F7F7;font-family:Arial,sans-serif;">
+      <table width="600" align="center" style="padding:32px 24px;">
+        <tr><td style="padding-bottom:24px;border-bottom:2px solid #8B23E5;">
+          <span style="font-size:22px;font-weight:900;">Frota Para <span style="color:#8B23E5;">Todos</span></span>
+          <p style="color:#94A3B8;margin:4px 0 0;font-size:13px;">🔥 Os mais lidos desta semana</p>
+        </td></tr>
+        ${postsHtml}
+        <tr><td style="padding-top:24px;font-size:12px;color:#4a4a6a;text-align:center;">
+          <a href="${baseUrl}" style="color:#8B23E5;">Ver todos os artigos</a> ·
+          <a href="${baseUrl}/unsubscribe" style="color:#4a4a6a;">Descadastrar</a>
+        </td></tr>
+      </table></body></html>`;
+    const transporter = require('nodemailer').createTransport({
+      host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT) || 587,
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+    });
+    let sent = 0;
+    for (const sub of subscribers) {
+      try {
+        await transporter.sendMail({ from: `"Frota Para Todos" <${process.env.SMTP_USER}>`, to: sub.email, subject: '🚛 Frota Para Todos — Os mais lidos desta semana', html });
+        sent++;
+      } catch(e) {}
+    }
+    res.json({ sent, total: subscribers.length });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // --- Helpers de segurança ---
@@ -613,6 +692,9 @@ app.get('/post/:slug', (req, res) => res.sendFile(path.join(__dirname, 'public',
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 app.get('/unsubscribe', (req, res) => res.sendFile(path.join(__dirname, 'public', 'unsubscribe.html')));
 app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'public', 'about.html')));
+app.get('/calculadora-cpk', (req, res) => res.sendFile(path.join(__dirname, 'public', 'calculadora-cpk.html')));
+app.get('/glossario', (req, res) => res.sendFile(path.join(__dirname, 'public', 'glossario.html')));
+app.get('/comece-aqui', (req, res) => res.sendFile(path.join(__dirname, 'public', 'comece-aqui.html')));
 
 app.get('/sitemap.xml', async (req, res) => {
   const base = process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br';

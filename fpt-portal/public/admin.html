@@ -115,6 +115,12 @@
       <!-- Newsletter Tab -->
       <div id="newsletter-tab" style="display:none">
         <div id="newsletter-stats" style="display:flex;gap:16px;margin-bottom:32px;flex-wrap:wrap;"></div>
+        <div style="margin-bottom:32px;">
+          <div class="section-title" style="margin-bottom:12px;">Digest semanal</div>
+          <p style="font-size:13px;color:#94A3B8;margin-bottom:16px;">Envia os 3 artigos mais vistos da semana para todos os inscritos confirmados.</p>
+          <button onclick="sendDigest()" style="background:#8B23E5;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;">🚛 Enviar digest agora</button>
+          <span id="digest-msg" style="margin-left:12px;font-size:13px;"></span>
+        </div>
         <div class="section-title">Inscritos ativos</div>
         <div id="subscribers-list"></div>
       </div>
@@ -123,6 +129,12 @@
       <div id="analytics-tab" style="display:none">
         <h2 style="margin-bottom:24px;">Analytics</h2>
         <div id="analytics-content"><div class="loading">Carregando...</div></div>
+        <div style="margin-top:40px;">
+          <div class="section-title" style="margin-bottom:16px;">Views por dia — últimos 30 dias</div>
+          <div id="views-chart-wrap" style="background:#0f0520;border-radius:12px;padding:24px;border:1px solid rgba(139,35,229,0.2);">
+            <div class="loading">Carregando gráfico...</div>
+          </div>
+        </div>
       </div>
 
       <!-- Comments Tab -->
@@ -171,6 +183,8 @@
     <textarea id="editSummary" rows="3" placeholder="Ponto 1&#10;Ponto 2&#10;Ponto 3" style="min-height:80px;"></textarea>
     <label>Agendar publicação <span style="font-size:11px;color:#94A3B8;">(opcional)</span></label>
     <input type="datetime-local" id="editScheduled" />
+    <label>Tags <span style="font-size:11px;color:#94A3B8;">(separadas por vírgula, ex: cpk,multa,telemetria)</span></label>
+    <input type="text" id="editTags" placeholder="cpk,multa,telemetria" />
     <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:14px;">
       <input type="checkbox" id="editFeatured" style="width:16px;height:16px;">
       Destacar na homepage (Featured)
@@ -425,6 +439,7 @@
     document.getElementById('editContentHtml').value = post.content_html || '';
     document.getElementById('editDifficulty').value = post.difficulty || '';
     document.getElementById('editSummary').value = (post.summary_points || '').split('|').filter(Boolean).join('\n');
+    document.getElementById('editTags').value = post.tags || '';
     document.getElementById('editScheduled').value = post.scheduled_at ? post.scheduled_at.replace(' ', 'T').substring(0, 16) : '';
     document.getElementById('editFeatured').checked = !!post.featured;
     document.getElementById('editModalOverlay').classList.add('open');
@@ -450,11 +465,12 @@
     const featured = document.getElementById('editFeatured').checked;
     const scheduled_at = document.getElementById('editScheduled').value;
     const image_url = document.getElementById('editImageUrl').value.trim();
+    const tags = document.getElementById('editTags').value.trim().split(',').map(t => t.trim()).filter(Boolean).join(',');
     if (!title || !content_html) return alert('Título e conteúdo são obrigatórios');
     const r = await fetch(`/api/admin/posts/${editingPostId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'x-api-key': currentKey },
-      body: JSON.stringify({ title, excerpt, content_html, category, difficulty, summary_points, featured, image_url })
+      body: JSON.stringify({ title, excerpt, content_html, category, difficulty, summary_points, featured, image_url, tags })
     });
     if (!r.ok) return alert('Erro ao salvar');
     if (scheduled_at) {
@@ -493,8 +509,44 @@
         </div>
         <h3 style="margin-bottom:16px;font-size:16px;">Top Posts por Views</h3>
         <div>${topPosts || '<div class="empty-state">Nenhum post com views ainda.</div>'}</div>`;
+
+      // Gráfico de views por dia
+      try {
+        const daily = await fetch('/api/admin/analytics/views-daily', { headers: { 'x-api-key': currentKey } }).then(r => r.json());
+        const chartWrap = document.getElementById('views-chart-wrap');
+        const last14 = daily.slice(-14);
+        const maxVal = Math.max(...last14.map(d => d.count), 1);
+        const bars = last14.map(d => {
+          const h = Math.max(4, Math.round((d.count / maxVal) * 120));
+          const label = d.date.slice(5); // MM-DD
+          return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;cursor:default;" title="${d.date}: ${d.count} views">
+            <span style="font-size:10px;color:#94A3B8;">${d.count || ''}</span>
+            <div style="width:100%;max-width:32px;height:${h}px;background:#8B23E5;border-radius:4px 4px 0 0;transition:opacity 0.2s;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1"></div>
+            <span style="font-size:10px;color:#4a4a6a;writing-mode:vertical-rl;transform:rotate(180deg);">${label}</span>
+          </div>`;
+        }).join('');
+        chartWrap.innerHTML = `<div style="display:flex;align-items:flex-end;gap:4px;height:160px;padding-bottom:32px;">${bars}</div>`;
+      } catch(e) {
+        document.getElementById('views-chart-wrap').innerHTML = '<div style="color:#94A3B8;font-size:13px;">Dados insuficientes para exibir gráfico. As views serão registradas a partir de agora.</div>';
+      }
     } catch(e) {
       el.innerHTML = '<div style="color:#ef4444;">Erro ao carregar analytics.</div>';
+    }
+  }
+
+  async function sendDigest() {
+    const msg = document.getElementById('digest-msg');
+    msg.style.color = '#94A3B8';
+    msg.textContent = '⏳ Enviando...';
+    try {
+      const r = await fetch('/api/admin/send-digest', { method: 'POST', headers: { 'x-api-key': currentKey } });
+      const data = await r.json();
+      if (data.skipped) { msg.style.color = '#94A3B8'; msg.textContent = 'SMTP não configurado.'; return; }
+      msg.style.color = '#22C55E';
+      msg.textContent = `✓ Enviado para ${data.sent} inscrito(s).`;
+    } catch(e) {
+      msg.style.color = '#ef4444';
+      msg.textContent = 'Erro ao enviar.';
     }
   }
 

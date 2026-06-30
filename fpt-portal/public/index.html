@@ -55,6 +55,14 @@
   <a href="/about" onclick="toggleMobileNav()">Sobre</a>
 </div>
 
+<!-- Ticker de últimas notícias -->
+<div class="news-ticker" id="news-ticker" style="display:none">
+  <span class="ticker-label">Últimas</span>
+  <div class="ticker-track-wrap">
+    <div class="ticker-track" id="ticker-track"></div>
+  </div>
+</div>
+
 <!-- Patrocinador Master -->
 <div id="sponsor-bar"></div>
 
@@ -137,6 +145,9 @@
       <h4>Portal</h4>
       <a href="/">Início</a>
       <a href="/about">Sobre</a>
+      <a href="/comece-aqui">Comece Aqui</a>
+      <a href="/glossario">Glossário</a>
+      <a href="/calculadora-cpk">Calculadora CPK</a>
       <a href="/admin">Admin</a>
     </div>
   </div>
@@ -157,6 +168,7 @@
 
   const params = new URLSearchParams(location.search);
   let currentCategory = params.get('category') || '';
+  let currentTag = params.get('tag') || '';
   let currentPage = Math.max(1, parseInt(params.get('page') || '1', 10));
   let totalPages = 1;
   const PAGE_SIZE = 12;
@@ -217,8 +229,10 @@
     const imageEl = img
       ? `<img class="card-image" src="${esc(img)}" alt="${esc(post.title)}" loading="lazy">`
       : `<div class="card-image-placeholder"><div class="card-placeholder-inner"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="12" rx="1"/><path d="M16 8l5 3v2l-5 3V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/><path d="M8 18.5h8"/></svg></div></div>`;
+    const tags = post.tags ? post.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+    const tagsHtml = tags.length ? `<div class="card-tags">${tags.map(t => `<span class="tag-pill${t === currentTag ? ' active' : ''}" onclick="event.stopPropagation();filterByTag('${esc(t)}')">#${esc(t)}</span>`).join('')}</div>` : '';
     return `
-      <article class="card${featuredClass} reveal" onclick="trackAndOpen('${post.slug}')"style="cursor:pointer">
+      <article class="card${featuredClass} reveal" onclick="trackAndOpen('${post.slug}')" style="cursor:pointer">
         <div class="card-image-wrap">
           ${imageEl}
         </div>
@@ -227,6 +241,7 @@
           ${isNew(post.published_at) ? '<span class="badge-novo">Novo</span>' : ''}
           <h2 class="card-title">${esc(post.title)}</h2>
           <p class="card-excerpt">${esc(post.excerpt || '')}</p>
+          ${tagsHtml}
           <div class="card-footer">
             <time class="card-date">${relativeDate(post.published_at)}</time>
             ${post.views > 0 ? `<span class="card-views"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>${post.views}</span>` : ''}
@@ -235,6 +250,19 @@
           </div>
         </div>
       </article>`;
+  }
+
+  function filterByTag(tag) {
+    if (currentTag === tag) {
+      currentTag = '';
+    } else {
+      currentTag = tag;
+      currentCategory = '';
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.category === ''));
+    }
+    currentPage = 1;
+    updateUrl();
+    loadPosts(currentCategory);
   }
 
   function renderSkeleton(count = 6) {
@@ -275,6 +303,7 @@
   function updateUrl() {
     const p = new URLSearchParams();
     if (currentCategory) p.set('category', currentCategory);
+    if (currentTag) p.set('tag', currentTag);
     if (currentPage > 1) p.set('page', currentPage);
     const qs = p.toString();
     history.pushState({}, '', qs ? `/?${qs}` : '/');
@@ -311,7 +340,9 @@
 
     try {
       const offset = (currentPage - 1) * PAGE_SIZE;
-      const url = `/api/posts?limit=${PAGE_SIZE}&offset=${offset}${category ? `&category=${category}` : ''}`;
+      let url = `/api/posts?limit=${PAGE_SIZE}&offset=${offset}`;
+      if (category) url += `&category=${category}`;
+      if (currentTag) url += `&tag=${encodeURIComponent(currentTag)}`;
       const posts = await fetch(url).then(r => r.json());
 
       if (currentPage === 1 && !category) renderHero(posts[0] || null);
@@ -551,6 +582,23 @@
     } catch(e) {}
   }
 
+  async function loadTicker() {
+    try {
+      const posts = await fetch('/api/posts?limit=8').then(r => r.json());
+      if (!posts.length) return;
+      const track = document.getElementById('ticker-track');
+      const items = posts.map(p => `
+        <span class="ticker-item" onclick="trackAndOpen('${p.slug}')">
+          <span class="ticker-cat">${CATEGORY_LABELS[p.category] || p.category}</span>
+          ${esc(p.title)}
+        </span>`).join('');
+      // duplica para loop contínuo
+      track.innerHTML = items + items;
+      document.getElementById('news-ticker').style.display = 'flex';
+    } catch(e) {}
+  }
+
+  loadTicker();
   loadSponsors();
   loadPopular();
   loadFeatured();
@@ -561,6 +609,7 @@
   window.addEventListener('popstate', () => {
     const p = new URLSearchParams(location.search);
     currentCategory = p.get('category') || '';
+    currentTag = p.get('tag') || '';
     currentPage = Math.max(1, parseInt(p.get('page') || '1', 10));
     document.querySelectorAll('.filter-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.category === currentCategory);

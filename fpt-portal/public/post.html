@@ -212,6 +212,21 @@
     </div>
   </div>
 
+  <!-- Reações -->
+  <div id="reactions-section" class="article" style="display:none">
+    <div style="padding:24px 0;border-top:1px solid rgba(139,35,229,0.15);">
+      <p style="font-size:13px;color:#94A3B8;margin-bottom:14px;">Este artigo foi útil para você?</p>
+      <div style="display:flex;gap:12px;">
+        <button id="react-useful" onclick="toggleReaction('useful')" style="display:flex;align-items:center;gap:8px;background:rgba(139,35,229,0.08);border:1px solid rgba(139,35,229,0.2);color:#F7F7F7;padding:10px 18px;border-radius:24px;cursor:pointer;font-size:14px;transition:all 0.2s;">
+          👍 <span>Útil</span> <strong id="count-useful" style="color:#8B23E5;">0</strong>
+        </button>
+        <button id="react-fire" onclick="toggleReaction('fire')" style="display:flex;align-items:center;gap:8px;background:rgba(139,35,229,0.08);border:1px solid rgba(139,35,229,0.2);color:#F7F7F7;padding:10px 18px;border-radius:24px;cursor:pointer;font-size:14px;transition:all 0.2s;">
+          🔥 <span>Imperdível</span> <strong id="count-fire" style="color:#8B23E5;">0</strong>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="related-section" class="article" style="display:none">
     <div class="related-wrap">
       <h3 class="related-title">Continue lendo</h3>
@@ -524,6 +539,8 @@
 
       await loadComments(slug);
       await loadRelated(slug);
+      initReactions(slug);
+      document.getElementById('reactions-section').style.display = 'block';
     } catch (e) {
       article.innerHTML = `
         <a href="/" class="back-link">← Voltar para o portal</a>
@@ -638,6 +655,80 @@
       }, 2000);
     });
   }
+
+  // --- Reações ---
+  function initReactions(slug) {
+    const key = `reactions_${slug}`;
+    const stored = JSON.parse(localStorage.getItem(key) || '{"useful":0,"fire":0,"mine":null}');
+    document.getElementById('count-useful').textContent = stored.useful;
+    document.getElementById('count-fire').textContent = stored.fire;
+    if (stored.mine) highlightReaction(stored.mine);
+    window._reactionSlug = slug;
+    window._reactionData = stored;
+  }
+
+  function toggleReaction(type) {
+    const slug = window._reactionSlug;
+    const key = `reactions_${slug}`;
+    const data = window._reactionData;
+    if (data.mine === type) {
+      data[type] = Math.max(0, data[type] - 1);
+      data.mine = null;
+    } else {
+      if (data.mine) data[data.mine] = Math.max(0, data[data.mine] - 1);
+      data[type]++;
+      data.mine = type;
+    }
+    localStorage.setItem(key, JSON.stringify(data));
+    document.getElementById('count-useful').textContent = data.useful;
+    document.getElementById('count-fire').textContent = data.fire;
+    highlightReaction(data.mine);
+    window._reactionData = data;
+  }
+
+  function highlightReaction(type) {
+    ['useful', 'fire'].forEach(t => {
+      const btn = document.getElementById(`react-${t}`);
+      if (t === type) {
+        btn.style.background = 'rgba(139,35,229,0.3)';
+        btn.style.borderColor = '#8B23E5';
+      } else {
+        btn.style.background = 'rgba(139,35,229,0.08)';
+        btn.style.borderColor = 'rgba(139,35,229,0.2)';
+      }
+    });
+  }
+
+  // --- Reader Mode ---
+  (function() {
+    const btn = document.createElement('button');
+    btn.id = 'reader-toggle';
+    btn.title = 'Modo leitura';
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>';
+    btn.style.cssText = 'position:fixed;bottom:80px;right:20px;z-index:200;background:#0f0520;border:1px solid rgba(139,35,229,0.3);color:#94A3B8;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;';
+    btn.onmouseover = () => btn.style.borderColor = '#8B23E5';
+    btn.onmouseout = () => { if (!document.body.classList.contains('reader-mode')) btn.style.borderColor = 'rgba(139,35,229,0.3)'; };
+
+    const style = document.createElement('style');
+    style.textContent = `
+      body.reader-mode .header, body.reader-mode .footer,
+      body.reader-mode .progress-bar, body.reader-mode .toc-wrap,
+      body.reader-mode .breadcrumb, body.reader-mode #back-to-top { display: none !important; }
+      body.reader-mode main { max-width: 680px; margin: 40px auto; padding: 0 24px; }
+      body.reader-mode .article-content { font-size: 18px; line-height: 1.9; }
+      body.reader-mode #reader-toggle { background: #8B23E5; border-color: #8B23E5; color: #fff; }
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(btn);
+
+    const saved = localStorage.getItem('reader-mode') === '1';
+    if (saved) document.body.classList.add('reader-mode');
+
+    btn.onclick = () => {
+      document.body.classList.toggle('reader-mode');
+      localStorage.setItem('reader-mode', document.body.classList.contains('reader-mode') ? '1' : '0');
+    };
+  })();
 
   loadPost();
 </script>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glossário de Gestão de Frotas — Frota Para Todos</title>
+  <meta name="description" content="Dicionário completo de termos técnicos de gestão de frotas, rastreamento e logística veicular.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .glossario-wrap { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+    .glossario-title { font-family: 'Playfair Display', Georgia, serif; font-size: 36px; font-weight: 900; margin-bottom: 8px; }
+    .glossario-sub { color: #94A3B8; font-size: 16px; margin-bottom: 32px; }
+    .search-glossario { width: 100%; background: #0f0520; border: 1px solid rgba(139,35,229,0.25); border-radius: 10px; color: #F7F7F7; font-size: 16px; padding: 14px 18px; outline: none; margin-bottom: 24px; transition: border-color 0.2s; }
+    .search-glossario:focus { border-color: #8B23E5; }
+    .letters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 32px; }
+    .letter-btn { background: rgba(139,35,229,0.08); border: 1px solid rgba(139,35,229,0.2); color: #94A3B8; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .letter-btn:hover, .letter-btn.active { background: #8B23E5; border-color: #8B23E5; color: #fff; }
+    .letter-section { margin-bottom: 40px; }
+    .letter-heading { font-family: 'Playfair Display', Georgia, serif; font-size: 28px; font-weight: 900; color: #8B23E5; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(139,35,229,0.2); }
+    .termo { padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .termo:last-child { border-bottom: none; }
+    .termo-nome { font-size: 16px; font-weight: 700; color: #F7F7F7; margin-bottom: 6px; }
+    .termo-sigla { color: #8B23E5; font-size: 13px; margin-left: 8px; }
+    .termo-def { font-size: 14px; color: #94A3B8; line-height: 1.7; }
+    .empty-gloss { color: #94A3B8; font-size: 14px; padding: 32px 0; text-align: center; }
+  </style>
+</head>
+<body>
+<header class="header">
+  <a href="/" class="header-logo">Frota Para <span>Todos</span></a>
+  <nav class="header-nav">
+    <a href="/">Início</a>
+    <a href="/?category=analises">Análises</a>
+    <a href="/calculadora-cpk">Calculadora CPK</a>
+    <a href="/comece-aqui">Comece Aqui</a>
+  </nav>
+</header>
+
+<main>
+  <div class="glossario-wrap">
+    <div style="margin-bottom:8px;"><a href="/" style="color:#94A3B8;font-size:13px;">← Portal</a></div>
+    <h1 class="glossario-title">Glossário de Frotas</h1>
+    <p class="glossario-sub">Termos técnicos de gestão de frotas, rastreamento e logística veicular — explicados de forma simples.</p>
+
+    <input type="search" class="search-glossario" id="search-gloss" placeholder="Buscar termo..." oninput="filtrar()">
+
+    <div class="letters" id="letters-nav"></div>
+
+    <div id="glossario-content"></div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="footer-logo">Frota Para <span>Todos</span></span>
+      <p>Conteúdo prático e independente para gestores de frota do Brasil.</p>
+    </div>
+    <div class="footer-links">
+      <h4>Ferramentas</h4>
+      <a href="/calculadora-cpk">Calculadora CPK</a>
+      <a href="/glossario">Glossário</a>
+      <a href="/comece-aqui">Comece Aqui</a>
+    </div>
+    <div class="footer-links">
+      <h4>Portal</h4>
+      <a href="/">Início</a>
+      <a href="/about">Sobre</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Frota Para Todos · Julio César · Patrocinado por <a href="https://contelerastreador.com.br" target="_blank">Contele Fleet</a></p>
+  </div>
+</footer>
+
+<script>
+const TERMOS = [
+  { nome: 'Agregado', sigla: '', def: 'Motorista autônomo que utiliza veículo próprio a serviço de uma empresa transportadora, sem vínculo empregatício. É responsável pela manutenção e custos do veículo.' },
+  { nome: 'Checklist de Vistoria', sigla: '', def: 'Lista de verificação que o motorista realiza antes de iniciar a jornada, conferindo itens como pneus, luzes, freios, óleo e documentação do veículo. Reduz acidentes e autuações.' },
+  { nome: 'CPK', sigla: 'Custo por Quilômetro', def: 'Indicador que divide todos os custos operacionais de um veículo pela quilometragem percorrida no período. É o principal KPI financeiro de gestão de frotas.' },
+  { nome: 'ELD', sigla: 'Electronic Logging Device', def: 'Dispositivo eletrônico que registra automaticamente horas de serviço do motorista, substituindo o diário de bordo em papel. Aumenta conformidade com a legislação de jornada.' },
+  { nome: 'Fadiga do Motorista', sigla: '', def: 'Estado de cansaço físico e mental que prejudica a capacidade de condução segura. É causa de grande parte dos acidentes graves em frotas de longa distância. Monitorado via tacógrafo e câmeras de fadiga.' },
+  { nome: 'Frota Própria', sigla: '', def: 'Modelo em que a empresa é proprietária dos veículos que utiliza em suas operações. Oferece mais controle, mas exige maior investimento de capital e gestão interna.' },
+  { nome: 'Frota Terceirizada', sigla: '', def: 'Modelo em que a empresa contrata veículos de terceiros para realizar suas operações logísticas. Reduz imobilização de capital, mas pode diminuir o controle sobre a operação.' },
+  { nome: 'GNV', sigla: 'Gás Natural Veicular', def: 'Combustível alternativo ao diesel e gasolina, com menor custo por km e menor emissão de poluentes. Muito usado em frotas urbanas de ônibus e veículos leves.' },
+  { nome: 'Gestão de Frotas', sigla: '', def: 'Conjunto de práticas, tecnologias e processos para administrar veículos de uma empresa, incluindo rastreamento, manutenção, controle de custos e conformidade com a legislação.' },
+  { nome: 'Hodômetro', sigla: '', def: 'Instrumento que mede a distância total percorrida por um veículo. Dado fundamental para cálculo de CPK, intervalo de manutenção e auditoria de jornada.' },
+  { nome: 'Hub Logístico', sigla: '', def: 'Centro de distribuição estrategicamente localizado para consolidar e redistribuir cargas, reduzindo o número de viagens e otimizando rotas.' },
+  { nome: 'Jornada do Motorista', sigla: '', def: 'Tempo de trabalho do motorista regulamentado pela legislação (CLT e Lei 13.103/2015). Inclui limites de horas de direção, intervalos obrigatórios e descanso entre jornadas.' },
+  { nome: 'KPI de Frotas', sigla: 'Key Performance Indicator', def: 'Indicadores-chave de desempenho da operação, como CPK, consumo médio, índice de manutenção corretiva, produtividade por veículo e custo de sinistro.' },
+  { nome: 'Manutenção Corretiva', sigla: '', def: 'Reparo realizado após a falha ou quebra do veículo. Tende a ser mais cara e urgente, causando paradas não planejadas que prejudicam a operação.' },
+  { nome: 'Manutenção Preditiva', sigla: '', def: 'Utiliza dados de telemetria e sensores para prever falhas antes que aconteçam, agendando manutenções no momento ideal — reduz custos e paradas inesperadas.' },
+  { nome: 'Manutenção Preventiva', sigla: '', def: 'Revisões e trocas de componentes realizadas em intervalos pré-definidos (por km ou tempo), independente de falhas. Evita quebras e prolonga a vida útil do veículo.' },
+  { nome: 'RNTRC', sigla: 'Registro Nacional de Transportadores Rodoviários de Cargas', def: 'Cadastro obrigatório da ANTT para transportadores autônomos, empresas e cooperativas que realizam transporte rodoviário de cargas no Brasil.' },
+  { nome: 'Rastreamento Veicular', sigla: '', def: 'Tecnologia que monitora a posição dos veículos em tempo real via GPS, permitindo controle de rotas, segurança antifurto e comprovação de entregas.' },
+  { nome: 'Score do Motorista', sigla: '', def: 'Pontuação que avalia o comportamento de condução do motorista com base em eventos como frenagem brusca, excesso de velocidade e aceleração agressiva. Usado para treinamento e bonificação.' },
+  { nome: 'Sinistro', sigla: '', def: 'Ocorrência que gera prejuízo financeiro, como acidente, furto ou avaria. O custo de sinistro por veículo é um dos KPIs mais importantes de segurança de frotas.' },
+  { nome: 'Tacógrafo', sigla: '', def: 'Equipamento obrigatório em veículos pesados (acima de 4,5t) que registra automaticamente velocidade, tempo de direção e paradas. Fundamental para conformidade legal com a jornada do motorista.' },
+  { nome: 'TCO', sigla: 'Total Cost of Ownership', def: 'Custo total de propriedade de um veículo, incluindo aquisição, manutenção, combustível, seguros, depreciação e valor residual. Ferramenta essencial para decisões de renovação de frota.' },
+  { nome: 'Telemetria', sigla: '', def: 'Tecnologia que coleta dados do veículo em movimento (velocidade, RPM, temperatura, frenagens) e os transmite em tempo real para análise. Base do monitoramento moderno de frotas.' },
+  { nome: 'Torre de Controle', sigla: '', def: 'Centro de monitoramento operacional que acompanha em tempo real todos os veículos da frota, respondendo a alertas, roteirizando e garantindo eficiência da operação.' },
+  { nome: 'Veículo Leve', sigla: '', def: 'Categoria de veículos com PBT (Peso Bruto Total) até 3,5 toneladas, como utilitários e vans. Possuem benchmark de CPK diferente de veículos pesados.' },
+  { nome: 'VDNT', sigla: 'Velocidade Desenvolvida Não Tolerada', def: 'Evento registrado pelo tacógrafo quando o veículo supera o limite de velocidade configurado. Gera infração e aumenta o risco de acidentes.' },
+];
+
+let filtroLetra = '';
+
+function renderGlossario(termos) {
+  const grupos = {};
+  termos.forEach(t => {
+    const l = t.nome[0].toUpperCase();
+    if (!grupos[l]) grupos[l] = [];
+    grupos[l].push(t);
+  });
+
+  const letras = Object.keys(grupos).sort();
+  const content = document.getElementById('glossario-content');
+
+  if (!termos.length) {
+    content.innerHTML = '<div class="empty-gloss">Nenhum termo encontrado.</div>';
+    return;
+  }
+
+  content.innerHTML = letras.map(l => `
+    <div class="letter-section" id="sec-${l}">
+      <div class="letter-heading">${l}</div>
+      ${grupos[l].map(t => `
+        <div class="termo">
+          <div class="termo-nome">${t.nome}${t.sigla ? `<span class="termo-sigla">(${t.sigla})</span>` : ''}</div>
+          <div class="termo-def">${t.def}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function buildLetters() {
+  const letras = [...new Set(TERMOS.map(t => t.nome[0].toUpperCase()))].sort();
+  document.getElementById('letters-nav').innerHTML = letras.map(l =>
+    `<button class="letter-btn" onclick="scrollToLetra('${l}')">${l}</button>`
+  ).join('');
+}
+
+function scrollToLetra(l) {
+  filtroLetra = l;
+  document.getElementById('search-gloss').value = '';
+  const filtered = TERMOS.filter(t => t.nome[0].toUpperCase() === l);
+  renderGlossario(filtered);
+  document.querySelectorAll('.letter-btn').forEach(b => b.classList.toggle('active', b.textContent === l));
+  window.scrollTo({ top: document.getElementById('glossario-content').offsetTop - 80, behavior: 'smooth' });
+}
+
+function filtrar() {
+  const q = document.getElementById('search-gloss').value.toLowerCase().trim();
+  filtroLetra = '';
+  document.querySelectorAll('.letter-btn').forEach(b => b.classList.remove('active'));
+  if (!q) { renderGlossario(TERMOS); return; }
+  renderGlossario(TERMOS.filter(t => t.nome.toLowerCase().includes(q) || t.def.toLowerCase().includes(q) || t.sigla.toLowerCase().includes(q)));
+}
+
+buildLetters();
+renderGlossario(TERMOS);
+
+window.addEventListener('scroll', () => {
+  document.querySelector('.header').classList.toggle('header--scrolled', window.scrollY > 10);
+}, { passive: true });
+</script>
+</body>
+</html>
