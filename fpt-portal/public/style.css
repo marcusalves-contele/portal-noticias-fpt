@@ -1370,6 +1370,18 @@ a:hover { color: #b56fff; }
   .about-title { font-size: 28px; }
   .about-links { flex-direction: column; }
   .search-box input[type="search"] { width: 150px; }
+  .news-ticker { font-size: 12px; }
+  .ticker-label { padding: 4px 8px; font-size: 10px; }
+  .filters { gap: 6px; }
+  .filter-btn { padding: 6px 12px; font-size: 12px; }
+  .popular-item { flex-direction: column; gap: 8px; }
+  .popular-rank { font-size: 28px; }
+  .about-page { padding: 32px 0; }
+  .pagination { gap: 8px; }
+  .page-btn { padding: 6px 8px; font-size: 13px; }
+  .search-box { max-width: calc(100vw - 80px); }
+  .share-bar { gap: 8px; }
+  .share-btn { padding: 7px 12px; font-size: 12px; }
 }
 
 @media (min-width: 641px) and (max-width: 1024px) {
