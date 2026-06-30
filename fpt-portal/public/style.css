@@ -637,6 +637,80 @@ a:hover { color: #b56fff; }
 }
 .footer-bottom a { color: #6C12B9; }
 
+/* News Ticker */
+.news-ticker {
+  background: rgba(139,35,229,0.06);
+  border-bottom: 1px solid rgba(139,35,229,0.15);
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 36px;
+}
+
+.ticker-label {
+  flex-shrink: 0;
+  background: var(--fpt-purple);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 0 14px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+}
+
+.ticker-track-wrap {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.ticker-track {
+  display: flex;
+  gap: 0;
+  animation: ticker-scroll 35s linear infinite;
+  white-space: nowrap;
+  width: max-content;
+}
+
+.ticker-track:hover { animation-play-state: paused; }
+
+.ticker-item {
+  font-size: 12px;
+  color: var(--fpt-text-muted);
+  padding: 0 28px 0 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+
+.ticker-item:hover { color: var(--fpt-text-light); }
+
+.ticker-item::before {
+  content: '•';
+  color: var(--fpt-purple);
+  font-size: 14px;
+}
+
+.ticker-cat {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--fpt-purple);
+}
+
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 /* Sponsor Bar */
 .sponsor-bar {
   background: linear-gradient(90deg, rgba(139,35,229,0.08), rgba(139,35,229,0.04));
@@ -1319,6 +1393,33 @@ a:hover { color: #b56fff; }
   letter-spacing: 0.5px;
   margin-left: 0;
   vertical-align: middle;
+}
+
+/* Tag pills */
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.tag-pill {
+  font-size: 11px;
+  color: var(--fpt-purple);
+  background: rgba(139,35,229,0.1);
+  border: 1px solid rgba(139,35,229,0.25);
+  border-radius: 20px;
+  padding: 2px 9px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  font-weight: 500;
+}
+
+.tag-pill:hover,
+.tag-pill.active {
+  background: var(--fpt-purple);
+  color: #fff;
+  border-color: var(--fpt-purple);
 }
 
 /* Comment count no card */
