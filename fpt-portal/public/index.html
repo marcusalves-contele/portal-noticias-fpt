@@ -612,6 +612,15 @@
 
   updatePageTitle(currentCategory);
 
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const searchBox = document.getElementById('search-box');
+      const mobileNav = document.getElementById('mobile-nav');
+      if (searchBox && searchBox.style.display !== 'none') closeSearch();
+      else if (mobileNav && mobileNav.classList.contains('open')) toggleMobileNav();
+    }
+  });
+
   window.addEventListener('popstate', () => {
     const p = new URLSearchParams(location.search);
     currentCategory = p.get('category') || '';
