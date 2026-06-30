@@ -45,20 +45,28 @@ function requireApiKey(req, res, next) {
   next();
 }
 
+// Cache-Control para endpoints públicos (10 minutos)
+function cachePublic(seconds = 600) {
+  return (req, res, next) => {
+    res.setHeader('Cache-Control', `public, max-age=${seconds}, stale-while-revalidate=60`);
+    next();
+  };
+}
+
 // --- Health check ---
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 // --- Patrocinadores ---
-app.get('/api/sponsors', (req, res) => res.json(sponsors));
+app.get('/api/sponsors', cachePublic(3600), (req, res) => res.json(sponsors));
 
 // --- API pública — Posts ---
-app.get('/api/posts', async (req, res) => {
+app.get('/api/posts', cachePublic(120), async (req, res) => {
   const { category, tag, limit = 20, offset = 0 } = req.query;
   const posts = await db.getPublished(Number(limit), Number(offset), category || null, tag || null);
   res.json(posts);
 });
 
-app.get('/api/tags', async (req, res) => {
+app.get('/api/tags', cachePublic(600), async (req, res) => {
   try {
     const rows = await db.getAllTags();
     const tagSet = new Set();
@@ -71,7 +79,7 @@ app.get('/api/tags', async (req, res) => {
   }
 });
 
-app.get('/api/posts/counts', async (req, res) => {
+app.get('/api/posts/counts', cachePublic(300), async (req, res) => {
   try {
     const rows = await db.countByCategory();
     const map = {};
@@ -82,13 +90,13 @@ app.get('/api/posts/counts', async (req, res) => {
   }
 });
 
-app.get('/api/posts/popular', async (req, res) => {
+app.get('/api/posts/popular', cachePublic(300), async (req, res) => {
   const { limit = 5 } = req.query;
   const posts = await db.getPopular(Math.min(Number(limit) || 5, 20));
   res.json(posts);
 });
 
-app.get('/api/posts/featured', async (req, res) => {
+app.get('/api/posts/featured', cachePublic(300), async (req, res) => {
   const post = await db.getFeatured();
   res.json(post || null);
 });
