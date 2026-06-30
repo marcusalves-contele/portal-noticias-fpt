@@ -255,4 +255,7 @@ module.exports = {
 
   getViewsStats: () =>
     all("SELECT substr(published_at, 1, 10) as date, SUM(views) as total_views, COUNT(*) as post_count FROM posts WHERE status = 'published' GROUP BY substr(published_at, 1, 10) ORDER BY date DESC LIMIT 30", []),
+
+  countByCategory: () =>
+    all("SELECT category, COUNT(*) as count FROM posts WHERE status = 'published' GROUP BY category"),
 };

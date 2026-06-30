@@ -604,11 +604,24 @@
     } catch(e) {}
   }
 
+  async function loadCategoryCounts() {
+    try {
+      const counts = await fetch('/api/posts/counts').then(r => r.json());
+      document.querySelectorAll('.filter-btn[data-category]').forEach(btn => {
+        const cat = btn.dataset.category;
+        if (cat && counts[cat]) {
+          btn.textContent = btn.textContent.split(' ·')[0] + ` · ${counts[cat]}`;
+        }
+      });
+    } catch(e) {}
+  }
+
   loadTicker();
   loadSponsors();
   loadPopular();
   loadFeatured();
   loadPosts(currentCategory);
+  loadCategoryCounts();
 
   updatePageTitle(currentCategory);
 

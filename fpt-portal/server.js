@@ -71,6 +71,17 @@ app.get('/api/tags', async (req, res) => {
   }
 });
 
+app.get('/api/posts/counts', async (req, res) => {
+  try {
+    const rows = await db.countByCategory();
+    const map = {};
+    rows.forEach(r => { map[r.category] = r.count; });
+    res.json(map);
+  } catch (e) {
+    res.json({});
+  }
+});
+
 app.get('/api/posts/popular', async (req, res) => {
   const { limit = 5 } = req.query;
   const posts = await db.getPopular(Math.min(Number(limit) || 5, 20));
