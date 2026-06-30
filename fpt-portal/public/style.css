@@ -1604,3 +1604,21 @@ a:hover { color: #b56fff; }
   .featured-hero-title { font-size: 18px; }
   .featured-hero-content { padding: 20px 16px; }
 }
+
+/* Print */
+@media print {
+  .header, .news-ticker, .sponsor-bar, .filters-wrap,
+  .newsletter-section, .popular-section, .footer,
+  .share-bar, .comments-section, .related-section,
+  .article-progress, .back-to-top, .breadcrumb,
+  #cookie-banner { display: none !important; }
+
+  body { background: #fff; color: #111; font-size: 12pt; }
+  .article { max-width: 100%; padding: 0; }
+  .article-title { font-size: 22pt; color: #111; }
+  .article-content { color: #111; }
+  .article-content a { color: #5500cc; text-decoration: underline; }
+  .article-hero { max-height: 300px; }
+  .article-hero-content { background: none; color: #111; }
+  .article-hero-content h1 { color: #111; }
+}
