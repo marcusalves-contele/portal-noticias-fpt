@@ -140,7 +140,10 @@
       <!-- Comments Tab -->
       <div id="comments-tab" style="display:none">
         <div id="pending-comments-section">
-          <div class="section-title">Comentários aguardando moderação</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="section-title" style="margin-bottom:0">Comentários aguardando moderação</div>
+            <button id="approve-all-btn" onclick="approveAllComments()" style="display:none;background:#22C55E;color:#fff;border:none;padding:7px 16px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;">✓ Aprovar todos</button>
+          </div>
           <div id="pending-comments-list"></div>
         </div>
 
@@ -258,8 +261,12 @@
   }
 
   function renderComments(comments, key) {
+    window.allComments = comments;
     const pending = comments.filter(c => c.status === 'pending');
     const approved = comments.filter(c => c.status === 'approved');
+
+    const approveAllBtn = document.getElementById('approve-all-btn');
+    if (approveAllBtn) approveAllBtn.style.display = pending.length > 1 ? 'inline-block' : 'none';
 
     const badge = document.getElementById('pending-comments-badge');
     if (pending.length) {
@@ -572,6 +579,18 @@
     }
     btn.textContent = orig;
     btn.disabled = false;
+  }
+
+  async function approveAllComments() {
+    const btn = document.getElementById('approve-all-btn');
+    if (!confirm('Aprovar todos os comentários pendentes?')) return;
+    btn.disabled = true;
+    btn.textContent = '⏳ Aprovando...';
+    const pending = (window.allComments || []).filter(c => c.status === 'pending');
+    await Promise.all(pending.map(c =>
+      fetch(`/api/admin/comments/${c.id}/approve`, { method: 'PUT', headers: { 'x-api-key': currentKey } })
+    ));
+    loadAdmin();
   }
 
   // --- Filtro de posts ---
