@@ -729,6 +729,42 @@ app.get('/robots.txt', (req, res) => {
   res.send(`User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\nSitemap: ${process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br'}/sitemap.xml`);
 });
 
+app.get('/feed.xml', async (req, res) => {
+  const base = process.env.PORTAL_URL || 'https://noticias.frotaparatodos.com.br';
+  try {
+    const posts = await db.getPublished(20, 0, null);
+    const items = posts.map(p => {
+      const pubDate = p.published_at ? new Date(p.published_at).toUTCString() : '';
+      const img = p.image_url || (p.video_id ? `https://img.youtube.com/vi/${p.video_id}/hqdefault.jpg` : '');
+      const enclosure = img ? `<enclosure url="${img}" type="image/jpeg"/>` : '';
+      return `
+    <item>
+      <title><![CDATA[${p.title}]]></title>
+      <link>${base}/post/${p.slug}</link>
+      <guid isPermaLink="true">${base}/post/${p.slug}</guid>
+      <description><![CDATA[${p.excerpt || ''}]]></description>
+      <pubDate>${pubDate}</pubDate>
+      <category>${p.category}</category>
+      ${enclosure}
+    </item>`;
+    }).join('');
+    res.setHeader('Content-Type', 'application/rss+xml; charset=utf-8');
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Frota Para Todos</title>
+    <link>${base}</link>
+    <description>Referência editorial em gestão de frotas do Brasil.</description>
+    <language>pt-BR</language>
+    <atom:link href="${base}/feed.xml" rel="self" type="application/rss+xml"/>
+    ${items}
+  </channel>
+</rss>`);
+  } catch (e) {
+    res.status(500).send('Erro ao gerar feed');
+  }
+});
+
 // 404 catch-all (deve ser o último middleware)
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
